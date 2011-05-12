@@ -1,0 +1,1112 @@
+from __future__ import print_function
+
+# Python 2 to 3 workarounds
+import sys
+if sys.version_info[0]==2:
+    strobj=basestring
+    _xrange=xrange
+elif sys.version_info[0]==3:
+    strobj=str
+    _xrange=range
+
+import math
+import csv
+import sqlite3
+import warnings
+from math import isnan,isinf
+from pprint import pprint as pp
+from copy import copy,deepcopy
+
+from collections import OrderedDict,Counter
+
+from texttable import Texttable as TextTable
+from dictset import DictSet
+import pystaggrelite3
+
+PRINTQUERIES=False
+
+# private functions begin with an underscore. Feel free to use them
+# but they may not remain backwards compatible or remain at all.
+
+def _transpose(lists, defval=''):
+    """
+    http://code.activestate.com/recipes/
+    410687-transposing-a-list-of-lists-with-different-lengths/
+
+    >>> a=[[1,2,3],[4,5,6,7]]
+    [[1, 4], [2, 5], [3, 6], ['', 7]]
+
+    """
+    if not lists: return []
+    return map(lambda *row: [elem or defval for elem in row], *lists)
+
+def _isfloat(string):
+    try: num=float(string)
+    except: return False
+    return True
+
+def _flatten(x):
+    """_flatten(sequence) -> list
+
+    Returns a single, flat list which contains all elements retrieved
+    from the sequence and all recursively contained sub-sequences
+    (iterables).
+
+    Examples:
+    >>> [1, 2, [3,4], (5,6)]
+    [1, 2, [3, 4], (5, 6)]
+    >>> _flatten([[[1,2,3], (42,None)], [4,5], [6], 7, MyVector(8,9,10)])
+    [1, 2, 3, 42, None, 4, 5, 6, 7, 8, 9, 10]"""
+
+    result = []
+    for el in x:
+        #if isinstance(el, (list, tuple)):
+        if hasattr(el, "__iter__") and not isinstance(el, basestring):
+            result.extend(_flatten(el))
+        else:
+            result.append(el)
+    return result
+
+def _xuniqueCombinations(items, n):
+    if n==0: yield []
+    else:
+        for i in xrange(len(items)):
+            for cc in _xuniqueCombinations(items[i+1:],n-1):
+                yield [items[i]]+cc
+                
+# the dataframe class
+class PyvtTbl(dict):                            
+    def __init__(self, d={}, dbfname=':memory:'):
+        for (k,v) in d.items():
+            self[k]=v
+    
+        self.dbfname=dbfname
+        self.conn=sqlite3.connect(dbfname)
+        self.cur=self.conn.cursor()
+        self.agglist='avg count count group_concat '  \
+                     'group_concat max min sum total' \
+                     .split()
+        
+        for n,a,f in pystaggrelite3.getaggregators():
+            self.conn.create_aggregate(n,a,f)
+            self.agglist.append(n)
+                
+        self.names=[]
+        self.types=[]
+        self.conditions=DictSet()
+        self.N=0 # num cols
+        self.M=0 # num rows
+
+        if d != {}:
+            self._refresh_state_vars()
+        
+    def readTbl(self, fname, skip=0, delimiter=',',labels=True):
+        """method to load table from plain text file"""
+        self.fname=fname
+        
+        # open and read dummy coded data results file to data dictionary
+        fid=open(fname,'r')
+        csv_reader=csv.reader(fid,delimiter=delimiter)
+        self.clear()
+        colnames=[]
+        
+        for i,row in enumerate(csv_reader):
+            # skip requested rows
+            if i<skip:
+                pass
+            
+            # read column labels from ith+1 line
+            elif i==skip and labels:
+                colnameCounter=Counter()
+                for k, colname in enumerate(row):
+                    colnameCounter[colname]+=1
+                    if colnameCounter[colname]>1:
+                        warnings.warn("Duplicate label '%s' found"%colname,
+                                      RuntimeWarning)
+                        
+                        colname='%s_%i'%(colname,colnameCounter[colname])
+                    
+                    
+                    colnames.append(colname)
+                    self[colname]=[]
+
+            # if labels is false we need to make labels
+            elif i==skip and not labels:
+                colnames=['COL_%s'%(k+1) for k in range(len(row))]
+                for j,colname in enumerate(colnames):
+                    if _isfloat(row[j]):
+                        self[colname]=[float(row[j])]
+                    else:
+                        self[colname]=[row[i]]
+
+            # for remaining lines where i>skip...
+            else:
+                if len(row)!=len(colnames):
+                    warnings.warn('Skipping line %i of file. '
+                                  'Expected %i cells found %i'\
+                                  %(i+1,len(colnames),len(row)),
+                                  RuntimeWarning)
+                else:                    
+                    for j,colname in enumerate(colnames):
+                        if _isfloat(row[j]):
+                            self[colname].append(float(row[j]))
+                        else:
+                            self[colname].append(row[j])
+            
+        # close data file
+        fid.close()
+        
+        self._refresh_state_vars()
+
+    def __setitem__(self, key, item):
+        try:
+            item=list(item)
+        except:
+            raise TypeError("'%s' object is not iterable"\
+                            %type(item).__name__)
+
+        super(PyvtTbl, self).__setitem__(key, item)
+        self._refresh_state_vars()
+        self._check_tbl_lengths()
+
+    def _check_tbl_lengths(self):
+        # this is often called in conjunction with
+        # _refresh_state_vars, but not always. We want to keep them
+        # separate so that the table data can be manipulated without
+        # throughing exceptions. We only want to throw exceptions
+        # when the user is trying to do operations that require the
+        # table lengths to be identical. The rest of the time we will
+        # assume that they know what they are doing and not complain.
+        counts=[len(v) for v in self.values()]
+        if not all([c-counts[0]+1 == 1 for c in counts]):
+            raise Exception('columns have unequal lengths')
+
+        if self.N>0:
+            self.M=len(self.values()[0])
+
+    def _refresh_state_vars(self):
+        self.conditions=DictSet(self)
+        self.names=[]
+        self.types=[]
+        
+        for n in self.keys():
+            self.names.append(n)
+
+            if self[n]==[]:
+                self.types.append('')
+            else:
+                if _isfloat(self[n][0]):                      
+                    self.types.append('real')
+                else:
+                    self.types.append('text')
+
+        self.N=len(self.names)
+        if self.N>0:
+            self.M=len(self.values()[0])
+
+        self.typesdict=dict(((n,t) for n,t in zip(self.names,self.types)))
+        
+    def _refresh_sqlite_tbl(self, names, exclude):
+        # check names and exclude before calling this funciton!
+        # open and read dummy coded data results file to data dictionary
+
+        # ignore keys/sets in exclude that aren't in self
+        X = self.conditions & exclude
+        
+        self.conn.commit()
+        self._execute('drop table if exists TBL')
+
+        self.conn.commit()
+        query='(%s)'%', '.join(['_%s_ %s'%(n,self.typesdict[n]) for \
+                n in self.names])
+        
+        self._execute('create temp table TBL\n  %s'%query)
+
+        if exclude=={}: # for performance
+                        # better to check it once if it is empty
+            for i in _xrange(self.M):
+                self._execute('insert into TBL values %s'% \
+                    str(tuple((str(self[n][i]) for n in  self.names))))
+        else:
+            for i in _xrange(self.M):
+                if X - [(k,[self[k][i]]) for k in self] == X:
+                    self._execute('insert into TBL values %s'% \
+                        str(tuple((str(self[n][i]) for n in  self.names))))                
+        # Save (commit) the changes
+        self.conn.commit()
+        
+    def _execute(self,query):
+        if PRINTQUERIES:
+            print(query)
+            print()
+            
+        self.cur.execute(query)
+
+    def _get_sql_tbl_info(self):
+        self.cur.commit()
+        self._execute('PRAGMA table_info(TBL)')
+        return [c for c in self.cur]
+            
+    def getFieldList(self):
+        return self.names
+
+    def getAggregateList(self):
+        return deepcopy(self.agglist)
+    
+    def _pvt(self, val, rows=[], cols=[], aggregate='avg',
+              exclude={}, flatten=False):
+        """
+        private pivot table method
+
+        returns pivot table, rnames, and cnames but doesn't
+        set self.Z, self.Zrnames, or self.Zcnames
+        """
+        #
+        # pivot programmatic flow
+        # 1. Check to make sure all the columns in the table are
+        #    the same length
+        # 2. Check the arguments to make sure they are valid
+        # 3. Create a sqlite table with only the data in columns
+        #    specified by val, rows, and cols. Also eliminate
+        #    rows that meet the exclude conditions
+        # 4. Build rnames and cnames lists
+        # 5. Build query based on val, rows, and cols
+        # 6. Run query
+        # 7. Read data to from cursor into a list of lists
+        # 8. Clean up
+        # 9. flatten if specified
+        # 8. return data, rnames, and cnames
+
+        # 1.
+        # check to see if data columns have equal lengths
+        self._check_tbl_lengths()
+
+        # 2.
+        # check the supplied arguments
+        if val not in self:
+            raise KeyError(val)
+
+        if isinstance(rows,strobj):
+            raise TypeError('rows should be a list')
+
+        if isinstance(cols,strobj):
+            raise TypeError('cols should be a list')
+
+        for k in rows:
+            if k not in self:
+                raise KeyError(k)
+            
+        for k in cols:
+            if k not in self:
+                raise KeyError(k)
+
+        for k in list(exclude.keys()):
+            if k not in self:
+                raise KeyError(k)
+
+        # check aggregate function
+        aggregate=aggregate.lower()
+
+        if aggregate not in self.agglist:
+            raise ValueError("supplied aggregate '%s' is not valid"%aggregate)
+
+        # check to make sure exclude is mappable
+        # todo
+
+        # warn if exclude is not a subset of self.conditions
+        if not self.conditions >= exclude:
+            warnings.warn("exclude is not a subset of table conditions",
+                          RuntimeWarning)
+            
+        # ignore keys/sets in exclude that aren't in self
+        X = self.conditions & exclude 
+        
+        # 3.
+        # Refresh table
+        self._refresh_sqlite_tbl([val]+rows+cols, X)
+        
+        # 4.
+        # Refresh conditions list so we can build row and col list
+        selected_conditions = self.conditions - X
+                
+        # Build row_list
+        if rows==[]:
+            row_list=[1]
+        else:
+            g=selected_conditions.unique_combinations(rows)
+            row_list=[zip(rows,v) for v in g]
+            
+        rsize=len(row_list)
+        
+        # Build col_list
+        if cols==[]:
+            col_list=[1]
+        else:
+            g=selected_conditions.unique_combinations(cols)
+            col_list=[zip(cols,v) for v in g]
+            
+        csize=len(col_list)
+
+        # 5.
+        # Build pivot query
+        query=['select ']
+
+        if row_list==[1] and col_list==[1]:
+            query.append('%s( _%s_ ) from TBL'%(aggregate,val))
+        else:
+            if row_list==[1]:
+                query.append('_%s_'%val)
+            else:
+                for i,r in enumerate(rows):
+                    if i!=0:
+                        query.append(', ')
+                    query.append('_%s_'%r)
+
+            if col_list==[1]:
+                query.append('\n  , %s( _%s_ )'%(aggregate,val))
+            else:
+                for cols in col_list:
+                    query.append('\n  , %s( case when '%aggregate)
+                    query.append('and '.join(('_%s_="%s"'\
+                                              %(k,v) for k,v in cols)))
+                    query.append(' then _%s_ end )'%val)
+
+            if row_list==[1]:
+                query.append('\nfrom TBL')
+            else:                
+                query.append('\nfrom TBL group by ')
+                
+                for i,r in enumerate(rows):
+                    if i!=0:
+                        query.append(', ')
+                    query.append('_%s_'%r)
+
+        # 6.
+        # Run pivot query
+        self._execute(''.join(query) )
+
+        # 7.
+        # read pivoted data from cursor
+        d=[]
+        if aggregate=='group_concat':
+            for row in self.cur:
+                d.append([])
+                for cell in list(row)[-len(col_list):]:
+                    zs=cell.split(',')
+                    if dict(zip(self.names,self.types))[val]=='real':
+                        d[-1].append([float(s) for s in zs])
+                    else:
+                        d[-1].append(zs)
+        else:
+            for row in self.cur:
+                d.append(list(row)[-len(col_list):])
+
+        # 8.
+        # Clean up
+        self.conn.commit()
+
+        # 9.
+        if flatten:
+            d=_flatten(d)
+
+        # 10.
+        return d,row_list,col_list
+
+
+    def pivot(self, val, rows=[], cols=[], aggregate='avg',
+              exclude={}, flatten=False):
+        
+        # public method, saves table to self variables after pivoting
+        """
+        Returns a pivot table as a 2d numpy array.
+
+        Behavior is modeled after the PivotTables in Excel 2007.
+
+            val = the colname to place as the data in the table
+            rows = list of colnames whos combinations will become rows
+                   in the table if left blank their will be one row
+            cols = list of colnames whos combinations will become cols
+                   in the table if left blank their will be one col
+            aggregate = function applied across data going into each cell
+                      of the table
+                      http://www.sqlite.org/lang_aggfunc.html
+            exclude = dictionary specifying levels to exclude
+                keys = colnames
+                values = lists of the levels in cooresponding colname to
+                         exclude
+        """
+        d,rnames,cnames = self._pvt(val, rows=rows, cols=cols,
+                                    aggregate=aggregate,
+                                    exclude=exclude,
+                                    flatten=flatten)
+        
+        # sets results to self attributes
+        self.Z=d
+        self.Zrnames=rnames
+        self.Zcnames=cnames
+
+        return self.Z,self.Zrnames,self.Zcnames
+        
+    
+    def selectCol(self, val, exclude={}):
+        """
+        Returns the selected value where the conditions in exclude are
+        not true. The order of the values in the returned list is not
+        necessarily preserved.
+        """
+        
+        return self._pvt(val,rows=[],cols=[],exclude=exclude,
+                         aggregate='group_concat',flatten=True)[0]
+
+##    def writeZtbl(self, fname, delimiter=','):
+##        fid=open(fname,'wb')
+##        wtr=csv.writer(fid,delimiter=delimiter)
+##        wtr.writerows(self.Z)
+##        fid.close()
+##
+##    def loadDB(self,fname):
+##        """method to load table from existing database file"""
+##        self.conn.commit()
+##
+##        self.names=[]
+##        self.types=[]
+##        
+##        with sqlite3.connect(fname) as c:
+##            c.cursor().execute('PRAGMA table_info(TBL)')
+##            for tup in c.cursor():
+##                print(tup)
+##                self.names.append(tup[1])
+##                self.types.append(tup[2])
+##
+##        print(self.types)
+##            
+##    def saveDB(self,fname):
+##        """save table to database file"""
+##        # Create a tmp table to manage exclusions
+##        self.conn.commit()
+##        
+##        with sqlite3.connect(fname) as c:
+##            query='(%s)'%', '.join(['_%s_ %s'%(n,t) for \
+##                    n,t in zip(self.names,self.types)])
+##            c.cursor().execute('create table TBL\n  %s'%(query))
+##
+##            query=['insert into TBL select\n ']
+##            query.append(', '.join(('_%s_'%n for n in self.names)))
+##            query.append('from TBL')
+##            c.cursor().execute(' '.join(query))
+##            c.commit()
+##
+##    def writeTbl(self, fname, delimiter=','):
+##        """save table to plain text file"""
+##        pass
+##    
+##    def Export4SPSS(self,p,dvs,between=[],within=[],
+##                    covariates=[],fname='',nested=True):
+##        def tostr(x):
+##            if len(x)==0   : return ''
+##            elif len(x)==1 : return str(x[0])
+##            else           : return str(x)
+##            
+##        # Loop through DVs and append within columns
+##        d=[]
+##        cols=[]
+##        first=True
+##        
+##        # start controls whether nested factors are
+##        # examined
+##        if nested : start = 1
+##        else      : start = len(within)
+##        
+##        for i,dv in enumerate(dvs):
+##            print('collaborating %s'%dv)
+##            for j in xrange(start,len(within)+1):
+##                
+##                for factors in _xuniqueCombinations(within, j):
+##                    print('  pivoting',factors,'...')
+##                    z,r_list,c_list=self.Pivot(dv,rows=[p]+between,
+##                        cols=factors,aggregate='avg',asarray=False)
+##
+##                    # append data to d
+##                    if first:
+##                        d=z
+##                        first=False
+##                    else:
+##                        for k,r in enumerate(z):
+##                            d[k].extend(copy(r))
+##                            
+##                    # store column name
+##                    if c_list==[1]:
+##                        cols.append(dv)
+##                    else:
+##                        for cname in c_list:
+##                            print(cname)
+##                            str_nms=','.join(('%s_%s'%(iv,str(c)) \
+##                                              for (iv,c) in cname))
+##                            cols.append('%s__%s'%(dv,str_nms))
+##
+##            print()
+##
+##        # Add the requested covariates and between
+##        # conditions and participant id
+##        for col in reversed([p]+covariates+between):
+##            print('  concatenating dv "%s"'%col)
+##            z,r_list,c_list=self.Pivot(col,rows=[p],
+##               cols=[],aggregate='arbitrary',asarray=False)
+##
+##                        
+##            for k,r in enumerate(z):
+##                tmp=copy(r)
+##                tmp.extend(d[k])
+##                d[k]=tmp
+##
+##        # If between measures are specified we need to exclude the rows
+##        # without actual data
+##        if between!=[]:
+##            d=d[[i for i,r in enumerate(d[:,-len(cols):]) \
+##                 if all([not v=='' for v in r])]]
+##
+##        # Now we can write the data
+##        if fname=='': fname='4spss_'+self.fname
+##
+##        header=[p]+covariates+between+cols
+##        header=[n.upper() for n in header]
+##        fid=open(fname,'wb')
+##        wtr=csv.writer(fid)
+##        wtr.writerow(header)
+##        wtr.writerows(d)
+##        fid.close()
+
+    def printTable(self):
+        
+        # figure out the width needed by the condition labels so we can
+        # set the width of the table
+        flength=sum([max([len(v) for c in v]) \
+                     for v in [self[f] for f in self.names]])+len(self.names)*2
+        
+        tt=TextTable(max_width=flength)
+        tt.set_cols_dtype(['a']*len(self.names))
+
+        for i in _xrange(self.M):
+            tt.add_row([self[n][i] for n in self.names])
+
+        tt.header(self.names)
+        tt.set_deco(TextTable.HEADER)
+
+        # output the table
+        print(tt.draw())
+        
+    def printPivot(self, val, rows=[], cols=[], aggregate='avg',
+                   exclude={}, flatten=False):
+        """
+        pivots, sets, and prints pivot table
+        """
+        self.pivot(val, rows=rows, cols=cols, aggregate=aggregate,
+                   exclude=exclude, flatten=flatten)
+        
+        # figure out the width needed by the condition labels so we can
+        # set the width of the table
+        flength=sum([max([len(v) for c in v]) \
+                     for v in [self[f] for f in cols]])+len(cols)*2
+
+        # build the header
+        print(rows)
+        header=rows+[',\n'.join(['%s=%s'%(f,c) for (f,c) in L]) \
+                     for L in self.Zcnames]
+
+        # initialize the texttable and add stuff
+        tt=TextTable(max_width=flength+48)
+        tt.set_cols_dtype(['t']*len(rows)+['a']*len(self.Zcnames))
+        tt.set_cols_align(['l']*len(rows)+['r']*len(self.Zcnames))
+
+        for i,L in enumerate(self.Zrnames):
+            tt.add_row([c for (f,c) in L]+self.Z[i])
+
+        tt.header(header)
+        tt.set_deco(TextTable.HEADER)
+
+        # output the table
+        print(tt.draw())
+        
+
+    def descriptives(self,cname,exclude={}):
+        """
+        Returns a dict of descriptive statistics for column cname
+        """
+        V=sorted(self.selectCol(cname,exclude=exclude))
+        N=len(V)
+        
+        D=OrderedDict()
+        D['count']      = N
+        D['mean']       = sum(V)/N
+        D['var']        = sum([(D['mean']-v)**2 for v in V])/(N-1)
+        D['stdev']      = math.sqrt(D['var'])
+        D['sem']        = D['stdev']/math.sqrt(N)
+        D['rms']        = math.sqrt(sum([v**2 for v in V])/N)
+        D['min']        = min(V)
+        D['max']        = max(V)
+        D['range']      = D['max']-D['min']
+        D['median']     = V[int(N/2)]
+        if D['count']%2==0:
+            D['median']+= V[int(N/2)-1]
+            D['median']/= 2.
+        D['95ci_lower'] = D['mean']-1.96*D['sem']
+        D['95ci_upper'] = D['mean']+1.96*D['sem']
+
+        return D
+    
+    def printDescriptives(self,cname):
+        D=self.descriptives(cname)
+
+        print()
+        print('Descriptive Statistics for')
+        print('',cname                    )
+        print('==========================',end='')
+
+        tt=TextTable(48)
+        tt.set_cols_dtype(['t','f'])
+        tt.set_cols_align(['r','r'])
+        for i,(k,v) in enumerate(D.items()):
+            tt.add_row([' %s'%k,v])
+        tt.set_deco(TextTable.HEADER)
+        
+        print()
+        print(tt.draw())
+
+
+    def marginals(self, val, factors, exclude={}):
+
+        dmu=self.pivot(
+            val,rows=factors,
+            exclude=exclude,aggregate='avg',
+            flatten=True)[0]
+
+        dN =self.pivot(
+            val,rows=factors,
+            exclude=exclude,aggregate='count',
+            flatten=True)[0]
+
+        dsem,r_list,c_list=self.pivot(
+            val,rows=factors,
+            exclude=exclude,aggregate='sem',
+            flatten=True)
+
+        f=OrderedDict()
+        for i,r in enumerate(r_list):
+            if i==0:
+                for c in r:
+                    f[c[0]]=[]
+            
+            for j,c in enumerate(r):
+                f[c[0]].append(c[1])
+
+        dlower=[]
+        dupper=[]
+        for mu,sem in zip(dmu,dsem):
+            dlower.append(mu-1.96*sem)
+            dupper.append(mu+1.96*sem)
+
+        return f,dmu,dN,dsem,dlower,dupper            
+        
+    def printMarginals(self, val, factors, exclude={}):
+        x=self.marginalMeans(val,factors=factors,exclude=exclude)
+        [f,dmu,dN,dsem,dlower,dupper]=x
+
+        M=[]
+        for v in f.values():
+            M.append(v)
+            
+        M.append(dmu)
+        M.append(dN)
+        M.append(dsem)
+        M.append(dlower)
+        M.append(dupper)
+        M=_transpose(M)
+
+        # figure out the width needed by the condition labels so we can
+        # set the width of the table
+        flength=sum([max([len(v) for c in v]) for v in f.values()])+len(f)*2
+
+        # build the header
+        header=factors+'Mean;Count;Std.\nError;'\
+                       '95% CI\nlower;95% CI\nupper'.split(';')
+
+        # initialize the texttable and add stuff
+        tt=TextTable(max_width=flength+48)
+        tt.set_cols_dtype(['t']*len(factors)+['f','i','f','f','f'])
+        tt.set_cols_align(['l']*len(factors)+['r','l','r','r','r'])
+        tt.add_rows(M,header=False)
+        tt.header(header)
+        tt.set_deco(TextTable.HEADER)
+
+        # output the table
+        print()
+        print(tt.draw())
+
+##    def Box(self, x, xaxis='', fname='boxplot.png',quality='low'):
+##
+##        if xaxis=='':
+##            v=self.SelectCol(val, exclude={}, asarray=False )
+##            N=len(v)
+##            v=sorted(protect(v))
+##
+##        fig=pylab.figure()
+##        pylab.boxplot(v)
+##        
+##        # save figure
+##        if   quality=='low'    : pylab.savefig(fname)
+##        elif quality=='medium' : pylab.savefig(fname,dpi=200)
+##        elif quality=='high'   : pylab.savefig(fname,dpi=300)
+##        else                   : pylab.savefig(fname)
+##
+##        pylab.close()
+##        
+##    def Hist(self, cname,fname='hist.png',quality='low'):
+##        v=self.SelectCol(cname, exclude={}, asarray=False )
+##        N=len(v)
+##        v=sorted(protect(v))
+##
+##        fig=pylab.figure()
+##        pylab.hist(v)
+##        
+##        # save figure
+##        if   quality=='low'    : pylab.savefig(fname)
+##        elif quality=='medium' : pylab.savefig(fname,dpi=200)
+##        elif quality=='high'   : pylab.savefig(fname,dpi=300)
+##        else                   : pylab.savefig(fname)
+##
+##        pylab.close()
+##
+    def plotMarginals(self, val, xaxis, 
+                      seplines='', sepxplots='', sepyplots='',
+                      xmin='AUTO', xmax='AUTO', ymin='AUTO', ymax='AUTO',
+                      exclude={}, fname='untitled.png',
+                      quality='low', yerr=None):
+        # pylab doesn't like not being closed. To avoid starting
+        # a plot without finishing it, we do some extensive checking
+        # up front
+
+        try    : import pylab
+        except : raise ImportError('pylab is required for plotting')
+
+        try    : import numpy as np
+        except : raise ImportError('numpy is required for plotting')
+
+        self._check_tbl_lengths()
+
+        if val not in self:
+            raise KeyError(val)
+
+        if xaxis not in self:
+            raise KeyError(xaxis)
+        
+        if seplines not in self and seplines!='':
+            raise KeyError(seplines)
+
+        if sepxplots not in self and sepxplots!='':
+            raise KeyError(sepxplots)
+        
+        if sepyplots not in self and sepyplots!='':
+            raise KeyError(sepyplots)
+
+        # check yerr
+        aggregate=None
+        if yerr=='sem'     : aggregate= 'sem'
+        elif yerr=='stdev' : aggregate= 'stdev'
+        elif yerr=='ci'    : aggregate= 'ci'
+
+        # figure out ymin and ymax if 'AUTO' is specified
+        desc=self.descriptives(val)
+        
+        if ymin=='AUTO':
+            if desc['min'] >= 0.:
+                ymin=0.
+            else:
+                ymin=desc['mean'] - 3.*desc['stdev']
+        if ymax=='AUTO':
+            ymax = desc['mean'] + 3.*desc['stdev']
+
+        if any([isnan(ymin),isinf(ymin),isnan(ymax),isinf(ymax)]):
+            raise Exception('calculated plot bounds nonsensical')
+
+        cols=[f for f in [seplines,sepxplots,sepyplots] if f in self]
+        counts=self.pivot(val,rows=[xaxis],cols=cols,
+                         flatten=True,exclude=exclude,aggregate='count')[0]
+
+        for count in counts:
+            if count < 1:
+                raise Exception('cell count too low to calculate mean')
+            if aggregate!=None:
+                if count < 2:
+                    raise Exception('cell count too low to calculate %s'%yerr)
+            
+        # figure out howmany subplots we need to make
+        numrows,rlevels=1,[1]
+        if sepyplots!='':
+            yconds=self.conditions[sepyplots]
+            numrows=len(yconds)
+            rlevels=copy(yconds)
+
+            if sepyplots in exclude:
+                numrows-=len(exclude[sepyplots])
+                rlevels=sorted(
+                          list(
+                            rlevels.difference(
+                              set(
+                                exclude[sepyplots]))))
+                
+        numcols,clevels=1,[1]            
+        if sepxplots!='':
+            xconds=self.conditions[sepxplots]
+            numcols=len(xconds)
+            clevels=copy(xconds)
+            
+            if sepxplots in exclude:
+                numcols-=len(exclude[sepxplots])
+                clevels=sorted(
+                          list(
+                            clevels.difference(
+                              set(
+                                exclude[sepyplots]))))
+
+        # build main title
+        maintitle='%s by %s'%(val,xaxis)
+        if seplines  : maintitle+=' * %s'%seplines
+        if sepxplots : maintitle+=' * %s'%sepxplots
+        if sepyplots : maintitle+=' * %s'%sepyplots
+
+        # declare figure
+        fig=pylab.figure(figsize=(4*numcols, 3*numrows+1))
+        fig.text(0.5,0.95,maintitle,
+                 horizontalalignment='center',
+                 verticalalignment='top')
+
+        fig.subplots_adjust(wspace=.05, hspace=0.25)
+        
+        plotnum=1 # subplot counter
+        axs=[]
+        for r,rlevel in enumerate(rlevels):
+            for c,clevel in enumerate(clevels):
+                rc_exclude=copy(exclude)
+                if sepyplots!='':
+                    rc_exclude[sepyplots]=yconds.difference([rlevel])
+
+                if sepxplots!='':
+                    rc_exclude[sepxplots]=xconds.difference([clevel])
+
+                # build title
+                try:
+                    if rlevel%1.==0. : rl_str='%i'%int(rlevel)
+                    else             : rl_str=rlevel
+                except               : rl_str=rlevel
+
+                try:
+                    if clevel%1.==0. : cl_str='%i'%int(clevel)
+                    else             : cl_str=clevel
+                except               : cl_str=clevel
+
+                if   rlevels==[1] and \
+                     clevels==[1] : title=''
+                elif rlevels==[1] : title='%s'%cl_str
+                elif clevels==[1] : title='%s'%rl_str
+                else              : title='%s=%s, %s=%s'\
+                                           %(sepyplots,rl_str,
+                                             sepxplots,cl_str)
+                
+                axs.append(pylab.subplot(numrows,numcols,plotnum))
+                if seplines=='':
+                    y,r_list,c_list=self.pivot(val,cols=[xaxis],
+                            exclude=rc_exclude,aggregate='avg',
+                            flatten=True)
+                    y=np.array(y)
+
+                    if aggregate!=None:
+                        yerr,r_list,c_list=self.pivot(val,cols=[xaxis],
+                            exclude=rc_exclude,aggregate=aggregate,
+                            flatten=True)
+
+                        yerr=np.array(yerr)
+
+                    x = [name for [(label,name)] in c_list]
+                    
+                    if _isfloat(yerr):
+                        yerr=np.array([yerr for a in x])
+
+                    if all([_isfloat(a) for a in x]):
+                        axs[-1].errorbar(x,y,yerr)
+                        if xmin=='AUTO' and xmax=='AUTO':
+                            xmin,xmax=axs[-1].get_xlim()
+                            xran=xmax-xmin
+                            xmin,xmax=xmin-.05*xran,xmax+.05*xran
+
+                        axs[-1].plot([xmin,xmax],[0.,0.],'k:')
+                        
+                    else : # categorical x axis
+                        axs[-1].errorbar(xrange(len(x)),y._flatten(),yerr)
+                        pylab.xticks(xrange(len(x)),x)
+                        xmin,xmax=-.5,len(x)-.5
+                        
+                        axs[-1].plot([xmin,xmax],[0.,0.],'k:')
+
+                # plot separate lines
+                else:
+                    y,r_list,c_list=self.pivot(val,
+                            rows=[seplines],cols=[xaxis],exclude=rc_exclude,
+                            aggregate='avg',flatten=False)
+                    y=np.array(y)
+                    
+                    if aggregate!=None:
+                        yerrs,r_list,c_list=self.pivot(val,
+                            rows=[seplines],cols=[xaxis],exclude=rc_exclude,
+                            aggregate=aggregate,flatten=False)
+
+                        yerrs=np.array(yerrs)
+                        
+                    x = [name for [(label,name)] in c_list]
+
+                    if _isfloat(yerr):
+                        yerr=np.array([yerr for a in x])
+
+                    plots,labels=[],[]
+                    for i,name in enumerate(r_list):
+                        if aggregate!=None:
+                            yerr=yerrs[i,:]
+                        
+                        labels.append(name[0][1])
+
+                        if all([_isfloat(a) for a in x]):
+                            plots.append(axs[-1].errorbar(x,y[i,:],yerr)[0])
+                            if xmin=='AUTO' and xmax=='AUTO':
+                                xmin,xmax=axs[-1].get_xlim()
+                                xran=xmax-xmin
+                                xmin,xmax=xmin-.05*xran,xmax+.05*xran
+                                
+                            axs[-1].plot([xmin,xmax],[0.,0.],'k:')
+                            
+                        else : # categorical x axis
+                            plots.append(axs[-1].errorbar(
+                                xrange(len(x)),y[i,:],yerr)[0])
+                            pylab.xticks(xrange(len(x)),x)
+                            xmin,xmax=-.5,len(x)-.5
+                            axs[-1].plot([xmin,xmax],[0.,0.],'k:')
+
+                    pylab.figlegend(plots,labels,loc=1,
+                                    labelsep=.005,
+                                    handlelen=.01,
+                                    handletextsep=.005)
+
+                # clean up axes and ticks
+                pylab.title(title,fontsize='medium')
+                pylab.xlim(xmin,xmax)
+                pylab.ylim(ymin,ymax)
+
+                if r!=len(rlevels)-1:
+                    locs,labels=pylab.xticks()
+                    pylab.xticks(locs,['' for l in xrange(len(locs))])
+                    
+                if c!=0:
+                    locs,labels=pylab.yticks()
+                    pylab.yticks(locs,['' for l in xrange(len(locs))])
+
+                if r==len(rlevels)-1 and c==len(clevels)-1:
+                    if aggregate!=None:
+                        if aggregate=='ci':
+                            aggregate='95% ci'
+                            
+                        pylab.xlabel('\n\n                '
+                                     '*Error bars reflect %s'\
+                                     %aggregate.upper())
+
+                Dx=abs(axs[-1].get_xlim()[0]-axs[-1].get_xlim()[1])
+                Dy=abs(axs[-1].get_ylim()[0]-axs[-1].get_ylim()[1])
+                axs[-1].set_aspect(.75*Dx/Dy)
+
+                plotnum+=1
+
+        # save figure
+        if   quality=='low'    : pylab.savefig(fname)
+        elif quality=='medium' : pylab.savefig(fname,dpi=200)
+        elif quality=='high'   : pylab.savefig(fname,dpi=300)
+        else                   : pylab.savefig(fname)
+
+        pylab.close()
+
+        return True
+
+##df=PyvtTbl()
+##df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+##df['DUM']=range(48)
+##df['DUM'].pop()
+##
+##df._execute('PRAGMA table_info(TBL)')
+##for c in df.cur: print(c)
+
+##self.df['DUM'].pop()
+        
+##'''
+##select SUBJECT 
+##  , COURSE
+##  ,avg(case when TIMEOFDAY='T1' then ERROR end) 
+##  ,avg(case when TIMEOFDAY='T2' then ERROR end) 
+##from PVTTBL group by SUBJECT,COURSE
+##'''
+##
+##df=DataFrame()
+##df.ReadTbl('error~subjectXtimeofdayXcourseXmodel.csv')
+##pp(df.Pivot('ERROR',rows=['SUBJECT','TIMEOFDAY'],exclude={'SUBJECT':['1']}))
+##
+df=PyvtTbl()
+df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+df.printPivot('SUPPRESSION',
+         rows=['GROUP'],
+         cols=['CYCLE','AGE'],
+         aggregate='avg')
+##
+##pp(m)
+##df.Plot('SUPPRESSION', xaxis='PHASE',
+##        seplines='CYCLE',sepxplots='GROUP',yerr='sem')
+##
+##df['RECIP_SUPPRESSION']=.log10(df['SUPPRESSION']+.00001)
+##
+##print df.keys()
+##df.PrintDescriptives('RECIP_SUPPRESSION')
+##
+##df.PrintMarginalMeans('RECIP_SUPPRESSION',factors=['GROUP','PHASE','CYCLE'])
+##
+
+##df._execute("select _SUPPRESSION_ from TBL where not _CYCLE_='1.' and not _CYCLE_='2.'")
+##for row in df.cur:
+##    print row
+    
+##
+##for l in d:
+##    print l
+    
+#,exclude={'SUBJECT':['1','2','3','4']}))
+##df.Plot('SUPPRESSION', 'CYCLE')
+
+##         exclude={'SUBJECT':['1']})
+##
+##import time
+##
+##t0=time.time()
+##print('need to format data for spss... (this may take a few minutes)')
+##
+##fname='collaborated.csv'
+##
+##covariates='age,gender,dicho_correct,dicho_misses,dicho_FA,SAAT_noncomp_correct,'\
+##           'SAAT_noncomp_incorrect,SAAT_comp_correct,SAAT_comp_incorrect'.split(',')
+##
+##within='speed,target_dir,agreement'.split(',')
+##
+##dvs='correct_decision_raw,decision_at_safe_distance_raw,decision_distance_raw,'\
+##    'decision_latency_raw,decision_proportion_raw,decision_ttc_proportion_raw,'\
+##    'decision_ttc_raw,detection_distance_raw,detection_latency_raw,'\
+##    'detection_proportion_raw,detection_ttc_proportion_raw,detection_ttc_raw,'\
+##    'position_distance_raw,position_latency_raw,risk_level_raw,trial_raw'.split(',')
+##    
+##df=DataFrame()
+##df.ReadTbl(fname)
+##df.Export4SPSS('participant',dvs=dvs,within=within,covariates=covariates,nested=False)
+##
+##print('\ndone.')
+##print(time.time()-t0)
