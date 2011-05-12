@@ -130,13 +130,6 @@ class Test__setitem__(unittest.TestCase):
     def setUp(self):
         self.df=PyvtTbl()
         self.df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-        
-    def test1(self):
-        with self.assertRaises(Exception) as cm:
-            self.df['DUM']=range(49)
-
-        self.assertEqual(str(cm.exception),
-                         'columns have unequal lengths')
 
     def test2(self):
         self.df['DUM']=range(48) # Shouldn't complain
@@ -163,7 +156,7 @@ class Test_pivot_1(unittest.TestCase):
             'WORDS':[9,8,6,8,10,4,6,5,7,7,7,9,6,6,6,11,6,3,8,7,11,13,8,6,14,11,13,13,10,11,12,11,16,11,9,23,12,10,19,11,10,19,14,5,10,11,14,15,11,11,8,6,4,6,7,6,5,7,9,7,10,7,8,10,4,7,10,6,7,7,14,11,18,14,13,22,17,16,12,11,20,16,16,15,18,16,20,22,14,19,21,19,17,15,22,16,22,22,18,21],
            }
         
-        self.df=PyvtTbl(D)
+        self.df=PyvtTbl()
         self.df.readTbl('words~ageXcondition.csv')
         
     def test001(self):

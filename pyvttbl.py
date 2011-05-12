@@ -41,9 +41,20 @@ def _transpose(lists, defval=''):
     return map(lambda *row: [elem or defval for elem in row], *lists)
 
 def _isfloat(string):
-    try: num=float(string)
+    try: float(string)
     except: return False
     return True
+
+def _isint(string):
+    try: f=float(string)
+    except: return False
+    if round(f)-f==0:
+        return True
+    return False
+
+def _ifelse(condition, ifTrue, ifFalse):
+    if condition: return ifTrue
+    return ifFalse
 
 def _flatten(x):
     """_flatten(sequence) -> list
@@ -76,29 +87,47 @@ def _xuniqueCombinations(items, n):
                 
 # the dataframe class
 class PyvtTbl(dict):                            
-    def __init__(self, d={}, dbfname=':memory:'):
-        for (k,v) in d.items():
-            self[k]=v
-    
-        self.dbfname=dbfname
-        self.conn=sqlite3.connect(dbfname)
+    def __init__(self):
+
+        # Initialize sqlite3
+        self.conn=sqlite3.connect(':memory:')
         self.cur=self.conn.cursor()
         self.agglist='avg count count group_concat '  \
-                     'group_concat max min sum total' \
+                     'group_concat max min sum total list' \
                      .split()
-        
+
+        # Bind pystaggrelite3 aggregators to sqlite3
         for n,a,f in pystaggrelite3.getaggregators():
             self.conn.create_aggregate(n,a,f)
             self.agglist.append(n)
-                
-        self.names=[]
-        self.types=[]
-        self.conditions=DictSet()
-        self.N=0 # num cols
-        self.M=0 # num rows
 
-        if d != {}:
-            self._refresh_state_vars()
+        # Initialize state variables
+        self.names=[] # same as self.keys()
+                      # it is a hackish way to have an
+                      # ordereddict, plus it gives a consistent
+                      # convention to the column row names
+                      
+        self.types=[] # list to hold the sqlite3 data types of the
+                      # table data
+                      
+        self.conditions=DictSet() # holds the factors conditions
+
+        self.typesdict={} # a dict with keys cooresponding to column
+                          # names and values cooresponding to the
+                          # datatype of the column
+        
+        self.N=0 # num cols in table
+        self.M=0 # num rows in table
+
+        self.Z=[[]] # list of lists to hold pivot data
+        
+        self.Zrnames =[] # list of lists of paired tuples where the
+                         # paired tuples hold the (factor, conditions)
+                         # of the cooresponding row
+
+        self.Zcnames =[] # list of lists of paired tuples where the
+                         # paired tuples hold the (factor, conditions)
+                         # of the cooresponding column
         
     def readTbl(self, fname, skip=0, delimiter=',',labels=True):
         """method to load table from plain text file"""
@@ -123,10 +152,7 @@ class PyvtTbl(dict):
                     if colnameCounter[colname]>1:
                         warnings.warn("Duplicate label '%s' found"%colname,
                                       RuntimeWarning)
-                        
-                        colname='%s_%i'%(colname,colnameCounter[colname])
-                    
-                    
+                        colname='%s_%i'%(colname,colnameCounter[colname])                    
                     colnames.append(colname)
                     self[colname]=[]
 
@@ -155,8 +181,14 @@ class PyvtTbl(dict):
             
         # close data file
         fid.close()
-        
-        self._refresh_state_vars()
+
+        # set state variables
+        self.names=colnames
+        self.types=[self._checktype(n) for n in colnames]
+        self.typesdict=dict(((n,t) for n,t in zip(self.names,self.types)))
+        self.conditions=DictSet(self)
+        self.N=len(self.names)
+        self.M=len(self.values()[0])
 
     def __setitem__(self, key, item):
         try:
@@ -166,8 +198,14 @@ class PyvtTbl(dict):
                             %type(item).__name__)
 
         super(PyvtTbl, self).__setitem__(key, item)
-        self._refresh_state_vars()
-        self._check_tbl_lengths()
+
+        # set state variables
+        self.names.append(key)
+        self.types.append(self._checktype(key))
+        self.typesdict[key]=self.types[-1]
+        self.conditions[key]=self[key]
+        self.N=len(self.names)
+        self.M=len(self.values()[0])
 
     def _check_tbl_lengths(self):
         # this is often called in conjunction with
@@ -184,30 +222,22 @@ class PyvtTbl(dict):
         if self.N>0:
             self.M=len(self.values()[0])
 
-    def _refresh_state_vars(self):
-        self.conditions=DictSet(self)
-        self.names=[]
-        self.types=[]
-        
-        for n in self.keys():
-            self.names.append(n)
+    def _checktype(self, cname):
+        """checks the datatype of self[cname]"""
+        if cname not in self:
+            raise KeyError(cname)
 
-            if self[n]==[]:
-                self.types.append('')
-            else:
-                if _isfloat(self[n][0]):                      
-                    self.types.append('real')
-                else:
-                    self.types.append('text')
-
-        self.N=len(self.names)
-        if self.N>0:
-            self.M=len(self.values()[0])
-
-        self.typesdict=dict(((n,t) for n,t in zip(self.names,self.types)))
+        if len(self[cname]) == 0:
+            return 'null'
+        elif all((_isint(v) for v in self[cname])):
+            return 'integer'
+        elif all((_isfloat(v) for v in self[cname])):
+            return 'real'
+        else:
+            return 'text'
         
     def _refresh_sqlite_tbl(self, names, exclude):
-        # check names and exclude before calling this funciton!
+        # check names and exclude before calling this function!
         # open and read dummy coded data results file to data dictionary
 
         # ignore keys/sets in exclude that aren't in self
@@ -229,28 +259,36 @@ class PyvtTbl(dict):
                     str(tuple((str(self[n][i]) for n in  self.names))))
         else:
             for i in _xrange(self.M):
-                if X - [(k,[self[k][i]]) for k in self] == X:
+                # X is the intersection of X and self.conditions
+                # so we know the keys in X will always be in self
+                if X - [(k,[self[k][i]]) for k in X] == X:
                     self._execute('insert into TBL values %s'% \
                         str(tuple((str(self[n][i]) for n in  self.names))))                
         # Save (commit) the changes
         self.conn.commit()
         
     def _execute(self,query):
+        """private method to execute sqlite3 queries"""
         if PRINTQUERIES:
-            print(query)
-            print()
+            print(query,end='\n\n')
             
         self.cur.execute(query)
 
     def _get_sql_tbl_info(self):
+        """
+        private method to get a list of tuples containing
+        information relevant to the current sqlite3 table
+        """
         self.cur.commit()
         self._execute('PRAGMA table_info(TBL)')
-        return [c for c in self.cur]
+        return list(self.cur)
             
     def getFieldList(self):
+        """returns a list of the column labels in the table"""
         return self.names
 
     def getAggregateList(self):
+        """returns a list of the available sqlite3 aggregators"""
         return deepcopy(self.agglist)
     
     def _pvt(self, val, rows=[], cols=[], aggregate='avg',
@@ -310,6 +348,9 @@ class PyvtTbl(dict):
         if aggregate not in self.agglist:
             raise ValueError("supplied aggregate '%s' is not valid"%aggregate)
 
+##        if aggregate=='list': _aggregate=='group_concat'
+##        if aggregate=='list': _aggregate=='group_concat'
+        
         # check to make sure exclude is mappable
         # todo
 
@@ -394,6 +435,8 @@ class PyvtTbl(dict):
                 for cell in list(row)[-len(col_list):]:
                     zs=cell.split(',')
                     if dict(zip(self.names,self.types))[val]=='real':
+                        d[-1].append([float(s) for s in zs])
+                    elif dict(zip(self.names,self.types))[val]=='integer':
                         d[-1].append([float(s) for s in zs])
                     else:
                         d[-1].append(zs)
@@ -576,7 +619,9 @@ class PyvtTbl(dict):
 ##        wtr.writerows(d)
 ##        fid.close()
 
-    def printTable(self):
+    def printTable(self, exclude={}):
+        # ignore keys/sets in exclude that aren't in self
+        X = self.conditions & exclude
         
         # figure out the width needed by the condition labels so we can
         # set the width of the table
@@ -584,10 +629,21 @@ class PyvtTbl(dict):
                      for v in [self[f] for f in self.names]])+len(self.names)*2
         
         tt=TextTable(max_width=flength)
-        tt.set_cols_dtype(['a']*len(self.names))
+        dtypes=[self.typesdict[n][0] for n in self.names]
+        dtypes=list(''.join(dtypes).replace('r','f'))
+        tt.set_cols_dtype(dtypes)
 
-        for i in _xrange(self.M):
-            tt.add_row([self[n][i] for n in self.names])
+        aligns=[_ifelse(dt in 'fi','r','l') for dt in dtypes]
+        tt.set_cols_align(aligns)
+        
+        if exclude=={}: # for performance
+                        # better to check it once if it is empty
+            for i in _xrange(self.M):
+                tt.add_row([self[n][i] for n in self.names])                
+        else:
+            for i in _xrange(self.M):
+                if X - [(k,[self[k][i]]) for k in X] == X:
+                    tt.add_row([self[n][i] for n in self.names])
 
         tt.header(self.names)
         tt.set_deco(TextTable.HEADER)
@@ -609,7 +665,6 @@ class PyvtTbl(dict):
                      for v in [self[f] for f in cols]])+len(cols)*2
 
         # build the header
-        print(rows)
         header=rows+[',\n'.join(['%s=%s'%(f,c) for (f,c) in L]) \
                      for L in self.Zcnames]
 
@@ -634,7 +689,10 @@ class PyvtTbl(dict):
         """
         V=sorted(self.selectCol(cname,exclude=exclude))
         N=len(V)
-        
+
+##        pp(V)
+##        print(cname,self.typesdict[cname])
+
         D=OrderedDict()
         D['count']      = N
         D['mean']       = sum(V)/N
@@ -657,19 +715,17 @@ class PyvtTbl(dict):
     def printDescriptives(self,cname):
         D=self.descriptives(cname)
 
-        print()
         print('Descriptive Statistics for')
         print('',cname                    )
-        print('==========================',end='')
+        print('==========================')
 
         tt=TextTable(48)
         tt.set_cols_dtype(['t','f'])
-        tt.set_cols_align(['r','r'])
+        tt.set_cols_align(['l','r'])
         for i,(k,v) in enumerate(D.items()):
             tt.add_row([' %s'%k,v])
         tt.set_deco(TextTable.HEADER)
         
-        print()
         print(tt.draw())
 
 
@@ -1059,7 +1115,9 @@ df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 df.printPivot('SUPPRESSION',
          rows=['GROUP'],
          cols=['CYCLE','AGE'],
-         aggregate='avg')
+         aggregate='group_concat')
+df.printTable(exclude={'AGE':['old'],'PHASE':['I']})
+df.printDescriptives('SUPPRESSION')
 ##
 ##pp(m)
 ##df.Plot('SUPPRESSION', xaxis='PHASE',
