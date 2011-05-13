@@ -42,7 +42,6 @@ from texttable import _str
 from dictset import DictSet
 import pystaggrelite3
 
-PRINTQUERIES=False
 
 # private functions begin with an underscore. Feel free to use them
 # but they may not remain backwards compatible or remain at all.
@@ -107,7 +106,7 @@ def _xuniqueCombinations(items, n):
     if n == 0:
         yield []
     else:
-        for i in xrange(len(items)):
+        for i in _xrange(len(items)):
             for cc in _xuniqueCombinations(items[i+1:], n-1):
                 yield [items[i]]+cc
                 
@@ -118,15 +117,17 @@ class PyvtTbl(dict):
         # Initialize sqlite3
         self.conn = sqlite3.connect(':memory:')
         self.cur = self.conn.cursor()
-        self.agglist = 'avg count count group_concat '  \
-                       'group_concat max min sum total list' \
-                       .split()
+        self.aggregates = 'avg count count group_concat '  \
+                          'group_concat max min sum total list' \
+                          .split()
 
         # Bind pystaggrelite3 aggregators to sqlite3
         for n, a, f in pystaggrelite3.getaggregators():
             self.conn.create_aggregate(n, a, f)
-            self.agglist.append(n)
+            self.aggregates.append(n)
 
+        self.aggregates = tuple(self.aggregates)
+        
         # Initialize state variables
         ####################################################
         # we really don't need to initialize them here, but
@@ -149,8 +150,8 @@ class PyvtTbl(dict):
         # values cooresponding to the datatype of the column
         self.typesdict = {} 
         
-        self.N = 0 # num cols in table
-        self.M = 0 # num rows in table
+        self.N = 0    # num cols in table
+        self.M = None # num rows in table
 
         # list of lists to hold pivot data
         self.Z = [[]] 
@@ -170,9 +171,23 @@ class PyvtTbl(dict):
         # a DictSet to hold the factor/levels that are not included
         # in the pivot table
         self.Zexclude = DictSet()
+
+        # prints the sqlite3 queries to standard out before
+        # executing them for debuggin purposes
+        self.PRINTQUERIES = False 
+
+        # When true the plotting methods return a dict that
+        # is validated with unit testing
+        self.TESTMODE = True      
+
         
     def readTbl(self, fname, skip=0, delimiter=',',labels=True):
-        """method to load table from plain text file"""
+        """
+        Loads tabulated data from a plain text file
+
+        Checks and renames duplicate column labels as well as checking
+        for missing cells. readTbl will warn and skip over missing lines.
+        """
         self.fname = fname
         
         # open and read dummy coded data results file to data dictionary
@@ -237,8 +252,7 @@ class PyvtTbl(dict):
         try:
             item = list(item)
         except:
-            raise TypeError("'%s' object is not iterable"\
-                            %type(item).__name__)
+            raise TypeError("'%s' object is not iterable"%type(item).__name__)
 
         super(PyvtTbl, self).__setitem__(key, item)
 
@@ -250,21 +264,19 @@ class PyvtTbl(dict):
         self.N = len(self.names)
         self.M = len(self.values()[0])
 
-    def _check_tbl_lengths(self):
-        # this is often called in conjunction with
-        # _refresh_state_vars, but not always. We want to keep them
-        # separate so that the table data can be manipulated without
-        # throughing exceptions. We only want to throw exceptions
-        # when the user is trying to do operations that require the
-        # table lengths to be identical. The rest of the time we will
-        # assume that they know what they are doing and not complain.
-        
-        counts = [len(v) for v in self.values()]
-        if not all([c-counts[0]+1 == 1 for c in counts]):
-            raise Exception('columns have unequal lengths')
+    def _tbl_lengths_equal(self):
 
-        if self.N > 0:
-            self.M = len(self.values()[0])
+        # if self is not empty
+        counts = [len(v) for v in self.values()]
+        if all([c-counts[0]+1 == 1 for c in counts]):
+            if self == {}:
+                self.M = None
+            else:
+                self.M = len(self.values()[0])
+            return True
+        else:
+            self.M = None
+            return False
 
     def _checktype(self, cname):
         """checks the datatype of self[cname]"""
@@ -273,51 +285,56 @@ class PyvtTbl(dict):
 
         if len(self[cname]) == 0:
             return 'null'
-        elif all((_isint(v) for v in self[cname])):
+        elif all(_isint(v) for v in self[cname]):
             return 'integer'
-        elif all((_isfloat(v) for v in self[cname])):
+        elif all(_isfloat(v) for v in self[cname]):
             return 'real'
         else:
             return 'text'
         
-    def _refresh_sqlite_tbl(self, names, exclude):
+    def _build_sqlite_tbl(self, names, exclude):
         # check names and exclude before calling this function!
         # open and read dummy coded data results file to data dictionary
 
         # ignore keys/sets in exclude that are not in self
         X = self.conditions & exclude
-        
+
+        # initialize table
         self.conn.commit()
         self._execute('drop table if exists TBL')
 
         self.conn.commit()
-        query = '(%s)'%', '.join(['_%s_ %s'%(n,self.typesdict[n]) for \
-                n in self.names])
-        
-        self._execute('create temp table TBL\n  %s'%query)
+        query =  'create temp table TBL\n  ('
+        query += ', '.join('_%s_ %s'%(n, self.typesdict[n]) for n in names)
+        query += ')'
+        self._execute(query)
+
+        # build insert query
+        query = 'insert into TBL values (' + ','.join('?' for n in names) + ')'
 
         if exclude == {}: # for performance
                           # better to check it once if it is empty
             for i in _xrange(self.M):
-                self._execute('insert into TBL values %s'% \
-                    str(tuple((str(self[n][i]) for n in  self.names))))
+                self._execute(query, tuple(self[n][i] for n in names))
         else:
             for i in _xrange(self.M):
                 # X is the intersection of X and self.conditions
                 # so we know the keys in X will always be in self
                 if X - [(k,[self[k][i]]) for k in X] == X:
-                    self._execute('insert into TBL values %s'% \
-                        str(tuple((str(self[n][i]) for n in  self.names))))
+                    self._execute(query, tuple((self[n][i] for n in names)))
                     
         # Save (commit) the changes
         self.conn.commit()
         
-    def _execute(self,query):
+    def _execute(self, query, t=tuple()):
         """private method to execute sqlite3 queries"""
-        if PRINTQUERIES:
-            print(query,end='\n\n')
-            
-        self.cur.execute(query)
+        if self.PRINTQUERIES:
+            print(query)
+            if len(t)>0:
+                print('  ',t)
+            print()
+
+        self.cur.execute(query,t)
 
     def _get_sql_tbl_info(self):
         """
@@ -327,14 +344,6 @@ class PyvtTbl(dict):
         self.cur.commit()
         self._execute('PRAGMA table_info(TBL)')
         return list(self.cur)
-            
-    def getFieldList(self):
-        """returns a list of the column labels in the table"""
-        return self.names
-
-    def getAggregateList(self):
-        """returns a list of the available sqlite3 aggregators"""
-        return deepcopy(self.agglist)
     
     def _pvt(self, val, rows=[], cols=[], aggregate='avg',
               exclude={}, flatten=False):
@@ -344,28 +353,39 @@ class PyvtTbl(dict):
         returns pivot table, rnames, and cnames but doesn't
         set self.Z, self.Zrnames, or self.Zcnames
         """
-        #
-        # pivot programmatic flow
         ##############################################################
-        #  1. Check to make sure all the columns in the table are
-        #     the same length
-        #  2. Check the arguments to make sure they are valid
-        #  3. Create a sqlite table with only the data in columns
-        #     specified by val, rows, and cols. Also eliminate
-        #     rows that meet the exclude conditions
-        #  4. Build rnames and cnames lists
-        #  5. Build query based on val, rows, and cols
-        #  6. Run query
-        #  7. Read data to from cursor into a list of lists
-        #  8. Clean up
-        #  9. flatten if specified
-        # 10. return data, rnames, and cnames
+        # _pvt programmatic flow                                     #
+        ##############################################################
+        #  1. Check to make sure the table can be pivoted with the   #
+        #     specified parameters                                   #
+        #  2. Create a sqlite table with only the data in columns    #
+        #     specified by val, rows, and cols. Also eliminate       #
+        #     rows that meet the exclude conditions                  #
+        #  3. Build rnames and cnames lists                          #
+        #  4. Build query based on val, rows, and cols               #
+        #  5. Run query                                              #
+        #  6. Read data to from cursor into a list of lists          #
+        #  7. Clean up                                               #
+        #  8. flatten if specified                                   #
+        #  9. return data, rnames, and cnames                        #
+        ##############################################################
 
-        # 1.
+
+        #  1. Check to make sure the table can be pivoted with the
+        #     specified parameters
+        ##############################################################
+        #  This may seem excessive but it provides better feedback
+        #  to the user if the errors can be parsed out before had
+        #  instead of crashing on confusing looking code segments
+        
+        
+        if self=={}:
+            raise Exception('Table must have data to print data')
+        
         # check to see if data columns have equal lengths
-        self._check_tbl_lengths()
+        if not self._tbl_lengths_equal():
+            raise Exception('columns have unequal lengths')
 
-        # 2.
         # check the supplied arguments
         if val not in self:
             raise KeyError(val)
@@ -390,10 +410,17 @@ class PyvtTbl(dict):
             if k not in self:
                 raise KeyError(k)
 
+        # check for duplicate names
+        dup = Counter([val]+rows+cols)
+        del dup[None]
+        if not all([count==1 for count in dup.values()]):
+            raise Exception('duplicate labels specified as plot parameters')
+        del dup
+
         # check aggregate function
         aggregate=aggregate.lower()
 
-        if aggregate not in self.agglist:
+        if aggregate not in self.aggregates:
             raise ValueError("supplied aggregate '%s' is not valid"%aggregate)
 
 ##        if aggregate=='list': _aggregate=='group_concat'
@@ -408,13 +435,45 @@ class PyvtTbl(dict):
                           RuntimeWarning)
             
         # ignore keys/sets in exclude that aren't in self
-        X = self.conditions & exclude 
+        X = self.conditions & exclude
         
-        # 3.
-        # Refresh table
-        self._refresh_sqlite_tbl([val]+rows+cols, X)
+        #  2. Create a sqlite table with only the data in columns
+        #     specified by val, rows, and cols. Also eliminate
+        #     rows that meet the exclude conditions      
+        ##############################################################
+        names_subset = [val]+rows+cols
+
+        # initialize table
+        self.conn.commit()
+        self._execute('drop table if exists TBL')
+
+        self.conn.commit()
+        query =  'create temp table TBL\n  ('
+        query += ', '.join('_%s_ %s'%(n, self.typesdict[n]) for n in names_subset)
+        query += ')'
+        self._execute(query)
+
+        # build insert query
+        query = 'insert into TBL values (' + ','.join('?' for n in names_subset) + ')'
+
+        # for performance it is better to check it once if it is empty
+        # values are passed to sqlite as a tuple
+        if exclude == {}: 
+            for i in _xrange(self.M):
+                self._execute(query, tuple(self[n][i] for n in names_subset))
+        else:
+            for i in _xrange(self.M):
+                # X is the intersection of X and self.conditions
+                # so we know the keys in X will always be in self
+                if X - [(k,[self[k][i]]) for k in X] == X:
+                    self._execute(query, tuple((self[n][i] for n in names_subset)))
+                    
+        # Save (commit) the changes
+        self.conn.commit()
         
-        # 4.
+        #  3. Build rnames and cnames lists
+        ##############################################################
+        
         # Refresh conditions list so we can build row and col list
         selected_conditions = self.conditions - X
                 
@@ -436,8 +495,15 @@ class PyvtTbl(dict):
             
         csize=len(col_list)
 
-        # 5.
-        # Build pivot query
+        #  4. Build query based on val, rows, and cols
+        ##############################################################
+        #  Here we are using string formatting to build the query.
+        #  This method is generally discouraged for security, but
+        #  in this circumstance I think it should be okay. The column
+        #  labels are protected with leading and trailing underscores.
+        #  The rest of the query is set by the logic.
+        #
+        #  When we pass the data in we use the (?) tuple format
         query=['select ']
 
         if row_list==[1] and col_list==[1]:
@@ -470,12 +536,12 @@ class PyvtTbl(dict):
                         query.append(', ')
                     query.append('_%s_'%r)
 
-        # 6.
-        # Run pivot query
+        #  5. Run Query
+        ##############################################################
         self._execute(''.join(query) )
 
-        # 7.
-        # read pivoted data from cursor
+        #  6. Read data to from cursor into a list of lists
+        ##############################################################
         d=[]
         val_type = self.typesdict[val]
         if aggregate=='group_concat':
@@ -490,15 +556,18 @@ class PyvtTbl(dict):
             for row in self.cur:
                 d.append(list(row)[-len(col_list):])
 
-        # 8.
-        # Clean up
+
+        #  7. Clean up
+        ##############################################################
         self.conn.commit()
 
-        # 9.
+        #  8. flatten if specified
+        ##############################################################
         if flatten:
             d=_flatten(d)
 
-        # 10.
+        #  9. return data, rnames, and cnames
+        ##############################################################
         return d,row_list,col_list
 
 
@@ -548,7 +617,8 @@ class PyvtTbl(dict):
         """
         # 1.
         # check to see if data columns have equal lengths
-        self._check_tbl_lengths()
+        if not self._tbl_lengths_equal():
+            raise Exception('columns have unequal lengths')
 
         # 2.
         # check the supplied arguments
@@ -588,8 +658,11 @@ class PyvtTbl(dict):
         if not isinstance(other, PyvtTbl):
             raise TypeError('second argument must be a PyvtTbl')
         
-        self._check_tbl_lengths()
-        other._check_tbl_lengths()
+        if not self._tbl_lengths_equal():
+            raise Exception('columns in self have unequal lengths')
+        
+        if not other._tbl_lengths_equal():
+            raise Exception('columns in other have unequal lengths')
 
         if not set(self.names) == set(other.names):
             raise Exception('self and other must have the same columns')
@@ -718,8 +791,9 @@ class PyvtTbl(dict):
         if self=={}:
             raise Exception('Table must have data to print data')
 
-        # raises Exception if they are not equal
-        self._check_tbl_lengths()
+        # check to see if data columns have equal lengths
+        if not self._tbl_lengths_equal():
+            raise Exception('columns have unequal lengths')
 
         if self.M < 1: # self.M gets reset by self._check_tbl_lengths()
             raise Exception('Table must have at least one row to print data')
@@ -754,12 +828,12 @@ class PyvtTbl(dict):
         if self=={}:
             raise Exception('Table must have data to print data')
 
-        # raises Exception if they are not equal
-        self._check_tbl_lengths()
+        # check to see if data columns have equal lengths
+        if not self._tbl_lengths_equal():
+            raise Exception('columns have unequal lengths')
 
         if self.M < 1: # self.M gets reset by self._check_tbl_lengths()
             raise Exception('Table must have at least one row to print data')
-
             
         # ignore keys/sets in exclude that aren't in self
         X = self.conditions & exclude
@@ -792,13 +866,13 @@ class PyvtTbl(dict):
                 for i in _xrange(self.M):
                     if X - [(k,[self[k][i]]) for k in X] == X:
                         wtr.writerow([_str(self[n][i],n=8) for n in self.names])
-                        
-            
+                                    
     def printPivot(self, val, rows=[], cols=[], aggregate='avg',
                    exclude={}, flatten=False):
         """
         pivots, sets, and prints pivot table
         """
+        # _pvt does checking
         self.pivot(val, rows=rows, cols=cols, aggregate=aggregate,
                    exclude=exclude, flatten=flatten)
 
@@ -958,6 +1032,10 @@ class PyvtTbl(dict):
         if self=={}:
             raise Exception('Table must have data to calculate descriptives')
 
+        # check to see if data columns have equal lengths
+        if not self._tbl_lengths_equal():
+            raise Exception('columns have unequal lengths')
+
         if cname not in self:
             raise KeyError(cname)
         
@@ -1003,10 +1081,21 @@ class PyvtTbl(dict):
     def marginals(self, val, factors, exclude={}):
         if self=={}:
             raise Exception('Table must have data to calculate marginals')
+        
+        # check to see if data columns have equal lengths
+        if not self._tbl_lengths_equal():
+            raise Exception('columns have unequal lengths')
 
         for cname in [val]+factors:
             if cname not in self:
                 raise KeyError(cname)
+
+        # check for duplicate names
+        dup = Counter([val]+factors)
+        del dup[None]
+        if not all([count==1 for count in dup.values()]):
+            raise Exception('duplicate labels specified as plot parameters')
+        del dup
 
         if not hasattr(factors, '__iter__'):
             raise TypeError( "'%s' object is not iterable"
@@ -1112,16 +1201,45 @@ class PyvtTbl(dict):
 ##        pylab.close()
 ##
     def plotMarginals(self, val, xaxis, 
-                      seplines='', sepxplots='', sepyplots='',
+                      seplines=None, sepxplots=None, sepyplots=None,
                       xmin='AUTO', xmax='AUTO', ymin='AUTO', ymax='AUTO',
-                      exclude={}, fname='untitled.png',
+                      exclude={}, fname=None,
                       quality='low', yerr=None):
         # pylab doesn't like not being closed. To avoid starting
         # a plot without finishing it, we do some extensive checking
         # up front
+
+        ##############################################################
+        # plotMarginals programmatic flow                            #
+        ##############################################################
+        #  1. Check to make sure a plot can be generated with the    # 
+        #     specified arguments and parameter                      #
+        #  2. Set yerr aggregate                                     #
+        #  3. Figure out ymin and ymax if 'AUTO' is specified        #
+        #  4. Figure out how many subplots we need to make and the   #
+        #     levels of those subplots                               #
+        #  5. Initialize pylab.figure and set plot parameters        #
+        #  6. Build and set main title                               #
+        #  7. loop through the the rlevels and clevels and make      #
+        #     subplots                                               #
+        #      7.1 Create new axes for the subplot                   #
+        #      7.2 Add subplot title                                 #
+        #      7.3 Format the subplot                                #
+        #      7.4 Iterate plotnum counter                           #
+        #  8. Place yerr text in bottom right corner                 #
+        #  9. Save the figure                                        #
+        # 10. return the test dictionary                             #
+        ##############################################################
+
+        #  1. Check to make sure a plot can be generated with the    
+        #     specified arguments and parameter
+        ##############################################################
+
+        # check for data
         if self=={}:
             raise Exception('Table must have data to plot marginals')
 
+        # check for third party packages
         try:
             import pylab
         except:
@@ -1132,33 +1250,85 @@ class PyvtTbl(dict):
         except:
             raise ImportError('numpy is required for plotting')
 
-        self._check_tbl_lengths()
+        # check to see if data columns have equal lengths
+        if not self._tbl_lengths_equal():
+            raise Exception('columns have unequal lengths')
 
+        # check to make sure arguments are column labels
         if val not in self:
             raise KeyError(val)
 
         if xaxis not in self:
             raise KeyError(xaxis)
         
-        if seplines not in self and seplines != '':
+        if seplines not in self and seplines != None:
             raise KeyError(seplines)
 
-        if sepxplots not in self and sepxplots != '':
+        if sepxplots not in self and sepxplots != None:
             raise KeyError(sepxplots)
         
-        if sepyplots not in self and sepyplots != '':
+        if sepyplots not in self and sepyplots != None:
             raise KeyError(sepyplots)
 
+        # check for duplicate names
+        dup = Counter([val, xaxis, seplines, sepxplots, sepyplots])
+        del dup[None]
+        if not all([count == 1 for count in dup.values()]):
+            raise Exception('duplicate labels specified as plot parameters')
+
+        # check fname
+        if not isinstance(fname, _strobj) and fname != None:
+            raise TypeError('fname must be None or string')
+
+        if isinstance(fname, _strobj):
+            if not (fname.lower().endswith('.png') or \
+                    fname.lower().endswith('.svg')):
+                raise Exception('fname must end with .png or .svg')                
+
+        # ignore keys/sets in exclude that aren't in self
+        X = self.conditions & exclude
+
+        # check cell counts
+        cols=[f for f in [seplines, sepxplots, sepyplots] if f in self]
+        counts=self.pivot(val, rows=[xaxis], cols=cols,
+                         flatten=True, exclude=X, aggregate='count')[0]
+
+        for count in counts:
+            if count < 1:
+                raise Exception('cell count too low to calculate mean')
+
+        #  2. Initialize test dictionary
+        ##############################################################
+        # To test the plotting a dict with various plot parameters
+        # is build and returned to the testing module. In this
+        # scenario our primary concern is that the values represent
+        # what we think they represent. Whether they match the plot
+        # should be fairly obvious to the user. 
+        test = {}
+        
+        #  3. Set yerr aggregate so sqlite knows how to calculate yerr
+        ##############################################################
+        
         # check yerr
         aggregate = None
         if yerr == 'sem':
             aggregate = 'sem'
+            
         elif yerr == 'stdev':
             aggregate = 'stdev'
+            
         elif yerr == 'ci':
             aggregate = 'ci'
 
-        # figure out ymin and ymax if 'AUTO' is specified
+        for count in counts:
+            if aggregate != None and count < 2:
+                raise Exception('cell count too low to calculate %s'%yerr)
+
+        test['yerr'] = yerr
+        test['aggregate'] = aggregate
+
+        #  4. Figure out ymin and ymax if 'AUTO' is specified
+        ##############################################################            
         desc = self.descriptives(val)
         
         if ymin == 'AUTO':
@@ -1172,53 +1342,48 @@ class PyvtTbl(dict):
         if any([isnan(ymin), isinf(ymin), isnan(ymax), isinf(ymax)]):
             raise Exception('calculated plot bounds nonsensical')
 
-        cols=[f for f in [seplines, sepxplots, sepyplots] if f in self]
-        counts=self.pivot(val, rows=[xaxis], cols=cols,
-                         flatten=True, exclude=exclude, aggregate='count')[0]
+        test['ymin'] = ymin
+        test['ymax'] = ymax
 
-        for count in counts:
-            if count < 1:
-                raise Exception('cell count too low to calculate mean')
-            if aggregate != None:
-                if count < 2:
-                    raise Exception('cell count too low to calculate %s'%yerr)
-
-        # some of this plot code code probably be simplified. I wrote it
-        # three years ago and obviously didn't comment it as much as I should
-        # have.
-            
-        # figure out howmany subplots we need to make
+        #  5. Figure out how many subplots we need to make and the
+        #     levels of those subplots
+        ##############################################################      
         numrows = 1
         rlevels = [1]
-        if sepyplots != '':
-            yconds = self.conditions[sepyplots]
-            numrows = len(yconds)
-            rlevels = copy(yconds)
+        if sepyplots != None:
+            rlevels = copy(self.conditions[sepyplots]) # a set
+            numrows = len(rlevels) # a int
 
-            if sepyplots in exclude:
-                numrows -= len(exclude[sepyplots])
-                rlevels = sorted(
-                            list(
-                              rlevels.difference(
-                                set(
-                                  exclude[sepyplots]))))
+            if sepyplots in X:
+                rlevels -= set(X[sepyplots])
+                numrows -= len(X[sepyplots])
+
+            rlevels = sorted(rlevels) # set -> sorted list
                 
         numcols = 1
         clevels = [1]            
-        if sepxplots != '':
-            xconds = self.conditions[sepxplots]
-            numcols = len(xconds)
-            clevels = copy(xconds)
+        if sepxplots != None:
+            clevels = copy(self.conditions[sepxplots])
+            numcols = len(clevels)
             
-            if sepxplots in exclude:
-                numcols -= len(exclude[sepxplots])
-                clevels = sorted(
-                            list(
-                              clevels.difference(
-                                set(
-                                  exclude[sepyplots]))))
+            if sepxplots in X:
+                clevels -= set(X[sepyplots])
+                numcols -= len(X[sepxplots])
 
-        # build main title
+            clevels = sorted(clevels) # set -> sorted list
+
+        test['numrows']  = numrows
+        test['rlevels']  = rlevels
+        test['numcols']  = numcols
+        test['clevels']  = clevels
+        
+        #  6. Initialize pylab.figure and set plot parameters
+        ##############################################################  
+        fig = pylab.figure(figsize=(4*numcols, 3*numrows+1))
+        fig.subplots_adjust(wspace=.05, hspace=0.25)
+        
+        #  7. Build and set main title
+        ##############################################################  
         maintitle = '%s by %s'%(val,xaxis)
         if seplines:
             maintitle += ' * %s'%seplines
@@ -1226,70 +1391,44 @@ class PyvtTbl(dict):
             maintitle += ' * %s'%sepxplots
         if sepyplots:
             maintitle += ' * %s'%sepyplots
-
-        # declare figure
-        fig = pylab.figure(figsize=(4*numcols, 3*numrows+1))
+            
         fig.text(0.5, 0.95, maintitle,
                  horizontalalignment='center',
                  verticalalignment='top')
 
-        fig.subplots_adjust(wspace=.05, hspace=0.25)
+        test['maintitle']  = maintitle
+        
+        #  8. loop through the the rlevels and clevels and make
+        #     subplots
+        ##############################################################
+        test['y'] = []
+        test['yerr'] = []
+        test['subplot_titles'] = []
+        test['xmins'] = []
+        test['xmaxs'] = []
         
         plotnum = 1 # subplot counter
         axs = []
         for r, rlevel in enumerate(rlevels):
             for c, clevel in enumerate(clevels):
-                rc_exclude = copy(exclude)
-                if sepyplots != '':
-                    rc_exclude[sepyplots] = yconds.difference([rlevel])
-
-                if sepxplots != '':
-                    rc_exclude[sepxplots] = xconds.difference([clevel])
-
-                # build title
-                try:
-                    if rlevel%1.==0.:
-                        rl_str='%i'%int(rlevel)
-                    else:
-                        rl_str=rlevel
-                except:
-                    rl_str=rlevel
-
-                try:
-                    if clevel%1.==0.:
-                        cl_str='%i'%int(clevel)
-                    else:
-                        cl_str=clevel
-                except:
-                    cl_str=clevel
-
-                if   rlevels==[1] and clevels==[1]:
-                    title=''
-                    
-                elif rlevels==[1]:
-                    title='%s'%cl_str
-                    
-                elif clevels==[1]:
-                    title='%s'%rl_str
-                    
-                else:
-                    title='%s=%s, %s=%s'%(sepyplots,rl_str,
-                                          sepxplots,cl_str)
                 
+                #  8.1 Create new axes for the subplot
+                ######################################################
                 axs.append(pylab.subplot(numrows, numcols, plotnum))
-                if seplines=='':
-                    y, r_list,c_list=self.pivot(val,cols=[xaxis],
-                            exclude=rc_exclude,aggregate='avg',
+
+                ######## If separate lines are not specified #########
+                if seplines == None:
+                    y, r_list, c_list=self._pvt(val,cols=[xaxis],
+                            exclude=X,aggregate='avg',
                             flatten=True)
                     y = np.array(y)
 
                     if aggregate!=None:
-                        yerr,r_list,c_list=self.pivot(val,cols=[xaxis],
-                            exclude=rc_exclude,aggregate=aggregate,
-                            flatten=True)
-
+                        yerr=self._pvt(val,cols=[xaxis],
+                            exclude=X,aggregate=aggregate,
+                            flatten=True)[0]
                         yerr=np.array(yerr)
-
+                        
                     x = [name for [(label,name)] in c_list]
                     
                     if _isfloat(yerr):
@@ -1305,24 +1444,23 @@ class PyvtTbl(dict):
                         axs[-1].plot([xmin,xmax],[0.,0.],'k:')
                         
                     else : # categorical x axis
-                        axs[-1].errorbar(xrange(len(x)),y._flatten(),yerr)
-                        pylab.xticks(xrange(len(x)),x)
+                        axs[-1].errorbar(_xrange(len(x)),y.flatten(),yerr)
+                        pylab.xticks(_xrange(len(x)),x)
                         xmin,xmax=-.5,len(x)-.5
                         
                         axs[-1].plot([xmin,xmax],[0.,0.],'k:')
 
-                # plot separate lines
+                ########## If separate lines are specified ###########
                 else:
-                    y,r_list,c_list=self.pivot(val,
-                            rows=[seplines],cols=[xaxis],exclude=rc_exclude,
+                    y,r_list,c_list=self._pvt(val,
+                            rows=[seplines],cols=[xaxis],exclude=X,
                             aggregate='avg',flatten=False)
                     y=np.array(y)
                     
                     if aggregate!=None:
-                        yerrs,r_list,c_list=self.pivot(val,
-                            rows=[seplines],cols=[xaxis],exclude=rc_exclude,
-                            aggregate=aggregate,flatten=False)
-
+                        yerrs=self._pvt(val,
+                            rows=[seplines],cols=[xaxis],exclude=X,
+                            aggregate=aggregate,flatten=False)[0]
                         yerrs=np.array(yerrs)
                         
                     x = [name for [(label,name)] in c_list]
@@ -1348,8 +1486,8 @@ class PyvtTbl(dict):
                             
                         else : # categorical x axis
                             plots.append(axs[-1].errorbar(
-                                xrange(len(x)),y[i,:],yerr)[0])
-                            pylab.xticks(xrange(len(x)),x)
+                                _xrange(len(x)),y[i,:],yerr)[0])
+                            pylab.xticks(_xrange(len(x)),x)
                             xmin,xmax=-.5,len(x)-.5
                             axs[-1].plot([xmin,xmax],[0.,0.],'k:')
 
@@ -1358,35 +1496,73 @@ class PyvtTbl(dict):
                                     handlelen=.01,
                                     handletextsep=.005)
 
-                # clean up axes and ticks
+                test['y'].append(y.tolist())
+                if yerr==None:
+                    test['yerr'].append([])
+                else:
+                    test['yerr'].append(yerr.tolist())
+                test['xmins'].append(xmin)
+                test['xmaxs'].append(xmax)
+
+                #  8.2 Add subplot title
+                ######################################################
+                if rlevels==[1] and clevels==[1]:
+                    title = ''
+                    
+                elif rlevels==[1]:
+                    title = _str(clevel)
+                    
+                elif clevels==[1]:
+                    title = _str(rlevel)
+                    
+                else:
+                    title = '%s = %s, %s = %s' % (sepyplots,_str(rlevel),
+                                                  sepxplots,_str(rlevel))
+                    
                 pylab.title(title, fontsize='medium')
+                test['subplot_titles'].append(title)
+
+                #  8.3 Format the subplot
+                ######################################################
                 pylab.xlim(xmin, xmax)
                 pylab.ylim(ymin, ymax)
 
+                # supress tick labels unless subplot is on the bottom
+                # row or the far left column
                 if r != (len(rlevels) - 1):
                     locs, labels = pylab.xticks()
-                    pylab.xticks(locs, ['' for l in xrange(len(locs))])
+                    pylab.xticks(locs, ['' for l in _xrange(len(locs))])
                     
                 if c != 0:
                     locs,labels=pylab.yticks()
-                    pylab.yticks(locs, ['' for l in xrange(len(locs))])
+                    pylab.yticks(locs, ['' for l in _xrange(len(locs))])
 
-                if r == (len(rlevels) - 1) and c == (len(clevels) - 1):
-                    if aggregate!=None:
-                        if aggregate=='ci':
-                            aggregate='95% ci'
-                            
-                        pylab.xlabel('\n\n                '
-                                     '*Error bars reflect %s'\
-                                     %aggregate.upper())
-
+                # Set the aspect ratio for the subplot
                 Dx=abs(axs[-1].get_xlim()[0]-axs[-1].get_xlim()[1])
                 Dy=abs(axs[-1].get_ylim()[0]-axs[-1].get_ylim()[1])
                 axs[-1].set_aspect(.75*Dx/Dy)
+                
+                #  8.4 Iterate plotnum counter
+                ######################################################
+                plotnum += 1
 
-                plotnum+=1
+        #  9. Place yerr text in bottom right corner
+        ##############################################################
+        if aggregate != None:
+            if aggregate == 'ci':
+                aggregate = '95% ci' 
+                
+            pylab.xlabel('\n\n                '
+                         '*Error bars reflect %s'\
+                         %aggregate.upper())
 
-        # save figure
+        # 10. Save the figure
+        ##############################################################
+        if fname == None:
+            fname = maintitle.lower() \
+                             .replace('by','~') \
+                             .replace('*','X') \
+                             .replace(' ','')
         if   quality=='low':
             pylab.savefig(fname)
         elif quality=='medium':
@@ -1398,7 +1574,12 @@ class PyvtTbl(dict):
 
         pylab.close()
 
-        return True
+        test['fname']=fname
+
+        # 11. return the test dictionary
+        ##############################################################
+        if self.TESTMODE:
+            return test
 
 ##df=PyvtTbl()
 ##df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
@@ -1424,12 +1605,11 @@ class PyvtTbl(dict):
 ##
 
 ##    
-##df=PyvtTbl()
-##df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
-##df.printPivot('SUPPRESSION',
-##         rows=['CYCLE'],
-##         aggregate='count',
-##         exclude={'GROUP':['AB'],'CYCLE':[1,2]})
+df=PyvtTbl()
+df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+df.printPivot('SUPPRESSION',
+         aggregate='count',
+         exclude={'GROUP':['AB'],'CYCLE':[1,2]})
 ##df.printTable(exclude={'AGE':['old'],'PHASE':['I']})
 ##df.printDescriptives('SUPPRESSION')
 ##df.writePivot()

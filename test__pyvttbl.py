@@ -299,7 +299,7 @@ class Test_pivot_1(unittest.TestCase):
             self.df.pivot('SUBJECT',cols='AGE')
 
         self.assertEqual(str(cm.exception),
-                         'cols should be a list')
+                         "'str' object is not iterable")
     def test004(self):
         # test the exclude parameter checking
 
@@ -771,32 +771,382 @@ class Test_marginals(unittest.TestCase):
 
 class Test_plotMarginals(unittest.TestCase):
     def test0(self):
-        self.df=PyvtTbl()
-        self.df.readTbl('words~ageXcondition.csv')
-        R=self.df.plotMarginals('WORDS','AGE','CONDITION')
-        self.assertTrue(R)
+        R = {'aggregate': None,
+             'clevels': [1],
+             'fname': 'words~ageXcondition',
+             'maintitle': 'WORDS by AGE * CONDITION',
+             'numcols': 1,
+             'numrows': 1,
+             'rlevels': [1],
+             'subplot_titles': [''],
+             'xmaxs': [1.5],
+             'xmins': [-0.5],
+             'y': [[[11.0, 14.8], [7.0, 6.5], [13.4, 17.6], [12.0, 19.3], [6.9, 7.6]]],
+             'yerr': [[]],
+             'ymin': 0.0,
+             'ymax': 27.183257964740832}
+        
+        # a simple plot
+        df=PyvtTbl()
+        df.TESTMODE=True
+        df.readTbl('words~ageXcondition.csv')
+        D=df.plotMarginals('WORDS','AGE','CONDITION')
+
+        self.assertEqual(D['aggregate'],R['aggregate'])
+        self.assertEqual(D['clevels'],R['clevels'])
+        self.assertEqual(D['rlevels'],R['rlevels'])
+        self.assertEqual(D['numcols'],R['numcols'])
+        self.assertEqual(D['numrows'],R['numrows'])
+        self.assertEqual(D['fname'],R['fname'])
+        self.assertEqual(D['maintitle'],R['maintitle'])
+        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],R['ymin'])
+        self.assertAlmostEqual(D['ymax'],R['ymax'])
+
+        for d,r in zip(D['xmins'],R['xmins']):
+            self.assertAlmostEqual(d,r)
+            
+        for d,r in zip(D['xmaxs'],R['xmaxs']):
+            self.assertAlmostEqual(d,r)
+        
+        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+            self.assertAlmostEqual(d,r)
         
     def test1(self):
-        self.df=PyvtTbl()
-        self.df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-        R=self.df.plotMarginals('ERROR','TIMEOFDAY',
+        R = {'aggregate': None,
+             'clevels': ['M1', 'M2', 'M3'],
+             'fname': 'error~timeofdayXcourseXmodel',
+             'maintitle': 'ERROR by TIMEOFDAY * COURSE * MODEL',
+             'numcols': 3,
+             'numrows': 1,
+             'rlevels': [1],
+             'subplot_titles': ['M1', 'M2', 'M3'],
+             'xmaxs': [1.5, 1.5, 1.5],
+             'xmins': [-0.5, -0.5, -0.5],
+             'y': [[[7.166666666666667, 3.2222222222222223], [6.5, 2.888888888888889], [4.0, 1.5555555555555556]], [[7.166666666666667, 3.2222222222222223], [6.5, 2.888888888888889], [4.0, 1.5555555555555556]], [[7.166666666666667, 3.2222222222222223], [6.5, 2.888888888888889], [4.0, 1.5555555555555556]]],
+             'yerr': [[1.0, 1.0], [1.0, 1.0], [1.0, 1.0]],
+             'ymax': 11.119188627248182,
+             'ymin': 0.0}
+        
+        # specify yerr
+        df=PyvtTbl()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        D=df.plotMarginals('ERROR','TIMEOFDAY',
                                 seplines='COURSE',
                                 sepxplots='MODEL',yerr=1.)
-        self.assertTrue(R)
+
+        self.assertEqual(D['aggregate'],R['aggregate'])
+        self.assertEqual(D['clevels'],R['clevels'])
+        self.assertEqual(D['rlevels'],R['rlevels'])
+        self.assertEqual(D['numcols'],R['numcols'])
+        self.assertEqual(D['numrows'],R['numrows'])
+        self.assertEqual(D['fname'],R['fname'])
+        self.assertEqual(D['maintitle'],R['maintitle'])
+        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],R['ymin'])
+        self.assertAlmostEqual(D['ymax'],R['ymax'])
+
+        for d,r in zip(D['xmins'],R['xmins']):
+            self.assertAlmostEqual(d,r)
+            
+        for d,r in zip(D['xmaxs'],R['xmaxs']):
+            self.assertAlmostEqual(d,r)
+        
+        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+            self.assertAlmostEqual(d,r)
 
     def test2(self):
-        self.df=PyvtTbl()
-        self.df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-
-        with self.assertRaises(Exception) as cm:
-            self.df.plotMarginals('ERROR','TIMEOFDAY',
-                                seplines='COURSE',
-                                sepxplots='MODEL',yerr='ci')
-
-        self.assertEqual(str(cm.exception),
-                         'cell count too low to calculate ci')
-
+        R = {'aggregate': 'ci',
+             'clevels': [1],
+             'fname': 'suppression~cycleXageXphase',
+             'maintitle': 'SUPPRESSION by CYCLE * AGE * PHASE',
+             'numcols': 1,
+             'numrows': 2,
+             'rlevels': ['I', 'II'],
+             'subplot_titles': ['I', 'II'],
+             'xmaxs': [4.1749999999999998, 4.1749999999999998],
+             'xmins': [0.32499999999999996, 0.32499999999999996],
+             'y': [[[21.979166666666668, 30.5625, 30.6875, 30.791666666666668], [8.791666666666668, 11.112499999999995, 11.449999999999998, 10.950000000000001]], [[21.979166666666668, 30.5625, 30.6875, 30.791666666666668], [8.791666666666668, 11.112499999999995, 11.449999999999998, 10.950000000000001]]],
+             'yerr': [[1.5806317070654425, 1.0647384230760477, 1.3467210191966632, 1.1532196680758091], [1.5806317070654425, 1.0647384230760477, 1.3467210191966632, 1.1532196680758091]],
+             'ymax': 64.8719707118471,
+             'ymin': 0.0}
         
+        # generate yerr
+        df=PyvtTbl()
+        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+
+        D = df.plotMarginals('SUPPRESSION','CYCLE',
+                            seplines='AGE',
+                            sepyplots='PHASE',yerr='ci')
+
+        self.assertEqual(D['aggregate'],R['aggregate'])
+        self.assertEqual(D['clevels'],R['clevels'])
+        self.assertEqual(D['rlevels'],R['rlevels'])
+        self.assertEqual(D['numcols'],R['numcols'])
+        self.assertEqual(D['numrows'],R['numrows'])
+        self.assertEqual(D['fname'],R['fname'])
+        self.assertEqual(D['maintitle'],R['maintitle'])
+        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],R['ymin'])
+        self.assertAlmostEqual(D['ymax'],R['ymax'])
+
+        for d,r in zip(D['xmins'],R['xmins']):
+            self.assertAlmostEqual(d,r)
+            
+        for d,r in zip(D['xmaxs'],R['xmaxs']):
+            self.assertAlmostEqual(d,r)
+        
+        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+            self.assertAlmostEqual(d,r)
+
+    def test3(self):
+        R = {'aggregate': 'ci',
+             'clevels': ['I', 'II'],
+             'fname': 'suppression~cycleXageXphaseXgroup',
+             'maintitle': 'SUPPRESSION by CYCLE * AGE * PHASE * GROUP',
+             'numcols': 2,
+             'numrows': 2,
+             'rlevels': ['AA', 'AB'],
+             'subplot_titles': ['GROUP = AA, PHASE = AA', 'GROUP = AA, PHASE = AA', 'GROUP = AB, PHASE = AB', 'GROUP = AB, PHASE = AB'],
+             'xmaxs': [4.1500000000000004, 4.1500000000000004, 4.1500000000000004, 4.1500000000000004],
+             'xmins': [0.84999999999999998, 0.84999999999999998, 0.84999999999999998, 0.84999999999999998],
+             'y': [[[18.5, 28.78125, 27.5, 27.96875], [7.793750000000001, 10.599999999999996, 10.90625, 10.406249999999998]],
+                   [[18.5, 28.78125, 27.5, 27.96875], [7.793750000000001, 10.599999999999996, 10.90625, 10.406249999999998]],
+                   [[18.5, 28.78125, 27.5, 27.96875], [7.793750000000001, 10.599999999999996, 10.90625, 10.406249999999998]],
+                   [[18.5, 28.78125, 27.5, 27.96875], [7.793750000000001, 10.599999999999996, 10.90625, 10.406249999999998]]],
+             'yerr': [[1.9389820403558615, 1.2681503421608105, 1.691832428382257, 1.2797605110823689], [1.9389820403558615, 1.2681503421608105, 1.691832428382257, 1.2797605110823689], [1.9389820403558615, 1.2681503421608105, 1.691832428382257, 1.2797605110823689], [1.9389820403558615, 1.2681503421608105, 1.691832428382257, 1.2797605110823689]],
+             'ymax': 64.8719707118471,
+             'ymin': 0.0}
+                    
+        # separate y plots and separate x plots
+        df=PyvtTbl()
+        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+
+        D = df.plotMarginals('SUPPRESSION','CYCLE',
+                              seplines='AGE',
+                              sepxplots='PHASE',
+                              sepyplots='GROUP',yerr='ci',
+                              exclude={'GROUP':['LAB']})
+   
+        self.assertEqual(D['aggregate'],R['aggregate'])
+        self.assertEqual(D['clevels'],R['clevels'])
+        self.assertEqual(D['rlevels'],R['rlevels'])
+        self.assertEqual(D['numcols'],R['numcols'])
+        self.assertEqual(D['numrows'],R['numrows'])
+        self.assertEqual(D['fname'],R['fname'])
+        self.assertEqual(D['maintitle'],R['maintitle'])
+        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],R['ymin'])
+        self.assertAlmostEqual(D['ymax'],R['ymax'])
+
+        for d,r in zip(D['xmins'],R['xmins']):
+            self.assertAlmostEqual(d,r)
+            
+        for d,r in zip(D['xmaxs'],R['xmaxs']):
+            self.assertAlmostEqual(d,r)
+        
+        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+            self.assertAlmostEqual(d,r)
+
+
+
+    # the code for when seplines=None is in a different branch
+    # these test that code
+    def test4(self):
+        R = {'aggregate': None,
+             'clevels': ['adjective', 'counting', 'imagery', 'intention', 'rhyming'],
+             'fname': 'words~ageXcondition',
+             'maintitle': 'WORDS by AGE * CONDITION',
+             'numcols': 5,
+             'numrows': 1,
+             'rlevels': [1],
+             'subplot_titles': ['adjective', 'counting', 'imagery', 'intention', 'rhyming'],
+             'xmaxs': [1.5, 1.5, 1.5, 1.5, 1.5],
+             'xmins': [-0.5, -0.5, -0.5, -0.5, -0.5],
+             'y': [[10.06, 13.16], [10.06, 13.16], [10.06, 13.16], [10.06, 13.16], [10.06, 13.16]],
+             'yerr': [[], [], [], [], []],
+             'ymax': 27.183257964740832,
+             'ymin': 0.0}
+        
+        # a simple plot
+        df=PyvtTbl()
+        df.readTbl('words~ageXcondition.csv')
+        D = df.plotMarginals('WORDS','AGE',sepxplots='CONDITION')
+
+        self.assertEqual(D['aggregate'],R['aggregate'])
+        self.assertEqual(D['clevels'],R['clevels'])
+        self.assertEqual(D['rlevels'],R['rlevels'])
+        self.assertEqual(D['numcols'],R['numcols'])
+        self.assertEqual(D['numrows'],R['numrows'])
+        self.assertEqual(D['fname'],R['fname'])
+        self.assertEqual(D['maintitle'],R['maintitle'])
+        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],R['ymin'])
+        self.assertAlmostEqual(D['ymax'],R['ymax'])
+
+        for d,r in zip(D['xmins'],R['xmins']):
+            self.assertAlmostEqual(d,r)
+            
+        for d,r in zip(D['xmaxs'],R['xmaxs']):
+            self.assertAlmostEqual(d,r)
+        
+        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+            self.assertAlmostEqual(d,r)
+        
+    def test5(self):
+        R = {'aggregate': None,
+             'clevels': ['M1', 'M2', 'M3'],
+             'fname': 'error~timeofdayXmodel',
+             'maintitle': 'ERROR by TIMEOFDAY * MODEL',
+             'numcols': 3,
+             'numrows': 1,
+             'rlevels': [1],
+             'subplot_titles': ['M1', 'M2', 'M3'],
+             'xmaxs': [1.5, 1.5, 1.5],
+             'xmins': [-0.5, -0.5, -0.5],
+             'y': [[5.619047619047619, 2.5555555555555554], [5.619047619047619, 2.5555555555555554], [5.619047619047619, 2.5555555555555554]],
+             'yerr': [[1.0, 1.0], [1.0, 1.0], [1.0, 1.0]],
+             'ymax': 11.119188627248182,
+             'ymin': 0.0}
+                    
+        # specify yerr
+        df=PyvtTbl()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        D = df.plotMarginals('ERROR','TIMEOFDAY',
+                                sepxplots='MODEL',yerr=1.) 
+
+        self.assertEqual(D['aggregate'],R['aggregate'])
+        self.assertEqual(D['clevels'],R['clevels'])
+        self.assertEqual(D['rlevels'],R['rlevels'])
+        self.assertEqual(D['numcols'],R['numcols'])
+        self.assertEqual(D['numrows'],R['numrows'])
+        self.assertEqual(D['fname'],R['fname'])
+        self.assertEqual(D['maintitle'],R['maintitle'])
+        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],R['ymin'])
+        self.assertAlmostEqual(D['ymax'],R['ymax'])
+
+        for d,r in zip(D['xmins'],R['xmins']):
+            self.assertAlmostEqual(d,r)
+            
+        for d,r in zip(D['xmaxs'],R['xmaxs']):
+            self.assertAlmostEqual(d,r)
+        
+        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+            self.assertAlmostEqual(d,r)
+            
+    def test6(self):
+        R = {'aggregate': 'ci',
+             'clevels': [1],
+             'fname': 'suppression~cycleXphase',
+             'maintitle': 'SUPPRESSION by CYCLE * PHASE',
+             'numcols': 1,
+             'numrows': 2,
+             'rlevels': ['I', 'II'],
+             'subplot_titles': ['I', 'II'],
+             'xmaxs': [4.1749999999999998, 4.1749999999999998],
+             'xmins': [0.32499999999999996, 0.32499999999999996],
+             'y': [[15.38541666666667, 20.8375, 21.068749999999998, 20.870833333333326], [15.38541666666667, 20.8375, 21.068749999999998, 20.870833333333326]],
+             'yerr': [[2.61145375321679, 2.949214252328975, 3.12200931549039, 3.261774931685317], [2.61145375321679, 2.949214252328975, 3.12200931549039, 3.261774931685317]],
+             'ymax': 64.8719707118471,
+             'ymin': 0.0}
+        
+        # generate yerr
+        df=PyvtTbl()
+        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        D = df.plotMarginals('SUPPRESSION','CYCLE',
+                              sepyplots='PHASE',yerr='ci') 
+
+        self.assertEqual(D['aggregate'],R['aggregate'])
+        self.assertEqual(D['clevels'],R['clevels'])
+        self.assertEqual(D['rlevels'],R['rlevels'])
+        self.assertEqual(D['numcols'],R['numcols'])
+        self.assertEqual(D['numrows'],R['numrows'])
+        self.assertEqual(D['fname'],R['fname'])
+        self.assertEqual(D['maintitle'],R['maintitle'])
+        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],R['ymin'])
+        self.assertAlmostEqual(D['ymax'],R['ymax'])
+
+        for d,r in zip(D['xmins'],R['xmins']):
+            self.assertAlmostEqual(d,r)
+            
+        for d,r in zip(D['xmaxs'],R['xmaxs']):
+            self.assertAlmostEqual(d,r)
+        
+        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+            self.assertAlmostEqual(d,r)
+
+    def test7(self):
+        R = {'aggregate': 'ci',
+             'clevels': ['I', 'II'],
+             'fname': 'suppression~cycleXphaseXgroup',
+             'maintitle': 'SUPPRESSION by CYCLE * PHASE * GROUP',
+             'numcols': 2,
+             'numrows': 2,
+             'rlevels': ['AA', 'AB'],
+             'subplot_titles': ['GROUP = AA, PHASE = AA', 'GROUP = AA, PHASE = AA', 'GROUP = AB, PHASE = AB', 'GROUP = AB, PHASE = AB'],
+             'xmaxs': [4.1500000000000004, 4.1500000000000004, 4.1500000000000004, 4.1500000000000004],
+             'xmins': [0.84999999999999998, 0.84999999999999998, 0.84999999999999998, 0.84999999999999998],
+             'y': [[13.146875000000005, 19.690624999999997, 19.203124999999996, 19.187500000000004], [13.146875000000005, 19.690624999999997, 19.203124999999996, 19.187500000000004], [13.146875000000005, 19.690624999999997, 19.203124999999996, 19.187500000000004], [13.146875000000005, 19.690624999999997, 19.203124999999996, 19.187500000000004]],
+             'yerr': [[2.973964360180699, 3.346152147793127, 3.4887686723195532, 3.8861848793729132], [2.973964360180699, 3.346152147793127, 3.4887686723195532, 3.8861848793729132], [2.973964360180699, 3.346152147793127, 3.4887686723195532, 3.8861848793729132], [2.973964360180699, 3.346152147793127, 3.4887686723195532, 3.8861848793729132]],
+             'ymax': 64.8719707118471,
+             'ymin': 0.0}
+        
+        # separate y plots and separate x plots
+        df=PyvtTbl()
+        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+
+        D = df.plotMarginals('SUPPRESSION','CYCLE',
+                              sepxplots='PHASE',
+                              sepyplots='GROUP',yerr='ci',
+                              exclude={'GROUP':['LAB']})
+        
+        pp(D,width=400)
+        self.assertEqual(D['aggregate'],R['aggregate'])
+        self.assertEqual(D['clevels'],R['clevels'])
+        self.assertEqual(D['rlevels'],R['rlevels'])
+        self.assertEqual(D['numcols'],R['numcols'])
+        self.assertEqual(D['numrows'],R['numrows'])
+        self.assertEqual(D['fname'],R['fname'])
+        self.assertEqual(D['maintitle'],R['maintitle'])
+        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],R['ymin'])
+        self.assertAlmostEqual(D['ymax'],R['ymax'])
+
+        for d,r in zip(D['xmins'],R['xmins']):
+            self.assertAlmostEqual(d,r)
+            
+        for d,r in zip(D['xmaxs'],R['xmaxs']):
+            self.assertAlmostEqual(d,r)
+        
+        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+            self.assertAlmostEqual(d,r)
+            
 class Test_descriptives(unittest.TestCase):
     def test0(self):
         self.df=PyvtTbl()
@@ -820,7 +1170,6 @@ class Test_descriptives(unittest.TestCase):
 
         for k in D.keys():
             self.failUnlessAlmostEqual(D[k],R[k])
-
            
 def suite():
     return unittest.TestSuite((
