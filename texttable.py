@@ -104,6 +104,32 @@ def len(iterable):
         return len(unicode(iterable, 'utf'))
     except:
         return iterable.__len__()
+
+
+def _str(x, dtype='a', n=3):
+    """Handles string formatting of cell data
+
+        x- is the item being added
+        dtype- is so we can index self._dtype 
+    """
+    try    : f=float(x)
+    except : return str(x)
+    
+    if   dtype == 'i' : return str(int(round(f)))
+    elif dtype == 'f' : return '%.*f'%(n, f)
+    elif dtype == 'e' : return '%.*e'%(n, f)
+    elif dtype == 't' : return str(x)
+    else:
+        if f-round(f) == 0:
+            if abs(f) > 1e8:
+                return '%.*e'%(n, f)
+            else:
+                return str(int(round(f)))
+        else:
+            if abs(f) > 1e8 or abs(f) < 1e-8:
+                return '%.*e'%(n, f)
+            else:
+                return '%.*f'%(n, f)
             
 class ArraySizeError(Exception):
     """Exception raised when specified rows don't fit the required size
@@ -115,6 +141,7 @@ class ArraySizeError(Exception):
 
     def __str__(self):
         return self.msg
+
 
 class Texttable:
 
@@ -171,7 +198,7 @@ class Texttable:
             
         cells=[]
         for i,x in enumerate(array):
-            cells.append(self._str(x,i))
+            cells.append(_str(x,self._dtype[i], self._float_precision))
         self._rows.append(cells)
 
     def add_rows(self, rows, header=True):
@@ -323,34 +350,6 @@ class Texttable:
         if self._has_border():
             out += self._hline()
         return out[:-1]
-    
-    def _str(self,x,i):
-        """Handles string formatting of cell data
-
-            x- is the item being added
-            i- is so we can index self._dtype 
-        """
-        try    : f=float(x)
-        except : return str(x)
-
-        n = self._float_precision
-        dtype = self._dtype[i]
-        
-        if   dtype == 'i' : return str(int(round(f)))
-        elif dtype == 'f' : return '%.*f'%(n, f)
-        elif dtype == 'e' : return '%.*e'%(n, f)
-        elif dtype == 't' : return str(x)
-        else:
-            if f-round(f) == 0:
-                if abs(f) > 1e8:
-                    return '%.*e'%(n, f)
-                else:
-                    return str(int(round(f)))
-            else:
-                if abs(f) > 1e8 or abs(f) < 1e-8:
-                    return '%.*e'%(n, f)
-                else:
-                    return '%.*f'%(n, f)
 
     def _check_row_size(self, array):
         """Check that the specified array fits the previous rows size

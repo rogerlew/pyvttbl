@@ -1,25 +1,44 @@
 from __future__ import print_function
 
+# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# This software is funded in part by NIH Grant P20 RR016454.
+
+# if it looks like a made an effort to conform to PEP8 then the code
+# is fairly mature, if it looks like spaghetti it is because it is
+# spaghetti.
+
 # Python 2 to 3 workarounds
 import sys
-if sys.version_info[0]==2:
-    strobj=basestring
-    _xrange=xrange
-elif sys.version_info[0]==3:
-    strobj=str
-    _xrange=range
+if sys.version_info[0] == 2:
+    _strobj = basestring
+    _xrange = xrange
+elif sys.version_info[0] == 3:
+    _strobj = str
+    _xrange = range
 
 import math
 import csv
 import sqlite3
 import warnings
-from math import isnan,isinf
+
+from math import isnan, isinf
 from pprint import pprint as pp
-from copy import copy,deepcopy
+from copy import copy, deepcopy
+from collections import OrderedDict, Counter
 
-from collections import OrderedDict,Counter
-
+# I have modifed the texttable module original
+# published by Gerome Fournier <jefke(at)free.fr>.
+# I have modified it to provide more readable float
+# printing and I am redistributing it under GPL.
 from texttable import Texttable as TextTable
+
+# I wrote and tested this private static method.
+# I am re-distributing text table so I know it won't change
+from texttable import _str  
+
+# I am the author of these non-standard packages. I have
+# extensively tested both of them and they do not rely on
+# non-standard code.
 from dictset import DictSet
 import pystaggrelite3
 
@@ -37,23 +56,29 @@ def _transpose(lists, defval=''):
     [[1, 4], [2, 5], [3, 6], ['', 7]]
 
     """
-    if not lists: return []
+    if not lists:
+        return []
     return map(lambda *row: [elem or defval for elem in row], *lists)
 
 def _isfloat(string):
-    try: float(string)
-    except: return False
+    try:
+        float(string)
+    except:
+        return False
     return True
 
 def _isint(string):
-    try: f=float(string)
-    except: return False
-    if round(f)-f==0:
+    try:
+        f = float(string)
+    except:
+        return False
+    if round(f) - f == 0:
         return True
     return False
 
 def _ifelse(condition, ifTrue, ifFalse):
-    if condition: return ifTrue
+    if condition:
+        return ifTrue
     return ifFalse
 
 def _flatten(x):
@@ -79,10 +104,11 @@ def _flatten(x):
     return result
 
 def _xuniqueCombinations(items, n):
-    if n==0: yield []
+    if n == 0:
+        yield []
     else:
         for i in xrange(len(items)):
-            for cc in _xuniqueCombinations(items[i+1:],n-1):
+            for cc in _xuniqueCombinations(items[i+1:], n-1):
                 yield [items[i]]+cc
                 
 # the dataframe class
@@ -90,90 +116,107 @@ class PyvtTbl(dict):
     def __init__(self):
 
         # Initialize sqlite3
-        self.conn=sqlite3.connect(':memory:')
-        self.cur=self.conn.cursor()
-        self.agglist='avg count count group_concat '  \
-                     'group_concat max min sum total list' \
-                     .split()
+        self.conn = sqlite3.connect(':memory:')
+        self.cur = self.conn.cursor()
+        self.agglist = 'avg count count group_concat '  \
+                       'group_concat max min sum total list' \
+                       .split()
 
         # Bind pystaggrelite3 aggregators to sqlite3
-        for n,a,f in pystaggrelite3.getaggregators():
-            self.conn.create_aggregate(n,a,f)
+        for n, a, f in pystaggrelite3.getaggregators():
+            self.conn.create_aggregate(n, a, f)
             self.agglist.append(n)
 
         # Initialize state variables
-        self.names=[] # same as self.keys()
-                      # it is a hackish way to have an
-                      # ordereddict, plus it gives a consistent
-                      # convention to the column row names
-                      
-        self.types=[] # list to hold the sqlite3 data types of the
-                      # table data
-                      
-        self.conditions=DictSet() # holds the factors conditions
-
-        self.typesdict={} # a dict with keys cooresponding to column
-                          # names and values cooresponding to the
-                          # datatype of the column
+        ####################################################
+        # we really don't need to initialize them here, but
+        # it is a good excuse to explain what they are
         
-        self.N=0 # num cols in table
-        self.M=0 # num rows in table
+        # same as self.keys() it is a hackish way to have an
+        # ordereddict, plus it gives a consistent convention
+        # to the column row names
+        self.names = [] 
 
-        self.Z=[[]] # list of lists to hold pivot data
+        # list to hold the sqlite3 data types of the table data
+        self.types = [] 
+
+        # holds the factors conditions (and all the data values)
+        # maybe this should be built on the fly for necessary
+        # columns only?
+        self.conditions = DictSet() 
+
+        # a dict with keys cooresponding to column names and
+        # values cooresponding to the datatype of the column
+        self.typesdict = {} 
         
-        self.Zrnames =[] # list of lists of paired tuples where the
-                         # paired tuples hold the (factor, conditions)
-                         # of the cooresponding row
+        self.N = 0 # num cols in table
+        self.M = 0 # num rows in table
 
-        self.Zcnames =[] # list of lists of paired tuples where the
-                         # paired tuples hold the (factor, conditions)
-                         # of the cooresponding column
+        # list of lists to hold pivot data
+        self.Z = [[]] 
+
+        # list of lists of paired tuples where the paired tuples
+        # hold the (factor, conditions) of the cooresponding row
+        self.Zrnames = [] 
+
+        # list of lists of paired tuples where the paired tuples
+        # hold the (factor, conditions) of the cooresponding column
+        self.Zcnames = [] 
+
+        # string specifing the aggregate function used to summarize
+        # data
+        self.Zaggregate = '' 
+
+        # a DictSet to hold the factor/levels that are not included
+        # in the pivot table
+        self.Zexclude = DictSet()
         
     def readTbl(self, fname, skip=0, delimiter=',',labels=True):
         """method to load table from plain text file"""
-        self.fname=fname
+        self.fname = fname
         
         # open and read dummy coded data results file to data dictionary
-        fid=open(fname,'r')
-        csv_reader=csv.reader(fid,delimiter=delimiter)
+        fid = open(fname, 'r')
+        csv_reader = csv.reader(fid, delimiter=delimiter)
         self.clear()
-        colnames=[]
+        colnames = []
         
-        for i,row in enumerate(csv_reader):
+        for i, row in enumerate(csv_reader):
             # skip requested rows
-            if i<skip:
+            if i < skip:
                 pass
             
             # read column labels from ith+1 line
-            elif i==skip and labels:
-                colnameCounter=Counter()
+            elif i == skip and labels:
+                colnameCounter = Counter()
                 for k, colname in enumerate(row):
-                    colnameCounter[colname]+=1
-                    if colnameCounter[colname]>1:
-                        warnings.warn("Duplicate label '%s' found"%colname,
+                    colnameCounter[colname] += 1
+                    if colnameCounter[colname] > 1:
+                        warnings.warn("Duplicate label '%s' found"
+                                      %colname,
                                       RuntimeWarning)
-                        colname='%s_%i'%(colname,colnameCounter[colname])                    
+                        colname = '%s_%i'%(colname, colnameCounter[colname])                    
                     colnames.append(colname)
-                    self[colname]=[]
+                    self[colname] = []
 
             # if labels is false we need to make labels
-            elif i==skip and not labels:
-                colnames=['COL_%s'%(k+1) for k in range(len(row))]
+            elif i == skip and not labels:
+                colnames = ['COL_%s'%(k+1) for k in range(len(row))]
                 for j,colname in enumerate(colnames):
                     if _isfloat(row[j]):
-                        self[colname]=[float(row[j])]
+                        self[colname] = [float(row[j])]
                     else:
-                        self[colname]=[row[i]]
+                        self[colname] = [row[i]]
 
             # for remaining lines where i>skip...
             else:
-                if len(row)!=len(colnames):
+                if len(row) != len(colnames):
                     warnings.warn('Skipping line %i of file. '
                                   'Expected %i cells found %i'\
-                                  %(i+1,len(colnames),len(row)),
+                                  %(i+1, len(colnames), len(row)),
                                   RuntimeWarning)
                 else:                    
-                    for j,colname in enumerate(colnames):
+                    for j, colname in enumerate(colnames):
                         if _isfloat(row[j]):
                             self[colname].append(float(row[j]))
                         else:
@@ -183,16 +226,16 @@ class PyvtTbl(dict):
         fid.close()
 
         # set state variables
-        self.names=colnames
-        self.types=[self._checktype(n) for n in colnames]
-        self.typesdict=dict(((n,t) for n,t in zip(self.names,self.types)))
-        self.conditions=DictSet(self)
-        self.N=len(self.names)
-        self.M=len(self.values()[0])
+        self.names = colnames
+        self.types = [self._checktype(n) for n in colnames]
+        self.typesdict = dict(((n, t) for n, t in zip(self.names, self.types)))
+        self.conditions = DictSet(self)
+        self.N = len(self.names)
+        self.M = len(self.values()[0])
 
     def __setitem__(self, key, item):
         try:
-            item=list(item)
+            item = list(item)
         except:
             raise TypeError("'%s' object is not iterable"\
                             %type(item).__name__)
@@ -202,10 +245,10 @@ class PyvtTbl(dict):
         # set state variables
         self.names.append(key)
         self.types.append(self._checktype(key))
-        self.typesdict[key]=self.types[-1]
-        self.conditions[key]=self[key]
-        self.N=len(self.names)
-        self.M=len(self.values()[0])
+        self.typesdict[key] = self.types[-1]
+        self.conditions[key] = self[key]
+        self.N = len(self.names)
+        self.M = len(self.values()[0])
 
     def _check_tbl_lengths(self):
         # this is often called in conjunction with
@@ -215,12 +258,13 @@ class PyvtTbl(dict):
         # when the user is trying to do operations that require the
         # table lengths to be identical. The rest of the time we will
         # assume that they know what they are doing and not complain.
-        counts=[len(v) for v in self.values()]
+        
+        counts = [len(v) for v in self.values()]
         if not all([c-counts[0]+1 == 1 for c in counts]):
             raise Exception('columns have unequal lengths')
 
-        if self.N>0:
-            self.M=len(self.values()[0])
+        if self.N > 0:
+            self.M = len(self.values()[0])
 
     def _checktype(self, cname):
         """checks the datatype of self[cname]"""
@@ -240,20 +284,20 @@ class PyvtTbl(dict):
         # check names and exclude before calling this function!
         # open and read dummy coded data results file to data dictionary
 
-        # ignore keys/sets in exclude that aren't in self
+        # ignore keys/sets in exclude that are not in self
         X = self.conditions & exclude
         
         self.conn.commit()
         self._execute('drop table if exists TBL')
 
         self.conn.commit()
-        query='(%s)'%', '.join(['_%s_ %s'%(n,self.typesdict[n]) for \
+        query = '(%s)'%', '.join(['_%s_ %s'%(n,self.typesdict[n]) for \
                 n in self.names])
         
         self._execute('create temp table TBL\n  %s'%query)
 
-        if exclude=={}: # for performance
-                        # better to check it once if it is empty
+        if exclude == {}: # for performance
+                          # better to check it once if it is empty
             for i in _xrange(self.M):
                 self._execute('insert into TBL values %s'% \
                     str(tuple((str(self[n][i]) for n in  self.names))))
@@ -263,7 +307,8 @@ class PyvtTbl(dict):
                 # so we know the keys in X will always be in self
                 if X - [(k,[self[k][i]]) for k in X] == X:
                     self._execute('insert into TBL values %s'% \
-                        str(tuple((str(self[n][i]) for n in  self.names))))                
+                        str(tuple((str(self[n][i]) for n in  self.names))))
+                    
         # Save (commit) the changes
         self.conn.commit()
         
@@ -301,19 +346,20 @@ class PyvtTbl(dict):
         """
         #
         # pivot programmatic flow
-        # 1. Check to make sure all the columns in the table are
-        #    the same length
-        # 2. Check the arguments to make sure they are valid
-        # 3. Create a sqlite table with only the data in columns
-        #    specified by val, rows, and cols. Also eliminate
-        #    rows that meet the exclude conditions
-        # 4. Build rnames and cnames lists
-        # 5. Build query based on val, rows, and cols
-        # 6. Run query
-        # 7. Read data to from cursor into a list of lists
-        # 8. Clean up
-        # 9. flatten if specified
-        # 8. return data, rnames, and cnames
+        ##############################################################
+        #  1. Check to make sure all the columns in the table are
+        #     the same length
+        #  2. Check the arguments to make sure they are valid
+        #  3. Create a sqlite table with only the data in columns
+        #     specified by val, rows, and cols. Also eliminate
+        #     rows that meet the exclude conditions
+        #  4. Build rnames and cnames lists
+        #  5. Build query based on val, rows, and cols
+        #  6. Run query
+        #  7. Read data to from cursor into a list of lists
+        #  8. Clean up
+        #  9. flatten if specified
+        # 10. return data, rnames, and cnames
 
         # 1.
         # check to see if data columns have equal lengths
@@ -324,12 +370,14 @@ class PyvtTbl(dict):
         if val not in self:
             raise KeyError(val)
 
-        if isinstance(rows,strobj):
-            raise TypeError('rows should be a list')
+        if not hasattr(rows, '__iter__'):
+            raise TypeError( "'%s' object is not iterable"
+                             % type(cols).__name__)
 
-        if isinstance(cols,strobj):
-            raise TypeError('cols should be a list')
-
+        if not hasattr(cols, '__iter__'):
+            raise TypeError( "'%s' object is not iterable"
+                             % type(cols).__name__)
+        
         for k in rows:
             if k not in self:
                 raise KeyError(k)
@@ -429,17 +477,15 @@ class PyvtTbl(dict):
         # 7.
         # read pivoted data from cursor
         d=[]
+        val_type = self.typesdict[val]
         if aggregate=='group_concat':
             for row in self.cur:
                 d.append([])
                 for cell in list(row)[-len(col_list):]:
-                    zs=cell.split(',')
-                    if dict(zip(self.names,self.types))[val]=='real':
-                        d[-1].append([float(s) for s in zs])
-                    elif dict(zip(self.names,self.types))[val]=='integer':
-                        d[-1].append([float(s) for s in zs])
+                    if val_type == 'real' or val_type == 'integer':
+                        d[-1].append(eval('[%s]'%cell))
                     else:
-                        d[-1].append(zs)
+                        d[-1].append(cell.split(','))
         else:
             for row in self.cur:
                 d.append(list(row)[-len(col_list):])
@@ -484,28 +530,81 @@ class PyvtTbl(dict):
                                     flatten=flatten)
         
         # sets results to self attributes
-        self.Z=d
-        self.Zrnames=rnames
-        self.Zcnames=cnames
+        self.Z = d
+        self.Zval = val
+        self.Zexclude = self.conditions & exclude
+        self.Zaggregate = aggregate
+        self.Zrnames = rnames
+        self.Zcnames = cnames
 
-        return self.Z,self.Zrnames,self.Zcnames
+        return self.Z, self.Zrnames, self.Zcnames
         
     
     def selectCol(self, val, exclude={}):
         """
-        Returns the selected value where the conditions in exclude are
-        not true. The order of the values in the returned list is not
-        necessarily preserved.
+        Returns the a copy of the selected value where the conditions
+        in exclude are not true. The order of the values in the returned
+        list is preserved.
         """
-        
-        return self._pvt(val,rows=[],cols=[],exclude=exclude,
-                         aggregate='group_concat',flatten=True)[0]
+        # 1.
+        # check to see if data columns have equal lengths
+        self._check_tbl_lengths()
 
-##    def writeZtbl(self, fname, delimiter=','):
-##        fid=open(fname,'wb')
-##        wtr=csv.writer(fid,delimiter=delimiter)
-##        wtr.writerows(self.Z)
-##        fid.close()
+        # 2.
+        # check the supplied arguments
+        if val not in self:
+            raise KeyError(val)
+
+        # check to make sure exclude is mappable
+        # todo
+
+        # warn if exclude is not a subset of self.conditions
+        if not self.conditions >= exclude:
+            warnings.warn("exclude is not a subset of table conditions",
+                          RuntimeWarning)
+            
+        # ignore keys/sets in exclude that aren't in self
+        X = self.conditions & exclude 
+
+        if exclude == {}: # the simple case
+            return copy(self[val])
+
+        d=[]
+        for i in _xrange(self.M):
+            # X is the intersection of X and self.conditions
+            # so we know the keys in X will always be in self
+            if X - [(k,[self[k][i]]) for k in X] == X:
+                d.append(self[val][i])
+
+        return d
+
+    def attach(self, other):
+        """
+        attaches a second pivot table to this pivot table
+        if the second table has a superset of columns
+        """
+
+        # do some checking
+        if not isinstance(other, PyvtTbl):
+            raise TypeError('second argument must be a PyvtTbl')
+        
+        self._check_tbl_lengths()
+        other._check_tbl_lengths()
+
+        if not set(self.names) == set(other.names):
+            raise Exception('self and other must have the same columns')
+
+        if not all([self.typesdict[n] == other.typesdict[n] for n in self.names]):
+            raise Exception('types of self and other must match')
+
+        # perform attachment
+        for n in self.names:
+            self[n].extend(copy(other[n]))
+
+        # update state variables
+        self.conditions = DictSet(self)
+        self.M = len(self.values()[0])
+            
 ##
 ##    def loadDB(self,fname):
 ##        """method to load table from existing database file"""
@@ -538,10 +637,6 @@ class PyvtTbl(dict):
 ##            query.append('from TBL')
 ##            c.cursor().execute(' '.join(query))
 ##            c.commit()
-##
-##    def writeTbl(self, fname, delimiter=','):
-##        """save table to plain text file"""
-##        pass
 ##    
 ##    def Export4SPSS(self,p,dvs,between=[],within=[],
 ##                    covariates=[],fname='',nested=True):
@@ -620,15 +715,19 @@ class PyvtTbl(dict):
 ##        fid.close()
 
     def printTable(self, exclude={}):
+        if self=={}:
+            raise Exception('Table must have data to print data')
+
+        # raises Exception if they are not equal
+        self._check_tbl_lengths()
+
+        if self.M < 1: # self.M gets reset by self._check_tbl_lengths()
+            raise Exception('Table must have at least one row to print data')
+        
         # ignore keys/sets in exclude that aren't in self
         X = self.conditions & exclude
         
-        # figure out the width needed by the condition labels so we can
-        # set the width of the table
-        flength=sum([max([len(v) for c in v]) \
-                     for v in [self[f] for f in self.names]])+len(self.names)*2
-        
-        tt=TextTable(max_width=flength)
+        tt=TextTable(max_width=100000000)
         dtypes=[self.typesdict[n][0] for n in self.names]
         dtypes=list(''.join(dtypes).replace('r','f'))
         tt.set_cols_dtype(dtypes)
@@ -650,7 +749,51 @@ class PyvtTbl(dict):
 
         # output the table
         print(tt.draw())
+
+    def writeTable(self, exclude={}, fname=None, delimiter=','):
+        if self=={}:
+            raise Exception('Table must have data to print data')
+
+        # raises Exception if they are not equal
+        self._check_tbl_lengths()
+
+        if self.M < 1: # self.M gets reset by self._check_tbl_lengths()
+            raise Exception('Table must have at least one row to print data')
+
+            
+        # ignore keys/sets in exclude that aren't in self
+        X = self.conditions & exclude
         
+        # check or build fname
+        if fname != None:
+            if not isinstance(fname, _strobj):
+                raise TypeError('fname must be a string')
+        else:
+            lower_names = [str(n).lower().replace('1','') for n in self.names]
+            
+            fname = 'X'.join(lower_names)
+
+            if delimiter == ',':
+                fname += '.csv' 
+            elif delimiter == '\t':               
+                fname += '.tsv'
+            else:
+                fname += '.txt'
+
+        with open(fname,'wb') as fid:
+            wtr = csv.writer(fid, delimiter=delimiter)
+            wtr.writerow(self.names)
+
+            if exclude=={}: # for performance
+                            # better to check it once if it is empty
+                for i in _xrange(self.M):
+                    wtr.writerow([_str(self[n][i],n=8) for n in self.names])                
+            else:
+                for i in _xrange(self.M):
+                    if X - [(k,[self[k][i]]) for k in X] == X:
+                        wtr.writerow([_str(self[n][i],n=8) for n in self.names])
+                        
+            
     def printPivot(self, val, rows=[], cols=[], aggregate='avg',
                    exclude={}, flatten=False):
         """
@@ -658,40 +801,168 @@ class PyvtTbl(dict):
         """
         self.pivot(val, rows=rows, cols=cols, aggregate=aggregate,
                    exclude=exclude, flatten=flatten)
-        
-        # figure out the width needed by the condition labels so we can
-        # set the width of the table
-        flength=sum([max([len(v) for c in v]) \
-                     for v in [self[f] for f in cols]])+len(cols)*2
 
-        # build the header
-        header=rows+[',\n'.join(['%s=%s'%(f,c) for (f,c) in L]) \
-                     for L in self.Zcnames]
+        # build first line
+        first = '%s(%s)'%(self.Zaggregate, self.Zval)
+        if self.Zexclude != {}:
+            X_list = []
+            for (k, v) in sorted(self.Zexclude.items()):
+                conditions = ', '.join((str(c) for c in v))
+                X_list.append('%s not in {%s}'%(k, conditions))
+            first += ' where ' + ' or '.join(X_list)
 
-        # initialize the texttable and add stuff
-        tt=TextTable(max_width=flength+48)
-        tt.set_cols_dtype(['t']*len(rows)+['a']*len(self.Zcnames))
-        tt.set_cols_align(['l']*len(rows)+['r']*len(self.Zcnames))
+        tt = TextTable(max_width=10000000)
 
-        for i,L in enumerate(self.Zrnames):
-            tt.add_row([c for (f,c) in L]+self.Z[i])
+        # no rows or cols were specified
+        if self.Zrnames == [1] and self.Zcnames == [1]:
+            # build the header
+            header = ['Value']
 
+            # initialize the texttable and add stuff
+            tt.set_cols_dtype(['t'])
+            tt.set_cols_dtype(['l'])
+            tt.add_row(self.Z[0])
+            
+        elif self.Zrnames == [1]: # no rows were specified
+            # build the header
+            header = [',\n'.join(['%s=%s'%(f,c) for (f,c) in L]) \
+                      for L in self.Zcnames]
+            
+            # initialize the texttable and add stuff
+            tt.set_cols_dtype(['a']*len(self.Zcnames))
+            tt.set_cols_align(['r']*len(self.Zcnames))
+            tt.add_row(self.Z[0])
+            
+        elif self.Zcnames == [1]: # no cols were specified
+            # build the header
+            header = rows + ['Value']
+            
+            # initialize the texttable and add stuff
+            tt.set_cols_dtype(['t']*len(rows)+['a'])
+            tt.set_cols_align(['l']*len(rows)+['r'])
+            for i,L in enumerate(self.Zrnames):
+                tt.add_row([c for (f,c) in L]+self.Z[i])
+            
+        else: # table has rows and cols
+            # build the header
+            header = rows + [',\n'.join(['%s=%s'%(f,c) for (f,c) in L]) \
+                             for L in self.Zcnames]
+
+            # initialize the texttable and add stuff
+            tt.set_cols_dtype(['t']*len(rows)+['a']*len(self.Zcnames))
+            tt.set_cols_align(['l']*len(rows)+['r']*len(self.Zcnames))
+            for i,L in enumerate(self.Zrnames):
+                tt.add_row([c for (f,c) in L]+self.Z[i])
+
+        # add header and decoration
         tt.header(header)
         tt.set_deco(TextTable.HEADER)
 
         # output the table
+        print(first)
         print(tt.draw())
+
+    def writePivot(self, fname=None, delimiter=','):
         
+        if len(_flatten(self.Z)) == 0:
+            raise Exception('must call pivot before writing pivot table')
+        
+        if self.Zrnames == [1]:
+            rows = [1]
+        else:
+            rows = [str(k) for (k, v) in self.Zrnames[0]]
+
+        if self.Zcnames == [1]:
+            cols = [1]
+        else:
+            cols = [str(k) for (k, v) in self.Zcnames[0]]
+        
+        # check or build fname
+        if fname != None:
+            if not isinstance(fname, _strobj):
+                raise TypeError('fname must be a string')
+        else:
+            # if rows == [1] then lower_rows becomes ['']
+            # if cols...
+            lower_rows = [str(n).lower().replace('1','') for n in rows]
+            lower_cols = [str(n).lower().replace('1','') for n in cols]
+            
+            fname = '%s~(%s)Z(%s)'%(self.Zval.lower(),
+                                    'X'.join(lower_rows),
+                                    'X'.join(lower_cols))
+            if delimiter == ',':
+                fname += '.csv' 
+            elif delimiter == '\t':               
+                fname += '.tsv'
+            else:
+                fname += '.txt'
+        
+        # build and write first line
+        if self.Zexclude != {}:
+            X_list=[]
+            for (k, v) in sorted(self.Zexclude.items()):
+                conditions = '; '.join((str(c) for c in v))
+                X_list.append('%s not in {%s}'%(k, conditions))
+            first = [self.Zval + ' where ' + ' or '.join(X_list)]
+        else:
+            first = [self.Zval]
+
+        data = [] # append the rows to this list and write with
+                  # csv writer in one call
+        
+        # no rows or cols were specified
+        if self.Zrnames == [1] and self.Zcnames == [1]:
+            # build and write the header
+            header = ['Value']
+
+            # initialize the texttable and add stuff
+            data.append(self.Z[0])
+            
+        elif self.Zrnames == [1]: # no rows were specified
+            # build the header
+            header = ['_'.join(['%s=%s'%(f,c) for (f,c) in L]) \
+                      for L in self.Zcnames]
+
+            # initialize the texttable and add stuff
+            data.append(self.Z[0])
+            
+        elif self.Zcnames == [1]: # no cols were specified
+            # build the header
+            header = rows + ['Value']
+            
+            # initialize the texttable and add stuff
+            for i,L in enumerate(self.Zrnames):
+                data.append([c for (f,c) in L]+self.Z[i])
+            
+        else: # table has rows and cols
+            # build the header
+            header = rows + ['_'.join(['%s=%s'%(f,c) for (f,c) in L]) \
+                             for L in self.Zcnames]
+
+            # initialize the texttable and add stuff
+            for i,L in enumerate(self.Zrnames):
+                data.append([c for (f,c) in L]+self.Z[i])
+
+        # write file
+        with open(fname, 'wb') as fid:
+            wtr = csv.writer(fid, delimiter=delimiter)
+            wtr.writerow(first)
+            wtr.writerow(header)
+            wtr.writerows(data)
 
     def descriptives(self,cname,exclude={}):
+        
         """
         Returns a dict of descriptive statistics for column cname
         """
+        if self=={}:
+            raise Exception('Table must have data to calculate descriptives')
+
+        if cname not in self:
+            raise KeyError(cname)
+        
         V=sorted(self.selectCol(cname,exclude=exclude))
         N=len(V)
-
-##        pp(V)
-##        print(cname,self.typesdict[cname])
 
         D=OrderedDict()
         D['count']      = N
@@ -730,40 +1001,48 @@ class PyvtTbl(dict):
 
 
     def marginals(self, val, factors, exclude={}):
+        if self=={}:
+            raise Exception('Table must have data to calculate marginals')
 
-        dmu=self.pivot(
-            val,rows=factors,
-            exclude=exclude,aggregate='avg',
-            flatten=True)[0]
+        for cname in [val]+factors:
+            if cname not in self:
+                raise KeyError(cname)
 
-        dN =self.pivot(
-            val,rows=factors,
-            exclude=exclude,aggregate='count',
-            flatten=True)[0]
+        if not hasattr(factors, '__iter__'):
+            raise TypeError( "'%s' object is not iterable"
+                         % type(cols).__name__)
 
-        dsem,r_list,c_list=self.pivot(
-            val,rows=factors,
-            exclude=exclude,aggregate='sem',
-            flatten=True)
+        dmu=self.pivot(val, rows=factors, exclude=exclude,
+                       aggregate='avg', flatten=True)[0]
 
-        f=OrderedDict()
+        dN =self.pivot(val, rows=factors, exclude=exclude,
+                       aggregate='count', flatten=True)[0]
+
+        dsem,r_list,c_list=self.pivot(val, rows=factors, exclude=exclude,
+                                      aggregate='sem', flatten=True)
+
+        # build factors from r_list
+        factors=OrderedDict()
         for i,r in enumerate(r_list):
             if i==0:
                 for c in r:
-                    f[c[0]]=[]
+                    factors[c[0]]=[]
             
-            for j,c in enumerate(r):
-                f[c[0]].append(c[1])
+            for j, c in enumerate(r):
+                factors[c[0]].append(c[1])
 
         dlower=[]
         dupper=[]
         for mu,sem in zip(dmu,dsem):
-            dlower.append(mu-1.96*sem)
-            dupper.append(mu+1.96*sem)
+            dlower.append(mu - 1.96*sem)
+            dupper.append(mu + 1.96*sem)
 
-        return f,dmu,dN,dsem,dlower,dupper            
+        return factors,dmu,dN,dsem,dlower,dupper            
         
     def printMarginals(self, val, factors, exclude={}):
+        """Plot marginal statisics over factors for val"""
+
+        # marginalMeans handles checking
         x=self.marginalMeans(val,factors=factors,exclude=exclude)
         [f,dmu,dN,dsem,dlower,dupper]=x
 
@@ -840,12 +1119,18 @@ class PyvtTbl(dict):
         # pylab doesn't like not being closed. To avoid starting
         # a plot without finishing it, we do some extensive checking
         # up front
+        if self=={}:
+            raise Exception('Table must have data to plot marginals')
 
-        try    : import pylab
-        except : raise ImportError('pylab is required for plotting')
+        try:
+            import pylab
+        except:
+            raise ImportError('pylab is required for plotting')
 
-        try    : import numpy as np
-        except : raise ImportError('numpy is required for plotting')
+        try:
+            import numpy as np
+        except:
+            raise ImportError('numpy is required for plotting')
 
         self._check_tbl_lengths()
 
@@ -855,125 +1140,148 @@ class PyvtTbl(dict):
         if xaxis not in self:
             raise KeyError(xaxis)
         
-        if seplines not in self and seplines!='':
+        if seplines not in self and seplines != '':
             raise KeyError(seplines)
 
-        if sepxplots not in self and sepxplots!='':
+        if sepxplots not in self and sepxplots != '':
             raise KeyError(sepxplots)
         
-        if sepyplots not in self and sepyplots!='':
+        if sepyplots not in self and sepyplots != '':
             raise KeyError(sepyplots)
 
         # check yerr
-        aggregate=None
-        if yerr=='sem'     : aggregate= 'sem'
-        elif yerr=='stdev' : aggregate= 'stdev'
-        elif yerr=='ci'    : aggregate= 'ci'
+        aggregate = None
+        if yerr == 'sem':
+            aggregate = 'sem'
+        elif yerr == 'stdev':
+            aggregate = 'stdev'
+        elif yerr == 'ci':
+            aggregate = 'ci'
 
         # figure out ymin and ymax if 'AUTO' is specified
-        desc=self.descriptives(val)
+        desc = self.descriptives(val)
         
-        if ymin=='AUTO':
+        if ymin == 'AUTO':
             if desc['min'] >= 0.:
-                ymin=0.
+                ymin = 0.
             else:
-                ymin=desc['mean'] - 3.*desc['stdev']
-        if ymax=='AUTO':
+                ymin = desc['mean'] - 3.*desc['stdev']
+        if ymax == 'AUTO':
             ymax = desc['mean'] + 3.*desc['stdev']
 
-        if any([isnan(ymin),isinf(ymin),isnan(ymax),isinf(ymax)]):
+        if any([isnan(ymin), isinf(ymin), isnan(ymax), isinf(ymax)]):
             raise Exception('calculated plot bounds nonsensical')
 
-        cols=[f for f in [seplines,sepxplots,sepyplots] if f in self]
-        counts=self.pivot(val,rows=[xaxis],cols=cols,
-                         flatten=True,exclude=exclude,aggregate='count')[0]
+        cols=[f for f in [seplines, sepxplots, sepyplots] if f in self]
+        counts=self.pivot(val, rows=[xaxis], cols=cols,
+                         flatten=True, exclude=exclude, aggregate='count')[0]
 
         for count in counts:
             if count < 1:
                 raise Exception('cell count too low to calculate mean')
-            if aggregate!=None:
+            if aggregate != None:
                 if count < 2:
                     raise Exception('cell count too low to calculate %s'%yerr)
+
+        # some of this plot code code probably be simplified. I wrote it
+        # three years ago and obviously didn't comment it as much as I should
+        # have.
             
         # figure out howmany subplots we need to make
-        numrows,rlevels=1,[1]
-        if sepyplots!='':
-            yconds=self.conditions[sepyplots]
-            numrows=len(yconds)
-            rlevels=copy(yconds)
+        numrows = 1
+        rlevels = [1]
+        if sepyplots != '':
+            yconds = self.conditions[sepyplots]
+            numrows = len(yconds)
+            rlevels = copy(yconds)
 
             if sepyplots in exclude:
-                numrows-=len(exclude[sepyplots])
-                rlevels=sorted(
-                          list(
-                            rlevels.difference(
-                              set(
-                                exclude[sepyplots]))))
+                numrows -= len(exclude[sepyplots])
+                rlevels = sorted(
+                            list(
+                              rlevels.difference(
+                                set(
+                                  exclude[sepyplots]))))
                 
-        numcols,clevels=1,[1]            
-        if sepxplots!='':
-            xconds=self.conditions[sepxplots]
-            numcols=len(xconds)
-            clevels=copy(xconds)
+        numcols = 1
+        clevels = [1]            
+        if sepxplots != '':
+            xconds = self.conditions[sepxplots]
+            numcols = len(xconds)
+            clevels = copy(xconds)
             
             if sepxplots in exclude:
-                numcols-=len(exclude[sepxplots])
-                clevels=sorted(
-                          list(
-                            clevels.difference(
-                              set(
-                                exclude[sepyplots]))))
+                numcols -= len(exclude[sepxplots])
+                clevels = sorted(
+                            list(
+                              clevels.difference(
+                                set(
+                                  exclude[sepyplots]))))
 
         # build main title
-        maintitle='%s by %s'%(val,xaxis)
-        if seplines  : maintitle+=' * %s'%seplines
-        if sepxplots : maintitle+=' * %s'%sepxplots
-        if sepyplots : maintitle+=' * %s'%sepyplots
+        maintitle = '%s by %s'%(val,xaxis)
+        if seplines:
+            maintitle += ' * %s'%seplines
+        if sepxplots:
+            maintitle += ' * %s'%sepxplots
+        if sepyplots:
+            maintitle += ' * %s'%sepyplots
 
         # declare figure
-        fig=pylab.figure(figsize=(4*numcols, 3*numrows+1))
-        fig.text(0.5,0.95,maintitle,
+        fig = pylab.figure(figsize=(4*numcols, 3*numrows+1))
+        fig.text(0.5, 0.95, maintitle,
                  horizontalalignment='center',
                  verticalalignment='top')
 
         fig.subplots_adjust(wspace=.05, hspace=0.25)
         
-        plotnum=1 # subplot counter
-        axs=[]
-        for r,rlevel in enumerate(rlevels):
-            for c,clevel in enumerate(clevels):
-                rc_exclude=copy(exclude)
-                if sepyplots!='':
-                    rc_exclude[sepyplots]=yconds.difference([rlevel])
+        plotnum = 1 # subplot counter
+        axs = []
+        for r, rlevel in enumerate(rlevels):
+            for c, clevel in enumerate(clevels):
+                rc_exclude = copy(exclude)
+                if sepyplots != '':
+                    rc_exclude[sepyplots] = yconds.difference([rlevel])
 
-                if sepxplots!='':
-                    rc_exclude[sepxplots]=xconds.difference([clevel])
+                if sepxplots != '':
+                    rc_exclude[sepxplots] = xconds.difference([clevel])
 
                 # build title
                 try:
-                    if rlevel%1.==0. : rl_str='%i'%int(rlevel)
-                    else             : rl_str=rlevel
-                except               : rl_str=rlevel
+                    if rlevel%1.==0.:
+                        rl_str='%i'%int(rlevel)
+                    else:
+                        rl_str=rlevel
+                except:
+                    rl_str=rlevel
 
                 try:
-                    if clevel%1.==0. : cl_str='%i'%int(clevel)
-                    else             : cl_str=clevel
-                except               : cl_str=clevel
+                    if clevel%1.==0.:
+                        cl_str='%i'%int(clevel)
+                    else:
+                        cl_str=clevel
+                except:
+                    cl_str=clevel
 
-                if   rlevels==[1] and \
-                     clevels==[1] : title=''
-                elif rlevels==[1] : title='%s'%cl_str
-                elif clevels==[1] : title='%s'%rl_str
-                else              : title='%s=%s, %s=%s'\
-                                           %(sepyplots,rl_str,
-                                             sepxplots,cl_str)
+                if   rlevels==[1] and clevels==[1]:
+                    title=''
+                    
+                elif rlevels==[1]:
+                    title='%s'%cl_str
+                    
+                elif clevels==[1]:
+                    title='%s'%rl_str
+                    
+                else:
+                    title='%s=%s, %s=%s'%(sepyplots,rl_str,
+                                          sepxplots,cl_str)
                 
-                axs.append(pylab.subplot(numrows,numcols,plotnum))
+                axs.append(pylab.subplot(numrows, numcols, plotnum))
                 if seplines=='':
-                    y,r_list,c_list=self.pivot(val,cols=[xaxis],
+                    y, r_list,c_list=self.pivot(val,cols=[xaxis],
                             exclude=rc_exclude,aggregate='avg',
                             flatten=True)
-                    y=np.array(y)
+                    y = np.array(y)
 
                     if aggregate!=None:
                         yerr,r_list,c_list=self.pivot(val,cols=[xaxis],
@@ -1051,19 +1359,19 @@ class PyvtTbl(dict):
                                     handletextsep=.005)
 
                 # clean up axes and ticks
-                pylab.title(title,fontsize='medium')
-                pylab.xlim(xmin,xmax)
-                pylab.ylim(ymin,ymax)
+                pylab.title(title, fontsize='medium')
+                pylab.xlim(xmin, xmax)
+                pylab.ylim(ymin, ymax)
 
-                if r!=len(rlevels)-1:
-                    locs,labels=pylab.xticks()
-                    pylab.xticks(locs,['' for l in xrange(len(locs))])
+                if r != (len(rlevels) - 1):
+                    locs, labels = pylab.xticks()
+                    pylab.xticks(locs, ['' for l in xrange(len(locs))])
                     
-                if c!=0:
+                if c != 0:
                     locs,labels=pylab.yticks()
-                    pylab.yticks(locs,['' for l in xrange(len(locs))])
+                    pylab.yticks(locs, ['' for l in xrange(len(locs))])
 
-                if r==len(rlevels)-1 and c==len(clevels)-1:
+                if r == (len(rlevels) - 1) and c == (len(clevels) - 1):
                     if aggregate!=None:
                         if aggregate=='ci':
                             aggregate='95% ci'
@@ -1079,10 +1387,14 @@ class PyvtTbl(dict):
                 plotnum+=1
 
         # save figure
-        if   quality=='low'    : pylab.savefig(fname)
-        elif quality=='medium' : pylab.savefig(fname,dpi=200)
-        elif quality=='high'   : pylab.savefig(fname,dpi=300)
-        else                   : pylab.savefig(fname)
+        if   quality=='low':
+            pylab.savefig(fname)
+        elif quality=='medium':
+            pylab.savefig(fname,dpi=200)
+        elif quality=='high':
+            pylab.savefig(fname,dpi=300)
+        else:
+            pylab.savefig(fname)
 
         pylab.close()
 
@@ -1110,14 +1422,18 @@ class PyvtTbl(dict):
 ##df.ReadTbl('error~subjectXtimeofdayXcourseXmodel.csv')
 ##pp(df.Pivot('ERROR',rows=['SUBJECT','TIMEOFDAY'],exclude={'SUBJECT':['1']}))
 ##
-df=PyvtTbl()
-df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
-df.printPivot('SUPPRESSION',
-         rows=['GROUP'],
-         cols=['CYCLE','AGE'],
-         aggregate='group_concat')
-df.printTable(exclude={'AGE':['old'],'PHASE':['I']})
-df.printDescriptives('SUPPRESSION')
+
+##    
+##df=PyvtTbl()
+##df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+##df.printPivot('SUPPRESSION',
+##         rows=['CYCLE'],
+##         aggregate='count',
+##         exclude={'GROUP':['AB'],'CYCLE':[1,2]})
+##df.printTable(exclude={'AGE':['old'],'PHASE':['I']})
+##df.printDescriptives('SUPPRESSION')
+##df.writePivot()
+
 ##
 ##pp(m)
 ##df.Plot('SUPPRESSION', xaxis='PHASE',
