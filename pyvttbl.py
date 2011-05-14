@@ -16,8 +16,9 @@ elif sys.version_info[0] == 3:
     _strobj = str
     _xrange = range
 
-import math
+import anydbm
 import csv
+import math
 import sqlite3
 import warnings
 
@@ -109,6 +110,8 @@ def _xuniqueCombinations(items, n):
         for i in _xrange(len(items)):
             for cc in _xuniqueCombinations(items[i+1:], n-1):
                 yield [items[i]]+cc
+
+
                 
 # the dataframe class
 class PyvtTbl(dict):                            
@@ -118,7 +121,7 @@ class PyvtTbl(dict):
         self.conn = sqlite3.connect(':memory:')
         self.cur = self.conn.cursor()
         self.aggregates = 'avg count count group_concat '  \
-                          'group_concat max min sum total list' \
+                          'group_concat max min sum total tolist' \
                           .split()
 
         # Bind pystaggrelite3 aggregators to sqlite3
@@ -178,8 +181,7 @@ class PyvtTbl(dict):
 
         # When true the plotting methods return a dict that
         # is validated with unit testing
-        self.TESTMODE = True      
-
+        self.TESTMODE = False    
         
     def readTbl(self, fname, skip=0, delimiter=',',labels=True):
         """
@@ -264,7 +266,7 @@ class PyvtTbl(dict):
         self.N = len(self.names)
         self.M = len(self.values()[0])
 
-    def _tbl_lengths_equal(self):
+    def _are_col_lengths_equal(self):
 
         # if self is not empty
         counts = [len(v) for v in self.values()]
@@ -291,41 +293,7 @@ class PyvtTbl(dict):
             return 'real'
         else:
             return 'text'
-        
-    def _build_sqlite_tbl(self, names, exclude):
-        # check names and exclude before calling this function!
-        # open and read dummy coded data results file to data dictionary
 
-        # ignore keys/sets in exclude that are not in self
-        X = self.conditions & exclude
-
-        # initialize table
-        self.conn.commit()
-        self._execute('drop table if exists TBL')
-
-        self.conn.commit()
-        query =  'create temp table TBL\n  ('
-        query += ', '.join('_%s_ %s'%(n, self.typesdict[n]) for n in names)
-        query += ')'
-        self._execute(query)
-
-        # build insert query
-        query = 'insert into TBL values (' + ','.join('?' for n in names) + ')'
-
-        if exclude == {}: # for performance
-                          # better to check it once if it is empty
-            for i in _xrange(self.M):
-                self._execute(query, tuple(self[n][i] for n in names))
-        else:
-            for i in _xrange(self.M):
-                # X is the intersection of X and self.conditions
-                # so we know the keys in X will always be in self
-                if X - [(k,[self[k][i]]) for k in X] == X:
-                    self._execute(query, tuple((self[n][i] for n in names)))
-                    
-        # Save (commit) the changes
-        self.conn.commit()
-        
     def _execute(self, query, t=tuple()):
         """private method to execute sqlite3 queries"""
         if self.PRINTQUERIES:
@@ -377,13 +345,12 @@ class PyvtTbl(dict):
         #  This may seem excessive but it provides better feedback
         #  to the user if the errors can be parsed out before had
         #  instead of crashing on confusing looking code segments
-        
-        
+                
         if self=={}:
             raise Exception('Table must have data to print data')
         
         # check to see if data columns have equal lengths
-        if not self._tbl_lengths_equal():
+        if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
 
         # check the supplied arguments
@@ -415,16 +382,12 @@ class PyvtTbl(dict):
         del dup[None]
         if not all([count==1 for count in dup.values()]):
             raise Exception('duplicate labels specified as plot parameters')
-        del dup
 
         # check aggregate function
         aggregate=aggregate.lower()
 
         if aggregate not in self.aggregates:
             raise ValueError("supplied aggregate '%s' is not valid"%aggregate)
-
-##        if aggregate=='list': _aggregate=='group_concat'
-##        if aggregate=='list': _aggregate=='group_concat'
         
         # check to make sure exclude is mappable
         # todo
@@ -441,7 +404,7 @@ class PyvtTbl(dict):
         #     specified by val, rows, and cols. Also eliminate
         #     rows that meet the exclude conditions      
         ##############################################################
-        names_subset = [val]+rows+cols
+        nsubset = [val]+rows+cols
 
         # initialize table
         self.conn.commit()
@@ -449,24 +412,25 @@ class PyvtTbl(dict):
 
         self.conn.commit()
         query =  'create temp table TBL\n  ('
-        query += ', '.join('_%s_ %s'%(n, self.typesdict[n]) for n in names_subset)
+        query += ', '.join('_%s_ %s'%(n, self.typesdict[n]) for n in nsubset)
         query += ')'
         self._execute(query)
 
         # build insert query
-        query = 'insert into TBL values (' + ','.join('?' for n in names_subset) + ')'
+        query = 'insert into TBL values ('
+        query += ','.join('?' for n in nsubset) + ')'
 
         # for performance it is better to check it once if it is empty
         # values are passed to sqlite as a tuple
         if exclude == {}: 
             for i in _xrange(self.M):
-                self._execute(query, tuple(self[n][i] for n in names_subset))
+                self._execute(query, tuple(self[n][i] for n in nsubset))
         else:
             for i in _xrange(self.M):
                 # X is the intersection of X and self.conditions
                 # so we know the keys in X will always be in self
                 if X - [(k,[self[k][i]]) for k in X] == X:
-                    self._execute(query, tuple((self[n][i] for n in names_subset)))
+                    self._execute(query, tuple((self[n][i] for n in nsubset)))
                     
         # Save (commit) the changes
         self.conn.commit()
@@ -505,9 +469,13 @@ class PyvtTbl(dict):
         #
         #  When we pass the data in we use the (?) tuple format
         query=['select ']
-
+        if aggregate == 'tolist':
+            agg = 'group_concat'
+        else:
+            agg = aggregate
+            
         if row_list==[1] and col_list==[1]:
-            query.append('%s( _%s_ ) from TBL'%(aggregate,val))
+            query.append('%s( _%s_ ) from TBL'%(agg,val))
         else:
             if row_list==[1]:
                 query.append('_%s_'%val)
@@ -518,10 +486,10 @@ class PyvtTbl(dict):
                     query.append('_%s_'%r)
 
             if col_list==[1]:
-                query.append('\n  , %s( _%s_ )'%(aggregate,val))
+                query.append('\n  , %s( _%s_ )'%(agg,val))
             else:
                 for cols in col_list:
-                    query.append('\n  , %s( case when '%aggregate)
+                    query.append('\n  , %s( case when '%agg)
                     query.append('and '.join(('_%s_="%s"'\
                                               %(k,v) for k,v in cols)))
                     query.append(' then _%s_ end )'%val)
@@ -544,7 +512,7 @@ class PyvtTbl(dict):
         ##############################################################
         d=[]
         val_type = self.typesdict[val]
-        if aggregate=='group_concat':
+        if aggregate=='tolist':
             for row in self.cur:
                 d.append([])
                 for cell in list(row)[-len(col_list):]:
@@ -617,7 +585,7 @@ class PyvtTbl(dict):
         """
         # 1.
         # check to see if data columns have equal lengths
-        if not self._tbl_lengths_equal():
+        if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
 
         # 2.
@@ -658,10 +626,10 @@ class PyvtTbl(dict):
         if not isinstance(other, PyvtTbl):
             raise TypeError('second argument must be a PyvtTbl')
         
-        if not self._tbl_lengths_equal():
+        if not self._are_col_lengths_equal():
             raise Exception('columns in self have unequal lengths')
         
-        if not other._tbl_lengths_equal():
+        if not other._are_col_lengths_equal():
             raise Exception('columns in other have unequal lengths')
 
         if not set(self.names) == set(other.names):
@@ -677,122 +645,13 @@ class PyvtTbl(dict):
         # update state variables
         self.conditions = DictSet(self)
         self.M = len(self.values()[0])
-            
-##
-##    def loadDB(self,fname):
-##        """method to load table from existing database file"""
-##        self.conn.commit()
-##
-##        self.names=[]
-##        self.types=[]
-##        
-##        with sqlite3.connect(fname) as c:
-##            c.cursor().execute('PRAGMA table_info(TBL)')
-##            for tup in c.cursor():
-##                print(tup)
-##                self.names.append(tup[1])
-##                self.types.append(tup[2])
-##
-##        print(self.types)
-##            
-##    def saveDB(self,fname):
-##        """save table to database file"""
-##        # Create a tmp table to manage exclusions
-##        self.conn.commit()
-##        
-##        with sqlite3.connect(fname) as c:
-##            query='(%s)'%', '.join(['_%s_ %s'%(n,t) for \
-##                    n,t in zip(self.names,self.types)])
-##            c.cursor().execute('create table TBL\n  %s'%(query))
-##
-##            query=['insert into TBL select\n ']
-##            query.append(', '.join(('_%s_'%n for n in self.names)))
-##            query.append('from TBL')
-##            c.cursor().execute(' '.join(query))
-##            c.commit()
-##    
-##    def Export4SPSS(self,p,dvs,between=[],within=[],
-##                    covariates=[],fname='',nested=True):
-##        def tostr(x):
-##            if len(x)==0   : return ''
-##            elif len(x)==1 : return str(x[0])
-##            else           : return str(x)
-##            
-##        # Loop through DVs and append within columns
-##        d=[]
-##        cols=[]
-##        first=True
-##        
-##        # start controls whether nested factors are
-##        # examined
-##        if nested : start = 1
-##        else      : start = len(within)
-##        
-##        for i,dv in enumerate(dvs):
-##            print('collaborating %s'%dv)
-##            for j in xrange(start,len(within)+1):
-##                
-##                for factors in _xuniqueCombinations(within, j):
-##                    print('  pivoting',factors,'...')
-##                    z,r_list,c_list=self.Pivot(dv,rows=[p]+between,
-##                        cols=factors,aggregate='avg',asarray=False)
-##
-##                    # append data to d
-##                    if first:
-##                        d=z
-##                        first=False
-##                    else:
-##                        for k,r in enumerate(z):
-##                            d[k].extend(copy(r))
-##                            
-##                    # store column name
-##                    if c_list==[1]:
-##                        cols.append(dv)
-##                    else:
-##                        for cname in c_list:
-##                            print(cname)
-##                            str_nms=','.join(('%s_%s'%(iv,str(c)) \
-##                                              for (iv,c) in cname))
-##                            cols.append('%s__%s'%(dv,str_nms))
-##
-##            print()
-##
-##        # Add the requested covariates and between
-##        # conditions and participant id
-##        for col in reversed([p]+covariates+between):
-##            print('  concatenating dv "%s"'%col)
-##            z,r_list,c_list=self.Pivot(col,rows=[p],
-##               cols=[],aggregate='arbitrary',asarray=False)
-##
-##                        
-##            for k,r in enumerate(z):
-##                tmp=copy(r)
-##                tmp.extend(d[k])
-##                d[k]=tmp
-##
-##        # If between measures are specified we need to exclude the rows
-##        # without actual data
-##        if between!=[]:
-##            d=d[[i for i,r in enumerate(d[:,-len(cols):]) \
-##                 if all([not v=='' for v in r])]]
-##
-##        # Now we can write the data
-##        if fname=='': fname='4spss_'+self.fname
-##
-##        header=[p]+covariates+between+cols
-##        header=[n.upper() for n in header]
-##        fid=open(fname,'wb')
-##        wtr=csv.writer(fid)
-##        wtr.writerow(header)
-##        wtr.writerows(d)
-##        fid.close()
 
     def printTable(self, exclude={}):
         if self=={}:
             raise Exception('Table must have data to print data')
 
         # check to see if data columns have equal lengths
-        if not self._tbl_lengths_equal():
+        if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
 
         if self.M < 1: # self.M gets reset by self._check_tbl_lengths()
@@ -829,7 +688,7 @@ class PyvtTbl(dict):
             raise Exception('Table must have data to print data')
 
         # check to see if data columns have equal lengths
-        if not self._tbl_lengths_equal():
+        if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
 
         if self.M < 1: # self.M gets reset by self._check_tbl_lengths()
@@ -1033,7 +892,7 @@ class PyvtTbl(dict):
             raise Exception('Table must have data to calculate descriptives')
 
         # check to see if data columns have equal lengths
-        if not self._tbl_lengths_equal():
+        if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
 
         if cname not in self:
@@ -1083,7 +942,7 @@ class PyvtTbl(dict):
             raise Exception('Table must have data to calculate marginals')
         
         # check to see if data columns have equal lengths
-        if not self._tbl_lengths_equal():
+        if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
 
         for cname in [val]+factors:
@@ -1095,7 +954,6 @@ class PyvtTbl(dict):
         del dup[None]
         if not all([count==1 for count in dup.values()]):
             raise Exception('duplicate labels specified as plot parameters')
-        del dup
 
         if not hasattr(factors, '__iter__'):
             raise TypeError( "'%s' object is not iterable"
@@ -1128,7 +986,7 @@ class PyvtTbl(dict):
 
         return factors,dmu,dN,dsem,dlower,dupper            
         
-    def printMarginals(self, val, factors, exclude={}):
+    def printMarginals(self, val, factors=None, exclude={}):
         """Plot marginal statisics over factors for val"""
 
         # marginalMeans handles checking
@@ -1166,40 +1024,166 @@ class PyvtTbl(dict):
         print()
         print(tt.draw())
 
-##    def Box(self, x, xaxis='', fname='boxplot.png',quality='low'):
-##
-##        if xaxis=='':
-##            v=self.SelectCol(val, exclude={}, asarray=False )
-##            N=len(v)
-##            v=sorted(protect(v))
-##
-##        fig=pylab.figure()
-##        pylab.boxplot(v)
-##        
-##        # save figure
-##        if   quality=='low'    : pylab.savefig(fname)
-##        elif quality=='medium' : pylab.savefig(fname,dpi=200)
-##        elif quality=='high'   : pylab.savefig(fname,dpi=300)
-##        else                   : pylab.savefig(fname)
-##
-##        pylab.close()
-##        
-##    def Hist(self, cname,fname='hist.png',quality='low'):
-##        v=self.SelectCol(cname, exclude={}, asarray=False )
-##        N=len(v)
-##        v=sorted(protect(v))
-##
-##        fig=pylab.figure()
-##        pylab.hist(v)
-##        
-##        # save figure
-##        if   quality=='low'    : pylab.savefig(fname)
-##        elif quality=='medium' : pylab.savefig(fname,dpi=200)
-##        elif quality=='high'   : pylab.savefig(fname,dpi=300)
-##        else                   : pylab.savefig(fname)
-##
-##        pylab.close()
-##
+    def plotBox(self, val, factors=[], exclude={},
+            fname=None, quality='medium'):
+        if self=={}:
+            raise Exception('Table must have data to print data')
+        
+        # check to see if data columns have equal lengths
+        if not self._are_col_lengths_equal():
+            raise Exception('columns have unequal lengths')
+
+        # check the supplied arguments
+        if val not in self:
+            raise KeyError(val)
+
+        if not hasattr(factors, '__iter__'):
+            raise TypeError( "'%s' object is not iterable"
+                             % type(factors).__name__)
+        
+        for k in factors:
+            if k not in self:
+                raise KeyError(k)
+            
+        # check for duplicate names
+        dup = Counter([val]+factors)
+        del dup[None]
+        if not all([count==1 for count in dup.values()]):
+            raise Exception('duplicate labels specified as plot parameters')
+
+        # check for third party packages
+        try:
+            import pylab
+        except:
+            raise ImportError('pylab is required for plotting')
+
+        try:
+            import numpy as np
+        except:
+            raise ImportError('numpy is required for plotting')
+
+        # check fname
+        if not isinstance(fname, _strobj) and fname != None:
+            raise TypeError('fname must be None or string')
+
+        if isinstance(fname, _strobj):
+            if not (fname.lower().endswith('.png') or \
+                    fname.lower().endswith('.svg')):
+                raise Exception('fname must end with .png or .svg')
+
+        if factors == None:
+            d = self.selectCol(val, exclude=exclude)            
+            fig = pylab.figure()
+            pylab.boxplot(np.array(d))
+            xticks = pylab.xticks()[0]
+            xlabels = [val]
+            pylab.xticks(xticks, xlabels)
+
+        else:
+            D,cs = self._pvt(val, rows=factors,
+                             exclude=exclude,
+                             aggregate='tolist')[:2]
+
+            D = [np.array(_flatten(d)) for d in D]
+
+            fig = pylab.figure(figsize=(6*len(factors),6))
+            fig.subplots_adjust(left=.05, right=.97, bottom=0.24)
+            pylab.boxplot(D)
+            xticks = pylab.xticks()[0]
+            xlabels = ['\n'.join(['%s = %s'%fc for fc in c]) for c in cs]
+            pylab.xticks(xticks, xlabels,
+                         rotation='vertical',
+                         verticalalignment='top')   
+
+
+        maintitle = '%s'%val
+
+        if factors != []:
+            maintitle += ' by '
+            maintitle += ' * '.join(factors)
+            
+        fig.text(0.5, 0.95, maintitle,
+                 horizontalalignment='center',
+                 verticalalignment='top')   
+            
+        if fname == None:
+            fname = 'box(%s).png'%val.lower()
+        
+        # save figure
+        if quality=='low' or fname.endswith('.svg'):
+            pylab.savefig(fname)
+            
+        elif quality=='medium':
+            pylab.savefig(fname,dpi=200)
+            
+        elif quality=='high':
+            pylab.savefig(fname,dpi=300)
+            
+        else:
+            pylab.savefig(fname)
+
+        pylab.close()
+
+        if self.TESTMODE:
+            return True
+
+    def hist(self, val, exclude={}, bins=10,
+             range=None, density=False, cumulative=False):          
+        V = self.selectCol(val, exclude=exclude)
+        return pystaggrelite3.hist(V, bins=bins, range=range,
+                                   density=density, cumulative=cumulative)
+
+    def plotHist(self, val, exclude={}, bins=10,
+                 range=None, density=False, cumulative=False,
+                 fname=None, quality='medium'):    
+        
+        # check for third party packages
+        try:
+            import pylab
+        except:
+            raise ImportError('pylab is required for plotting')
+
+        try:
+            import numpy as np
+        except:
+            raise ImportError('numpy is required for plotting')
+
+        # check fname
+        if not isinstance(fname, _strobj) and fname != None:
+            raise TypeError('fname must be None or string')
+
+        if isinstance(fname, _strobj):
+            if not (fname.lower().endswith('.png') or \
+                    fname.lower().endswith('.svg')):
+                raise Exception('fname must end with .png or .svg')                
+
+        v = self.selectCol(val, exclude=exclude)
+        
+        fig=pylab.figure()
+        pylab.hist(np.array(v), bins=bins, range=range,
+                   normed=density, cumulative=cumulative)
+
+        if fname == None:
+            fname = 'hist(%s).png'%val.lower()
+        
+        # save figure
+        if quality=='low' or fname.endswith('.svg'):
+            pylab.savefig(fname)
+            
+        elif quality=='medium':
+            pylab.savefig(fname,dpi=200)
+            
+        elif quality=='high':
+            pylab.savefig(fname,dpi=300)
+            
+        else:
+            pylab.savefig(fname)
+
+        pylab.close()
+
+        if self.TESTMODE:
+            return True
+
     def plotMarginals(self, val, xaxis, 
                       seplines=None, sepxplots=None, sepyplots=None,
                       xmin='AUTO', xmax='AUTO', ymin='AUTO', ymax='AUTO',
@@ -1251,7 +1235,7 @@ class PyvtTbl(dict):
             raise ImportError('numpy is required for plotting')
 
         # check to see if data columns have equal lengths
-        if not self._tbl_lengths_equal():
+        if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
 
         # check to make sure arguments are column labels
@@ -1332,8 +1316,9 @@ class PyvtTbl(dict):
         desc = self.descriptives(val)
         
         if ymin == 'AUTO':
+            # when plotting postive data always have the y-axis go to 0
             if desc['min'] >= 0.:
-                ymin = 0.
+                ymin = 0. 
             else:
                 ymin = desc['mean'] - 3.*desc['stdev']
         if ymax == 'AUTO':
@@ -1379,12 +1364,13 @@ class PyvtTbl(dict):
         
         #  6. Initialize pylab.figure and set plot parameters
         ##############################################################  
-        fig = pylab.figure(figsize=(4*numcols, 3*numrows+1))
-        fig.subplots_adjust(wspace=.05, hspace=0.25)
+        fig = pylab.figure(figsize=(6*numcols, 4*numrows+1))
+        fig.subplots_adjust(wspace=.05, hspace=0.2)
         
         #  7. Build and set main title
         ##############################################################  
         maintitle = '%s by %s'%(val,xaxis)
+        
         if seplines:
             maintitle += ' * %s'%seplines
         if sepxplots:
@@ -1563,12 +1549,16 @@ class PyvtTbl(dict):
                              .replace('by','~') \
                              .replace('*','X') \
                              .replace(' ','')
-        if   quality=='low':
+            
+        if quality=='low' or fname.endswith('.svg'):
             pylab.savefig(fname)
+            
         elif quality=='medium':
             pylab.savefig(fname,dpi=200)
+            
         elif quality=='high':
             pylab.savefig(fname,dpi=300)
+            
         else:
             pylab.savefig(fname)
 
@@ -1580,7 +1570,20 @@ class PyvtTbl(dict):
         ##############################################################
         if self.TESTMODE:
             return test
-
+        
+####W[-1]=10000.
+##
+##
+##_hist(x, bins=13, weights=W, cumulative=False, density=False)
+##
+##import pylab
+##pylab.figure()
+##(N, B, patches)=pylab.hist(x, bins=-13, weights=W, cumulative=False, normed=False)
+##print(patches)
+##for n,b in zip(N, B):
+##    print(_str(b,'f',3),n)
+##
+##pylab.close()
 ##df=PyvtTbl()
 ##df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
 ##df['DUM']=range(48)
@@ -1599,17 +1602,18 @@ class PyvtTbl(dict):
 ##from PVTTBL group by SUBJECT,COURSE
 ##'''
 ##
-##df=DataFrame()
-##df.ReadTbl('error~subjectXtimeofdayXcourseXmodel.csv')
+df=PyvtTbl()
+df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+df.plotBox('SUPPRESSION',factors=['GROUP','CYCLE'])
 ##pp(df.Pivot('ERROR',rows=['SUBJECT','TIMEOFDAY'],exclude={'SUBJECT':['1']}))
 ##
 
 ##    
-df=PyvtTbl()
-df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
-df.printPivot('SUPPRESSION',
-         aggregate='count',
-         exclude={'GROUP':['AB'],'CYCLE':[1,2]})
+##df=PyvtTbl()
+##df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+##df.printPivot('SUPPRESSION',
+##         aggregate='count',
+##         exclude={'GROUP':['AB'],'CYCLE':[1,2]})
 ##df.printTable(exclude={'AGE':['old'],'PHASE':['I']})
 ##df.printDescriptives('SUPPRESSION')
 ##df.writePivot()
