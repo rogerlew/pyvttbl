@@ -538,6 +538,63 @@ class PyvtTbl(dict):
         ##############################################################
         return d,row_list,col_list
 
+    def sort(self):
+        """sort the table in place"""
+        pass
+
+    def validate(self, criteria, verbose=False, report=True):
+        """
+        validate the data in the table.
+        
+        criteria is a dict. The keys should coorespond to columns in
+        the table. The values should be functions which take a single
+        parameter and return a boolean. The function is applied
+        individually to each value of the column.
+        """
+        if self=={}:
+            raise Exception('Table must have data to validate data')
+
+        valCounter = Counter()
+        reportDict = {}
+        for (k,func) in criteria.items():
+            reportDict[k] = []
+            if k not in self:
+                reportDict[k].append("'%s' is not a column")
+            
+            if verbose: print('\nValidating %s:'%k)
+                
+            for i,v in enumerate(self[k]):
+                try:
+                    result = func(v)
+                except:
+                    result = False
+                    reportDict[k].append("failure applying func to %s"%str(v))
+                
+                valCounter[result] += 1
+                valCounter['n'] += 1
+
+                if result:
+                    if verbose: print('.', end='')
+                else:
+                    reportDict[k].append("on index %i value '%s' failed validation"
+                                     %(i, str(v)))
+                    if verbose: print('X', end='')
+            if verbose: print()
+
+
+        if report:
+            print('\nReport')
+            for k in criteria:
+                if len(reportDict[k]) > 0:
+                    print('While validating %s:'%k)
+                for line in reportDict[k]:
+                    print(' ',line)
+
+            print('Tested:', valCounter['n'])
+            print('Passed:', valCounter[True])
+            print('Failed:', valCounter[False])
+
+        return valCounter['n'] == valCounter[True]
 
     def pivot(self, val, rows=[], cols=[], aggregate='avg',
               exclude={}, flatten=False):
@@ -1605,6 +1662,14 @@ class PyvtTbl(dict):
 df=PyvtTbl()
 df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 df.plotBox('SUPPRESSION',factors=['GROUP','CYCLE'])
+df['RANDDATA'][42]='nan'
+
+df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
+               'SEX' : lambda x: x in [0],
+       'SUPPRESSION' : lambda x: x < 62.,
+          'RANDDATA' : lambda x: _isfloat(x) and not isnan(x),
+           'SUBJECT' : _isint}, verbose=True, report=False)
+
 ##pp(df.Pivot('ERROR',rows=['SUBJECT','TIMEOFDAY'],exclude={'SUBJECT':['1']}))
 ##
 
