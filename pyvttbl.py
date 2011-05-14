@@ -553,48 +553,74 @@ class PyvtTbl(dict):
         """
         if self=={}:
             raise Exception('Table must have data to validate data')
-
+        
+        try:        
+            c, s = set(criteria.keys()), set(self.keys())
+        except:
+            raise TypeError('criteria must be mappable type')
+        
         valCounter = Counter()
         reportDict = {}
-        for (k,func) in criteria.items():
+        for k in (c&s):
             reportDict[k] = []
-            if k not in self:
-                reportDict[k].append("'%s' is not a column")
-            
-            if verbose: print('\nValidating %s:'%k)
+            if verbose:
+                print('\nValidating %s:'%k)
                 
             for i,v in enumerate(self[k]):
                 try:
+                    func = criteria[k]
                     result = func(v)
                 except:
                     result = False
-                    reportDict[k].append("failure applying func to %s"%str(v))
+                    valCounter['code_failures'] +=1
                 
                 valCounter[result] += 1
                 valCounter['n'] += 1
 
                 if result:
-                    if verbose: print('.', end='')
+                    if verbose:
+                        print('.', end='')
                 else:
-                    reportDict[k].append("on index %i value '%s' failed validation"
-                                     %(i, str(v)))
-                    if verbose: print('X', end='')
-            if verbose: print()
+                    reportDict[k].append(
+                        "Error: on index %i value "
+                        "'%s' failed validation"%(i, str(v)))
+                    if verbose:
+                        print('X', end='')
+            if verbose:
+                print()
 
-
+        all_keys_found = bool((c ^ (c & s)) == set())
+        pass_or_fail = (valCounter['n'] == valCounter[True]) & all_keys_found
+        
         if report:
-            print('\nReport')
-            for k in criteria:
+            print('\nReport:')
+            for k in (c&s):
                 if len(reportDict[k]) > 0:
                     print('While validating %s:'%k)
                 for line in reportDict[k]:
-                    print(' ',line)
+                    print('   ',line)
 
-            print('Tested:', valCounter['n'])
-            print('Passed:', valCounter[True])
-            print('Failed:', valCounter[False])
+            print(  '  Values tested:', valCounter['n'],
+                  '\n  Values passed:', valCounter[True],
+                  '\n  Values failed:', valCounter[False])
 
-        return valCounter['n'] == valCounter[True]
+            if valCounter['code_failures'] != 0:
+                print('\n  (%i values failed because '
+                      'func(x) did not properly execute)'
+                      %valCounter['code_failures'])
+
+            if not all_keys_found:
+                print('\n  Error: criteria dict contained '
+                      'keys not found in table:'
+                      '\n   ', ', '.join(c ^ (c & s)))
+
+            if pass_or_fail:
+                print('\n***Validation PASSED***')
+            else:
+                print('\n***Validation FAILED***')
+
+        
+        return (valCounter['n'] == valCounter[True]) and all_keys_found
 
     def pivot(self, val, rows=[], cols=[], aggregate='avg',
               exclude={}, flatten=False):
@@ -969,9 +995,9 @@ class PyvtTbl(dict):
         D['max']        = max(V)
         D['range']      = D['max']-D['min']
         D['median']     = V[int(N/2)]
-        if D['count']%2==0:
-            D['median']+= V[int(N/2)-1]
-            D['median']/= 2.
+        if D['count']%2 == 0:
+            D['median'] += V[int(N/2)-1]
+            D['median'] /= 2.
         D['95ci_lower'] = D['mean']-1.96*D['sem']
         D['95ci_upper'] = D['mean']+1.96*D['sem']
 
@@ -1659,16 +1685,43 @@ class PyvtTbl(dict):
 ##from PVTTBL group by SUBJECT,COURSE
 ##'''
 ##
+##df=PyvtTbl()
+##df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+##df.plotBox('SUPPRESSION',factors=['GROUP','CYCLE'])
+##df['RANDDATA'][42]='nan'
+##
+##df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
+##               'SEX' : lambda x: x in [0],
+##       'SUPPRESSION' : lambda x: x < 62.,
+##          'RANDDATA' : lambda x: _isfloat(x) and not isnan(x),
+##           'SUBJECT' : _isint}, verbose=True, report=False)
+
+
+
+##df=PyvtTbl()
+##df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+##df.plotBox('SUPPRESSION',factors=['GROUP','CYCLE'])
+####df['RANDDATA'][42]='nan'
+##
+##R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
+##               'SEX' : lambda x: x in [0,1],
+##       'SUPPRESSION' : lambda x: x < 1000.,
+##          'RANDDATA' : lambda x: _isfloat(x) and not isnan(x),
+##           'SUBJECT' : _isint}, verbose=True, report=True)
+
 df=PyvtTbl()
 df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 df.plotBox('SUPPRESSION',factors=['GROUP','CYCLE'])
-df['RANDDATA'][42]='nan'
+##df['RANDDATA'][42]='nan'
 
-df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
-               'SEX' : lambda x: x in [0],
-       'SUPPRESSION' : lambda x: x < 62.,
-          'RANDDATA' : lambda x: _isfloat(x) and not isnan(x),
-           'SUBJECT' : _isint}, verbose=True, report=False)
+R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
+                 'SEX' : lambda x: x in [0,1],
+         'SUPPRESSION' : lambda x: x < 1000.,
+            'RANDDATA' : lambda x: _isfloat(x) and not isnan(x),
+             'SUBJECT' : _isint(1),
+          'NOT_A_COL1' : _isint,
+          'NOT_A_COL2' : _isint}, verbose=False, report=True)
+
 
 ##pp(df.Pivot('ERROR',rows=['SUBJECT','TIMEOFDAY'],exclude={'SUBJECT':['1']}))
 ##
