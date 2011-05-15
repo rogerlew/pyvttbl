@@ -244,7 +244,7 @@ class PyvtTbl(dict):
 
         super(PyvtTbl, self).__setitem__(key, item)
 
-        # set state variables
+        # update state variables
         if key not in self.names:
             self.names.append(key)
             self.types.append(self._checktype(key))
@@ -253,6 +253,18 @@ class PyvtTbl(dict):
         self.conditions[key] = self[key]
         self.N = len(self.names)
         self.M = len(self.values()[0])
+
+    def __delitem__(self, key):
+        super(PyvtTbl, self).__delitem__(key)
+
+        # update state variables
+        index = self.names.index(key)
+        self.names.pop(index)
+        self.types.pop(index)
+            
+        del self.typesdict[key]
+        del self.conditions[key]
+        self.N = len(self.names)    
 
     def _are_col_lengths_equal(self):
         
@@ -292,7 +304,16 @@ class PyvtTbl(dict):
 
         self.cur.execute(query,t)
 
-    def _build_tbl(self, nsubset, exclude={}):
+    def _executemany(self, query, tlist):
+        """private method to execute sqlite3 queries"""
+        if self.PRINTQUERIES:
+            print(query)
+            print('  ',tlist[0])
+            print('   ...\n')
+
+        self.cur.executemany(query,tlist)
+
+    def _build_tbl_old(self, nsubset, exclude={}):
         """
         build or rebuild sqlite table with columns in nsubset and where
         the key-conditions in exclude are not True.
@@ -328,12 +349,68 @@ class PyvtTbl(dict):
         # Save (commit) the changes
         self.conn.commit()
 
+    def _build_tbl(self, nsubset, exclude={}):
+        """
+        build or rebuild sqlite table with columns in nsubset and where
+        any of the the key/conditions in exclude are True.
+        """
+        X = self.conditions & exclude
+        nsubset2 = list(set(nsubset)|set(exclude.keys()))
+        
+        # initialize table
+        self.conn.commit()
+        self._execute('drop table if exists TBL2')
+
+        self.conn.commit()
+        query =  'create temp table TBL2\n  ('
+        query += ', '.join('_%s_ %s'%(n, self.typesdict[n]) for n in nsubset2)
+        query += ')'
+        self._execute(query)
+
+        # build insert query
+        query = 'insert into TBL2 values ('
+        query += ','.join('?' for n in nsubset2) + ')'
+        self._executemany(query, zip(*[self[n] for n in nsubset2]))
+        self.conn.commit()
+
+        if X == {}:
+            self._execute('drop table if exists TBL')
+            self.conn.commit()
+            
+            self._execute('alter table TBL2 rename to TBL')
+            self.conn.commit()
+        else:
+            self._execute('drop table if exists TBL')
+            self.conn.commit()
+            
+            query = []
+            for n in nsubset:
+                query.append('_%s_ %s'%(n, self.typesdict[n]))
+            query = ', '.join(query)
+            query =  'create temp table TBL\n  (' + query + ')'
+            
+            self._execute(query)
+
+            # build insert query
+            query = []
+            for k,values in X.items():
+                for v in values:
+                    query.append('not _%s_="%s"'%(k,v))
+
+            query = ' and '.join(query)
+            nstr = ', '.join('_%s_'%n for n in nsubset)
+            query = 'insert into TBL select %s from TBL2\n where '%nstr + query
+            
+            # run query
+            self._execute(query)
+            self.conn.commit()
+
     def _get_sql_tbl_info(self):
         """
         private method to get a list of tuples containing
         information relevant to the current sqlite3 table
         """
-        self.cur.commit()
+        self.conn.commit()
         self._execute('PRAGMA table_info(TBL)')
         return list(self.cur)
     
@@ -463,12 +540,12 @@ class PyvtTbl(dict):
         #  The rest of the query is set by the logic.
         #
         #  When we pass the data in we use the (?) tuple format
-        query=['select ']
         if aggregate == 'tolist':
             agg = 'group_concat'
         else:
             agg = aggregate
             
+        query=['select ']            
         if row_list==[1] and col_list==[1]:
             query.append('%s( _%s_ ) from TBL'%(agg,val))
         else:
@@ -485,8 +562,12 @@ class PyvtTbl(dict):
             else:
                 for cols in col_list:
                     query.append('\n  , %s( case when '%agg)
-                    query.append(' and '.join(('_%s_="%s"'\
-                                              %(k,v) for k,v in cols)))
+                    if all(map(_isfloat, zip(*cols)[1])):
+                        query.append(' and '\
+                                     .join(('_%s_=%s'%(k,v) for k,v in cols)))
+                    else:
+                        query.append(' and '\
+                                     .join(('_%s_="%s"'%(k,v) for k,v in cols)))
                     query.append(' then _%s_ end )'%val)
 
             if row_list==[1]:
@@ -501,7 +582,7 @@ class PyvtTbl(dict):
 
         #  5. Run Query
         ##############################################################
-        self._execute(''.join(query) )
+        self._execute(''.join(query))
 
         #  6. Read data to from cursor into a list of lists
         ##############################################################
@@ -552,31 +633,35 @@ class PyvtTbl(dict):
             raise TypeError( "'%s' object is not iterable"
                              % type(cols).__name__)
 
+
+        # check or build order
+        if order == []:
+            order = deepcopy(self.names)
+
+        # there are probably faster ways to do this, we definitely need
+        # to treat the words as tokens to avoid problems were column
+        # names are substrings of other column names
         for i,k in enumerate(order):
             ks = k.split()
             if ks[0] not in self:
                 raise KeyError(k)
+            
+            if len(ks) == 1:
+                order[i] = '_%s_'%ks[0]
 
-            if len(ks) == 2:
+            elif len(ks) == 2:
                 if ks[1].lower() not in ['desc', 'asc']:
                     raise Exception("'order arg must be 'DESC' or 'ASC'")
+                order[i] = '_%s_ %s'%(ks[0],ks[1])
 
             elif len(ks) > 2:
                 raise Exception('too many parameters specified')
 
-        # Build table
+        # build table
         self._build_tbl(self.names)
-        
-        # form query
-        if order == []:
-            order = deepcopy(self.names)
 
-        for i in _xrange(len(order)):
-            for n in self.names:
-                order[i] = order[i].replace(n, '_%s_'%n)
-
+        # build and excute query
         query = 'select * from TBL order by ' + ', '.join(order)
-
         self._execute(query)
 
         # read sorted order from cursor
@@ -604,7 +689,8 @@ class PyvtTbl(dict):
             raise Exception('table must have data to validate data')
         
         try:        
-            c, s = set(criteria.keys()), set(self.keys())
+            c = set(criteria.keys())
+            s = set(self.keys())
         except:
             raise TypeError('criteria must be mappable type')
 
@@ -747,20 +833,14 @@ class PyvtTbl(dict):
             warnings.warn("exclude is not a subset of table conditions",
                           RuntimeWarning)
             
-        # ignore keys/sets in exclude that aren't in self
-        X = self.conditions & exclude 
-
-        if exclude == {}: # the simple case
-            return copy(self[val])
-
-        d=[]
-        for i in _xrange(self.M):
-            # X is the intersection of X and self.conditions
-            # so we know the keys in X will always be in self
-            if X - [(k,[self[k][i]]) for k in X] == X:
-                d.append(self[val][i])
-
-        return d
+        if exclude == {}: 
+            return copy(self[val])             
+        else:
+            # ignore keys/sets in exclude that aren't in self
+            X = self.conditions & exclude
+            self._build_tbl([val], exclude)
+            self._execute('select * from TBL')
+            return [r[0] for r in self.cur]
 
     def attach(self, other):
         """
@@ -793,7 +873,12 @@ class PyvtTbl(dict):
         self.M = len(self.values()[0])
 
     def insert(self, row):
-        """insert a row into the table. The row should be mappable"""
+        """
+        insert a row into the table
+
+        The row should be mappable. e.g. a dict or a list with key/value
+        pairs. 
+        """
         try:
             c, s = set(dict(row).keys()), set(self.keys())
         except:
@@ -803,7 +888,7 @@ class PyvtTbl(dict):
         if self == {}:
             # if the table is empty try and unpack the table as
             # a row so it preserves the order of the column names
-            if isinstance(row,list):
+            if isinstance(row, list):
                 for (k,v) in row:
                     self[k] = [v]
                     self.conditions[k] = [v]
@@ -840,15 +925,13 @@ class PyvtTbl(dict):
         aligns=[_ifelse(dt in 'fi','r','l') for dt in dtypes]
         tt.set_cols_align(aligns)
         
-        if exclude=={}: # for performance
-                        # better to check it once if it is empty
-            for i in _xrange(self.M):
-                tt.add_row([self[n][i] for n in self.names])                
+        if exclude == {}: 
+                tt.add_rows(zip(*list(self[n] for n in self.names)))              
         else:
-            for i in _xrange(self.M):
-                if X - [(k,[self[k][i]]) for k in X] == X:
-                    tt.add_row([self[n][i] for n in self.names])
-
+            self._build_tbl(self.names, exclude)
+            self._execute('select * from TBL')
+            tt.add_rows(list(self.cur))
+        
         tt.header(self.names)
         tt.set_deco(TextTable.HEADER)
 
@@ -889,14 +972,12 @@ class PyvtTbl(dict):
             wtr = csv.writer(fid, delimiter=delimiter)
             wtr.writerow(self.names)
 
-            if exclude=={}: # for performance
-                            # better to check it once if it is empty
-                for i in _xrange(self.M):
-                    wtr.writerow([_str(self[n][i],n=8) for n in self.names])                
+            if exclude == {}: 
+                wtr.writerows(zip(*list(self[n] for n in self.names)))
             else:
-                for i in _xrange(self.M):
-                    if X - [(k,[self[k][i]]) for k in X] == X:
-                        wtr.writerow([_str(self[n][i],n=8) for n in self.names])
+                self._build_tbl(self.names, exclude)
+                self._execute('select * from TBL')
+                wtr.writerows(list(self.cur))
                                     
     def printPivot(self, val, rows=[], cols=[], aggregate='avg',
                    exclude={}, flatten=False):
@@ -914,7 +995,7 @@ class PyvtTbl(dict):
             for (k, v) in sorted(self.Zexclude.items()):
                 conditions = ', '.join((str(c) for c in v))
                 X_list.append('%s not in {%s}'%(k, conditions))
-            first += ' where ' + ' or '.join(X_list)
+            first += ' where ' + ' and '.join(X_list)
 
         tt = TextTable(max_width=10000000)
 
@@ -1009,7 +1090,7 @@ class PyvtTbl(dict):
             for (k, v) in sorted(self.Zexclude.items()):
                 conditions = '; '.join((str(c) for c in v))
                 X_list.append('%s not in {%s}'%(k, conditions))
-            first = [self.Zval + ' where ' + ' or '.join(X_list)]
+            first = [self.Zval + ' where ' + ' and '.join(X_list)]
         else:
             first = [self.Zval]
 
@@ -1163,7 +1244,7 @@ class PyvtTbl(dict):
     def printMarginals(self, val, factors, exclude={}):
         """Plot marginal statisics over factors for val"""
 
-        # marginalMeans handles checking
+        # marginals handles checking
         x=self.marginals(val,factors=factors,exclude=exclude)
         [f,dmu,dN,dsem,dlower,dupper]=x
 
@@ -1176,7 +1257,7 @@ class PyvtTbl(dict):
         M.append(dsem)
         M.append(dlower)
         M.append(dupper)
-        M=[list(row) for row in zip(*M)] # transpose
+        M=zip(*M) # transpose
 
         # figure out the width needed by the condition labels so we can
         # set the width of the table
@@ -1792,8 +1873,7 @@ class PyvtTbl(dict):
 ##    print(_str(b,'f',3),n)
 ##
 ##pylab.close()
-##df=PyvtTbl()
-##df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+
 
 ##df.sort(['MODEL DESC', 'COURSE'])
 ##df.printTable()

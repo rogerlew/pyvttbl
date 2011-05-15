@@ -193,13 +193,33 @@ class Test__setitem__(unittest.TestCase):
 
         # user should be able to freely manipulate data, but should
         # complain if the user tries to pivot with unequal columns
-        
         with self.assertRaises(Exception) as cm:
             self.df.pivot('DUM',['COURSE'])
 
         self.assertEqual(str(cm.exception),
                          'columns have unequal lengths')
 
+class Test__delitem__(unittest.TestCase):
+    def setUp(self):
+        self.df=PyvtTbl()
+        self.df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        del self.df['COURSE']
+
+    def test0(self):
+        self.assertEqual(self.df.names,
+                         ['SUBJECT', 'TIMEOFDAY', 'MODEL', 'ERROR'])
+
+    def test1(self):
+        self.assertEqual(self.df.types,
+                         ['integer', 'text', 'text', 'integer'])
+
+    def test2(self):
+        self.assertEqual(self.df.conditions.keys(),
+                         ['SUBJECT', 'MODEL', 'TIMEOFDAY', 'ERROR'])
+
+    def test3(self):
+        self.assertEqual(self.df.N, 4)
+        
 class Test_insert(unittest.TestCase):
     def test0(self):
         df=PyvtTbl()
@@ -742,7 +762,7 @@ class Test_writePivot(unittest.TestCase):
     def test0(self):
         # self.assertEqual doesn't like really long comparisons
         # so we will break it up into lines
-        R=['SUPPRESSION where CYCLE not in {1; 2} or GROUP not in {AB}\r\n',
+        R=['SUPPRESSION where CYCLE not in {1; 2} and GROUP not in {AB}\r\n',
            'GROUP,CYCLE=3.0_AGE=old,CYCLE=3.0_AGE=young,CYCLE=4.0_AGE=old,CYCLE=4.0_AGE=young\r\n',
            'AA,21.9375,10.0125,22.25,10.5125\r\n',
            'LAB,37.0625,12.5375,36.4375,12.0375\r\n']
@@ -764,7 +784,7 @@ class Test_writePivot(unittest.TestCase):
             self.failUnlessEqual(d,r)
 
         # clean up
-        os.remove('./suppression~(group)Z(cycleXage).csv')
+##        os.remove('./suppression~(group)Z(cycleXage).csv')
             
     def test1(self):
         # same as test0 except we are specifying a filename
@@ -1297,10 +1317,10 @@ class Test_validate(unittest.TestCase):
         df['RANDDATA'][42]='nan'
 
         R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
-                       'SEX' : lambda x: x in [0],
-               'SUPPRESSION' : lambda x: x < 62.,
-                  'RANDDATA' : lambda x: _isfloat(x),
-                   'SUBJECT' : _isint}, verbose=False, report=False)
+                         'SEX' : lambda x: x in [0],
+                 'SUPPRESSION' : lambda x: x < 62.,
+                    'RANDDATA' : lambda x: _isfloat(x),
+                     'SUBJECT' : _isint}, verbose=False, report=False)
         self.assertFalse(R)
 
 
@@ -1312,10 +1332,10 @@ class Test_validate(unittest.TestCase):
         ##df['RANDDATA'][42]='nan'
 
         R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
-                       'SEX' : lambda x: x in [0,1],
-               'SUPPRESSION' : lambda x: x < 1000.,
-                  'RANDDATA' : lambda x: _isfloat(x),
-                   'SUBJECT' : _isint}, verbose=False, report=False)
+                         'SEX' : lambda x: x in [0,1],
+                 'SUPPRESSION' : lambda x: x < 1000.,
+                    'RANDDATA' : lambda x: _isfloat(x),
+                     'SUBJECT' : _isint}, verbose=False, report=False)
         self.assertTrue(R)
         
     def test2(self):
@@ -1357,6 +1377,7 @@ def suite():
     return unittest.TestSuite((
             unittest.makeSuite(Test_readTbl),
             unittest.makeSuite(Test__setitem__),
+            unittest.makeSuite(Test__delitem__),
             unittest.makeSuite(Test_insert),
             unittest.makeSuite(Test_attach),
             unittest.makeSuite(Test_sort),
@@ -1365,8 +1386,8 @@ def suite():
             unittest.makeSuite(Test_marginals),
             unittest.makeSuite(Test_selectCol),
             unittest.makeSuite(Test_hist),
-##            unittest.makeSuite(Test_plotHist),
-##            unittest.makeSuite(Test_plotMarginals),
+            unittest.makeSuite(Test_plotHist),
+            unittest.makeSuite(Test_plotMarginals),
             unittest.makeSuite(Test_writeTable),
             unittest.makeSuite(Test_writePivot),
             unittest.makeSuite(Test_descriptives),
