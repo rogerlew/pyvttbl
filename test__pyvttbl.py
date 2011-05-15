@@ -1166,6 +1166,52 @@ class Test_descriptives(unittest.TestCase):
 
         for k in D.keys():
             self.failUnlessAlmostEqual(D[k],R[k])
+
+class Test_validate(unittest.TestCase):
+    def test0(self):
+        from pyvttbl import _isint, _isfloat
+
+        df=PyvtTbl()
+        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df['RANDDATA'][42]='nan'
+
+        R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
+                       'SEX' : lambda x: x in [0],
+               'SUPPRESSION' : lambda x: x < 62.,
+                  'RANDDATA' : lambda x: _isfloat(x),
+                   'SUBJECT' : _isint}, verbose=False, report=False)
+        self.assertFalse(R)
+
+
+    def test1(self):
+        from pyvttbl import _isint, _isfloat
+
+        df=PyvtTbl()
+        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        ##df['RANDDATA'][42]='nan'
+
+        R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
+                       'SEX' : lambda x: x in [0,1],
+               'SUPPRESSION' : lambda x: x < 1000.,
+                  'RANDDATA' : lambda x: _isfloat(x),
+                   'SUBJECT' : _isint}, verbose=False, report=False)
+        self.assertTrue(R)
+        
+    def test2(self):
+        from pyvttbl import _isint, _isfloat
+
+        df=PyvtTbl()
+        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        ##df['RANDDATA'][42]='nan'
+
+        R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
+                         'SEX' : lambda x: x in [0,1],
+                 'SUPPRESSION' : lambda x: x < 1000.,
+                    'RANDDATA' : lambda x: _isfloat(x) and not isnan(x),
+                     'SUBJECT' : _isint(1),
+                  'NOT_A_COL1' : _isint,
+                  'NOT_A_COL2' : _isint}, verbose=False, report=False)
+        self.assertFalse(R)
            
 def suite():
     return unittest.TestSuite((
@@ -1182,6 +1228,7 @@ def suite():
             unittest.makeSuite(Test_writeTable),
             unittest.makeSuite(Test_writePivot),
             unittest.makeSuite(Test_descriptives),
+            unittest.makeSuite(Test_validate),
                               ))
 
 if __name__ == "__main__":

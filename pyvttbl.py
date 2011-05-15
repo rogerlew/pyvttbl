@@ -18,6 +18,7 @@ elif sys.version_info[0] == 3:
 
 import anydbm
 import csv
+import inspect
 import math
 import sqlite3
 import warnings
@@ -110,8 +111,6 @@ def _xuniqueCombinations(items, n):
         for i in _xrange(len(items)):
             for cc in _xuniqueCombinations(items[i+1:], n-1):
                 yield [items[i]]+cc
-
-
                 
 # the dataframe class
 class PyvtTbl(dict):                            
@@ -177,11 +176,11 @@ class PyvtTbl(dict):
 
         # prints the sqlite3 queries to standard out before
         # executing them for debuggin purposes
-        self.PRINTQUERIES = False 
+        self.PRINTQUERIES = False
 
         # When true the plotting methods return a dict that
         # is validated with unit testing
-        self.TESTMODE = False    
+        self.TESTMODE = False
         
     def readTbl(self, fname, skip=0, delimiter=',',labels=True):
         """
@@ -245,7 +244,7 @@ class PyvtTbl(dict):
         # set state variables
         self.names = colnames
         self.types = [self._checktype(n) for n in colnames]
-        self.typesdict = dict(((n, t) for n, t in zip(self.names, self.types)))
+        self.typesdict = dict(zip(self.names, self.types))
         self.conditions = DictSet(self)
         self.N = len(self.names)
         self.M = len(self.values()[0])
@@ -259,15 +258,17 @@ class PyvtTbl(dict):
         super(PyvtTbl, self).__setitem__(key, item)
 
         # set state variables
-        self.names.append(key)
-        self.types.append(self._checktype(key))
-        self.typesdict[key] = self.types[-1]
+        if key not in self.names:
+            self.names.append(key)
+            self.types.append(self._checktype(key))
+            
+        self.typesdict[key] = self._checktype(key)
         self.conditions[key] = self[key]
         self.N = len(self.names)
         self.M = len(self.values()[0])
 
     def _are_col_lengths_equal(self):
-
+        
         # if self is not empty
         counts = [len(v) for v in self.values()]
         if all([c-counts[0]+1 == 1 for c in counts]):
@@ -303,6 +304,42 @@ class PyvtTbl(dict):
             print()
 
         self.cur.execute(query,t)
+
+    def _build_tbl(self, nsubset, exclude={}):
+        """
+        build or rebuild sqlite table with columns in nsubset and where
+        the key-conditions in exclude are not True.
+        """
+        X = self.conditions & exclude
+        
+        # initialize table
+        self.conn.commit()
+        self._execute('drop table if exists TBL')
+
+        self.conn.commit()
+        query =  'create temp table TBL\n  ('
+        query += ', '.join('_%s_ %s'%(n, self.typesdict[n]) for n in nsubset)
+        query += ')'
+        self._execute(query)
+
+        # build insert query
+        query = 'insert into TBL values ('
+        query += ','.join('?' for n in nsubset) + ')'
+
+        # for performance it is better to check it once if it is empty
+        # values are passed to sqlite as a tuple
+        if exclude == {}: 
+            for i in _xrange(self.M):
+                self._execute(query, tuple(self[n][i] for n in nsubset))
+        else:
+            for i in _xrange(self.M):
+                # X is the intersection of X and self.conditions
+                # so we know the keys in X will always be in self
+                if X - [(k,[self[k][i]]) for k in X] == X:
+                    self._execute(query, tuple((self[n][i] for n in nsubset)))
+
+        # Save (commit) the changes
+        self.conn.commit()
 
     def _get_sql_tbl_info(self):
         """
@@ -346,7 +383,7 @@ class PyvtTbl(dict):
         #  to the user if the errors can be parsed out before had
         #  instead of crashing on confusing looking code segments
                 
-        if self=={}:
+        if self == {}:
             raise Exception('Table must have data to print data')
         
         # check to see if data columns have equal lengths
@@ -404,36 +441,7 @@ class PyvtTbl(dict):
         #     specified by val, rows, and cols. Also eliminate
         #     rows that meet the exclude conditions      
         ##############################################################
-        nsubset = [val]+rows+cols
-
-        # initialize table
-        self.conn.commit()
-        self._execute('drop table if exists TBL')
-
-        self.conn.commit()
-        query =  'create temp table TBL\n  ('
-        query += ', '.join('_%s_ %s'%(n, self.typesdict[n]) for n in nsubset)
-        query += ')'
-        self._execute(query)
-
-        # build insert query
-        query = 'insert into TBL values ('
-        query += ','.join('?' for n in nsubset) + ')'
-
-        # for performance it is better to check it once if it is empty
-        # values are passed to sqlite as a tuple
-        if exclude == {}: 
-            for i in _xrange(self.M):
-                self._execute(query, tuple(self[n][i] for n in nsubset))
-        else:
-            for i in _xrange(self.M):
-                # X is the intersection of X and self.conditions
-                # so we know the keys in X will always be in self
-                if X - [(k,[self[k][i]]) for k in X] == X:
-                    self._execute(query, tuple((self[n][i] for n in nsubset)))
-                    
-        # Save (commit) the changes
-        self.conn.commit()
+        self._build_tbl([val]+rows+cols, exclude)
         
         #  3. Build rnames and cnames lists
         ##############################################################
@@ -524,7 +532,6 @@ class PyvtTbl(dict):
             for row in self.cur:
                 d.append(list(row)[-len(col_list):])
 
-
         #  7. Clean up
         ##############################################################
         self.conn.commit()
@@ -538,10 +545,62 @@ class PyvtTbl(dict):
         ##############################################################
         return d,row_list,col_list
 
-    def sort(self):
-        """sort the table in place"""
-        pass
+    def sort(self, order=[]):
+        """
+        sort the table in place
 
+        order is a list of factors to sort by. to reverse order
+        append " desc" to the factor.
+        """
+
+        # Check arguments        
+        if self == {}:
+            raise Exception('Table must have data to print data')
+        
+        # check to see if data columns have equal lengths
+        if not self._are_col_lengths_equal():
+            raise Exception('columns have unequal lengths')
+        
+        if not hasattr(order, '__iter__'):
+            raise TypeError( "'%s' object is not iterable"
+                             % type(cols).__name__)
+
+        for i,k in enumerate(order):
+            ks = k.split()
+            if ks[0] not in self:
+                raise KeyError(k)
+
+            if len(ks) == 2:
+                if ks[1].lower() not in ['desc', 'asc']:
+                    raise Exception("'order arg must be 'DESC' or 'ASC'")
+
+            elif len(ks) > 2:
+                raise Exception('too many parameters specified')
+
+        # Build table
+        self._build_tbl(self.names)
+        
+        # form query
+        if order == []:
+            order = deepcopy(self.names)     
+
+        query = 'select * from TBL order by '
+        query += ', '.join(order)
+
+        for n in self.names:
+            query = query.replace(n, '_%s_'%n)
+
+        self._execute(query)
+
+        # read sorted order from cursor
+        d=[]
+        for row in self.cur:
+            d.append(list(row))
+
+        d = _transpose(d)
+        for i,n in enumerate(self.names):
+            self[n]=d[i]
+        
     def validate(self, criteria, verbose=False, report=True):
         """
         validate the data in the table.
@@ -550,15 +609,21 @@ class PyvtTbl(dict):
         the table. The values should be functions which take a single
         parameter and return a boolean. The function is applied
         individually to each value of the column.
+
+        validation fails if the keys in the criteria dict is not a
+        subset of the table keys.
         """
-        if self=={}:
+        # do some checking
+        if self == {}:
             raise Exception('Table must have data to validate data')
         
         try:        
             c, s = set(criteria.keys()), set(self.keys())
         except:
             raise TypeError('criteria must be mappable type')
-        
+
+        # loop through specified columns and apply the
+        # validation function to each value in the column
         valCounter = Counter()
         reportDict = {}
         for k in (c&s):
@@ -589,9 +654,11 @@ class PyvtTbl(dict):
             if verbose:
                 print()
 
+        # do some book keeping
         all_keys_found = bool((c ^ (c & s)) == set())
         pass_or_fail = (valCounter['n'] == valCounter[True]) & all_keys_found
-        
+
+        # print a report if the user has requested one
         if report:
             print('\nReport:')
             for k in (c&s):
@@ -619,8 +686,8 @@ class PyvtTbl(dict):
             else:
                 print('\n***Validation FAILED***')
 
-        
-        return (valCounter['n'] == valCounter[True]) and all_keys_found
+        # return the test result
+        return pass_or_fail
 
     def pivot(self, val, rows=[], cols=[], aggregate='avg',
               exclude={}, flatten=False):
@@ -657,8 +724,7 @@ class PyvtTbl(dict):
         self.Zrnames = rnames
         self.Zcnames = cnames
 
-        return self.Z, self.Zrnames, self.Zcnames
-        
+        return self.Z, self.Zrnames, self.Zcnames        
     
     def selectCol(self, val, exclude={}):
         """
@@ -729,8 +795,27 @@ class PyvtTbl(dict):
         self.conditions = DictSet(self)
         self.M = len(self.values()[0])
 
+    def insert(self, row):
+        """insert a row into the table. The row should be mappable"""
+        try:
+            c, s = set(dict(row).keys()), set(self.keys())
+        except:
+            raise TypeError('criteria must be mappable type')
+        
+        # the easy case
+        if self == {}:
+            for k,v in dict(row).items():
+                self[k] = [v]
+                self.conditions[k] = [v]
+        elif c-s == set():
+            for k,v in dict(row).items():
+                self[k].append(v)
+                self.conditions[k].add(v)
+        else:
+            raise Exception('row must have the same keys as the table')
+        
     def printTable(self, exclude={}):
-        if self=={}:
+        if self == {}:
             raise Exception('Table must have data to print data')
 
         # check to see if data columns have equal lengths
@@ -767,7 +852,7 @@ class PyvtTbl(dict):
         print(tt.draw())
 
     def writeTable(self, exclude={}, fname=None, delimiter=','):
-        if self=={}:
+        if self == {}:
             raise Exception('Table must have data to print data')
 
         # check to see if data columns have equal lengths
@@ -841,7 +926,7 @@ class PyvtTbl(dict):
             
         elif self.Zrnames == [1]: # no rows were specified
             # build the header
-            header = [',\n'.join(['%s=%s'%(f,c) for (f,c) in L]) \
+            header = [',\n'.join('%s=%s'%(f,c) for (f,c) in L) \
                       for L in self.Zcnames]
             
             # initialize the texttable and add stuff
@@ -861,8 +946,9 @@ class PyvtTbl(dict):
             
         else: # table has rows and cols
             # build the header
-            header = rows + [',\n'.join(['%s=%s'%(f,c) for (f,c) in L]) \
-                             for L in self.Zcnames]
+            header = copy(rows)
+            for L in self.Zcnames:
+               header.append(',\n'.join('%s=%s'%(f,c) for (f,c) in L))
 
             # initialize the texttable and add stuff
             tt.set_cols_dtype(['t']*len(rows)+['a']*len(self.Zcnames))
@@ -936,7 +1022,7 @@ class PyvtTbl(dict):
             
         elif self.Zrnames == [1]: # no rows were specified
             # build the header
-            header = ['_'.join(['%s=%s'%(f,c) for (f,c) in L]) \
+            header = ['_'.join('%s=%s'%(f,c) for (f,c) in L) \
                       for L in self.Zcnames]
 
             # initialize the texttable and add stuff
@@ -952,8 +1038,9 @@ class PyvtTbl(dict):
             
         else: # table has rows and cols
             # build the header
-            header = rows + ['_'.join(['%s=%s'%(f,c) for (f,c) in L]) \
-                             for L in self.Zcnames]
+            header = copy(rows)
+            for L in self.Zcnames:
+                header.append('_'.join('%s=%s'%(f,c) for (f,c) in L))
 
             # initialize the texttable and add stuff
             for i,L in enumerate(self.Zrnames):
@@ -971,7 +1058,7 @@ class PyvtTbl(dict):
         """
         Returns a dict of descriptive statistics for column cname
         """
-        if self=={}:
+        if self == {}:
             raise Exception('Table must have data to calculate descriptives')
 
         # check to see if data columns have equal lengths
@@ -1021,7 +1108,7 @@ class PyvtTbl(dict):
 
 
     def marginals(self, val, factors, exclude={}):
-        if self=={}:
+        if self == {}:
             raise Exception('Table must have data to calculate marginals')
         
         # check to see if data columns have equal lengths
@@ -1073,7 +1160,7 @@ class PyvtTbl(dict):
         """Plot marginal statisics over factors for val"""
 
         # marginalMeans handles checking
-        x=self.marginalMeans(val,factors=factors,exclude=exclude)
+        x=self.marginals(val,factors=factors,exclude=exclude)
         [f,dmu,dN,dsem,dlower,dupper]=x
 
         M=[]
@@ -1109,7 +1196,7 @@ class PyvtTbl(dict):
 
     def plotBox(self, val, factors=[], exclude={},
             fname=None, quality='medium'):
-        if self=={}:
+        if self == {}:
             raise Exception('Table must have data to print data')
         
         # check to see if data columns have equal lengths
@@ -1173,11 +1260,10 @@ class PyvtTbl(dict):
             fig.subplots_adjust(left=.05, right=.97, bottom=0.24)
             pylab.boxplot(D)
             xticks = pylab.xticks()[0]
-            xlabels = ['\n'.join(['%s = %s'%fc for fc in c]) for c in cs]
+            xlabels = ['\n'.join('%s = %s'%fc for fc in c) for c in cs]
             pylab.xticks(xticks, xlabels,
                          rotation='vertical',
                          verticalalignment='top')   
-
 
         maintitle = '%s'%val
 
@@ -1303,7 +1389,7 @@ class PyvtTbl(dict):
         ##############################################################
 
         # check for data
-        if self=={}:
+        if self == {}:
             raise Exception('Table must have data to plot marginals')
 
         # check for third party packages
@@ -1478,6 +1564,7 @@ class PyvtTbl(dict):
         
         plotnum = 1 # subplot counter
         axs = []
+
         for r, rlevel in enumerate(rlevels):
             for c, clevel in enumerate(clevels):
                 
@@ -1653,7 +1740,21 @@ class PyvtTbl(dict):
         ##############################################################
         if self.TESTMODE:
             return test
-        
+
+
+from random import random
+df=PyvtTbl()
+conditionsDict=DictSet({'A':[10,20,40,80],
+                        'B':[100,800],
+                      'rep':range(100)})
+
+for A,B,rep in conditionsDict.unique_combinations():
+    s = A*random() + B*random()
+
+    df.insert([('A',A),('B',B),('sum',s),('rep',rep)])
+    
+df.printTable()
+df.printPivot('sum',rows=['A'],cols=['B'])
 ####W[-1]=10000.
 ##
 ##
@@ -1669,6 +1770,8 @@ class PyvtTbl(dict):
 ##pylab.close()
 ##df=PyvtTbl()
 ##df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+##df.sort(['MODEL DESC', 'COURSE'])
+##df.printTable()
 ##df['DUM']=range(48)
 ##df['DUM'].pop()
 ##
@@ -1685,42 +1788,7 @@ class PyvtTbl(dict):
 ##from PVTTBL group by SUBJECT,COURSE
 ##'''
 ##
-##df=PyvtTbl()
-##df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
-##df.plotBox('SUPPRESSION',factors=['GROUP','CYCLE'])
-##df['RANDDATA'][42]='nan'
-##
-##df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
-##               'SEX' : lambda x: x in [0],
-##       'SUPPRESSION' : lambda x: x < 62.,
-##          'RANDDATA' : lambda x: _isfloat(x) and not isnan(x),
-##           'SUBJECT' : _isint}, verbose=True, report=False)
 
-
-
-##df=PyvtTbl()
-##df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
-##df.plotBox('SUPPRESSION',factors=['GROUP','CYCLE'])
-####df['RANDDATA'][42]='nan'
-##
-##R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
-##               'SEX' : lambda x: x in [0,1],
-##       'SUPPRESSION' : lambda x: x < 1000.,
-##          'RANDDATA' : lambda x: _isfloat(x) and not isnan(x),
-##           'SUBJECT' : _isint}, verbose=True, report=True)
-
-df=PyvtTbl()
-df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
-df.plotBox('SUPPRESSION',factors=['GROUP','CYCLE'])
-##df['RANDDATA'][42]='nan'
-
-R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
-                 'SEX' : lambda x: x in [0,1],
-         'SUPPRESSION' : lambda x: x < 1000.,
-            'RANDDATA' : lambda x: _isfloat(x) and not isnan(x),
-             'SUBJECT' : _isint(1),
-          'NOT_A_COL1' : _isint,
-          'NOT_A_COL2' : _isint}, verbose=False, report=True)
 
 
 ##pp(df.Pivot('ERROR',rows=['SUBJECT','TIMEOFDAY'],exclude={'SUBJECT':['1']}))
