@@ -7,8 +7,11 @@ import unittest
 import warnings
 import os
 
+from random import shuffle
 from collections import Counter
-from numpy import array
+from dictset import DictSet,_rep_generator
+from math import isnan, isinf
+import numpy as np
 from pprint import pprint as pp
 from pyvttbl import PyvtTbl
 from pyvttbl import _flatten
@@ -197,6 +200,58 @@ class Test__setitem__(unittest.TestCase):
         self.assertEqual(str(cm.exception),
                          'columns have unequal lengths')
 
+class Test_insert(unittest.TestCase):
+    def test0(self):
+        df=PyvtTbl()
+        conditionsDict=DictSet({'A':[10,20,40,80],
+                                'B':[100,800],
+                              'rep':range(10)})
+        for A,B,rep in conditionsDict.unique_combinations():
+            df.insert({'A':A, 'B':B,'rep':rep})
+
+        for d,r in zip(df['A'],_rep_generator([10,20,40,80],4,20)):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(df['B'],_rep_generator([100,800],8,10)):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(df['rep'],_rep_generator(range(10),8,1)):
+            self.assertAlmostEqual(d,r)
+
+    def test1(self):
+        df=PyvtTbl()
+
+        with self.assertRaises(Exception) as cm:
+            df.insert([1,2,3,4])
+
+        self.assertEqual(str(cm.exception),
+                         'row must be mappable type')
+
+    def test2(self):
+        df=PyvtTbl()
+        df.insert({'A':1, 'B':2})
+
+        with self.assertRaises(Exception) as cm:
+            df.insert({'A':1, 'B':2, 'C':3})
+
+        self.assertEqual(str(cm.exception),
+                         'row must have the same keys as the table')
+        
+    def test3(self):
+        df=PyvtTbl()
+        df.insert({'A':1, 'B':2})
+
+        with self.assertRaises(Exception) as cm:
+            df.insert({'A':1, 'B':2, 'C':3})
+
+        self.assertEqual(str(cm.exception),
+                         'row must have the same keys as the table')
+
+    def test4(self):
+        df=PyvtTbl()
+        df.insert([('A',1.23), ('B',2), ('C','A')])
+        self.assertEqual(df.types, ['real', 'integer', 'text'])
+        
 class Test_attach(unittest.TestCase):
     def test0(self):
         self.df1=PyvtTbl()
@@ -244,6 +299,64 @@ class Test_attach(unittest.TestCase):
                     self.assertAlmostEqual(df1[n][i],df1[n][M+i])
                 else:
                     self.assertEqual(df1[n][i],df1[n][M+i])
+
+class Test_sort(unittest.TestCase):
+    def test0(self):
+        R={'A': [-10.0, -9.0, -8.0, -7.0, -6.0, -5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0],
+           'B': [2.0, 2.0, 1.0, 1.0, 2.0, 2.0, 2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 1.0]}
+
+        a=[4, 8, 1, 5, -7, -5, 9, 7, -8, -10, -1, -4, 3, 0., -2, 6, 2, -9, -3, -6]
+        b=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
+
+        df=PyvtTbl()
+        for A,B in zip(a,b):
+            df.insert({'A':A, 'B':B})
+
+        df.sort(['A'])
+        
+        for d,r in zip(df['A'],R['A']):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(df['B'],R['B']):
+            self.assertAlmostEqual(d,r)
+            
+    def test1(self):
+        R={'A': [9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0, -10.0],
+           'B': [1.0, 2.0, 2.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 1.0, 1.0, 2.0, 2.0]}
+
+        a=[4, 8, 1, 5, -7, -5, 9, 7, -8, -10, -1, -4, 3, 0., -2, 6, 2, -9, -3, -6]
+        b=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
+
+        df=PyvtTbl()
+        for A,B in zip(a,b):
+            df.insert({'A':A, 'B':B})
+
+        df.sort(['A desc',])
+
+        for d,r in zip(df['A'],R['A']):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(df['B'],R['B']):
+            self.assertAlmostEqual(d,r)
+
+    def test2(self):
+        R={'A': [-8.0, -7.0, -3.0, -2.0, -1.0, 1.0, 2.0, 3.0, 4.0, 9.0, -10.0, -9.0, -6.0, -5.0, -4.0, 0.0, 5.0, 6.0, 7.0, 8.0],
+           'B': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]}
+
+        a=[4, 8, 1, 5, -7, -5, 9, 7, -8, -10, -1, -4, 3, 0., -2, 6, 2, -9, -3, -6]
+        b=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
+
+        df=PyvtTbl()
+        for A,B in zip(a,b):
+            df.insert({'A':A, 'B':B})
+
+        df.sort(['B','A'])
+
+        for d,r in zip(df['A'],R['A']):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(df['B'],R['B']):
+            self.assertAlmostEqual(d,r)
 
 class Test_pivot_1(unittest.TestCase):
     def setUp(self):
@@ -315,11 +428,11 @@ class Test_pivot_1(unittest.TestCase):
     
     def test005(self):
         # test the exclude parameter
-        R=array([[14.8], [6.5], [17.6], [19.3], [7.6]])
+        R=np.array([[14.8], [6.5], [17.6], [19.3], [7.6]])
         
         # this one shouldn't raise an Exception
         self.df.pivot('WORDS',rows=['CONDITION'],exclude={'AGE':['old',]})
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -329,11 +442,11 @@ class Test_pivot_1(unittest.TestCase):
             self.failUnlessAlmostEqual(d,r)
         
     def test011(self):
-        R=array([[25.5], [75.5]])
+        R=np.array([[25.5], [75.5]])
         
         # aggregate is case-insensitive
         self.df.pivot('SUBJECT',rows=['AGE'],aggregate='AVG')
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -343,11 +456,11 @@ class Test_pivot_1(unittest.TestCase):
             self.failUnlessAlmostEqual(d,r)
         
     def test0(self):
-        R=array([[ 11. ,   7. ,  13.4,  12. ,   6.9],
+        R=np.array([[ 11. ,   7. ,  13.4,  12. ,   6.9],
                  [ 14.8,   6.5,  17.6,  19.3,   7.6]])
         
         self.df.pivot('WORDS',rows=['AGE'],cols=['CONDITION'])
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -357,14 +470,14 @@ class Test_pivot_1(unittest.TestCase):
             self.failUnlessAlmostEqual(d,r)
 
     def test1(self):
-        R=array([[ 110.,  148.],
+        R=np.array([[ 110.,  148.],
                  [  70.,   65.],
                  [ 134.,  176.],
                  [ 120.,  193.],
                  [  69.,   76.]])
         
         self.df.pivot('WORDS',rows=['CONDITION'],cols=['AGE'],aggregate='sum')
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -374,7 +487,7 @@ class Test_pivot_1(unittest.TestCase):
             self.failUnlessAlmostEqual(d,r)
 
     def test3(self):
-        R=array([[None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+        R=np.array([[None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                   11.0, 13.0, 8.0,  6.0,  14.0, 11.0, 13.0, 13.0, 10.0, 11.0, None, None, None, None, None, None, None, None, None, None,
                   None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                   None, None, None, None, None, None, None, None, None, None, 14.0, 11.0, 18.0, 14.0, 13.0, 22.0, 17.0, 16.0, 12.0, 11.0,
@@ -403,7 +516,7 @@ class Test_pivot_1(unittest.TestCase):
 
         # One row and one col factor                     
         self.df.pivot('WORDS',rows=['CONDITION'],cols=['SUBJECT'],aggregate='sum')
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -413,11 +526,11 @@ class Test_pivot_1(unittest.TestCase):
             self.failUnlessAlmostEqual(d,r)
 
     def test4(self):
-        R=array([[5.191085988]])
+        R=np.array([[5.191085988]])
 
         # No rows or cols        
         self.df.pivot('WORDS',aggregate='stdev')
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -429,7 +542,7 @@ class Test_pivot_1(unittest.TestCase):
     def test5(self):
         # when the tolist aggregate the pivot operation
         # uses eval to unpack the lists
-        R=array([[[11.0, 13.0, 8.0, 6.0, 14.0, 11.0, 13.0, 13.0, 10.0, 11.0],
+        R=np.array([[[11.0, 13.0, 8.0, 6.0, 14.0, 11.0, 13.0, 13.0, 10.0, 11.0],
                   [9.0, 8.0, 6.0, 8.0, 10.0, 4.0, 6.0, 5.0, 7.0, 7.0],
                   [12.0, 11.0, 16.0, 11.0, 9.0, 23.0, 12.0, 10.0, 19.0, 11.0],
                   [10.0, 19.0, 14.0, 5.0, 10.0, 11.0, 14.0, 15.0, 11.0, 11.0],
@@ -443,7 +556,7 @@ class Test_pivot_1(unittest.TestCase):
         self.df.pivot('WORDS',
                       rows=['AGE'], cols=['CONDITION'],
                       aggregate='tolist')
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -455,7 +568,7 @@ class Test_pivot_1(unittest.TestCase):
     def test6(self):
         # tolist handles text data differently then integer
         # or float data. We need to test this case as well
-        R=array([[['L', 'N', 'I', 'G', 'O', 'L', 'N', 'N', 'K', 'L'],
+        R=np.array([[['L', 'N', 'I', 'G', 'O', 'L', 'N', 'N', 'K', 'L'],
                   ['J', 'I', 'G', 'I', 'K', 'E', 'G', 'F', 'H', 'H'],
                   ['M', 'L', 'Q', 'L', 'J', 'X', 'M', 'K', 'T', 'L'],
                   ['K', 'T', 'O', 'F', 'K', 'L', 'O', 'P', 'L', 'L'],
@@ -474,7 +587,7 @@ class Test_pivot_1(unittest.TestCase):
                       rows=['AGE'], cols=['CONDITION'],
                       aggregate='tolist')
         
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -485,12 +598,20 @@ class Test_pivot_1(unittest.TestCase):
 
     def test7(self):
         # test group_concat
-        R=array([['11,13,8,6,14,11,13,13,10,11', '9,8,6,8,10,4,6,5,7,7', '12,11,16,11,9,23,12,10,19,11', '10,19,14,5,10,11,14,15,11,11', '7,9,6,6,6,11,6,3,8,7'], ['14,11,18,14,13,22,17,16,12,11', '8,6,4,6,7,6,5,7,9,7', '20,16,16,15,18,16,20,22,14,19', '21,19,17,15,22,16,22,22,18,21', '10,7,8,10,4,7,10,6,7,7']])
-
+        R=np.array( [[u'11,13,8,6,14,11,13,13,10,11',
+                      u'9,8,6,8,10,4,6,5,7,7',
+                      u'12,11,16,11,9,23,12,10,19,11',
+                      u'10,19,14,5,10,11,14,15,11,11',
+                      u'7,9,6,6,6,11,6,3,8,7'],
+                     [u'14,11,18,14,13,22,17,16,12,11',
+                      u'8,6,4,6,7,6,5,7,9,7',
+                      u'20,16,16,15,18,16,20,22,14,19',
+                      u'21,19,17,15,22,16,22,22,18,21',
+                      u'10,7,8,10,4,7,10,6,7,7']])
         self.df.pivot('WORDS',
                       rows=['AGE'], cols=['CONDITION'],
                       aggregate='group_concat')
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -506,7 +627,7 @@ class Test_pivot_2(unittest.TestCase):
         
     def test0(self):
               # M 1  2  3
-        R=array([[2, 2, 2],  # T1 C1
+        R=np.array([[2, 2, 2],  # T1 C1
                  [3, 1, 2],  # T1 C2
                  [3, 3, 3],  # T1 C3
                  [3, 3, 3],  # T2 C1
@@ -515,7 +636,7 @@ class Test_pivot_2(unittest.TestCase):
         
         self.df.pivot('ERROR',rows=['TIMEOFDAY','COURSE'],
                       cols=['MODEL'],aggregate='count')
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -526,7 +647,7 @@ class Test_pivot_2(unittest.TestCase):
 
     def test1(self):
         # check to make sure missing cells are correct
-        R=array([[1, 1, 1, 1, 1, 1],
+        R=np.array([[1, 1, 1, 1, 1, 1],
                  [1, 1, 0, 1, 0, 1],
                  [1, 1, 1, 1, 1, 1],
                  [0, 1, 0, 1, 0, 1],
@@ -539,7 +660,7 @@ class Test_pivot_2(unittest.TestCase):
         # multiple rows and cols
         self.df.pivot('ERROR',rows=['SUBJECT','COURSE'],
                       cols=['MODEL','TIMEOFDAY'],aggregate='count')
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -549,11 +670,11 @@ class Test_pivot_2(unittest.TestCase):
             self.failUnlessAlmostEqual(d,r)
 
     def test2(self):          
-        R=array([[ 0.26882528, -0.06797845]])
+        R=np.array([[ 0.26882528, -0.06797845]])
 
         # No row
         self.df.pivot('ERROR',cols=['TIMEOFDAY'],aggregate='skew')
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -563,12 +684,12 @@ class Test_pivot_2(unittest.TestCase):
             self.failUnlessAlmostEqual(d,r)
 
     def test3(self):              
-        R=array([[ 0.26882528],
+        R=np.array([[ 0.26882528],
                  [-0.06797845]])
 
         # No col
         self.df.pivot('ERROR',rows=['TIMEOFDAY'],aggregate='skew')
-        D=array(self.df.Z)
+        D=np.array(self.df.Z)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -841,10 +962,10 @@ class Test_plotMarginals(unittest.TestCase):
         self.assertAlmostEqual(D['ymin'],R['ymin'])
         self.assertAlmostEqual(D['ymax'],R['ymax'])
 
-        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
         
     def test1(self):
@@ -882,10 +1003,10 @@ class Test_plotMarginals(unittest.TestCase):
         self.assertAlmostEqual(D['ymin'],R['ymin'])
         self.assertAlmostEqual(D['ymax'],R['ymax'])
 
-        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
 
     def test2(self):
@@ -924,10 +1045,10 @@ class Test_plotMarginals(unittest.TestCase):
         self.assertAlmostEqual(D['ymin'],R['ymin'])
         self.assertAlmostEqual(D['ymax'],R['ymax'])
         
-        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
 
     def test3(self):
@@ -971,10 +1092,10 @@ class Test_plotMarginals(unittest.TestCase):
         self.assertAlmostEqual(D['ymin'],R['ymin'])
         self.assertAlmostEqual(D['ymax'],R['ymax'])
         
-        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
 
 
@@ -1014,10 +1135,10 @@ class Test_plotMarginals(unittest.TestCase):
         self.assertAlmostEqual(D['ymin'],R['ymin'])
         self.assertAlmostEqual(D['ymax'],R['ymax'])
         
-        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
         
     def test5(self):
@@ -1054,10 +1175,10 @@ class Test_plotMarginals(unittest.TestCase):
         self.assertAlmostEqual(D['ymin'],R['ymin'])
         self.assertAlmostEqual(D['ymax'],R['ymax'])
         
-        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
             
     def test6(self):
@@ -1094,10 +1215,10 @@ class Test_plotMarginals(unittest.TestCase):
         self.assertAlmostEqual(D['ymin'],R['ymin'])
         self.assertAlmostEqual(D['ymax'],R['ymax'])
         
-        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
 
     def test7(self):
@@ -1137,10 +1258,10 @@ class Test_plotMarginals(unittest.TestCase):
         self.assertAlmostEqual(D['ymin'],R['ymin'])
         self.assertAlmostEqual(D['ymax'],R['ymax'])
         
-        for d,r in zip(array(D['y']).flat,array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(array(D['yerr']).flat,array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
             
 class Test_descriptives(unittest.TestCase):
@@ -1212,19 +1333,40 @@ class Test_validate(unittest.TestCase):
                   'NOT_A_COL1' : _isint,
                   'NOT_A_COL2' : _isint}, verbose=False, report=False)
         self.assertFalse(R)
-           
+
+    def test3(self):
+        df=PyvtTbl()
+        
+        with self.assertRaises(Exception) as cm:
+            df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB']})
+
+        self.assertEqual(str(cm.exception),
+                         'table must have data to validate data')
+
+    def test4(self):
+        df=PyvtTbl()
+        df.insert([('GROUP','AA'),('VAL',1)])
+        
+        with self.assertRaises(Exception) as cm:
+            df.validate(lambda x: x in ['AA', 'AB', 'LAB'])
+
+        self.assertEqual(str(cm.exception),
+                         'criteria must be mappable type')
+
 def suite():
     return unittest.TestSuite((
             unittest.makeSuite(Test_readTbl),
             unittest.makeSuite(Test__setitem__),
+            unittest.makeSuite(Test_insert),
             unittest.makeSuite(Test_attach),
+            unittest.makeSuite(Test_sort),
             unittest.makeSuite(Test_pivot_1),
             unittest.makeSuite(Test_pivot_2),
             unittest.makeSuite(Test_marginals),
             unittest.makeSuite(Test_selectCol),
             unittest.makeSuite(Test_hist),
-            unittest.makeSuite(Test_plotHist),
-            unittest.makeSuite(Test_plotMarginals),
+##            unittest.makeSuite(Test_plotHist),
+##            unittest.makeSuite(Test_plotMarginals),
             unittest.makeSuite(Test_writeTable),
             unittest.makeSuite(Test_writePivot),
             unittest.makeSuite(Test_descriptives),

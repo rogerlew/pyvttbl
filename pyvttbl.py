@@ -48,19 +48,6 @@ import pystaggrelite3
 # private functions begin with an underscore. Feel free to use them
 # but they may not remain backwards compatible or remain at all.
 
-def _transpose(lists, defval=''):
-    """
-    http://code.activestate.com/recipes/
-    410687-transposing-a-list-of-lists-with-different-lengths/
-
-    >>> a=[[1,2,3],[4,5,6,7]]
-    [[1, 4], [2, 5], [3, 6], ['', 7]]
-
-    """
-    if not lists:
-        return []
-    return map(lambda *row: [elem or defval for elem in row], *lists)
-
 def _isfloat(string):
     try:
         float(string)
@@ -175,7 +162,7 @@ class PyvtTbl(dict):
         self.Zexclude = DictSet()
 
         # prints the sqlite3 queries to standard out before
-        # executing them for debuggin purposes
+        # executing them for debugging purposes
         self.PRINTQUERIES = False
 
         # When true the plotting methods return a dict that
@@ -288,9 +275,9 @@ class PyvtTbl(dict):
 
         if len(self[cname]) == 0:
             return 'null'
-        elif all(_isint(v) for v in self[cname]):
+        elif all(map(_isint, self[cname])):
             return 'integer'
-        elif all(_isfloat(v) for v in self[cname]):
+        elif all(map(_isfloat, self[cname])):
             return 'real'
         else:
             return 'text'
@@ -498,7 +485,7 @@ class PyvtTbl(dict):
             else:
                 for cols in col_list:
                     query.append('\n  , %s( case when '%agg)
-                    query.append('and '.join(('_%s_="%s"'\
+                    query.append(' and '.join(('_%s_="%s"'\
                                               %(k,v) for k,v in cols)))
                     query.append(' then _%s_ end )'%val)
 
@@ -582,13 +569,13 @@ class PyvtTbl(dict):
         
         # form query
         if order == []:
-            order = deepcopy(self.names)     
+            order = deepcopy(self.names)
 
-        query = 'select * from TBL order by '
-        query += ', '.join(order)
+        for i in _xrange(len(order)):
+            for n in self.names:
+                order[i] = order[i].replace(n, '_%s_'%n)
 
-        for n in self.names:
-            query = query.replace(n, '_%s_'%n)
+        query = 'select * from TBL order by ' + ', '.join(order)
 
         self._execute(query)
 
@@ -597,30 +584,41 @@ class PyvtTbl(dict):
         for row in self.cur:
             d.append(list(row))
 
-        d = _transpose(d)
+        d = zip(*d) # transpose
         for i,n in enumerate(self.names):
-            self[n]=d[i]
+            self[n] = list(d[i])
         
-    def validate(self, criteria, verbose=False, report=True):
+    def validate(self, criteria, verbose=False, report=False):
         """
         validate the data in the table.
         
         criteria is a dict. The keys should coorespond to columns in
         the table. The values should be functions which take a single
-        parameter and return a boolean. The function is applied
-        individually to each value of the column.
+        parameter and return a boolean.
 
         validation fails if the keys in the criteria dict is not a
         subset of the table keys.
         """
         # do some checking
         if self == {}:
-            raise Exception('Table must have data to validate data')
+            raise Exception('table must have data to validate data')
         
         try:        
             c, s = set(criteria.keys()), set(self.keys())
         except:
             raise TypeError('criteria must be mappable type')
+
+        # check if the criteria dict has keys that aren't in self
+        all_keys_found = bool((c ^ (c & s)) == set())
+
+        # if the user doesn't want a detailed report we don't have
+        # to do as much book keeping and can greatly simplify the
+        # logic
+        if not verbose and not report:
+            if all_keys_found:
+                return all(all(map(criteria[k], self[k])) for k in criteria)
+            else:
+                return False
 
         # loop through specified columns and apply the
         # validation function to each value in the column
@@ -655,7 +653,6 @@ class PyvtTbl(dict):
                 print()
 
         # do some book keeping
-        all_keys_found = bool((c ^ (c & s)) == set())
         pass_or_fail = (valCounter['n'] == valCounter[True]) & all_keys_found
 
         # print a report if the user has requested one
@@ -800,13 +797,20 @@ class PyvtTbl(dict):
         try:
             c, s = set(dict(row).keys()), set(self.keys())
         except:
-            raise TypeError('criteria must be mappable type')
+            raise TypeError('row must be mappable type')
         
         # the easy case
         if self == {}:
-            for k,v in dict(row).items():
-                self[k] = [v]
-                self.conditions[k] = [v]
+            # if the table is empty try and unpack the table as
+            # a row so it preserves the order of the column names
+            if isinstance(row,list):
+                for (k,v) in row:
+                    self[k] = [v]
+                    self.conditions[k] = [v]
+            else:
+                for k,v in dict(row).items():
+                    self[k] = [v]
+                    self.conditions[k] = [v]
         elif c-s == set():
             for k,v in dict(row).items():
                 self[k].append(v)
@@ -1156,7 +1160,7 @@ class PyvtTbl(dict):
 
         return factors,dmu,dN,dsem,dlower,dupper            
         
-    def printMarginals(self, val, factors=None, exclude={}):
+    def printMarginals(self, val, factors, exclude={}):
         """Plot marginal statisics over factors for val"""
 
         # marginalMeans handles checking
@@ -1172,7 +1176,7 @@ class PyvtTbl(dict):
         M.append(dsem)
         M.append(dlower)
         M.append(dupper)
-        M=_transpose(M)
+        M=[list(row) for row in zip(*M)] # transpose
 
         # figure out the width needed by the condition labels so we can
         # set the width of the table
@@ -1196,6 +1200,19 @@ class PyvtTbl(dict):
 
     def plotBox(self, val, factors=[], exclude={},
             fname=None, quality='medium'):
+        
+        # check for third party packages
+        try:
+            import pylab
+        except:
+            raise ImportError('pylab is required for plotting')
+
+        try:
+            import numpy as np
+        except:
+            raise ImportError('numpy is required for plotting')
+
+        # check to see if there is any data in the table
         if self == {}:
             raise Exception('Table must have data to print data')
         
@@ -1220,17 +1237,6 @@ class PyvtTbl(dict):
         del dup[None]
         if not all([count==1 for count in dup.values()]):
             raise Exception('duplicate labels specified as plot parameters')
-
-        # check for third party packages
-        try:
-            import pylab
-        except:
-            raise ImportError('pylab is required for plotting')
-
-        try:
-            import numpy as np
-        except:
-            raise ImportError('numpy is required for plotting')
 
         # check fname
         if not isinstance(fname, _strobj) and fname != None:
@@ -1742,19 +1748,37 @@ class PyvtTbl(dict):
             return test
 
 
-from random import random
-df=PyvtTbl()
-conditionsDict=DictSet({'A':[10,20,40,80],
-                        'B':[100,800],
-                      'rep':range(100)})
+##from random import shuffle
+##a=[0.0,1.,2.,3.,4.]
+##b=range(1,11)*10
+##
+##print(a)
+##
+##df=PyvtTbl()
+##for A,B in zip(a,b):
+##    df.insert({'A':A, 'B':B})
+##
+##print(df['A'])
+##
+##df.sort(['A',])
+##print(df['A'])
 
-for A,B,rep in conditionsDict.unique_combinations():
-    s = A*random() + B*random()
-
-    df.insert([('A',A),('B',B),('sum',s),('rep',rep)])
-    
-df.printTable()
-df.printPivot('sum',rows=['A'],cols=['B'])
+##from random import random
+##df=PyvtTbl()
+##conditionsDict=DictSet({'A':[10,20,40,80],
+##                        'B':[100,800],
+##                      'rep':range(100)})
+##
+##df.insert([('A',10),('B',100),('sum',1),('rep',1)])
+##for A,B,rep in conditionsDict.unique_combinations():
+##    s = A*random() + B*random()
+##
+##    df.insert([('A',A),('B',B),('sum',s),('rep',rep)])
+##
+##print(df.types)
+##    
+##df.printTable()
+##df.printPivot('sum',rows=['A'],cols=['B'])
 ####W[-1]=10000.
 ##
 ##
@@ -1770,6 +1794,7 @@ df.printPivot('sum',rows=['A'],cols=['B'])
 ##pylab.close()
 ##df=PyvtTbl()
 ##df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+
 ##df.sort(['MODEL DESC', 'COURSE'])
 ##df.printTable()
 ##df['DUM']=range(48)
