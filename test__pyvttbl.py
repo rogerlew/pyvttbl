@@ -37,7 +37,7 @@ def fcmp(d,r):
     rlines = rh.readlines()
     boolCounter = Counter()
     for dline, rline in zip(dlines,rlines):
-        for dc,rc in zip(dline.split(','),rline.split(',')):
+        for dc,rc in zip(dline.split(','), rline.split(',')):
             if _isfloat(dc):
                 if round(float(dc),7)!=round(float(rc),7):
                     boolCounter[False] += 1
@@ -198,6 +198,20 @@ class Test__setitem__(unittest.TestCase):
         self.assertEqual(str(cm.exception),
                          'columns have unequal lengths')
 
+    def test2(self):
+        with self.assertRaises(TypeError) as cm:
+            self.df['DUM']=42
+
+        self.assertEqual(str(cm.exception),
+                         "'int' object is not iterable")
+        
+    def test3(self):
+        with self.assertRaises(TypeError) as cm:
+            self.df[set('DUM')]=42
+
+        self.assertEqual(str(cm.exception),
+                         "'set' object is not hashable")
+        
 class Test__delitem__(unittest.TestCase):
     def setUp(self):
         self.df=PyvtTbl()
@@ -219,6 +233,177 @@ class Test__delitem__(unittest.TestCase):
     def test3(self):
         self.assertEqual(self.df.N, 4)
         
+class Test__are_col_lengths_equal(unittest.TestCase):
+    def test0(self):
+        """emtpy table"""
+        df=PyvtTbl()
+        self.assertTrue(df._are_col_lengths_equal())
+
+    def test1(self):
+        """emtpy lists in table"""
+        df=PyvtTbl()
+        df[1]=[]
+        df[2]=[]
+        self.assertTrue(df._are_col_lengths_equal())
+
+    def test2(self):
+        """equal non-zero"""
+        df=PyvtTbl()
+        df[1]=range(10)
+        df[2]=range(10)
+        df[3]=range(10)
+        df[4]=range(10)
+        self.assertTrue(df._are_col_lengths_equal())
+
+    def test3(self):
+        """unequal"""
+        df=PyvtTbl()
+        df[1]=range(10)
+        df[2]=range(10)
+        df[3]=range(10)
+        df[4]=range(10)
+        df[4].pop()
+        self.assertFalse(df._are_col_lengths_equal())
+
+class Test__checktype(unittest.TestCase):
+    def test0(self):
+        df=PyvtTbl()
+        df[1]=[]
+        self.assertEqual(df._checktype(1),'null')
+
+    def test1(self):
+        df=PyvtTbl()
+        df[1]=[1,2,3.,5.,8.]
+        self.assertEqual(df._checktype(1),'integer')
+
+    def test2(self):
+        df=PyvtTbl()
+        df[1]=[1,2,3.,5.,8.]
+        self.assertEqual(df._checktype(1),'integer')
+
+    def test3(self):
+        df=PyvtTbl()
+        df[1]=[1,2,3.,5.,8.0001]
+        self.assertEqual(df._checktype(1),'real')
+
+    def test4(self):
+        df=PyvtTbl()
+        df[1]=[1e4,3e3,5e1,6e0]
+        self.assertEqual(df._checktype(1),'integer')
+
+    def test5(self):
+        df=PyvtTbl()
+        df[1]=[1e4,3e3,5e1,6.001e0]
+        self.assertEqual(df._checktype(1),'real')
+        
+    def test6(self):
+        df=PyvtTbl()
+        df[1]=[1,2,3.,5.,8.0001,'a']
+        self.assertEqual(df._checktype(1),'text')
+
+class Test__build_sqlite3_tbl(unittest.TestCase):
+    def test0(self):
+        df=PyvtTbl()
+        df[1]=range(100)
+        df[2]=['bob' for i in range(100)]
+        df[3]=[i*1.234232 for i in range(100)]
+        df[4]=['bob' for i in range(50)]+range(50)
+
+        shuffle(df[1])
+        shuffle(df[2])
+        shuffle(df[3])
+        shuffle(df[4])
+
+        df._build_sqlite3_tbl(df.names)
+        
+        df._execute('select * from TBL')
+        for i,(a,b,c,d) in enumerate(df.cur):
+            self.assertEqual(a,df[1][i])
+            self.assertEqual(b,df[2][i])
+            self.assertEqual(c,df[3][i])
+            self.assertEqual(d,str(df[4][i]))
+            
+    def test1(self):
+        df=PyvtTbl()
+        df[1]=range(100)
+        df[2]=['bob' for i in range(100)]
+        df[3]=[i*1.234232 for i in range(100)]
+        df[4]=['bob' for i in range(50)]+range(50)
+
+        shuffle(df[1])
+        shuffle(df[2])
+        shuffle(df[3])
+        shuffle(df[4])
+
+        df._build_sqlite3_tbl(df.names[:2])
+        
+        df._execute('select * from TBL')
+        for i,(a,b) in enumerate(df.cur):
+            self.assertEqual(a,df[1][i])
+            self.assertEqual(b,df[2][i])
+
+    def test2(self):
+        df=PyvtTbl()
+        df[1]=range(100)
+        df[2]=['bob' for i in range(100)]
+        df[3]=[i*1.234232 for i in range(100)]
+        df[4]=['bob' for i in range(50)]+range(50)
+
+        shuffle(df[1])
+        shuffle(df[2])
+        shuffle(df[3])
+
+        df._build_sqlite3_tbl(df.names[:2], [(4,'not in',['bob'])])
+        
+        df._execute('select * from TBL')
+        for i,(a,b) in enumerate(df.cur):
+            self.assertEqual(a,df[1][i+50])
+            self.assertEqual(b,df[2][i+50])
+
+    def test21(self):
+        df=PyvtTbl()
+        df[1]=range(100)
+        df[2]=['bob' for i in range(100)]
+        df[3]=[i*1.234232 for i in range(100)]
+        df[4]=['bob' for i in range(50)]+range(50)
+
+        shuffle(df[1])
+        shuffle(df[2])
+        shuffle(df[3])
+
+        df._build_sqlite3_tbl(df.names[:2], [(4,'!=','bob')])
+        
+        df._execute('select * from TBL')
+        for i,(a,b) in enumerate(df.cur):
+            self.assertEqual(a,df[1][i+50])
+            self.assertEqual(b,df[2][i+50])
+            
+    def test3(self):
+        df=PyvtTbl()
+        df[1]=range(100)
+        df[2]=['bob' for i in range(100)]
+        df[3]=[i*1.234232 for i in range(100)]
+        df[4]=['bob' for i in range(50)]+range(50)
+
+        with self.assertRaises(TypeError) as cm:
+            df._build_sqlite3_tbl(df.names[:2], 42)
+        
+        self.assertEqual(str(cm.exception),
+                         "'int' object is not iterable")
+
+    def test4(self):
+        df=PyvtTbl()
+        df[1]=range(100)
+        df[2]=['bob' for i in range(100)]
+        df[3]=[i*1.234232 for i in range(100)]
+        df[4]=['bob' for i in range(50)]+range(50)
+
+        with self.assertRaises(Exception) as cm:
+            df._build_sqlite3_tbl(df.names[:2], [4, 'not in', 'bob'])
+        
+        self.assertEqual(str(cm.exception),
+                         'cannot unpack tuples from where')
+
 class Test_insert(unittest.TestCase):
     def test0(self):
         df=PyvtTbl()
@@ -377,6 +562,37 @@ class Test_sort(unittest.TestCase):
         for d,r in zip(df['B'],R['B']):
             self.assertAlmostEqual(d,r)
 
+    def test3(self):
+        df=PyvtTbl()
+  
+        with self.assertRaises(Exception) as cm:
+            df.sort()
+
+        self.assertEqual(str(cm.exception),
+                         'Table must have data to sort data')
+
+    def test4(self):
+        df=PyvtTbl()
+        df['a']=[2]
+        df['b']=[2,3]
+  
+        with self.assertRaises(Exception) as cm:
+            df.sort()
+
+        self.assertEqual(str(cm.exception),
+                         'columns have unequal lengths')
+
+    def test5(self):
+        df=PyvtTbl()
+        df['a']=[2,5]
+        df['b']=[2,3]
+  
+        with self.assertRaises(Exception) as cm:
+            df.sort(42)
+
+        self.assertEqual(str(cm.exception),
+                         "'int' object is not iterable")
+        
 class Test_pivot_1(unittest.TestCase):
     def setUp(self):
         D={
@@ -743,14 +959,12 @@ class Test_writeTable(unittest.TestCase):
         # clean up
         os.remove('./subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv') 
 
-class Test_selectCol(unittest.TestCase):
-    def setUp(self):
+class Test_select_col(unittest.TestCase):
+    def test0(self):
         self.df=PyvtTbl()
         self.df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
-    
-    def test0(self):
         R=[33.0, 43.0, 40.0, 52.0, 39.0, 52.0, 38.0, 48.0, 4.0, 35.0, 9.0, 42.0, 4.0, 46.0, 23.0, 51.0, 32.0, 39.0, 38.0, 47.0, 24.0, 44.0, 16.0, 40.0, 17.0, 34.0, 21.0, 41.0, 27.0, 50.0, 13.0, 40.0, 44.0, 52.0, 37.0, 48.0, 33.0, 53.0, 33.0, 43.0, 12.0, 16.0, 9.0, 39.0, 9.0, 59.0, 13.0, 45.0, 18.0, 42.0, 3.0, 62.0, 45.0, 49.0, 60.0, 57.0, 13.0, 29.0, 14.0, 44.0, 9.0, 50.0, 15.0, 48.0]
-        D=self.df.selectCol('SUPPRESSION',
+        D=self.df.select_col('SUPPRESSION',
                             where=[('AGE','not in',['young']),
                                    ('GROUP','not in',['AB','AA'])])
         for r,d in zip(R,D):
@@ -943,11 +1157,132 @@ class Test_hist(unittest.TestCase):
         for (d,r) in zip(_flatten(D),_flatten(R)):
             self.assertAlmostEqual(d,r)
 
+class Test_plotBox(unittest.TestCase):
+    def test0(self):
+        R = {'d': [9.0, 8.0, 6.0, 8.0, 10.0, 4.0, 6.0, 5.0, 7.0, 7.0, 7.0, 9.0, 6.0, 6.0, 6.0, 11.0, 6.0, 3.0, 8.0, 7.0, 11.0, 13.0, 8.0, 6.0, 14.0, 11.0, 13.0, 13.0, 10.0, 11.0, 12.0, 11.0, 16.0, 11.0, 9.0, 23.0, 12.0, 10.0, 19.0, 11.0, 10.0, 19.0, 14.0, 5.0, 10.0, 11.0, 14.0, 15.0, 11.0, 11.0, 8.0, 6.0, 4.0, 6.0, 7.0, 6.0, 5.0, 7.0, 9.0, 7.0, 10.0, 7.0, 8.0, 10.0, 4.0, 7.0, 10.0, 6.0, 7.0, 7.0, 14.0, 11.0, 18.0, 14.0, 13.0, 22.0, 17.0, 16.0, 12.0, 11.0, 20.0, 16.0, 16.0, 15.0, 18.0, 16.0, 20.0, 22.0, 14.0, 19.0, 21.0, 19.0, 17.0, 15.0, 22.0, 16.0, 22.0, 22.0, 18.0, 21.0],
+             'fname': 'box(words).png',
+             'maintitle': 'WORDS',
+             'val': 'WORDS'}
+        df=PyvtTbl()
+        df.TESTMODE=True
+        df.readTbl('words~ageXcondition.csv')
+        D=df.plotBox('WORDS')
+        
+        self.assertEqual(D['fname'],R['fname'])
+        self.assertEqual(D['maintitle'],R['maintitle'])
+        self.assertEqual(D['val'],R['val'])
+        
+        for d,r in zip(np.array(D['d']).flat,np.array(R['d']).flat):
+            self.assertAlmostEqual(d,r)        
+
+    def test1(self):
+        R = {'d': [np.array([ 9,  8,  6,  8, 10,  4,  6,  5,  7,  7,  7,  9,  6,  6,  6, 11,  6,
+                    3,  8,  7, 11, 13,  8,  6, 14, 11, 13, 13, 10, 11, 12, 11, 16, 11,
+                    9, 23, 12, 10, 19, 11, 10, 19, 14,  5, 10, 11, 14, 15, 11, 11]),
+                   np.array([ 8,  6,  4,  6,  7,  6,  5,  7,  9,  7, 10,  7,  8, 10,  4,  7, 10,
+                    6,  7,  7, 14, 11, 18, 14, 13, 22, 17, 16, 12, 11, 20, 16, 16, 15,
+                   18, 16, 20, 22, 14, 19, 21, 19, 17, 15, 22, 16, 22, 22, 18, 21])],
+             'fname': 'box(words).png',
+             'maintitle': 'WORDS by AGE',
+             'xlabels': [u'AGE = old', u'AGE = young']}
+        
+        df=PyvtTbl()
+        df.TESTMODE=True
+        df.readTbl('words~ageXcondition.csv')
+        D=df.plotBox('WORDS',['AGE'])
+
+        self.assertEqual(D['fname'],R['fname'])
+        self.assertEqual(D['maintitle'],R['maintitle'])
+        self.assertEqual(D['xlabels'],R['xlabels'])
+        
+        for d,r in zip(np.array(D['d']).flat,np.array(R['d']).flat):
+            self.assertAlmostEqual(d,r)
+
+    def test2(self):
+        R = {'d': [np.array([11, 13,  8,  6, 14, 11, 13, 13, 10, 11]),
+                   np.array([ 9,  8,  6,  8, 10,  4,  6,  5,  7,  7]),
+                   np.array([12, 11, 16, 11,  9, 23, 12, 10, 19, 11]),
+                   np.array([10, 19, 14,  5, 10, 11, 14, 15, 11, 11]),
+                   np.array([ 7,  9,  6,  6,  6, 11,  6,  3,  8,  7]),
+                   np.array([14, 11, 18, 14, 13, 22, 17, 16, 12, 11]),
+                   np.array([8, 6, 4, 6, 7, 6, 5, 7, 9, 7]),
+                   np.array([20, 16, 16, 15, 18, 16, 20, 22, 14, 19]),
+                   np.array([21, 19, 17, 15, 22, 16, 22, 22, 18, 21]),
+                   np.array([10,  7,  8, 10,  4,  7, 10,  6,  7,  7])],
+             'fname': 'box(words).png',
+             'maintitle': 'WORDS by AGE * CONDITION',
+             'xlabels': [u'AGE = old\nCONDITION = adjective', u'AGE = old\nCONDITION = counting', u'AGE = old\nCONDITION = imagery', u'AGE = old\nCONDITION = intention', u'AGE = old\nCONDITION = rhyming', u'AGE = young\nCONDITION = adjective', u'AGE = young\nCONDITION = counting', u'AGE = young\nCONDITION = imagery', u'AGE = young\nCONDITION = intention', u'AGE = young\nCONDITION = rhyming']}
+        
+        df=PyvtTbl()
+        df.TESTMODE=True
+        df.readTbl('words~ageXcondition.csv')
+        D=df.plotBox('WORDS',['AGE','CONDITION'])
+
+        self.assertEqual(D['fname'],R['fname'])
+        self.assertEqual(D['maintitle'],R['maintitle'])
+        self.assertEqual(D['xlabels'],R['xlabels'])
+        
+        for d,r in zip(np.array(D['d']).flat,np.array(R['d']).flat):
+            self.assertAlmostEqual(d,r)
+
+    def test3(self):
+        df=PyvtTbl()
+  
+        with self.assertRaises(Exception) as cm:
+            df.plotBox('a')
+
+        self.assertEqual(str(cm.exception),
+                         'Table must have data to print data')
+
+    def test4(self):
+        df=PyvtTbl()
+        df['a']=[2]
+        df['b']=[2,3]
+  
+        with self.assertRaises(Exception) as cm:
+            df.plotBox('a')
+
+        self.assertEqual(str(cm.exception),
+                         'columns have unequal lengths')
+
+    def test5(self):
+        df=PyvtTbl()
+        df['a']=[2,5]
+        df['b']=[2,3]
+  
+        with self.assertRaises(Exception) as cm:
+            df.plotBox('a',42)
+
+        self.assertEqual(str(cm.exception),
+                         "'int' object is not iterable")
+        
+    def test6(self):
+        df=PyvtTbl()
+        df['a']=[2,5]
+        df['b']=[2,3]
+  
+        with self.assertRaises(KeyError) as cm:
+            df.plotBox('c')
+
+        self.assertEqual(str(cm.exception),"'c'")
+        
 class Test_plotHist(unittest.TestCase):
     def test0(self):
+        R = {'bins': np.array([ 4, 14, 17, 12, 15, 10,  9,  5,  6,  8]),
+             'counts': np.array([  3.,   5.,   7.,   9.,  11.,  13.,  15.,  17.,  19.,  21.,  23.]),
+             'fname': 'hist(words).png'}
         df=PyvtTbl()
+        df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
         D=df.plotHist('WORDS')
+
+        self.assertEqual(D['fname'],R['fname'])
+        
+        for d,r in zip(D['bins'].flat,R['bins'].flat):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(D['counts'].flat,R['counts'].flat):
+            self.assertAlmostEqual(d,r)
             
 class Test_plotMarginals(unittest.TestCase):
     # TODO: check checking
@@ -1380,14 +1715,18 @@ def suite():
             unittest.makeSuite(Test_readTbl),
             unittest.makeSuite(Test__setitem__),
             unittest.makeSuite(Test__delitem__),
+            unittest.makeSuite(Test__are_col_lengths_equal),
+            unittest.makeSuite(Test__checktype),
+            unittest.makeSuite(Test__build_sqlite3_tbl),
             unittest.makeSuite(Test_insert),
             unittest.makeSuite(Test_attach),
             unittest.makeSuite(Test_sort),
             unittest.makeSuite(Test_pivot_1),
             unittest.makeSuite(Test_pivot_2),
             unittest.makeSuite(Test_marginals),
-            unittest.makeSuite(Test_selectCol),
+            unittest.makeSuite(Test_select_col),
             unittest.makeSuite(Test_hist),
+            unittest.makeSuite(Test_plotBox),
             unittest.makeSuite(Test_plotHist),
             unittest.makeSuite(Test_plotMarginals),
             unittest.makeSuite(Test_writeTable),

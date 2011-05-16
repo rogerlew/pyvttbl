@@ -16,7 +16,7 @@ elif sys.version_info[0] == 3:
     _strobj = str
     _xrange = range
 
-import anydbm
+import collections
 import csv
 import inspect
 import math
@@ -27,6 +27,19 @@ from math import isnan, isinf
 from pprint import pprint as pp
 from copy import copy, deepcopy
 from collections import OrderedDict, Counter
+
+# check for third party packages
+try:
+    import pylab
+    HAS_PYLAB = True
+except:
+    HAS_PYLAB = False
+    
+try:
+    import numpy as np
+    HAS_NUMPY = True
+except:
+    HAS_NUMPY = False
 
 # I have modifed the texttable module original
 # published by Gerome Fournier <jefke(at)free.fr>.
@@ -91,17 +104,23 @@ def _flatten(x):
             result.append(el)
     return result
 
-def _xuniqueCombinations(items, n):
+def _xunique_combinations(items, n):
     if n == 0:
         yield []
     else:
         for i in _xrange(len(items)):
-            for cc in _xuniqueCombinations(items[i+1:], n-1):
+            for cc in _xunique_combinations(items[i+1:], n-1):
                 yield [items[i]]+cc
                 
 # the dataframe class
 class PyvtTbl(dict):                            
     def __init__(self):
+        """
+        initialize a PyvtTbl object
+
+          keep in mind that because this class uses sqlite3
+          behind the scenes the keys are case-insensitive
+        """
 
         # Initialize sqlite3
         self.conn = sqlite3.connect(':memory:')
@@ -143,8 +162,12 @@ class PyvtTbl(dict):
         self.M = None # num rows in table
 
         # list of lists to hold pivot data
-        self.Z = [[]] 
+        self.Z = [[]]
 
+        # the key of the value that was aggregated in the pivot
+        # table
+        self.Zval = ''
+        
         # list of lists of paired tuples where the paired tuples
         # hold the (factor, conditions) of the cooresponding row
         self.Zrnames = [] 
@@ -175,12 +198,11 @@ class PyvtTbl(dict):
         
     def readTbl(self, fname, skip=0, delimiter=',',labels=True):
         """
-        Loads tabulated data from a plain text file
+        loads tabulated data from a plain text file
 
-        Checks and renames duplicate column labels as well as checking
-        for missing cells. readTbl will warn and skip over missing lines.
+          Checks and renames duplicate column labels as well as checking
+          for missing cells. readTbl will warn and skip over missing lines.
         """
-        self.fname = fname
         
         # open and read dummy coded data results file to data dictionary
         fid = open(fname, 'r')
@@ -241,12 +263,22 @@ class PyvtTbl(dict):
         self.M = len(self.values()[0])
 
     def __setitem__(self, key, item):
+        """
+        assign a column in the table
+
+          The assigned item must be iterable. To add a single row use
+          the insert method. To attach another table to this one use
+          the attach method.
+        """
+        if not isinstance(key, collections.Hashable):
+            raise TypeError("'%s' object is not hashable"%type(key).__name__)
+        
         try:
             item = list(item)
         except:
             raise TypeError("'%s' object is not iterable"%type(item).__name__)
 
-        super(PyvtTbl, self).__setitem__(key, item)
+        super(PyvtTbl, self).__setitem__(key, list(item))
 
         # update state variables
         if key not in self.names:
@@ -259,6 +291,9 @@ class PyvtTbl(dict):
         self.M = len(self.values()[0])
 
     def __delitem__(self, key):
+        """
+        delete a column from the table
+        """
         super(PyvtTbl, self).__delitem__(key)
 
         # update state variables
@@ -271,10 +306,16 @@ class PyvtTbl(dict):
         self.N = len(self.names)    
 
     def _are_col_lengths_equal(self):
+        """
+        private method to check if the items in self have equal lengths
+
+          returns True if all the items are equal
+          returns False otherwise
+        """
         
         # if self is not empty
         counts = [len(v) for v in self.values()]
-        if all([c-counts[0]+1 == 1 for c in counts]):
+        if all([c - counts[0] + 1 == 1 for c in counts]):
             if self == {}:
                 self.M = None
             else:
@@ -284,8 +325,23 @@ class PyvtTbl(dict):
             self.M = None
             return False
 
+    def _duplicate_names_exist(self):
+        """
+        private method to check if the items in self have equal lengths
+
+          returns True if all the items are equal
+          returns False otherwise
+        """
+        
+        # if self is not empty
+        return (len(self.names) - set(n.lower() for n in self.names)) != 0
+        
     def _checktype(self, cname):
-        """checks the datatype of self[cname]"""
+        """
+        checks the sqlite3 datatype of self[cname]
+
+          returns either 'null', 'integer', 'real', or 'text'
+        """
         if cname not in self:
             raise KeyError(cname)
 
@@ -299,25 +355,36 @@ class PyvtTbl(dict):
             return 'text'
 
     def _execute(self, query, t=tuple()):
-        """private method to execute sqlite3 queries"""
+        """
+        private method to execute sqlite3 query
+
+          When the PRINTQUERIES bool is true it prints the queries
+          before executing them
+        """
         if self.PRINTQUERIES:
             print(query)
-            if len(t)>0:
-                print('  ',t)
+            if len(t) > 0:
+                print('  ', t)
             print()
 
-        self.cur.execute(query,t)
+        self.cur.execute(query, t)
 
     def _executemany(self, query, tlist):
-        """private method to execute sqlite3 queries"""
+        """
+        private method to execute sqlite3 queries
+
+          When the PRINTQUERIES bool is true it prints the queries
+          before executing them. The execute many method is about twice
+          as fast for building tables as the execute method.
+        """
         if self.PRINTQUERIES:
             print(query)
-            print('  ',tlist[0])
+            print('  ', tlist[0])
             print('   ...\n')
 
-        self.cur.executemany(query,tlist)
+        self.cur.executemany(query, tlist)
 
-##    def _build_tbl_old(self, nsubset, where=[]):
+##    def _build_sqlite3_tbl_old(self, nsubset, where=[]):
 ##        """
 ##        build or rebuild sqlite table with columns in nsubset and where
 ##        the key-conditions in exclude are not True.
@@ -353,20 +420,29 @@ class PyvtTbl(dict):
 ##        # Save (commit) the changes
 ##        self.conn.commit()
 
-    def _build_tbl(self, nsubset, where=[]):
+    def _build_sqlite3_tbl(self, nsubset, where=[]):
         """
         build or rebuild sqlite table with columns in nsubset based on
-        the where list.
+        the where list
 
-        where should be a list of tuples. Each tuple should have three
-        elements. The first should be a column key (label). The second
-        should be an operator: in, =, !=, <, >. The third element
-        should contain value for the operator.
+          where should be a list of tuples. Each tuple should have three
+          elements. The first should be a column key (label). The second
+          should be an operator: in, =, !=, <, >. The third element
+          should contain value for the operator.
         """
-        
-        #  1. Get the neccesary data into a temparary table          
+        #  1. Perform some checkings
         ##############################################################
-        W = [tup for tup in where if tup[0] in self]
+        if not hasattr(where, '__iter__'):
+            raise TypeError( "'%s' object is not iterable"
+                             % type(where).__name__)
+
+        try:
+            W = [tup for tup in where if tup[0] in self]
+        except:
+            raise Exception('cannot unpack tuples from where')
+        
+        #  2. Get the neccesary data into a temparary table          
+        ##############################################################           
         nsubset2 = list(set(nsubset) | set(tup[0] for tup in W))
         
         # initialize table
@@ -385,7 +461,7 @@ class PyvtTbl(dict):
         self._executemany(query, zip(*[self[n] for n in nsubset2]))
         self.conn.commit()
 
-        #  2. Use sqlite3 to eliminate rows that should be excluded  
+        #  3. Use sqlite3 to eliminate rows that should be excluded  
         ##############################################################
         if W == []:
             self._execute('drop table if exists TBL')
@@ -434,8 +510,12 @@ class PyvtTbl(dict):
 
     def _get_sql_tbl_info(self):
         """
-        private method to get a list of tuples containing
-        information relevant to the current sqlite3 table
+        private method to get a list of tuples containing information
+        relevant to the current sqlite3 table
+
+          Returns a list of tuples. Each tuple cooresponds to a column.
+          Tuples include the column name, data type, whether or not the
+          column can be NULL, and the default value for the column.
         """
         self.conn.commit()
         self._execute('PRAGMA table_info(TBL)')
@@ -446,8 +526,8 @@ class PyvtTbl(dict):
         """
         private pivot table method
 
-        returns pivot table, rnames, and cnames but doesn't
-        set self.Z, self.Zrnames, or self.Zcnames
+          returns pivot table, rnames, and cnames but doesn't
+          set self.Z, self.Zrnames, self.Zcnames, and self.Zconditions
         """
         ##############################################################
         # _pvt programmatic flow                                     #
@@ -506,13 +586,13 @@ class PyvtTbl(dict):
                 raise KeyError(k)
 
         # check for duplicate names
-        dup = Counter([val]+rows+cols)
+        dup = Counter([val] + rows + cols)
         del dup[None]
-        if not all([count==1 for count in dup.values()]):
+        if not all([count == 1 for count in dup.values()]):
             raise Exception('duplicate labels specified')
 
         # check aggregate function
-        aggregate=aggregate.lower()
+        aggregate = aggregate.lower()
 
         if aggregate not in self.aggregates:
             raise ValueError("supplied aggregate '%s' is not valid"%aggregate)
@@ -524,31 +604,31 @@ class PyvtTbl(dict):
         #     specified by val, rows, and cols. Also eliminate
         #     rows that meet the exclude conditions      
         ##############################################################
-        self._build_tbl([val]+rows+cols, where)
+        self._build_sqlite3_tbl([val] + rows + cols, where)
         
         #  3. Build rnames and cnames lists
         ##############################################################
         
         # Refresh conditions list so we can build row and col list
         self._execute('select %s from TBL'
-                      %', '.join('_%s_'%n for n in [val]+rows+cols))
+                      %', '.join('_%s_'%n for n in [val] + rows + cols))
         Zconditions = DictSet(zip([val]+rows+cols, zip(*list(self.cur))))
                 
         # Build row_list
-        if rows==[]:
-            row_list=[1]
+        if rows == []:
+            row_list = [1]
         else:
-            g=Zconditions.unique_combinations(rows)
-            row_list=[zip(rows,v) for v in g]
+            g = Zconditions.unique_combinations(rows)
+            row_list = [zip(rows, v) for v in g]
             
-        rsize=len(row_list)
+        rsize = len(row_list)
         
         # Build col_list
-        if cols==[]:
-            col_list=[1]
+        if cols == []:
+            col_list = [1]
         else:
-            g=Zconditions.unique_combinations(cols)
-            col_list=[zip(cols,v) for v in g]
+            g = Zconditions.unique_combinations(cols)
+            col_list = [zip(cols, v) for v in g]
             
         csize=len(col_list)
 
@@ -566,38 +646,38 @@ class PyvtTbl(dict):
         else:
             agg = aggregate
             
-        query=['select ']            
-        if row_list==[1] and col_list==[1]:
-            query.append('%s( _%s_ ) from TBL'%(agg,val))
+        query = ['select ']            
+        if row_list == [1] and col_list == [1]:
+            query.append('%s( _%s_ ) from TBL'%(agg, val))
         else:
-            if row_list==[1]:
+            if row_list == [1]:
                 query.append('_%s_'%val)
             else:
-                for i,r in enumerate(rows):
-                    if i!=0:
+                for i, r in enumerate(rows):
+                    if i != 0:
                         query.append(', ')
                     query.append('_%s_'%r)
 
-            if col_list==[1]:
-                query.append('\n  , %s( _%s_ )'%(agg,val))
+            if col_list == [1]:
+                query.append('\n  , %s( _%s_ )'%(agg, val))
             else:
                 for cols in col_list:
                     query.append('\n  , %s( case when '%agg)
                     if all(map(_isfloat, zip(*cols)[1])):
                         query.append(' and '\
-                                     .join(('_%s_=%s'%(k,v) for k,v in cols)))
+                             .join(('_%s_=%s'%(k, v) for k, v in cols)))
                     else:
                         query.append(' and '\
-                                     .join(('_%s_="%s"'%(k,v) for k,v in cols)))
+                             .join(('_%s_="%s"'%(k ,v) for k, v in cols)))
                     query.append(' then _%s_ end )'%val)
 
-            if row_list==[1]:
+            if row_list == [1]:
                 query.append('\nfrom TBL')
             else:                
                 query.append('\nfrom TBL group by ')
                 
-                for i,r in enumerate(rows):
-                    if i!=0:
+                for i, r in enumerate(rows):
+                    if i != 0:
                         query.append(', ')
                     query.append('_%s_'%r)
 
@@ -608,12 +688,12 @@ class PyvtTbl(dict):
         #  6. Read data to from cursor into a list of lists
         ##############################################################
 
-        d=[]
+        d = []
         val_type = self.typesdict[val]
 
         # keep the columns with the row labels
         if attach_rlabels:
-            if aggregate=='tolist':
+            if aggregate == 'tolist':
                 for row in self.cur:
                     d.append([])
                     for cell in list(row):
@@ -625,11 +705,11 @@ class PyvtTbl(dict):
                 for row in self.cur:
                     d.append(list(row))
 
-            col_list = [(r,'') for r in rows].extend(col_list)
+            col_list = [(r, '') for r in rows].extend(col_list)
                     
         # eliminate the columns with row labels
         else:
-            if aggregate=='tolist':
+            if aggregate == 'tolist':
                 for row in self.cur:
                     d.append([])
                     for cell in list(row)[-len(col_list):]:
@@ -648,29 +728,24 @@ class PyvtTbl(dict):
         #  8. flatten if specified
         ##############################################################
         if flatten:
-            d=_flatten(d)
+            d = _flatten(d)
 
         #  9. return data, rnames, and cnames
         ##############################################################
-        if row_list == [1]:
-            row_list = [(val,'')]
-
-        if col_list == [1]:
-            col_list = [(val,'')]
         
         return d, row_list, col_list, Zconditions
 
     def sort(self, order=[]):
         """
-        sort the table in place
+        sort the table in-place
 
-        order is a list of factors to sort by. to reverse order
-        append " desc" to the factor.
+          order is a list of factors to sort by
+          to reverse order append " desc" to the factor
         """
 
         # Check arguments        
         if self == {}:
-            raise Exception('Table must have data to print data')
+            raise Exception('Table must have data to sort data')
         
         # check to see if data columns have equal lengths
         if not self._are_col_lengths_equal():
@@ -678,7 +753,7 @@ class PyvtTbl(dict):
         
         if not hasattr(order, '__iter__'):
             raise TypeError( "'%s' object is not iterable"
-                             % type(cols).__name__)
+                             % type(order).__name__)
 
         # check or build order
         if order == []:
@@ -687,7 +762,7 @@ class PyvtTbl(dict):
         # there are probably faster ways to do this, we definitely need
         # to treat the words as tokens to avoid problems were column
         # names are substrings of other column names
-        for i,k in enumerate(order):
+        for i, k in enumerate(order):
             ks = k.split()
             if ks[0] not in self:
                 raise KeyError(k)
@@ -698,37 +773,43 @@ class PyvtTbl(dict):
             elif len(ks) == 2:
                 if ks[1].lower() not in ['desc', 'asc']:
                     raise Exception("'order arg must be 'DESC' or 'ASC'")
-                order[i] = '_%s_ %s'%(ks[0],ks[1])
+                order[i] = '_%s_ %s'%(ks[0], ks[1])
 
             elif len(ks) > 2:
                 raise Exception('too many parameters specified')
 
         # build table
-        self._build_tbl(self.names)
+        self._build_sqlite3_tbl(self.names)
 
         # build and excute query
         query = 'select * from TBL order by ' + ', '.join(order)
         self._execute(query)
 
         # read sorted order from cursor
-        d=[]
+        d = []
         for row in self.cur:
             d.append(list(row))
 
         d = zip(*d) # transpose
         for i,n in enumerate(self.names):
             self[n] = list(d[i])
+
+    def where_update(self, where):
+        """
+        Applies the filtering provided in where to the table
+        """
+        pass
         
     def validate(self, criteria, verbose=False, report=False):
         """
         validate the data in the table.
         
-        criteria is a dict. The keys should coorespond to columns in
-        the table. The values should be functions which take a single
-        parameter and return a boolean.
+          The criteria argument should be a dict. The keys should
+          coorespond to columns in the table. The values should be
+          functions which take a single parameter and return a boolean.
 
-        validation fails if the keys in the criteria dict is not a
-        subset of the table keys.
+          Validation fails if the keys in the criteria dict is not a
+          subset of the table keys.
         """
         # do some checking
         if self == {}:
@@ -837,11 +918,11 @@ class PyvtTbl(dict):
                       http://www.sqlite.org/lang_aggfunc.html
             where = list of tuples
         """
-        d,rnames,cnames,conds = self._pvt(val, rows=rows, cols=cols,
-                                         aggregate=aggregate,
-                                         where=where,
-                                         flatten=flatten,
-                                         attach_rlabels=attach_rlabels)
+        d, rnames, cnames, conds = self._pvt(val, rows=rows, cols=cols,
+                                             aggregate=aggregate,
+                                             where=where,
+                                             flatten=flatten,
+                                             attach_rlabels=attach_rlabels)
          
         # sets results to self attributes
         self.Z = d
@@ -854,7 +935,7 @@ class PyvtTbl(dict):
 
         return self.Z, self.Zrnames, self.Zcnames        
     
-    def selectCol(self, val, where=[]):
+    def select_col(self, val, where=[]):
         """
         Returns the a copy of the selected values based on the where parameter
         """
@@ -879,7 +960,7 @@ class PyvtTbl(dict):
         if where == []: 
             return copy(self[val])             
         else:
-            self._build_tbl([val], where)
+            self._build_sqlite3_tbl([val], where)
             self._execute('select * from TBL')
             return [r[0] for r in self.cur]
 
@@ -902,7 +983,8 @@ class PyvtTbl(dict):
         if not set(self.names) == set(other.names):
             raise Exception('self and other must have the same columns')
 
-        if not all([self.typesdict[n] == other.typesdict[n] for n in self.names]):
+        if not all([self.typesdict[n] == other.typesdict[n]
+                                                   for n in self.names]):
             raise Exception('types of self and other must match')
 
         # perform attachment
@@ -930,15 +1012,15 @@ class PyvtTbl(dict):
             # if the table is empty try and unpack the table as
             # a row so it preserves the order of the column names
             if isinstance(row, list):
-                for (k,v) in row:
+                for (k, v) in row:
                     self[k] = [v]
                     self.conditions[k] = [v]
             else:
-                for k,v in dict(row).items():
+                for (k, v) in dict(row).items():
                     self[k] = [v]
                     self.conditions[k] = [v]
-        elif c-s == set():
-            for k,v in dict(row).items():
+        elif c - s == set():
+            for (k, v) in dict(row).items():
                 self[k].append(v)
                 self.conditions[k].add(v)
         else:
@@ -958,18 +1040,18 @@ class PyvtTbl(dict):
         # ignore tuples in where that aren't in self
         W = [tup for tup in where if tup[0] in self]
         
-        tt=TextTable(max_width=100000000)
-        dtypes=[self.typesdict[n][0] for n in self.names]
-        dtypes=list(''.join(dtypes).replace('r','f'))
+        tt = TextTable(max_width=100000000)
+        dtypes = [self.typesdict[n][0] for n in self.names]
+        dtypes = list(''.join(dtypes).replace('r', 'f'))
         tt.set_cols_dtype(dtypes)
 
-        aligns=[_ifelse(dt in 'fi','r','l') for dt in dtypes]
+        aligns = [_ifelse(dt in 'fi','r','l') for dt in dtypes]
         tt.set_cols_align(aligns)
         
         if where == []: 
                 tt.add_rows(zip(*list(self[n] for n in self.names)))              
         else:
-            self._build_tbl(self.names, where)
+            self._build_sqlite3_tbl(self.names, where)
             self._execute('select * from TBL')
             tt.add_rows(list(self.cur))
         
@@ -989,9 +1071,6 @@ class PyvtTbl(dict):
 
         if self.M < 1: # self.M gets reset by self._check_tbl_lengths()
             raise Exception('Table must have at least one row to print data')
-            
-        # ignore tuples in where that aren't in self
-        W = [tup for tup in where if tup[0] in self]
         
         # check or build fname
         if fname != None:
@@ -1016,7 +1095,7 @@ class PyvtTbl(dict):
             if where == []: 
                 wtr.writerows(zip(*list(self[n] for n in self.names)))
             else:
-                self._build_tbl(self.names, where)
+                self._build_sqlite3_tbl(self.names, where)
                 self._execute('select * from TBL')
                 wtr.writerows(list(self.cur))
                                     
@@ -1033,8 +1112,8 @@ class PyvtTbl(dict):
         first = '%s(%s)'%(self.Zaggregate, self.Zval)
         if self.Zconditions != []:
             query = []
-            for k,op,value in where:
-                query.append(' %s %s %s'%(k,str(op),str(value)))
+            for k, op, value in where:
+                query.append(' %s %s %s'%(k, str(op), str(value)))
             first += ' where' + ' and '.join(query)
 
         tt = TextTable(max_width=10000000)
@@ -1051,12 +1130,12 @@ class PyvtTbl(dict):
             
         elif self.Zrnames == [1]: # no rows were specified
             # build the header
-            header = [',\n'.join('%s=%s'%(f,c) for (f,c) in L) \
+            header = [',\n'.join('%s=%s'%(f, c) for (f, c) in L) \
                       for L in self.Zcnames]
             
             # initialize the texttable and add stuff
-            tt.set_cols_dtype(['a']*len(self.Zcnames))
-            tt.set_cols_align(['r']*len(self.Zcnames))
+            tt.set_cols_dtype(['a'] * len(self.Zcnames))
+            tt.set_cols_align(['r'] * len(self.Zcnames))
             tt.add_row(self.Z[0])
             
         elif self.Zcnames == [1]: # no cols were specified
@@ -1064,22 +1143,25 @@ class PyvtTbl(dict):
             header = rows + ['Value']
             
             # initialize the texttable and add stuff
-            tt.set_cols_dtype(['t']*len(rows)+['a'])
-            tt.set_cols_align(['l']*len(rows)+['r'])
-            for i,L in enumerate(self.Zrnames):
-                tt.add_row([c for (f,c) in L]+self.Z[i])
+            tt.set_cols_dtype(['t'] * len(rows) + ['a'])
+            tt.set_cols_align(['l'] * len(rows) + ['r'])
+            for i, L in enumerate(self.Zrnames):
+                tt.add_row([c for (f, c) in L] + self.Z[i])
             
         else: # table has rows and cols
             # build the header
             header = copy(rows)
             for L in self.Zcnames:
-               header.append(',\n'.join('%s=%s'%(f,c) for (f,c) in L))
+                header.append(',\n'.join('%s=%s'%(f, c) for (f, c) in L))
+
+            dtypes = ['t'] * len(rows) + ['a'] * len(self.Zcnames)
+            aligns = ['l'] * len(rows) + ['r'] * len(self.Zcnames)
 
             # initialize the texttable and add stuff
-            tt.set_cols_dtype(['t']*len(rows)+['a']*len(self.Zcnames))
-            tt.set_cols_align(['l']*len(rows)+['r']*len(self.Zcnames))
-            for i,L in enumerate(self.Zrnames):
-                tt.add_row([c for (f,c) in L]+self.Z[i])
+            tt.set_cols_dtype(dtypes)
+            tt.set_cols_align(aligns)
+            for i, L in enumerate(self.Zrnames):
+                tt.add_row([c for (f, c) in L] + self.Z[i])
 
         # add header and decoration
         tt.header(header)
@@ -1128,8 +1210,8 @@ class PyvtTbl(dict):
         first = '%s(%s)'%(self.Zaggregate, self.Zval)
         if self.Zwhere != []:
             query = []
-            for k,op,value in self.Zwhere:
-                query.append(' %s %s %s'%(k,str(op),str(value)))
+            for k, op, value in self.Zwhere:
+                query.append(' %s %s %s'%(k, str(op), str(value)))
             first += ' where' + ' and '.join(query)
         first = [first]
 
@@ -1146,7 +1228,7 @@ class PyvtTbl(dict):
             
         elif self.Zrnames == [1]: # no rows were specified
             # build the header
-            header = ['_'.join('%s=%s'%(f,c) for (f,c) in L) \
+            header = ['_'.join('%s=%s'%(f, c) for (f, c) in L) \
                       for L in self.Zcnames]
 
             # initialize the texttable and add stuff
@@ -1157,18 +1239,18 @@ class PyvtTbl(dict):
             header = rows + ['Value']
             
             # initialize the texttable and add stuff
-            for i,L in enumerate(self.Zrnames):
-                data.append([c for (f,c) in L]+self.Z[i])
+            for i, L in enumerate(self.Zrnames):
+                data.append([c for (f, c) in L] + self.Z[i])
             
         else: # table has rows and cols
             # build the header
             header = copy(rows)
             for L in self.Zcnames:
-                header.append('_'.join('%s=%s'%(f,c) for (f,c) in L))
+                header.append('_'.join('%s=%s'%(f, c) for (f, c) in L))
 
             # initialize the texttable and add stuff
-            for i,L in enumerate(self.Zrnames):
-                data.append([c for (f,c) in L]+self.Z[i])
+            for i, L in enumerate(self.Zrnames):
+                data.append([c for (f, c) in L] + self.Z[i])
 
         # write file
         with open(fname, 'wb') as fid:
@@ -1177,7 +1259,7 @@ class PyvtTbl(dict):
             wtr.writerow(header)
             wtr.writerows(data)
 
-    def descriptives(self,cname,where=[]):
+    def descriptives(self, cname, where=[]):
         
         """
         Returns a dict of descriptive statistics for column cname
@@ -1192,44 +1274,43 @@ class PyvtTbl(dict):
         if cname not in self:
             raise KeyError(cname)
         
-        V=sorted(self.selectCol(cname,where=where))
-        N=len(V)
+        V = sorted(self.select_col(cname, where=where))
+        N = len(V)
 
-        D=OrderedDict()
+        D = OrderedDict()
         D['count']      = N
-        D['mean']       = sum(V)/N
-        D['var']        = sum([(D['mean']-v)**2 for v in V])/(N-1)
+        D['mean']       = sum(V) / N
+        D['var']        = sum([(D['mean']-v)**2 for v in V]) / (N - 1)
         D['stdev']      = math.sqrt(D['var'])
-        D['sem']        = D['stdev']/math.sqrt(N)
-        D['rms']        = math.sqrt(sum([v**2 for v in V])/N)
+        D['sem']        = D['stdev'] / math.sqrt(N)
+        D['rms']        = math.sqrt(sum([v**2 for v in V]) / N)
         D['min']        = min(V)
         D['max']        = max(V)
-        D['range']      = D['max']-D['min']
+        D['range']      = D['max'] - D['min']
         D['median']     = V[int(N/2)]
         if D['count']%2 == 0:
             D['median'] += V[int(N/2)-1]
             D['median'] /= 2.
-        D['95ci_lower'] = D['mean']-1.96*D['sem']
-        D['95ci_upper'] = D['mean']+1.96*D['sem']
+        D['95ci_lower'] = D['mean'] - 1.96*D['sem']
+        D['95ci_upper'] = D['mean'] + 1.96*D['sem']
 
         return D
     
-    def printDescriptives(self,cname):
-        D=self.descriptives(cname)
+    def printDescriptives(self, cname):
+        D = self.descriptives(cname)
 
         print('Descriptive Statistics for')
-        print('',cname                    )
+        print('', cname                   )
         print('==========================')
 
-        tt=TextTable(48)
-        tt.set_cols_dtype(['t','f'])
-        tt.set_cols_align(['l','r'])
-        for i,(k,v) in enumerate(D.items()):
-            tt.add_row([' %s'%k,v])
+        tt = TextTable(48)
+        tt.set_cols_dtype(['t', 'f'])
+        tt.set_cols_align(['l', 'r'])
+        for (k, v) in D.items():
+            tt.add_row([' %s'%k, v])
         tt.set_deco(TextTable.HEADER)
         
         print(tt.draw())
-
 
     def marginals(self, val, factors, where=[]):
         if self == {}:
@@ -1244,50 +1325,51 @@ class PyvtTbl(dict):
                 raise KeyError(cname)
 
         # check for duplicate names
-        dup = Counter([val]+factors)
+        dup = Counter([val] + factors)
         del dup[None]
-        if not all([count==1 for count in dup.values()]):
+        
+        if not all([count == 1 for count in dup.values()]):
             raise Exception('duplicate labels specified as plot parameters')
 
         if not hasattr(factors, '__iter__'):
             raise TypeError( "'%s' object is not iterable"
                          % type(cols).__name__)
 
-        dmu=self.pivot(val, rows=factors, where=where,
-                       aggregate='avg', flatten=True)[0]
+        dmu = self.pivot(val, rows=factors, where=where,
+                         aggregate='avg', flatten=True)[0]
 
-        dN =self.pivot(val, rows=factors, where=where,
-                       aggregate='count', flatten=True)[0]
+        dN = self.pivot(val, rows=factors, where=where,
+                        aggregate='count', flatten=True)[0]
 
-        dsem,r_list,c_list=self.pivot(val, rows=factors, where=where,
-                                      aggregate='sem', flatten=True)
-
+        dsem, r_list, c_list = self.pivot(val, rows=factors, where=where,
+                                          aggregate='sem', flatten=True)
+ 
         # build factors from r_list
-        factors=OrderedDict()
-        for i,r in enumerate(r_list):
-            if i==0:
+        factors = OrderedDict()
+        for i, r in enumerate(r_list):
+            if i == 0:
                 for c in r:
-                    factors[c[0]]=[]
+                    factors[c[0]] = []
             
             for j, c in enumerate(r):
                 factors[c[0]].append(c[1])
 
-        dlower=[]
-        dupper=[]
-        for mu,sem in zip(dmu,dsem):
+        dlower = []
+        dupper = []
+        for mu, sem in zip(dmu, dsem):
             dlower.append(mu - 1.96*sem)
             dupper.append(mu + 1.96*sem)
 
-        return factors,dmu,dN,dsem,dlower,dupper            
+        return factors, dmu, dN, dsem, dlower, dupper            
         
     def printMarginals(self, val, factors, where=[]):
         """Plot marginal statisics over factors for val"""
 
         # marginals handles checking
-        x=self.marginals(val,factors=factors,where=where)
-        [f,dmu,dN,dsem,dlower,dupper]=x
+        x = self.marginals(val, factors=factors, where=where)
+        [f, dmu, dN, dsem, dlower, dupper] = x
 
-        M=[]
+        M = []
         for v in f.values():
             M.append(v)
             
@@ -1296,20 +1378,24 @@ class PyvtTbl(dict):
         M.append(dsem)
         M.append(dlower)
         M.append(dupper)
-        M=zip(*M) # transpose
+        M = zip(*M) # transpose
 
         # figure out the width needed by the condition labels so we can
         # set the width of the table
-        flength=sum([max([len(v) for c in v]) for v in f.values()])+len(f)*2
+        flength = sum([max([len(v) for c in v]) for v in f.values()])
+        flength += len(f) * 2
 
         # build the header
-        header=factors+'Mean;Count;Std.\nError;'\
-                       '95% CI\nlower;95% CI\nupper'.split(';')
+        header = factors + 'Mean;Count;Std.\nError;'\
+                           '95% CI\nlower;95% CI\nupper'.split(';')
 
+        dtypes = ['t'] * len(factors) + ['f', 'i', 'f', 'f', 'f']
+        aligns = ['l'] * len(factors) + ['r', 'l', 'r', 'r', 'r']
+        
         # initialize the texttable and add stuff
-        tt=TextTable(max_width=flength+48)
-        tt.set_cols_dtype(['t']*len(factors)+['f','i','f','f','f'])
-        tt.set_cols_align(['l']*len(factors)+['r','l','r','r','r'])
+        tt = TextTable(max_width=flength+48)
+        tt.set_cols_dtype(dtypes)
+        tt.set_cols_align(aligns)
         tt.add_rows(M,header=False)
         tt.header(header)
         tt.set_deco(TextTable.HEADER)
@@ -1320,18 +1406,10 @@ class PyvtTbl(dict):
 
     def plotBox(self, val, factors=[], where=[],
             fname=None, quality='medium'):
+
+        if not (HAS_NUMPY and HAS_PYLAB):
+            raise ImportError('numpy and pylab are required for plotting')
         
-        # check for third party packages
-        try:
-            import pylab
-        except:
-            raise ImportError('pylab is required for plotting')
-
-        try:
-            import numpy as np
-        except:
-            raise ImportError('numpy is required for plotting')
-
         # check to see if there is any data in the table
         if self == {}:
             raise Exception('Table must have data to print data')
@@ -1367,18 +1445,23 @@ class PyvtTbl(dict):
                     fname.lower().endswith('.svg')):
                 raise Exception('fname must end with .png or .svg')
 
-        if factors == None:
-            d = self.selectCol(val, where=where)            
+        test = {}
+
+        if factors == []:
+            d = self.select_col(val, where=where)            
             fig = pylab.figure()
             pylab.boxplot(np.array(d))
             xticks = pylab.xticks()[0]
             xlabels = [val]
             pylab.xticks(xticks, xlabels)
 
+            test['d'] = d
+            test['val'] = val
+
         else:
-            D,cs = self._pvt(val, rows=factors,
-                             where=where,
-                             aggregate='tolist')[:2]
+            D, cs = self._pvt(val, rows=factors,
+                              where=where,
+                              aggregate='tolist')[:2]
 
             D = [np.array(_flatten(d)) for d in D]
 
@@ -1389,7 +1472,10 @@ class PyvtTbl(dict):
             xlabels = ['\n'.join('%s = %s'%fc for fc in c) for c in cs]
             pylab.xticks(xticks, xlabels,
                          rotation='vertical',
-                         verticalalignment='top')   
+                         verticalalignment='top')
+
+            test['d'] = D
+            test['xlabels'] = xlabels
 
         maintitle = '%s'%val
 
@@ -1399,20 +1485,24 @@ class PyvtTbl(dict):
             
         fig.text(0.5, 0.95, maintitle,
                  horizontalalignment='center',
-                 verticalalignment='top')   
+                 verticalalignment='top')
+        
+        test['maintitle'] = maintitle
             
         if fname == None:
             fname = 'box(%s).png'%val.lower()
+
+        test['fname'] = fname
         
         # save figure
-        if quality=='low' or fname.endswith('.svg'):
+        if quality == 'low' or fname.endswith('.svg'):
             pylab.savefig(fname)
             
-        elif quality=='medium':
-            pylab.savefig(fname,dpi=200)
+        elif quality == 'medium':
+            pylab.savefig(fname, dpi=200)
             
-        elif quality=='high':
-            pylab.savefig(fname,dpi=300)
+        elif quality == 'high':
+            pylab.savefig(fname, dpi=300)
             
         else:
             pylab.savefig(fname)
@@ -1420,28 +1510,25 @@ class PyvtTbl(dict):
         pylab.close()
 
         if self.TESTMODE:
-            return True
+            return test
 
     def hist(self, val, where=[], bins=10,
-             range=None, density=False, cumulative=False):          
-        V = self.selectCol(val, where=where)
-        return pystaggrelite3.hist(V, bins=bins, range=range,
-                                   density=density, cumulative=cumulative)
+             range=None, density=False, cumulative=False):
+        
+        V = self.select_col(val, where=where)
+        return pystaggrelite3.hist(V,
+                                   bins=bins,
+                                   range=range,
+                                   density=density,
+                                   cumulative=cumulative)
 
     def plotHist(self, val, where=[], bins=10,
                  range=None, density=False, cumulative=False,
                  fname=None, quality='medium'):    
         
         # check for third party packages
-        try:
-            import pylab
-        except:
-            raise ImportError('pylab is required for plotting')
-
-        try:
-            import numpy as np
-        except:
-            raise ImportError('numpy is required for plotting')
+        if not (HAS_NUMPY and HAS_PYLAB):
+            raise ImportError('numpy and pylab are required for plotting')
 
         # check fname
         if not isinstance(fname, _strobj) and fname != None:
@@ -1452,24 +1539,26 @@ class PyvtTbl(dict):
                     fname.lower().endswith('.svg')):
                 raise Exception('fname must end with .png or .svg')                
 
-        v = self.selectCol(val, where=where)
+        # select_col does checking of val and where
+        v = self.select_col(val, where=where)
         
         fig=pylab.figure()
-        pylab.hist(np.array(v), bins=bins, range=range,
-                   normed=density, cumulative=cumulative)
+        tup = pylab.hist(np.array(v), bins=bins, range=range,
+                         normed=density, cumulative=cumulative)
+        pylab.title(val)
 
         if fname == None:
             fname = 'hist(%s).png'%val.lower()
         
         # save figure
-        if quality=='low' or fname.endswith('.svg'):
+        if quality == 'low' or fname.endswith('.svg'):
             pylab.savefig(fname)
             
-        elif quality=='medium':
-            pylab.savefig(fname,dpi=200)
+        elif quality == 'medium':
+            pylab.savefig(fname, dpi=200)
             
-        elif quality=='high':
-            pylab.savefig(fname,dpi=300)
+        elif quality == 'high':
+            pylab.savefig(fname, dpi=300)
             
         else:
             pylab.savefig(fname)
@@ -1477,13 +1566,13 @@ class PyvtTbl(dict):
         pylab.close()
 
         if self.TESTMODE:
-            return True
+            # build and return test dictionary
+            return {'bins':tup[0], 'counts':tup[1], 'fname':fname}
 
     def plotMarginals(self, val, xaxis, 
                       seplines=None, sepxplots=None, sepyplots=None,
                       xmin='AUTO', xmax='AUTO', ymin='AUTO', ymax='AUTO',
-                      where=[], fname=None,
-                      quality='low', yerr=None):
+                      where=[], fname=None, quality='low', yerr=None):
 
         ##############################################################
         # plotMarginals programmatic flow                            #
@@ -1519,15 +1608,8 @@ class PyvtTbl(dict):
             raise Exception('Table must have data to plot marginals')
 
         # check for third party packages
-        try:
-            import pylab
-        except:
-            raise ImportError('pylab is required for plotting')
-
-        try:
-            import numpy as np
-        except:
-            raise ImportError('numpy is required for plotting')
+        if not (HAS_NUMPY and HAS_PYLAB):
+            raise ImportError('numpy and pylab are required for plotting')
 
         # check to see if data columns have equal lengths
         if not self._are_col_lengths_equal():
@@ -1565,9 +1647,9 @@ class PyvtTbl(dict):
                 raise Exception('fname must end with .png or .svg')                
 
         # check cell counts
-        cols=[f for f in [seplines, sepxplots, sepyplots] if f in self]
-        counts=self.pivot(val, rows=[xaxis], cols=cols,
-                         flatten=True, where=where, aggregate='count')[0]
+        cols = [f for f in [seplines, sepxplots, sepyplots] if f in self]
+        counts = self.pivot(val, rows=[xaxis], cols=cols,
+                            flatten=True, where=where, aggregate='count')[0]
 
         for count in counts:
             if count < 1:
@@ -1687,86 +1769,101 @@ class PyvtTbl(dict):
 
                 ######## If separate lines are not specified #########
                 if seplines == None:
-                    y, r_list, c_list=self._pvt(val,cols=[xaxis],
-                            where=where,aggregate='avg',
-                            flatten=True)[:3]
+                    y, r_list, c_list = self._pvt(val, cols=[xaxis],
+                                                  where=where,
+                                                  aggregate='avg',
+                                                  flatten=True)[:3]
                     y = np.array(y)
 
-                    if aggregate!=None:
-                        yerr=self._pvt(val,cols=[xaxis],
-                            where=where,aggregate=aggregate,
-                            flatten=True)[0]
-                        yerr=np.array(yerr)
+                    if aggregate != None:
+                        yerr = self._pvt(val, cols=[xaxis],
+                                         where=where,
+                                         aggregate=aggregate,
+                                         flatten=True)[0]
+                        yerr = np.array(yerr)
                         
-                    x = [name for [(label,name)] in c_list]
+                    x = [name for [(label, name)] in c_list]
                     
                     if _isfloat(yerr):
-                        yerr=np.array([yerr for a in x])
+                        yerr = np.array([yerr for a in x])
 
                     if all([_isfloat(a) for a in x]):
-                        axs[-1].errorbar(x,y,yerr)
-                        if xmin=='AUTO' and xmax=='AUTO':
-                            xmin,xmax=axs[-1].get_xlim()
-                            xran=xmax-xmin
-                            xmin,xmax=xmin-.05*xran,xmax+.05*xran
+                        axs[-1].errorbar(x, y, yerr)
+                        if xmin == 'AUTO' and xmax == 'AUTO':
+                            xmin, xmax = axs[-1].get_xlim()
+                            xran = xmax - xmin
+                            xmin = xmin - 0.05*xran
+                            xmax = xmax + 0.05*xran
 
-                        axs[-1].plot([xmin,xmax],[0.,0.],'k:')
+                        axs[-1].plot([xmin, xmax], [0., 0.], 'k:')
                         
                     else : # categorical x axis
-                        axs[-1].errorbar(_xrange(len(x)),y.flatten(),yerr)
-                        pylab.xticks(_xrange(len(x)),x)
-                        xmin,xmax=-.5,len(x)-.5
+                        axs[-1].errorbar(_xrange(len(x)), y.flatten(), yerr)
+                        pylab.xticks(_xrange(len(x)), x)
+                        xmin = - 0.5
+                        xmax = len(x) - 0.5
                         
-                        axs[-1].plot([xmin,xmax],[0.,0.],'k:')
+                        axs[-1].plot([xmin, xmax], [0., 0.], 'k:')
 
                 ########## If separate lines are specified ###########
                 else:
-                    y,r_list,c_list=self._pvt(val,
-                            rows=[seplines],cols=[xaxis],where=where,
-                            aggregate='avg',flatten=False)[:3]
-                    y=np.array(y)
+                    y, r_list, c_list = self._pvt(val,
+                                                  rows=[seplines],
+                                                  cols=[xaxis],
+                                                  where=where,
+                                                  aggregate='avg',
+                                                  flatten=False)[:3]
+                    y = np.array(y)
                     
-                    if aggregate!=None:
-                        yerrs=self._pvt(val,
-                            rows=[seplines],cols=[xaxis],where=where,
-                            aggregate=aggregate,flatten=False)[0]
-                        yerrs=np.array(yerrs)
+                    if aggregate != None:
+                        yerrs = self._pvt(val,
+                                          rows=[seplines],
+                                          cols=[xaxis],
+                                          where=where,
+                                          aggregate=aggregate,
+                                          flatten=False)[0]
+                        yerrs = np.array(yerrs)
                         
-                    x = [name for [(label,name)] in c_list]
+                    x = [name for [(label, name)] in c_list]
 
                     if _isfloat(yerr):
-                        yerr=np.array([yerr for a in x])
+                        yerr = np.array([yerr for a in x])
 
-                    plots,labels=[],[]
-                    for i,name in enumerate(r_list):
-                        if aggregate!=None:
-                            yerr=yerrs[i,:]
+                    plots = []
+                    labels = []
+                    for i, name in enumerate(r_list):
+                        if aggregate != None:
+                            yerr = yerrs[i,:]
                         
                         labels.append(name[0][1])
 
                         if all([_isfloat(a) for a in x]):
-                            plots.append(axs[-1].errorbar(x,y[i,:],yerr)[0])
+                            plots.append(axs[-1].errorbar(x, y[i,:], yerr)[0])
                             if xmin=='AUTO' and xmax=='AUTO':
-                                xmin,xmax=axs[-1].get_xlim()
-                                xran=xmax-xmin
-                                xmin,xmax=xmin-.05*xran,xmax+.05*xran
+                                xmin , xmax = axs[-1].get_xlim()
+                                xran = xmax - xmin
+                                xmin = xmin - .05*xran
+                                xmax = xmax + .05*xran
                                 
-                            axs[-1].plot([xmin,xmax],[0.,0.],'k:')
+                            axs[-1].plot([xmin, xmax], [0.,0.], 'k:')
                             
                         else : # categorical x axis
-                            plots.append(axs[-1].errorbar(
-                                _xrange(len(x)),y[i,:],yerr)[0])
-                            pylab.xticks(_xrange(len(x)),x)
-                            xmin,xmax=-.5,len(x)-.5
-                            axs[-1].plot([xmin,xmax],[0.,0.],'k:')
+                            plots.append(axs[-1].errorbar(_xrange(len(x)),
+                                                          y[i,:],
+                                                          yerr)[0])
+                            pylab.xticks(_xrange(len(x)), x)
+                            xmin = - 0.5
+                            xmax = len(x) - 0.5
+                            
+                            axs[-1].plot([xmin, xmax], [0., 0.], 'k:')
 
-                    pylab.figlegend(plots,labels,loc=1,
+                    pylab.figlegend(plots, labels, loc=1,
                                     labelsep=.005,
                                     handlelen=.01,
                                     handletextsep=.005)
 
                 test['y'].append(y.tolist())
-                if yerr==None:
+                if yerr == None:
                     test['yerr'].append([])
                 else:
                     test['yerr'].append(yerr.tolist())
@@ -1775,18 +1872,18 @@ class PyvtTbl(dict):
 
                 #  8.2 Add subplot title
                 ######################################################
-                if rlevels==[1] and clevels==[1]:
+                if rlevels == [1] and clevels == [1]:
                     title = ''
                     
-                elif rlevels==[1]:
+                elif rlevels == [1]:
                     title = _str(clevel)
                     
-                elif clevels==[1]:
+                elif clevels == [1]:
                     title = _str(rlevel)
                     
                 else:
-                    title = '%s = %s, %s = %s' % (sepyplots,_str(rlevel),
-                                                  sepxplots,_str(rlevel))
+                    title = '%s = %s, %s = %s' \
+                            % (sepyplots, _str(rlevel), sepxplots, _str(rlevel))
                     
                 pylab.title(title, fontsize='medium')
                 test['subplot_titles'].append(title)
@@ -1803,12 +1900,12 @@ class PyvtTbl(dict):
                     pylab.xticks(locs, ['' for l in _xrange(len(locs))])
                     
                 if c != 0:
-                    locs,labels=pylab.yticks()
+                    locs, labels = pylab.yticks()
                     pylab.yticks(locs, ['' for l in _xrange(len(locs))])
 
                 # Set the aspect ratio for the subplot
-                Dx=abs(axs[-1].get_xlim()[0]-axs[-1].get_xlim()[1])
-                Dy=abs(axs[-1].get_ylim()[0]-axs[-1].get_ylim()[1])
+                Dx = abs(axs[-1].get_xlim()[0] - axs[-1].get_xlim()[1])
+                Dy = abs(axs[-1].get_ylim()[0] - axs[-1].get_ylim()[1])
                 axs[-1].set_aspect(.75*Dx/Dy)
                 
                 #  8.4 Iterate plotnum counter
@@ -1829,25 +1926,25 @@ class PyvtTbl(dict):
         ##############################################################
         if fname == None:
             fname = maintitle.lower() \
-                             .replace('by','~') \
-                             .replace('*','X') \
-                             .replace(' ','')
+                             .replace('by', '~') \
+                             .replace('*', 'X') \
+                             .replace(' ', '')
             
-        if quality=='low' or fname.endswith('.svg'):
+        if quality == 'low' or fname.endswith('.svg'):
             pylab.savefig(fname)
             
-        elif quality=='medium':
-            pylab.savefig(fname,dpi=200)
+        elif quality == 'medium':
+            pylab.savefig(fname, dpi=200)
             
-        elif quality=='high':
-            pylab.savefig(fname,dpi=300)
+        elif quality == 'high':
+            pylab.savefig(fname, dpi=300)
             
         else:
             pylab.savefig(fname)
 
         pylab.close()
 
-        test['fname']=fname
+        test['fname'] = fname
 
         # 11. return the test dictionary
         ##############################################################
@@ -1894,7 +1991,7 @@ class PyvtTbl(dict):
 ##print(df.types)
 ##    
 ##df.printTable()
-##df.printPivot('sum',rows=['A'],cols=['B'])
+##df._xunique_combinationsot('sum',rows=['A'],cols=['B'])
 ####W[-1]=10000.
 ##
 ##
