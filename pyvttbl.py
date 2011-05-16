@@ -163,7 +163,7 @@ class PyvtTbl(dict):
 
         # a list of tuples specifying the filtering applied to the
         # the pivot table
-        self.Zwhere
+        self.Zwhere = []
 
         # prints the sqlite3 queries to standard out before
         # executing them for debugging purposes
@@ -442,7 +442,7 @@ class PyvtTbl(dict):
         return list(self.cur)
     
     def _pvt(self, val, rows=[], cols=[], aggregate='avg',
-              where=[], flatten=False):
+              where=[], flatten=False, attach_rlabels=False):
         """
         private pivot table method
 
@@ -509,7 +509,7 @@ class PyvtTbl(dict):
         dup = Counter([val]+rows+cols)
         del dup[None]
         if not all([count==1 for count in dup.values()]):
-            raise Exception('duplicate labels specified as plot parameters')
+            raise Exception('duplicate labels specified')
 
         # check aggregate function
         aggregate=aggregate.lower()
@@ -607,19 +607,39 @@ class PyvtTbl(dict):
 
         #  6. Read data to from cursor into a list of lists
         ##############################################################
+
         d=[]
         val_type = self.typesdict[val]
-        if aggregate=='tolist':
-            for row in self.cur:
-                d.append([])
-                for cell in list(row)[-len(col_list):]:
-                    if val_type == 'real' or val_type == 'integer':
-                        d[-1].append(eval('[%s]'%cell))
-                    else:
-                        d[-1].append(cell.split(','))
+
+        # keep the columns with the row labels
+        if attach_rlabels:
+            if aggregate=='tolist':
+                for row in self.cur:
+                    d.append([])
+                    for cell in list(row):
+                        if val_type == 'real' or val_type == 'integer':
+                            d[-1].append(eval('[%s]'%cell))
+                        else:
+                            d[-1].append(cell.split(','))
+            else:
+                for row in self.cur:
+                    d.append(list(row))
+
+            col_list = [(r,'') for r in rows].extend(col_list)
+                    
+        # eliminate the columns with row labels
         else:
-            for row in self.cur:
-                d.append(list(row)[-len(col_list):])
+            if aggregate=='tolist':
+                for row in self.cur:
+                    d.append([])
+                    for cell in list(row)[-len(col_list):]:
+                        if val_type == 'real' or val_type == 'integer':
+                            d[-1].append(eval('[%s]'%cell))
+                        else:
+                            d[-1].append(cell.split(','))
+            else:
+                for row in self.cur:
+                    d.append(list(row)[-len(col_list):])
 
         #  7. Clean up
         ##############################################################
@@ -632,6 +652,12 @@ class PyvtTbl(dict):
 
         #  9. return data, rnames, and cnames
         ##############################################################
+        if row_list == [1]:
+            row_list = [(val,'')]
+
+        if col_list == [1]:
+            col_list = [(val,'')]
+        
         return d, row_list, col_list, Zconditions
 
     def sort(self, order=[]):
@@ -793,7 +819,7 @@ class PyvtTbl(dict):
         return pass_or_fail
 
     def pivot(self, val, rows=[], cols=[], aggregate='avg',
-              where=[], flatten=False):
+              where=[], flatten=False, attach_rlabels=False):
         
         # public method, saves table to self variables after pivoting
         """
@@ -814,7 +840,8 @@ class PyvtTbl(dict):
         d,rnames,cnames,conds = self._pvt(val, rows=rows, cols=cols,
                                          aggregate=aggregate,
                                          where=where,
-                                         flatten=flatten)
+                                         flatten=flatten,
+                                         attach_rlabels=attach_rlabels)
          
         # sets results to self attributes
         self.Z = d
@@ -1831,10 +1858,10 @@ class PyvtTbl(dict):
 
 
 
-df=PyvtTbl()
-df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-df.printDescriptives('ERROR')
-df.printTable(where=[('ERROR','==',10.)])
+##df=PyvtTbl()
+##df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+##df.printDescriptives('ERROR')
+##df.printTable(where=[('ERROR','==',10.)])
 ##print(df.Z)
 
 ##from random import shuffle
