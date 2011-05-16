@@ -40,7 +40,6 @@ def fcmp(d,r):
         for dc,rc in zip(dline.split(','),rline.split(',')):
             if _isfloat(dc):
                 if round(float(dc),7)!=round(float(rc),7):
-                    print(dc,rc)
                     boolCounter[False] += 1
                 else:
                     boolCounter[True] += 1 
@@ -434,24 +433,26 @@ class Test_pivot_1(unittest.TestCase):
 
         self.assertEqual(str(cm.exception),
                          "'str' object is not iterable")
-    def test004(self):
-        # test the exclude parameter checking
-
-        with warnings.catch_warnings(record=True) as w:
-            # Cause all warnings to always be triggered.
-            warnings.simplefilter("always")
-            
-            # Trigger a warning.    
-            self.df.pivot('SUBJECT',exclude={'AGE':['medium',]})
-        
-            assert issubclass(w[-1].category, RuntimeWarning)
+##    def test004(self):
+##        # test the exclude parameter checking
+##
+##        with warnings.catch_warnings(record=True) as w:
+##            # Cause all warnings to always be triggered.
+##            warnings.simplefilter("always")
+##            
+##            # Trigger a warning.    
+##            self.df.pivot('SUBJECT',
+##                          where=[('AGE','not in',['medium',])])
+##        
+##            assert issubclass(w[-1].category, RuntimeWarning)
     
     def test005(self):
         # test the exclude parameter
         R=np.array([[14.8], [6.5], [17.6], [19.3], [7.6]])
         
         # this one shouldn't raise an Exception
-        self.df.pivot('WORDS',rows=['CONDITION'],exclude={'AGE':['old',]})
+        self.df.pivot('WORDS',rows=['CONDITION'],
+                      where=[('AGE','not in',['old',])])
         D=np.array(self.df.Z)
 
         # verify the table is the correct shape
@@ -736,7 +737,7 @@ class Test_writeTable(unittest.TestCase):
         # with exclusion
         d='suppression~subjectXgroupXageXcycleXphase.csv'
         r='subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv'
-        self.df.writeTable(exclude={'AGE':['young']})
+        self.df.writeTable(where=[('AGE','not in',['young'])])
         self.assertTrue(fcmp(d,r))
 
         # clean up
@@ -749,8 +750,9 @@ class Test_selectCol(unittest.TestCase):
     
     def test0(self):
         R=[33.0, 43.0, 40.0, 52.0, 39.0, 52.0, 38.0, 48.0, 4.0, 35.0, 9.0, 42.0, 4.0, 46.0, 23.0, 51.0, 32.0, 39.0, 38.0, 47.0, 24.0, 44.0, 16.0, 40.0, 17.0, 34.0, 21.0, 41.0, 27.0, 50.0, 13.0, 40.0, 44.0, 52.0, 37.0, 48.0, 33.0, 53.0, 33.0, 43.0, 12.0, 16.0, 9.0, 39.0, 9.0, 59.0, 13.0, 45.0, 18.0, 42.0, 3.0, 62.0, 45.0, 49.0, 60.0, 57.0, 13.0, 29.0, 14.0, 44.0, 9.0, 50.0, 15.0, 48.0]
-        D=self.df.selectCol('SUPPRESSION', exclude={'AGE':['young'],
-                                                  'GROUP':['AB','AA']})
+        D=self.df.selectCol('SUPPRESSION',
+                            where=[('AGE','not in',['young']),
+                                   ('GROUP','not in',['AB','AA'])])
         for r,d in zip(R,D):
             self.assertAlmostEqual(r,d)
              
@@ -762,8 +764,8 @@ class Test_writePivot(unittest.TestCase):
     def test0(self):
         # self.assertEqual doesn't like really long comparisons
         # so we will break it up into lines
-        R=['SUPPRESSION where CYCLE not in {1; 2} and GROUP not in {AB}\r\n',
-           'GROUP,CYCLE=3.0_AGE=old,CYCLE=3.0_AGE=young,CYCLE=4.0_AGE=old,CYCLE=4.0_AGE=young\r\n',
+        R=['"avg(SUPPRESSION) where GROUP not in [\'AB\'] and  CYCLE not in [1, 2]"\r\n',
+           'GROUP,CYCLE=3_AGE=old,CYCLE=3_AGE=young,CYCLE=4_AGE=old,CYCLE=4_AGE=young\r\n',
            'AA,21.9375,10.0125,22.25,10.5125\r\n',
            'LAB,37.0625,12.5375,36.4375,12.0375\r\n']
         
@@ -771,7 +773,8 @@ class Test_writePivot(unittest.TestCase):
                  rows=['GROUP'],
                  cols=['CYCLE','AGE'],
                  aggregate='avg',
-                 exclude={'GROUP':['AB'],'CYCLE':[1,2]})
+                 where=[('GROUP','not in',['AB']),
+                        ('CYCLE','not in',[1,2])])
         self.df.writePivot()
 
         D=[]
@@ -789,7 +792,7 @@ class Test_writePivot(unittest.TestCase):
     def test1(self):
         # same as test0 except we are specifying a filename
         # and specifying the delimiter as \t
-        R=['"""SUPPRESSION where CYCLE not in {1, 2} or GROUP not in {AB}"""\r\n',
+        R=['"avg(SUPPRESSION) where GROUP not in [\'AB\'] and  CYCLE not in [1, 2]"\r\n',
            'GROUP\tCYCLE=3.0_AGE=old\tCYCLE=3.0_AGE=young\tCYCLE=4.0_AGE=old\tCYCLE=4.0_AGE=young\r\n',
            'AA\t21.9375\t10.0125\t22.25\t10.5125\r\n',
            'LAB\t37.0625\t12.5375\t36.4375\t12.0375\r\n']
@@ -798,7 +801,8 @@ class Test_writePivot(unittest.TestCase):
                  rows=['GROUP'],
                  cols=['CYCLE','AGE'],
                  aggregate='avg',
-                 exclude={'GROUP':['AB'],'CYCLE':[1,2]})
+                 where=[('GROUP','not in',['AB']),
+                        ('CYCLE','not in',[1,2])])
         self.df.writePivot('myname.dat','\t')
 
         # clean up
@@ -806,8 +810,8 @@ class Test_writePivot(unittest.TestCase):
 
     def test2(self):
         # no exclusions this time
-        R=['SUPPRESSION\r\n',
-           'GROUP,CYCLE=1.0_AGE=old,CYCLE=1.0_AGE=young,CYCLE=2.0_AGE=old,CYCLE=2.0_AGE=young,CYCLE=3.0_AGE=old,CYCLE=3.0_AGE=young,CYCLE=4.0_AGE=old,CYCLE=4.0_AGE=young\r\n',
+        R=['avg(SUPPRESSION)\r\n',
+           'GROUP,CYCLE=1_AGE=old,CYCLE=1_AGE=young,CYCLE=2_AGE=old,CYCLE=2_AGE=young,CYCLE=3_AGE=old,CYCLE=3_AGE=young,CYCLE=4_AGE=old,CYCLE=4_AGE=young\r\n',
            'AA,19.3125,8.4875,25.25,10.2375,21.9375,10.0125,22.25,10.5125\r\n',
            'AB,17.6875,7.1,32.3125,10.9625,33.0625,11.8,33.6875,10.3\r\n',
            'LAB,28.9375,10.7875,34.125,12.1375,37.0625,12.5375,36.4375,12.0375\r\n']
@@ -839,8 +843,7 @@ class Test_writePivot(unittest.TestCase):
                          'must call pivot before writing pivot table')        
         
     def test4(self):
-        R = 'SUPPRESSION\r\nCYCLE=1.0_AGE=old,CYCLE=1.0_AGE=young,CYCLE=2.0_AGE=old,CYCLE=2.0_AGE=young,CYCLE=3.0_AGE=old,CYCLE=3.0_AGE=young,CYCLE=4.0_AGE=old,CYCLE=4.0_AGE=young\r\n21.9791666667,8.79166666667,30.5625,11.1125,30.6875,11.45,30.7916666667,10.95\r\n'
-
+        R = 'avg(SUPPRESSION)\r\nCYCLE=1_AGE=old,CYCLE=1_AGE=young,CYCLE=2_AGE=old,CYCLE=2_AGE=young,CYCLE=3_AGE=old,CYCLE=3_AGE=young,CYCLE=4_AGE=old,CYCLE=4_AGE=young\r\n21.9791666667,8.79166666667,30.5625,11.1125,30.6875,11.45,30.7916666667,10.95\r\n'
         # rows not specified
         self.df.pivot('SUPPRESSION',
                  cols=['CYCLE','AGE'],
@@ -857,8 +860,7 @@ class Test_writePivot(unittest.TestCase):
         os.remove('./suppression~()Z(cycleXage).csv')
 
     def test5(self):
-        R = 'SUPPRESSION\r\nCYCLE,AGE,Value\r\n1.0,old,21.9791666667\r\n1.0,young,8.79166666667\r\n2.0,old,30.5625\r\n2.0,young,11.1125\r\n3.0,old,30.6875\r\n3.0,young,11.45\r\n4.0,old,30.7916666667\r\n4.0,young,10.95\r\n'
-
+        R = 'avg(SUPPRESSION)\r\nCYCLE,AGE,Value\r\n1,old,21.9791666667\r\n1,young,8.79166666667\r\n2,old,30.5625\r\n2,young,11.1125\r\n3,old,30.6875\r\n3,young,11.45\r\n4,old,30.7916666667\r\n4,young,10.95\r\n'
         # cols not specified
         self.df.pivot('SUPPRESSION',
                  rows=['CYCLE','AGE'],
@@ -875,7 +877,7 @@ class Test_writePivot(unittest.TestCase):
         os.remove('./suppression~(cycleXage)Z().csv')
 
     def test6(self):
-        R = 'SUPPRESSION\r\nValue\r\n384\r\n'
+        R = 'count(SUPPRESSION)\r\nValue\r\n384\r\n'
         
         # no rows or cols not specified
         self.df.pivot('SUPPRESSION',
@@ -1099,7 +1101,7 @@ class Test_plotMarginals(unittest.TestCase):
                               seplines='AGE',
                               sepxplots='PHASE',
                               sepyplots='GROUP',yerr='ci',
-                              exclude={'GROUP':['LAB']})
+                              where=[('GROUP','not in',['LAB'])])
    
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1265,7 +1267,7 @@ class Test_plotMarginals(unittest.TestCase):
         D = df.plotMarginals('SUPPRESSION','CYCLE',
                               sepxplots='PHASE',
                               sepyplots='GROUP',yerr='ci',
-                              exclude={'GROUP':['LAB']})
+                              where=[('GROUP','not in',['LAB'])])
         
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])

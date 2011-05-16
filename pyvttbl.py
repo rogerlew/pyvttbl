@@ -159,7 +159,7 @@ class PyvtTbl(dict):
 
         # a DictSet to hold the factor/levels that are not included
         # in the pivot table
-        self.Zexclude = DictSet()
+        self.Zconditions = DictSet()
 
         # prints the sqlite3 queries to standard out before
         # executing them for debugging purposes
@@ -313,49 +313,57 @@ class PyvtTbl(dict):
 
         self.cur.executemany(query,tlist)
 
-    def _build_tbl_old(self, nsubset, exclude={}):
+##    def _build_tbl_old(self, nsubset, where=[]):
+##        """
+##        build or rebuild sqlite table with columns in nsubset and where
+##        the key-conditions in exclude are not True.
+##        """
+##        X = self.conditions & exclude
+##        
+##        # initialize table
+##        self.conn.commit()
+##        self._execute('drop table if exists TBL')
+##
+##        self.conn.commit()
+##        query =  'create temp table TBL\n  ('
+##        query += ', '.join('_%s_ %s'%(n, self.typesdict[n]) for n in nsubset)
+##        query += ')'
+##        self._execute(query)
+##
+##        # build insert query
+##        query = 'insert into TBL values ('
+##        query += ','.join('?' for n in nsubset) + ')'
+##
+##        # for performance it is better to check it once if it is empty
+##        # values are passed to sqlite as a tuple
+##        if exclude == {}: 
+##            for i in _xrange(self.M):
+##                self._execute(query, tuple(self[n][i] for n in nsubset))
+##        else:
+##            for i in _xrange(self.M):
+##                # X is the intersection of X and self.conditions
+##                # so we know the keys in X will always be in self
+##                if X - [(k,[self[k][i]]) for k in X] == X:
+##                    self._execute(query, tuple((self[n][i] for n in nsubset)))
+##
+##        # Save (commit) the changes
+##        self.conn.commit()
+
+    def _build_tbl(self, nsubset, where=[]):
         """
-        build or rebuild sqlite table with columns in nsubset and where
-        the key-conditions in exclude are not True.
+        build or rebuild sqlite table with columns in nsubset based on
+        the where list.
+
+        where should be a list of tuples. Each tuple should have three
+        elements. The first should be a column key (label). The second
+        should be an operator: in, =, !=, <, >. The third element
+        should contain value for the operator.
         """
-        X = self.conditions & exclude
         
-        # initialize table
-        self.conn.commit()
-        self._execute('drop table if exists TBL')
-
-        self.conn.commit()
-        query =  'create temp table TBL\n  ('
-        query += ', '.join('_%s_ %s'%(n, self.typesdict[n]) for n in nsubset)
-        query += ')'
-        self._execute(query)
-
-        # build insert query
-        query = 'insert into TBL values ('
-        query += ','.join('?' for n in nsubset) + ')'
-
-        # for performance it is better to check it once if it is empty
-        # values are passed to sqlite as a tuple
-        if exclude == {}: 
-            for i in _xrange(self.M):
-                self._execute(query, tuple(self[n][i] for n in nsubset))
-        else:
-            for i in _xrange(self.M):
-                # X is the intersection of X and self.conditions
-                # so we know the keys in X will always be in self
-                if X - [(k,[self[k][i]]) for k in X] == X:
-                    self._execute(query, tuple((self[n][i] for n in nsubset)))
-
-        # Save (commit) the changes
-        self.conn.commit()
-
-    def _build_tbl(self, nsubset, exclude={}):
-        """
-        build or rebuild sqlite table with columns in nsubset and where
-        any of the the key/conditions in exclude are True.
-        """
-        X = self.conditions & exclude
-        nsubset2 = list(set(nsubset)|set(exclude.keys()))
+        #  1. Get the neccesary data into a temparary table          
+        ##############################################################
+        W = [tup for tup in where if tup[0] in self]
+        nsubset2 = list(set(nsubset) | set(tup[0] for tup in W))
         
         # initialize table
         self.conn.commit()
@@ -373,7 +381,9 @@ class PyvtTbl(dict):
         self._executemany(query, zip(*[self[n] for n in nsubset2]))
         self.conn.commit()
 
-        if X == {}:
+        #  2. Use sqlite3 to eliminate rows that should be excluded  
+        ##############################################################
+        if W == []:
             self._execute('drop table if exists TBL')
             self.conn.commit()
             
@@ -393,9 +403,18 @@ class PyvtTbl(dict):
 
             # build insert query
             query = []
-            for k,values in X.items():
-                for v in values:
-                    query.append('not _%s_="%s"'%(k,v))
+            for k,op,value in W:
+                if _isfloat(value):
+                    query.append(' _%s_ %s %s'%(k,op,value))
+                elif isinstance(value,list):
+                    if _isfloat(value[0]):
+                        args = ', '.join(str(v) for v in value)
+                    else:
+                        args = ', '.join('"%s"'%v for v in value)
+                    query.append(' _%s_ %s (%s)'%(k,op,args))
+                else:
+                    query.append(' _%s_ %s "%s"'%(k,op,value))
+                    
 
             query = ' and '.join(query)
             nstr = ', '.join('_%s_'%n for n in nsubset)
@@ -403,6 +422,10 @@ class PyvtTbl(dict):
             
             # run query
             self._execute(query)
+            self.conn.commit()
+
+            # delete TBL2
+            self._execute('drop table if exists TBL2')
             self.conn.commit()
 
     def _get_sql_tbl_info(self):
@@ -415,7 +438,7 @@ class PyvtTbl(dict):
         return list(self.cur)
     
     def _pvt(self, val, rows=[], cols=[], aggregate='avg',
-              exclude={}, flatten=False):
+              where=[], flatten=False):
         """
         private pivot table method
 
@@ -474,7 +497,7 @@ class PyvtTbl(dict):
             if k not in self:
                 raise KeyError(k)
 
-        for k in list(exclude.keys()):
+        for k in [tup[0] for tup in where]:
             if k not in self:
                 raise KeyError(k)
 
@@ -490,34 +513,28 @@ class PyvtTbl(dict):
         if aggregate not in self.aggregates:
             raise ValueError("supplied aggregate '%s' is not valid"%aggregate)
         
-        # check to make sure exclude is mappable
+        # check to make sure where is properly formatted
         # todo
-
-        # warn if exclude is not a subset of self.conditions
-        if not self.conditions >= exclude:
-            warnings.warn("exclude is not a subset of table conditions",
-                          RuntimeWarning)
-            
-        # ignore keys/sets in exclude that aren't in self
-        X = self.conditions & exclude
         
         #  2. Create a sqlite table with only the data in columns
         #     specified by val, rows, and cols. Also eliminate
         #     rows that meet the exclude conditions      
         ##############################################################
-        self._build_tbl([val]+rows+cols, exclude)
+        self._build_tbl([val]+rows+cols, where)
         
         #  3. Build rnames and cnames lists
         ##############################################################
         
         # Refresh conditions list so we can build row and col list
-        selected_conditions = self.conditions - X
+        self._execute('select %s from TBL'
+                      %', '.join('_%s_'%n for n in [val]+rows+cols))
+        Zconditions = DictSet(zip([val]+rows+cols, zip(*list(self.cur))))
                 
         # Build row_list
         if rows==[]:
             row_list=[1]
         else:
-            g=selected_conditions.unique_combinations(rows)
+            g=Zconditions.unique_combinations(rows)
             row_list=[zip(rows,v) for v in g]
             
         rsize=len(row_list)
@@ -526,7 +543,7 @@ class PyvtTbl(dict):
         if cols==[]:
             col_list=[1]
         else:
-            g=selected_conditions.unique_combinations(cols)
+            g=Zconditions.unique_combinations(cols)
             col_list=[zip(cols,v) for v in g]
             
         csize=len(col_list)
@@ -611,7 +628,7 @@ class PyvtTbl(dict):
 
         #  9. return data, rnames, and cnames
         ##############################################################
-        return d,row_list,col_list
+        return d, row_list, col_list, Zconditions
 
     def sort(self, order=[]):
         """
@@ -632,7 +649,6 @@ class PyvtTbl(dict):
         if not hasattr(order, '__iter__'):
             raise TypeError( "'%s' object is not iterable"
                              % type(cols).__name__)
-
 
         # check or build order
         if order == []:
@@ -773,7 +789,7 @@ class PyvtTbl(dict):
         return pass_or_fail
 
     def pivot(self, val, rows=[], cols=[], aggregate='avg',
-              exclude={}, flatten=False):
+              where=[], flatten=False):
         
         # public method, saves table to self variables after pivoting
         """
@@ -789,31 +805,27 @@ class PyvtTbl(dict):
             aggregate = function applied across data going into each cell
                       of the table
                       http://www.sqlite.org/lang_aggfunc.html
-            exclude = dictionary specifying levels to exclude
-                keys = colnames
-                values = lists of the levels in cooresponding colname to
-                         exclude
+            where = list of tuples
         """
-        d,rnames,cnames = self._pvt(val, rows=rows, cols=cols,
-                                    aggregate=aggregate,
-                                    exclude=exclude,
-                                    flatten=flatten)
-        
+        d,rnames,cnames,conds = self._pvt(val, rows=rows, cols=cols,
+                                         aggregate=aggregate,
+                                         where=where,
+                                         flatten=flatten)
+         
         # sets results to self attributes
         self.Z = d
         self.Zval = val
-        self.Zexclude = self.conditions & exclude
+        self.Zconditions = conds
+        self.Zwhere = where
         self.Zaggregate = aggregate
         self.Zrnames = rnames
         self.Zcnames = cnames
 
         return self.Z, self.Zrnames, self.Zcnames        
     
-    def selectCol(self, val, exclude={}):
+    def selectCol(self, val, where=[]):
         """
-        Returns the a copy of the selected value where the conditions
-        in exclude are not true. The order of the values in the returned
-        list is preserved.
+        Returns the a copy of the selected values based on the where parameter
         """
         # 1.
         # check to see if data columns have equal lengths
@@ -829,16 +841,14 @@ class PyvtTbl(dict):
         # todo
 
         # warn if exclude is not a subset of self.conditions
-        if not self.conditions >= exclude:
-            warnings.warn("exclude is not a subset of table conditions",
+        if not set(self.names) >= set(tup[0] for tup in where):
+            warnings.warn("where is not a subset of table conditions",
                           RuntimeWarning)
             
-        if exclude == {}: 
+        if where == []: 
             return copy(self[val])             
         else:
-            # ignore keys/sets in exclude that aren't in self
-            X = self.conditions & exclude
-            self._build_tbl([val], exclude)
+            self._build_tbl([val], where)
             self._execute('select * from TBL')
             return [r[0] for r in self.cur]
 
@@ -903,7 +913,7 @@ class PyvtTbl(dict):
         else:
             raise Exception('row must have the same keys as the table')
         
-    def printTable(self, exclude={}):
+    def printTable(self, where=[]):
         if self == {}:
             raise Exception('Table must have data to print data')
 
@@ -914,8 +924,8 @@ class PyvtTbl(dict):
         if self.M < 1: # self.M gets reset by self._check_tbl_lengths()
             raise Exception('Table must have at least one row to print data')
         
-        # ignore keys/sets in exclude that aren't in self
-        X = self.conditions & exclude
+        # ignore tuples in where that aren't in self
+        W = [tup for tup in where if tup[0] in self]
         
         tt=TextTable(max_width=100000000)
         dtypes=[self.typesdict[n][0] for n in self.names]
@@ -925,10 +935,10 @@ class PyvtTbl(dict):
         aligns=[_ifelse(dt in 'fi','r','l') for dt in dtypes]
         tt.set_cols_align(aligns)
         
-        if exclude == {}: 
+        if where == []: 
                 tt.add_rows(zip(*list(self[n] for n in self.names)))              
         else:
-            self._build_tbl(self.names, exclude)
+            self._build_tbl(self.names, where)
             self._execute('select * from TBL')
             tt.add_rows(list(self.cur))
         
@@ -938,7 +948,7 @@ class PyvtTbl(dict):
         # output the table
         print(tt.draw())
 
-    def writeTable(self, exclude={}, fname=None, delimiter=','):
+    def writeTable(self, where=[], fname=None, delimiter=','):
         if self == {}:
             raise Exception('Table must have data to print data')
 
@@ -949,8 +959,8 @@ class PyvtTbl(dict):
         if self.M < 1: # self.M gets reset by self._check_tbl_lengths()
             raise Exception('Table must have at least one row to print data')
             
-        # ignore keys/sets in exclude that aren't in self
-        X = self.conditions & exclude
+        # ignore tuples in where that aren't in self
+        W = [tup for tup in where if tup[0] in self]
         
         # check or build fname
         if fname != None:
@@ -972,30 +982,29 @@ class PyvtTbl(dict):
             wtr = csv.writer(fid, delimiter=delimiter)
             wtr.writerow(self.names)
 
-            if exclude == {}: 
+            if where == []: 
                 wtr.writerows(zip(*list(self[n] for n in self.names)))
             else:
-                self._build_tbl(self.names, exclude)
+                self._build_tbl(self.names, where)
                 self._execute('select * from TBL')
                 wtr.writerows(list(self.cur))
                                     
     def printPivot(self, val, rows=[], cols=[], aggregate='avg',
-                   exclude={}, flatten=False):
+                   where=[], flatten=False):
         """
         pivots, sets, and prints pivot table
         """
         # _pvt does checking
         self.pivot(val, rows=rows, cols=cols, aggregate=aggregate,
-                   exclude=exclude, flatten=flatten)
+                   where=where, flatten=flatten)
 
         # build first line
         first = '%s(%s)'%(self.Zaggregate, self.Zval)
-        if self.Zexclude != {}:
-            X_list = []
-            for (k, v) in sorted(self.Zexclude.items()):
-                conditions = ', '.join((str(c) for c in v))
-                X_list.append('%s not in {%s}'%(k, conditions))
-            first += ' where ' + ' and '.join(X_list)
+        if self.Zconditions != []:
+            query = []
+            for k,op,value in where:
+                query.append(' %s %s %s'%(k,str(op),str(value)))
+            first += ' where' + ' and '.join(query)
 
         tt = TextTable(max_width=10000000)
 
@@ -1085,14 +1094,13 @@ class PyvtTbl(dict):
                 fname += '.txt'
         
         # build and write first line
-        if self.Zexclude != {}:
-            X_list=[]
-            for (k, v) in sorted(self.Zexclude.items()):
-                conditions = '; '.join((str(c) for c in v))
-                X_list.append('%s not in {%s}'%(k, conditions))
-            first = [self.Zval + ' where ' + ' and '.join(X_list)]
-        else:
-            first = [self.Zval]
+        first = '%s(%s)'%(self.Zaggregate, self.Zval)
+        if self.Zwhere != []:
+            query = []
+            for k,op,value in self.Zwhere:
+                query.append(' %s %s %s'%(k,str(op),str(value)))
+            first += ' where' + ' and '.join(query)
+        first = [first]
 
         data = [] # append the rows to this list and write with
                   # csv writer in one call
@@ -1138,7 +1146,7 @@ class PyvtTbl(dict):
             wtr.writerow(header)
             wtr.writerows(data)
 
-    def descriptives(self,cname,exclude={}):
+    def descriptives(self,cname,where=[]):
         
         """
         Returns a dict of descriptive statistics for column cname
@@ -1153,7 +1161,7 @@ class PyvtTbl(dict):
         if cname not in self:
             raise KeyError(cname)
         
-        V=sorted(self.selectCol(cname,exclude=exclude))
+        V=sorted(self.selectCol(cname,where=where))
         N=len(V)
 
         D=OrderedDict()
@@ -1192,7 +1200,7 @@ class PyvtTbl(dict):
         print(tt.draw())
 
 
-    def marginals(self, val, factors, exclude={}):
+    def marginals(self, val, factors, where=[]):
         if self == {}:
             raise Exception('Table must have data to calculate marginals')
         
@@ -1214,13 +1222,13 @@ class PyvtTbl(dict):
             raise TypeError( "'%s' object is not iterable"
                          % type(cols).__name__)
 
-        dmu=self.pivot(val, rows=factors, exclude=exclude,
+        dmu=self.pivot(val, rows=factors, where=where,
                        aggregate='avg', flatten=True)[0]
 
-        dN =self.pivot(val, rows=factors, exclude=exclude,
+        dN =self.pivot(val, rows=factors, where=where,
                        aggregate='count', flatten=True)[0]
 
-        dsem,r_list,c_list=self.pivot(val, rows=factors, exclude=exclude,
+        dsem,r_list,c_list=self.pivot(val, rows=factors, where=where,
                                       aggregate='sem', flatten=True)
 
         # build factors from r_list
@@ -1241,11 +1249,11 @@ class PyvtTbl(dict):
 
         return factors,dmu,dN,dsem,dlower,dupper            
         
-    def printMarginals(self, val, factors, exclude={}):
+    def printMarginals(self, val, factors, where=[]):
         """Plot marginal statisics over factors for val"""
 
         # marginals handles checking
-        x=self.marginals(val,factors=factors,exclude=exclude)
+        x=self.marginals(val,factors=factors,where=where)
         [f,dmu,dN,dsem,dlower,dupper]=x
 
         M=[]
@@ -1279,7 +1287,7 @@ class PyvtTbl(dict):
         print()
         print(tt.draw())
 
-    def plotBox(self, val, factors=[], exclude={},
+    def plotBox(self, val, factors=[], where=[],
             fname=None, quality='medium'):
         
         # check for third party packages
@@ -1329,7 +1337,7 @@ class PyvtTbl(dict):
                 raise Exception('fname must end with .png or .svg')
 
         if factors == None:
-            d = self.selectCol(val, exclude=exclude)            
+            d = self.selectCol(val, where=where)            
             fig = pylab.figure()
             pylab.boxplot(np.array(d))
             xticks = pylab.xticks()[0]
@@ -1338,7 +1346,7 @@ class PyvtTbl(dict):
 
         else:
             D,cs = self._pvt(val, rows=factors,
-                             exclude=exclude,
+                             where=where,
                              aggregate='tolist')[:2]
 
             D = [np.array(_flatten(d)) for d in D]
@@ -1383,13 +1391,13 @@ class PyvtTbl(dict):
         if self.TESTMODE:
             return True
 
-    def hist(self, val, exclude={}, bins=10,
+    def hist(self, val, where=[], bins=10,
              range=None, density=False, cumulative=False):          
-        V = self.selectCol(val, exclude=exclude)
+        V = self.selectCol(val, where=where)
         return pystaggrelite3.hist(V, bins=bins, range=range,
                                    density=density, cumulative=cumulative)
 
-    def plotHist(self, val, exclude={}, bins=10,
+    def plotHist(self, val, where=[], bins=10,
                  range=None, density=False, cumulative=False,
                  fname=None, quality='medium'):    
         
@@ -1413,7 +1421,7 @@ class PyvtTbl(dict):
                     fname.lower().endswith('.svg')):
                 raise Exception('fname must end with .png or .svg')                
 
-        v = self.selectCol(val, exclude=exclude)
+        v = self.selectCol(val, where=where)
         
         fig=pylab.figure()
         pylab.hist(np.array(v), bins=bins, range=range,
@@ -1443,11 +1451,8 @@ class PyvtTbl(dict):
     def plotMarginals(self, val, xaxis, 
                       seplines=None, sepxplots=None, sepyplots=None,
                       xmin='AUTO', xmax='AUTO', ymin='AUTO', ymax='AUTO',
-                      exclude={}, fname=None,
+                      where=[], fname=None,
                       quality='low', yerr=None):
-        # pylab doesn't like not being closed. To avoid starting
-        # a plot without finishing it, we do some extensive checking
-        # up front
 
         ##############################################################
         # plotMarginals programmatic flow                            #
@@ -1474,6 +1479,9 @@ class PyvtTbl(dict):
         #  1. Check to make sure a plot can be generated with the    
         #     specified arguments and parameter
         ##############################################################
+        # pylab doesn't like not being closed. To avoid starting
+        # a plot without finishing it, we do some extensive checking
+        # up front
 
         # check for data
         if self == {}:
@@ -1525,13 +1533,10 @@ class PyvtTbl(dict):
                     fname.lower().endswith('.svg')):
                 raise Exception('fname must end with .png or .svg')                
 
-        # ignore keys/sets in exclude that aren't in self
-        X = self.conditions & exclude
-
         # check cell counts
         cols=[f for f in [seplines, sepxplots, sepyplots] if f in self]
         counts=self.pivot(val, rows=[xaxis], cols=cols,
-                         flatten=True, exclude=X, aggregate='count')[0]
+                         flatten=True, where=where, aggregate='count')[0]
 
         for count in counts:
             if count < 1:
@@ -1592,24 +1597,24 @@ class PyvtTbl(dict):
         numrows = 1
         rlevels = [1]
         if sepyplots != None:
-            rlevels = copy(self.conditions[sepyplots]) # a set
+            rlevels = copy(self.Zconditions[sepyplots]) # a set
             numrows = len(rlevels) # a int
 
-            if sepyplots in X:
-                rlevels -= set(X[sepyplots])
-                numrows -= len(X[sepyplots])
+##            if sepyplots in X:
+##                rlevels -= set(X[sepyplots])
+##                numrows -= len(X[sepyplots])
 
             rlevels = sorted(rlevels) # set -> sorted list
                 
         numcols = 1
         clevels = [1]            
         if sepxplots != None:
-            clevels = copy(self.conditions[sepxplots])
+            clevels = copy(self.Zconditions[sepxplots])
             numcols = len(clevels)
             
-            if sepxplots in X:
-                clevels -= set(X[sepyplots])
-                numcols -= len(X[sepxplots])
+##            if sepxplots in X:
+##                clevels -= set(X[sepyplots])
+##                numcols -= len(X[sepxplots])
 
             clevels = sorted(clevels) # set -> sorted list
 
@@ -1662,13 +1667,13 @@ class PyvtTbl(dict):
                 ######## If separate lines are not specified #########
                 if seplines == None:
                     y, r_list, c_list=self._pvt(val,cols=[xaxis],
-                            exclude=X,aggregate='avg',
-                            flatten=True)
+                            where=where,aggregate='avg',
+                            flatten=True)[:3]
                     y = np.array(y)
 
                     if aggregate!=None:
                         yerr=self._pvt(val,cols=[xaxis],
-                            exclude=X,aggregate=aggregate,
+                            where=where,aggregate=aggregate,
                             flatten=True)[0]
                         yerr=np.array(yerr)
                         
@@ -1696,13 +1701,13 @@ class PyvtTbl(dict):
                 ########## If separate lines are specified ###########
                 else:
                     y,r_list,c_list=self._pvt(val,
-                            rows=[seplines],cols=[xaxis],exclude=X,
-                            aggregate='avg',flatten=False)
+                            rows=[seplines],cols=[xaxis],where=where,
+                            aggregate='avg',flatten=False)[:3]
                     y=np.array(y)
                     
                     if aggregate!=None:
                         yerrs=self._pvt(val,
-                            rows=[seplines],cols=[xaxis],exclude=X,
+                            rows=[seplines],cols=[xaxis],where=where,
                             aggregate=aggregate,flatten=False)[0]
                         yerrs=np.array(yerrs)
                         
@@ -1829,6 +1834,15 @@ class PyvtTbl(dict):
             return test
 
 
+
+
+
+df=PyvtTbl()
+df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+df.pivot('ERROR',rows=['TIMEOFDAY','COURSE'],
+              cols=['MODEL'],aggregate='count')
+##print(df.Z)
+
 ##from random import shuffle
 ##a=[0.0,1.,2.,3.,4.]
 ##b=range(1,11)*10
@@ -1902,10 +1916,16 @@ class PyvtTbl(dict):
 ##    
 ##df=PyvtTbl()
 ##df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
-##df.printPivot('SUPPRESSION',
-##         aggregate='count',
-##         exclude={'GROUP':['AB'],'CYCLE':[1,2]})
-##df.printTable(exclude={'AGE':['old'],'PHASE':['I']})
+##
+##
+##df.printPivot('SUPPRESSION',['GROUP','AGE'],['CYCLE','PHASE'],
+##              aggregate='count',
+##              where=[('AGE','not in',['old']),
+##                     ('PHASE','not in',['I'])])
+##
+##df.printTable(where=[('AGE','not in',['old']),
+##                     ('PHASE','not in',['I'])])
+##
 ##df.printDescriptives('SUPPRESSION')
 ##df.writePivot()
 
