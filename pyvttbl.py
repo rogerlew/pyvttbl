@@ -85,7 +85,7 @@ def _flatten(x):
     result = []
     for el in x:
         #if isinstance(el, (list, tuple)):
-        if hasattr(el, "__iter__") and not isinstance(el, basestring):
+        if hasattr(el, "__iter__") and not isinstance(el, _strobj):
             result.extend(_flatten(el))
         else:
             result.append(el)
@@ -160,6 +160,10 @@ class PyvtTbl(dict):
         # a DictSet to hold the factor/levels that are not included
         # in the pivot table
         self.Zconditions = DictSet()
+
+        # a list of tuples specifying the filtering applied to the
+        # the pivot table
+        self.Zwhere
 
         # prints the sqlite3 queries to standard out before
         # executing them for debugging purposes
@@ -1599,11 +1603,6 @@ class PyvtTbl(dict):
         if sepyplots != None:
             rlevels = copy(self.Zconditions[sepyplots]) # a set
             numrows = len(rlevels) # a int
-
-##            if sepyplots in X:
-##                rlevels -= set(X[sepyplots])
-##                numrows -= len(X[sepyplots])
-
             rlevels = sorted(rlevels) # set -> sorted list
                 
         numcols = 1
@@ -1611,11 +1610,6 @@ class PyvtTbl(dict):
         if sepxplots != None:
             clevels = copy(self.Zconditions[sepxplots])
             numcols = len(clevels)
-            
-##            if sepxplots in X:
-##                clevels -= set(X[sepyplots])
-##                numcols -= len(X[sepxplots])
-
             clevels = sorted(clevels) # set -> sorted list
 
         test['numrows']  = numrows
@@ -1839,8 +1833,8 @@ class PyvtTbl(dict):
 
 df=PyvtTbl()
 df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-df.pivot('ERROR',rows=['TIMEOFDAY','COURSE'],
-              cols=['MODEL'],aggregate='count')
+df.printDescriptives('ERROR')
+df.printTable(where=[('ERROR','==',10.)])
 ##print(df.Z)
 
 ##from random import shuffle

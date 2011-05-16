@@ -492,10 +492,10 @@ class Test_pivot_1(unittest.TestCase):
 
     def test1(self):
         R=np.array([[ 110.,  148.],
-                 [  70.,   65.],
-                 [ 134.,  176.],
-                 [ 120.,  193.],
-                 [  69.,   76.]])
+                    [  70.,   65.],
+                    [ 134.,  176.],
+                    [ 120.,  193.],
+                    [  69.,   76.]])
         
         self.df.pivot('WORDS',rows=['CONDITION'],cols=['AGE'],aggregate='sum')
         D=np.array(self.df.Z)
