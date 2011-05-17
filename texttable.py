@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 #!/usr/bin/env python
 #
 # texttable - module for creating simple ASCII tables
@@ -89,10 +91,11 @@ except ImportError:
     sys.stderr.write("Can't import textwrap module!\n")
     raise
 
-try:
-    True, False
-except NameError:
-    (True, False) = (1, 0)
+##if sys.version_info[0] != 3:
+##    try:
+##        True, False
+##    except NameError:
+##        (True, False) = (1, 0)
 
 def len(iterable):
     """Redefining len here so it will be able to work with non-ASCII characters
@@ -234,7 +237,7 @@ class Texttable:
         """
 
         if len(array) != 4:
-            raise ArraySizeError, "array should contain 4 characters"
+            raise Exception("array should contain 4 characters")
         array = [ x[:1] for x in [ str(s) for s in array ] ]
         (self._char_horiz, self._char_vert,
             self._char_corner, self._char_header) = array
@@ -358,8 +361,8 @@ class Texttable:
         if not self._row_size:
             self._row_size = len(array)
         elif self._row_size != len(array):
-            raise ArraySizeError, "array should contain %d elements" \
-                % self._row_size
+            raise Exception("array should contain %d elements" \
+                % self._row_size)
 
     def _has_vlines(self):
         """Return a boolean, if vlines are required or not
@@ -538,7 +541,7 @@ if __name__ == '__main__':
     table.add_rows([ ["Name", "Age", "Nickname"], 
                      ["Mr\nXavier\nHuon", 32, "Xav'"],
                      ["Mr\nBaptiste\nClement", 1, "Baby"] ])
-    print table.draw()
+    print(table.draw())
 
 
     # Roger Lew also add this example/test
@@ -560,5 +563,5 @@ if __name__ == '__main__':
                     ['efgh', 67.5434, .654,    89.6,    12800000000000000000000.00023],
                     ['ijkl', 5e-78,   5e-78,   89.4,    .000000000000128],
                     ['mnop', .023,    5e+78,   92.,     12800000000000000000000]])
-    print table.draw()
+    print(table.draw())
 

@@ -13,16 +13,8 @@ from dictset import DictSet,_rep_generator
 from math import isnan, isinf
 import numpy as np
 from pprint import pprint as pp
-from pyvttbl import PyvtTbl
-from dataframe import DataFrame
-
-from rl_lib import _isfloat
-from rl_lib import _isint
-from rl_lib import _flatten
-from rl_lib import _ifelse
-from rl_lib import _xunique_combinations
-
-import plot
+from pyvttbl import DataFrame, PyvtTbl, Descriptives,  Marginals, Histogram, \
+     _flatten, _isfloat, _isint
 
 def fcmp(d,r):
     """
@@ -345,16 +337,16 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
 
     def test2(self):
         df=DataFrame()
-        df[1]=range(100)
-        df[2]=['bob' for i in range(100)]
-        df[3]=[i*1.234232 for i in range(100)]
-        df[4]=['bob' for i in range(50)]+range(50)
+        df['1']=range(100)
+        df['2']=['bob' for i in range(100)]
+        df['3']=[i*1.234232 for i in range(100)]
+        df['4']=['bob' for i in range(50)]+range(50)
 
-        shuffle(df[1])
-        shuffle(df[2])
-        shuffle(df[3])
+        shuffle(df['1'])
+        shuffle(df['2'])
+        shuffle(df['3'])
 
-        df._build_sqlite3_tbl(df.names()[:2], [(4,'not in',['bob'])])
+        df._build_sqlite3_tbl(df.names()[:2], [('4','not in',['bob'])])
         
         df._execute('select * from TBL')
         for i,(a,b) in enumerate(df.cur):
@@ -372,7 +364,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
         shuffle(df[2])
         shuffle(df[3])
 
-        df._build_sqlite3_tbl(df.names()[:2], [(4,'!=','bob')])
+        df._build_sqlite3_tbl(df.names()[:2], ['4 not in ("bob")'])
         
         df._execute('select * from TBL')
         for i,(a,b) in enumerate(df.cur):
@@ -386,12 +378,35 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
         df[3]=[i*1.234232 for i in range(100)]
         df[4]=['bob' for i in range(50)]+range(50)
 
-        with self.assertRaises(TypeError) as cm:
-            df._build_sqlite3_tbl(df.names()[:2], 42)
-        
-        self.assertEqual(str(cm.exception),
-                         "'int' object is not iterable")
+        shuffle(df[1])
+        shuffle(df[2])
+        shuffle(df[3])
 
+        df._build_sqlite3_tbl(df.names()[:2], [(4,'!=','bob')])
+        
+        df._execute('select * from TBL')
+        for i,(a,b) in enumerate(df.cur):
+            self.assertEqual(a,df[1][i+50])
+            self.assertEqual(b,df[2][i+50])
+
+    def test31(self):
+        df=DataFrame()
+        df[1]=range(100)
+        df[2]=['bob' for i in range(100)]
+        df[3]=[i*1.234232 for i in range(100)]
+        df[4]=['bob' for i in range(50)]+range(50)
+
+        shuffle(df[1])
+        shuffle(df[2])
+        shuffle(df[3])
+
+        df._build_sqlite3_tbl(df.names()[:2], ['4 != "bob"'])
+        
+        df._execute('select * from TBL')
+        for i,(a,b) in enumerate(df.cur):
+            self.assertEqual(a,df[1][i+50])
+            self.assertEqual(b,df[2][i+50])
+            
     def test4(self):
         df=DataFrame()
         df[1]=range(100)
@@ -399,11 +414,24 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
         df[3]=[i*1.234232 for i in range(100)]
         df[4]=['bob' for i in range(50)]+range(50)
 
-        with self.assertRaises(Exception) as cm:
-            df._build_sqlite3_tbl(df.names()[:2], [4, 'not in', 'bob'])
+        with self.assertRaises(TypeError) as cm:
+            df._build_sqlite3_tbl(df.names()[:2], 42)
         
         self.assertEqual(str(cm.exception),
-                         'cannot unpack tuples from where')
+                         "'int' object is not iterable")
+
+##    def test5(self):
+##        df=DataFrame()
+##        df[1]=range(100)
+##        df[2]=['bob' for i in range(100)]
+##        df[3]=[i*1.234232 for i in range(100)]
+##        df[4]=['bob' for i in range(50)]+range(50)
+##
+##        with self.assertRaises(Exception) as cm:
+##            df._build_sqlite3_tbl(df.names()[:2], [4, 'not in', 'bob'])
+##        
+##        self.assertEqual(str(cm.exception),
+##                         'cannot unpack tuples from where')
 
 class Test_insert(unittest.TestCase):
     def test0(self):
@@ -1174,7 +1202,7 @@ class Test_box_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=plot.box(df,'WORDS', TESTMODE=True)
+        D=df.box_plot('WORDS')
         
         self.assertEqual(D['fname'],R['fname'])
         self.assertEqual(D['maintitle'],R['maintitle'])
@@ -1197,7 +1225,7 @@ class Test_box_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=plot.box(df,'WORDS',['AGE'], TESTMODE=True)
+        D=df.box_plot('WORDS',['AGE'])
 
         self.assertEqual(D['fname'],R['fname'])
         self.assertEqual(D['maintitle'],R['maintitle'])
@@ -1224,7 +1252,7 @@ class Test_box_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=plot.box(df,'WORDS',['AGE','CONDITION'], TESTMODE=True)
+        D=df.box_plot('WORDS',['AGE','CONDITION'])
 
         self.assertEqual(D['fname'],R['fname'])
         self.assertEqual(D['maintitle'],R['maintitle'])
@@ -1237,7 +1265,7 @@ class Test_box_plot(unittest.TestCase):
         df=DataFrame()
   
         with self.assertRaises(Exception) as cm:
-            plot.box(df,'a', TESTMODE=True)
+            df.box_plot('a')
 
         self.assertEqual(str(cm.exception),
                          'Table must have data to print data')
@@ -1248,7 +1276,7 @@ class Test_box_plot(unittest.TestCase):
         df['b']=[2,3]
   
         with self.assertRaises(Exception) as cm:
-            plot.box(df,'a', TESTMODE=True)
+            df.box_plot('a')
 
         self.assertEqual(str(cm.exception),
                          'columns have unequal lengths')
@@ -1259,7 +1287,7 @@ class Test_box_plot(unittest.TestCase):
         df['b']=[2,3]
   
         with self.assertRaises(Exception) as cm:
-            plot.box(df,'a',42, TESTMODE=True)
+            df.box_plot('a',42)
 
         self.assertEqual(str(cm.exception),
                          "'int' object is not iterable")
@@ -1270,7 +1298,7 @@ class Test_box_plot(unittest.TestCase):
         df['b']=[2,3]
   
         with self.assertRaises(KeyError) as cm:
-            plot.box(df,'c', TESTMODE=True)
+            df.box_plot('c')
 
         self.assertEqual(str(cm.exception),"'c'")
         
@@ -1282,7 +1310,7 @@ class Test_plotHist(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=plot.hist(df,'WORDS', TESTMODE=True)
+        D=df.histogram_plot('WORDS')
 
         self.assertEqual(D['fname'],R['fname'])
         
@@ -1314,8 +1342,7 @@ class Test_interaction_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=plot.interaction(df,'WORDS','AGE','CONDITION',
-                             TESTMODE=True)
+        D=df.interaction_plot('WORDS','AGE','CONDITION')
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1354,10 +1381,9 @@ class Test_interaction_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE = True
         df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-        D=plot.interaction(df,'ERROR','TIMEOFDAY',
+        D=df.interaction_plot('ERROR','TIMEOFDAY',
                                 seplines='COURSE',
-                                sepxplots='MODEL',yerr=1.,
-                             TESTMODE=True)
+                                sepxplots='MODEL',yerr=1.)
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1397,10 +1423,9 @@ class Test_interaction_plot(unittest.TestCase):
         df.TESTMODE = True
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
-        D = plot.interaction(df,'SUPPRESSION','CYCLE',
+        D = df.interaction_plot('SUPPRESSION','CYCLE',
                             seplines='AGE',
-                            sepyplots='PHASE',yerr='ci',
-                             TESTMODE=True)
+                            sepyplots='PHASE',yerr='ci')
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1443,13 +1468,12 @@ class Test_interaction_plot(unittest.TestCase):
         df.TESTMODE = True
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
-        D = plot.interaction(df,'SUPPRESSION','CYCLE',
+        D = df.interaction_plot('SUPPRESSION','CYCLE',
                               seplines='AGE',
                               sepxplots='PHASE',
                               sepyplots='GROUP',yerr='ci',
-                              where=[('GROUP','not in',['LAB'])],
-                             TESTMODE=True)
-   
+                              where=[('GROUP','not in',['LAB'])])
+        
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
         self.assertEqual(D['rlevels'],R['rlevels'])
@@ -1491,9 +1515,8 @@ class Test_interaction_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE = True
         df.readTbl('words~ageXcondition.csv')
-        D = plot.interaction(df,'WORDS','AGE',sepxplots='CONDITION',
-                             TESTMODE=True)
-
+        D = df.interaction_plot('WORDS','AGE',sepxplots='CONDITION')
+        
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
         self.assertEqual(D['rlevels'],R['rlevels'])
@@ -1531,9 +1554,8 @@ class Test_interaction_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE = True
         df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-        D = plot.interaction(df,'ERROR','TIMEOFDAY',
-                                sepxplots='MODEL',yerr=1.,
-                             TESTMODE=True) 
+        D = df.interaction_plot('ERROR','TIMEOFDAY',
+                                sepxplots='MODEL',yerr=1.)
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1572,9 +1594,8 @@ class Test_interaction_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE = True
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
-        D = plot.interaction(df,'SUPPRESSION','CYCLE',
-                              sepyplots='PHASE',yerr='ci',
-                             TESTMODE=True) 
+        D = df.interaction_plot('SUPPRESSION','CYCLE',
+                              sepyplots='PHASE',yerr='ci')
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1614,11 +1635,10 @@ class Test_interaction_plot(unittest.TestCase):
         df.TESTMODE = True
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
-        D = plot.interaction(df,'SUPPRESSION','CYCLE',
+        D = df.interaction_plot('SUPPRESSION','CYCLE',
                               sepxplots='PHASE',
                               sepyplots='GROUP',yerr='ci',
-                              where=[('GROUP','not in',['LAB'])],
-                             TESTMODE=True)
+                              where=[('GROUP','not in',['LAB'])])
         
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1743,7 +1763,7 @@ def suite():
             unittest.makeSuite(Test_select_col),
             unittest.makeSuite(Test_histogram),
             unittest.makeSuite(Test_box_plot),
-##            unittest.makeSuite(Test_plotHist),
+            unittest.makeSuite(Test_plotHist),
             unittest.makeSuite(Test_interaction_plot),
             unittest.makeSuite(Test_writeTable),
             unittest.makeSuite(Test_writePivot),
