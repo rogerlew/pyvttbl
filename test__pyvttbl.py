@@ -14,14 +14,13 @@ from math import isnan, isinf
 import numpy as np
 from pprint import pprint as pp
 from pyvttbl import PyvtTbl
-from pyvttbl import _flatten
+from dataframe import DataFrame
 
-def _isfloat(string):
-    try:
-        float(string)
-    except:
-        return False
-    return True
+from rl_lib import _isfloat
+from rl_lib import _isint
+from rl_lib import _flatten
+from rl_lib import _ifelse
+from rl_lib import _xunique_combinations
 
 def fcmp(d,r):
     """
@@ -73,7 +72,7 @@ x,y,z
 3,7,11
 4,8,12""")
             
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         self.df.readTbl('skiptest.csv',skip=4)
         D=self.df['x']+self.df['y']+self.df['z']
         R=range(1,13)
@@ -91,7 +90,7 @@ x,y,z
 3,7,11
 4,8,12""")
             
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         self.df.readTbl('test.csv',skip=1,labels=False)
         D=self.df['COL_1']+self.df['COL_2']+self.df['COL_3']
         R=range(1,13)
@@ -110,7 +109,7 @@ x,x,x
 3,7,11
 4,8,12""")
             
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         
         with warnings.catch_warnings(record=True) as w:
             # Cause all warnings to always be triggered.
@@ -138,7 +137,7 @@ x,y,z
 3,7,11
 4,8,12""")
             
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         
         with warnings.catch_warnings(record=True) as w:
             # Cause all warnings to always be triggered.
@@ -166,7 +165,7 @@ x,y,z
 3,7,11
 4,8,12""")
             
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         self.df.readTbl('test.csv',skip=1,labels=True)
         
         D=self.df['x']+self.df['y']+self.df['z']
@@ -180,7 +179,7 @@ x,y,z
 
 class Test__setitem__(unittest.TestCase):
     def setUp(self):
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         self.df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
 
     def test2(self):
@@ -214,7 +213,7 @@ class Test__setitem__(unittest.TestCase):
         
 class Test__delitem__(unittest.TestCase):
     def setUp(self):
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         self.df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         del self.df['COURSE']
 
@@ -236,19 +235,19 @@ class Test__delitem__(unittest.TestCase):
 class Test__are_col_lengths_equal(unittest.TestCase):
     def test0(self):
         """emtpy table"""
-        df=PyvtTbl()
+        df=DataFrame()
         self.assertTrue(df._are_col_lengths_equal())
 
     def test1(self):
         """emtpy lists in table"""
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=[]
         df[2]=[]
         self.assertTrue(df._are_col_lengths_equal())
 
     def test2(self):
         """equal non-zero"""
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=range(10)
         df[2]=range(10)
         df[3]=range(10)
@@ -257,7 +256,7 @@ class Test__are_col_lengths_equal(unittest.TestCase):
 
     def test3(self):
         """unequal"""
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=range(10)
         df[2]=range(10)
         df[3]=range(10)
@@ -267,43 +266,43 @@ class Test__are_col_lengths_equal(unittest.TestCase):
 
 class Test__checktype(unittest.TestCase):
     def test0(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=[]
         self.assertEqual(df._checktype(1),'null')
 
     def test1(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=[1,2,3.,5.,8.]
         self.assertEqual(df._checktype(1),'integer')
 
     def test2(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=[1,2,3.,5.,8.]
         self.assertEqual(df._checktype(1),'integer')
 
     def test3(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=[1,2,3.,5.,8.0001]
         self.assertEqual(df._checktype(1),'real')
 
     def test4(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=[1e4,3e3,5e1,6e0]
         self.assertEqual(df._checktype(1),'integer')
 
     def test5(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=[1e4,3e3,5e1,6.001e0]
         self.assertEqual(df._checktype(1),'real')
         
     def test6(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=[1,2,3.,5.,8.0001,'a']
         self.assertEqual(df._checktype(1),'text')
 
 class Test__build_sqlite3_tbl(unittest.TestCase):
     def test0(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=range(100)
         df[2]=['bob' for i in range(100)]
         df[3]=[i*1.234232 for i in range(100)]
@@ -324,7 +323,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
             self.assertEqual(d,str(df[4][i]))
             
     def test1(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=range(100)
         df[2]=['bob' for i in range(100)]
         df[3]=[i*1.234232 for i in range(100)]
@@ -343,7 +342,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
             self.assertEqual(b,df[2][i])
 
     def test2(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=range(100)
         df[2]=['bob' for i in range(100)]
         df[3]=[i*1.234232 for i in range(100)]
@@ -361,7 +360,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
             self.assertEqual(b,df[2][i+50])
 
     def test21(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=range(100)
         df[2]=['bob' for i in range(100)]
         df[3]=[i*1.234232 for i in range(100)]
@@ -379,7 +378,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
             self.assertEqual(b,df[2][i+50])
             
     def test3(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=range(100)
         df[2]=['bob' for i in range(100)]
         df[3]=[i*1.234232 for i in range(100)]
@@ -392,7 +391,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
                          "'int' object is not iterable")
 
     def test4(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df[1]=range(100)
         df[2]=['bob' for i in range(100)]
         df[3]=[i*1.234232 for i in range(100)]
@@ -406,7 +405,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
 
 class Test_insert(unittest.TestCase):
     def test0(self):
-        df=PyvtTbl()
+        df=DataFrame()
         conditionsDict=DictSet({'A':[10,20,40,80],
                                 'B':[100,800],
                               'rep':range(10)})
@@ -423,7 +422,7 @@ class Test_insert(unittest.TestCase):
             self.assertAlmostEqual(d,r)
 
     def test1(self):
-        df=PyvtTbl()
+        df=DataFrame()
 
         with self.assertRaises(Exception) as cm:
             df.insert([1,2,3,4])
@@ -432,7 +431,7 @@ class Test_insert(unittest.TestCase):
                          'row must be mappable type')
 
     def test2(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df.insert({'A':1, 'B':2})
 
         with self.assertRaises(Exception) as cm:
@@ -442,7 +441,7 @@ class Test_insert(unittest.TestCase):
                          'row must have the same keys as the table')
         
     def test3(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df.insert({'A':1, 'B':2})
 
         with self.assertRaises(Exception) as cm:
@@ -452,24 +451,24 @@ class Test_insert(unittest.TestCase):
                          'row must have the same keys as the table')
 
     def test4(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df.insert([('A',1.23), ('B',2), ('C','A')])
         self.assertEqual(df.types, ['real', 'integer', 'text'])
         
 class Test_attach(unittest.TestCase):
     def test0(self):
-        self.df1=PyvtTbl()
+        self.df1=DataFrame()
         self.df1.readTbl('words~ageXcondition.csv')
 
         with self.assertRaises(Exception) as cm:
             self.df1.attach('s')
 
         self.assertEqual(str(cm.exception),
-                         'second argument must be a PyvtTbl')
+                         'second argument must be a DataFrame')
         
     def test1(self):
-        self.df1=PyvtTbl()
-        self.df2=PyvtTbl()
+        self.df1=DataFrame()
+        self.df2=DataFrame()
         self.df1.readTbl('words~ageXcondition.csv')
         self.df2.readTbl('words~ageXcondition.csv')
 
@@ -483,8 +482,8 @@ class Test_attach(unittest.TestCase):
                          'self and other must have the same columns')
 
     def test2(self):
-        df1=PyvtTbl()
-        df2=PyvtTbl()
+        df1=DataFrame()
+        df2=DataFrame()
         df1.readTbl('words~ageXcondition.csv')
         df2.readTbl('words~ageXcondition.csv')
 
@@ -512,7 +511,7 @@ class Test_sort(unittest.TestCase):
         a=[4, 8, 1, 5, -7, -5, 9, 7, -8, -10, -1, -4, 3, 0., -2, 6, 2, -9, -3, -6]
         b=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
 
-        df=PyvtTbl()
+        df=DataFrame()
         for A,B in zip(a,b):
             df.insert({'A':A, 'B':B})
 
@@ -531,7 +530,7 @@ class Test_sort(unittest.TestCase):
         a=[4, 8, 1, 5, -7, -5, 9, 7, -8, -10, -1, -4, 3, 0., -2, 6, 2, -9, -3, -6]
         b=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
 
-        df=PyvtTbl()
+        df=DataFrame()
         for A,B in zip(a,b):
             df.insert({'A':A, 'B':B})
 
@@ -550,7 +549,7 @@ class Test_sort(unittest.TestCase):
         a=[4, 8, 1, 5, -7, -5, 9, 7, -8, -10, -1, -4, 3, 0., -2, 6, 2, -9, -3, -6]
         b=[1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
 
-        df=PyvtTbl()
+        df=DataFrame()
         for A,B in zip(a,b):
             df.insert({'A':A, 'B':B})
 
@@ -563,7 +562,7 @@ class Test_sort(unittest.TestCase):
             self.assertAlmostEqual(d,r)
 
     def test3(self):
-        df=PyvtTbl()
+        df=DataFrame()
   
         with self.assertRaises(Exception) as cm:
             df.sort()
@@ -572,7 +571,7 @@ class Test_sort(unittest.TestCase):
                          'Table must have data to sort data')
 
     def test4(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df['a']=[2]
         df['b']=[2,3]
   
@@ -583,7 +582,7 @@ class Test_sort(unittest.TestCase):
                          'columns have unequal lengths')
 
     def test5(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df['a']=[2,5]
         df['b']=[2,3]
   
@@ -602,7 +601,7 @@ class Test_pivot_1(unittest.TestCase):
             'WORDS':[9,8,6,8,10,4,6,5,7,7,7,9,6,6,6,11,6,3,8,7,11,13,8,6,14,11,13,13,10,11,12,11,16,11,9,23,12,10,19,11,10,19,14,5,10,11,14,15,11,11,8,6,4,6,7,6,5,7,9,7,10,7,8,10,4,7,10,6,7,7,14,11,18,14,13,22,17,16,12,11,20,16,16,15,18,16,20,22,14,19,21,19,17,15,22,16,22,22,18,21],
            }
         
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         self.df.readTbl('words~ageXcondition.csv')
         
     def test001(self):
@@ -667,9 +666,9 @@ class Test_pivot_1(unittest.TestCase):
         R=np.array([[14.8], [6.5], [17.6], [19.3], [7.6]])
         
         # this one shouldn't raise an Exception
-        self.df.pivot('WORDS',rows=['CONDITION'],
+        myPyvtTbl = self.df.pivot('WORDS',rows=['CONDITION'],
                       where=[('AGE','not in',['old',])])
-        D=np.array(self.df.Z)
+        D=np.array(myPyvtTbl)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -682,8 +681,8 @@ class Test_pivot_1(unittest.TestCase):
         R=np.array([[25.5], [75.5]])
         
         # aggregate is case-insensitive
-        self.df.pivot('SUBJECT',rows=['AGE'],aggregate='AVG')
-        D=np.array(self.df.Z)
+        myPyvtTbl = self.df.pivot('SUBJECT',rows=['AGE'],aggregate='AVG')
+        D=np.array(myPyvtTbl)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -696,8 +695,8 @@ class Test_pivot_1(unittest.TestCase):
         R=np.array([[ 11. ,   7. ,  13.4,  12. ,   6.9],
                  [ 14.8,   6.5,  17.6,  19.3,   7.6]])
         
-        self.df.pivot('WORDS',rows=['AGE'],cols=['CONDITION'])
-        D=np.array(self.df.Z)
+        myPyvtTbl = self.df.pivot('WORDS',rows=['AGE'],cols=['CONDITION'])
+        D=np.array(myPyvtTbl)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -713,9 +712,9 @@ class Test_pivot_1(unittest.TestCase):
                     [ 120.,  193.],
                     [  69.,   76.]])
         
-        self.df.pivot('WORDS',rows=['CONDITION'],cols=['AGE'],aggregate='sum')
-        D=np.array(self.df.Z)
-
+        myPyvtTbl = self.df.pivot('WORDS',rows=['CONDITION'],cols=['AGE'],aggregate='sum')
+        D=np.array(myPyvtTbl)
+        
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
 
@@ -750,11 +749,10 @@ class Test_pivot_1(unittest.TestCase):
                   10.0, 7.0,  8.0,  10.0, 4.0,  7.0,  10.0, 6.0,  7.0,  7.0,  None, None, None, None, None, None, None, None, None, None,
                   None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]], dtype=object)
 
-
         # One row and one col factor                     
-        self.df.pivot('WORDS',rows=['CONDITION'],cols=['SUBJECT'],aggregate='sum')
-        D=np.array(self.df.Z)
-
+        myPyvtTbl = self.df.pivot('WORDS',rows=['CONDITION'],cols=['SUBJECT'],aggregate='sum')
+        D=np.array(myPyvtTbl)
+    
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
 
@@ -766,8 +764,8 @@ class Test_pivot_1(unittest.TestCase):
         R=np.array([[5.191085988]])
 
         # No rows or cols        
-        self.df.pivot('WORDS',aggregate='stdev')
-        D=np.array(self.df.Z)
+        myPyvtTbl = self.df.pivot('WORDS',aggregate='stdev')
+        D=np.array(myPyvtTbl)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -790,10 +788,10 @@ class Test_pivot_1(unittest.TestCase):
                   [21.0, 19.0, 17.0, 15.0, 22.0, 16.0, 22.0, 22.0, 18.0, 21.0],
                   [10.0, 7.0, 8.0, 10.0, 4.0, 7.0, 10.0, 6.0, 7.0, 7.0]]])
 
-        self.df.pivot('WORDS',
+        myPyvtTbl = self.df.pivot('WORDS',
                       rows=['AGE'], cols=['CONDITION'],
                       aggregate='tolist')
-        D=np.array(self.df.Z)
+        D=np.array(myPyvtTbl)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -820,11 +818,11 @@ class Test_pivot_1(unittest.TestCase):
         num2abc=dict(zip(list(range(26)),'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))
         self.df['ABC']=[num2abc[v%26] for v in self.df['WORDS']]
 
-        self.df.pivot('ABC',
+        myPyvtTbl = self.df.pivot('ABC',
                       rows=['AGE'], cols=['CONDITION'],
                       aggregate='tolist')
-        
-        D=np.array(self.df.Z)
+
+        D=np.array(myPyvtTbl)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -845,10 +843,12 @@ class Test_pivot_1(unittest.TestCase):
                       u'20,16,16,15,18,16,20,22,14,19',
                       u'21,19,17,15,22,16,22,22,18,21',
                       u'10,7,8,10,4,7,10,6,7,7']])
-        self.df.pivot('WORDS',
+
+        myPyvtTbl = self.df.pivot('WORDS',
                       rows=['AGE'], cols=['CONDITION'],
                       aggregate='group_concat')
-        D=np.array(self.df.Z)
+
+        D=np.array(myPyvtTbl)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -859,7 +859,7 @@ class Test_pivot_1(unittest.TestCase):
 ##            
 class Test_pivot_2(unittest.TestCase):
     def setUp(self):
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         self.df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         
     def test0(self):
@@ -870,10 +870,11 @@ class Test_pivot_2(unittest.TestCase):
                  [3, 3, 3],  # T2 C1
                  [3, 3, 3],  # T2 C2
                  [3, 3, 3]]) # T2 C3
-        
-        self.df.pivot('ERROR',rows=['TIMEOFDAY','COURSE'],
+
+        myPyvtTbl = self.df.pivot('ERROR',rows=['TIMEOFDAY','COURSE'],
                       cols=['MODEL'],aggregate='count')
-        D=np.array(self.df.Z)
+
+        D=np.array(myPyvtTbl)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -895,9 +896,10 @@ class Test_pivot_2(unittest.TestCase):
                  [1, 1, 1, 1, 1, 1]])
         
         # multiple rows and cols
-        self.df.pivot('ERROR',rows=['SUBJECT','COURSE'],
+        myPyvtTbl = self.df.pivot('ERROR',rows=['SUBJECT','COURSE'],
                       cols=['MODEL','TIMEOFDAY'],aggregate='count')
-        D=np.array(self.df.Z)
+
+        D=np.array(myPyvtTbl)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -910,8 +912,8 @@ class Test_pivot_2(unittest.TestCase):
         R=np.array([[ 0.26882528, -0.06797845]])
 
         # No row
-        self.df.pivot('ERROR',cols=['TIMEOFDAY'],aggregate='skew')
-        D=np.array(self.df.Z)
+        myPyvtTbl = self.df.pivot('ERROR',cols=['TIMEOFDAY'],aggregate='skew')
+        D=np.array(myPyvtTbl)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -925,9 +927,9 @@ class Test_pivot_2(unittest.TestCase):
                  [-0.06797845]])
 
         # No col
-        self.df.pivot('ERROR',rows=['TIMEOFDAY'],aggregate='skew')
-        D=np.array(self.df.Z)
-
+        myPyvtTbl = self.df.pivot('ERROR',rows=['TIMEOFDAY'],aggregate='skew')
+        D=np.array(myPyvtTbl)
+        
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
 
@@ -937,13 +939,13 @@ class Test_pivot_2(unittest.TestCase):
 
 class Test_writeTable(unittest.TestCase):
     def setUp(self):
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         self.df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
     def test0(self):
         d='suppression~subjectXgroupXageXcycleXphase.csv'
         r='subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv'
-        self.df.writeTable()
+        self.df.write()
         self.assertTrue(fcmp(d,r))
 
         # clean up
@@ -953,7 +955,7 @@ class Test_writeTable(unittest.TestCase):
         # with exclusion
         d='suppression~subjectXgroupXageXcycleXphase.csv'
         r='subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv'
-        self.df.writeTable(where=[('AGE','not in',['young'])])
+        self.df.write(where=[('AGE','not in',['young'])])
         self.assertTrue(fcmp(d,r))
 
         # clean up
@@ -961,7 +963,7 @@ class Test_writeTable(unittest.TestCase):
 
 class Test_select_col(unittest.TestCase):
     def test0(self):
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         self.df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
         R=[33.0, 43.0, 40.0, 52.0, 39.0, 52.0, 38.0, 48.0, 4.0, 35.0, 9.0, 42.0, 4.0, 46.0, 23.0, 51.0, 32.0, 39.0, 38.0, 47.0, 24.0, 44.0, 16.0, 40.0, 17.0, 34.0, 21.0, 41.0, 27.0, 50.0, 13.0, 40.0, 44.0, 52.0, 37.0, 48.0, 33.0, 53.0, 33.0, 43.0, 12.0, 16.0, 9.0, 39.0, 9.0, 59.0, 13.0, 45.0, 18.0, 42.0, 3.0, 62.0, 45.0, 49.0, 60.0, 57.0, 13.0, 29.0, 14.0, 44.0, 9.0, 50.0, 15.0, 48.0]
         D=self.df.select_col('SUPPRESSION',
@@ -972,7 +974,7 @@ class Test_select_col(unittest.TestCase):
              
 class Test_writePivot(unittest.TestCase):
     def setUp(self):
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         self.df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
     def test0(self):
@@ -983,13 +985,13 @@ class Test_writePivot(unittest.TestCase):
            'AA,21.9375,10.0125,22.25,10.5125\r\n',
            'LAB,37.0625,12.5375,36.4375,12.0375\r\n']
         
-        self.df.pivot('SUPPRESSION',
-                 rows=['GROUP'],
-                 cols=['CYCLE','AGE'],
-                 aggregate='avg',
-                 where=[('GROUP','not in',['AB']),
-                        ('CYCLE','not in',[1,2])])
-        self.df.writePivot()
+        myPyvtTbl = self.df.pivot('SUPPRESSION',
+                               rows=['GROUP'],
+                               cols=['CYCLE','AGE'],
+                               aggregate='avg',
+                               where=[('GROUP','not in',['AB']),
+                                      ('CYCLE','not in',[1,2])])
+        myPyvtTbl.write()
 
         D=[]
         # write pivot should generate this name
@@ -1011,13 +1013,14 @@ class Test_writePivot(unittest.TestCase):
            'AA\t21.9375\t10.0125\t22.25\t10.5125\r\n',
            'LAB\t37.0625\t12.5375\t36.4375\t12.0375\r\n']
         
-        self.df.pivot('SUPPRESSION',
-                 rows=['GROUP'],
-                 cols=['CYCLE','AGE'],
-                 aggregate='avg',
-                 where=[('GROUP','not in',['AB']),
-                        ('CYCLE','not in',[1,2])])
-        self.df.writePivot('myname.dat','\t')
+        myPyvtTbl = self.df.pivot('SUPPRESSION',
+                               rows=['GROUP'],
+                               cols=['CYCLE','AGE'],
+                               aggregate='avg',
+                               where=[('GROUP','not in',['AB']),
+                                      ('CYCLE','not in',[1,2])])
+        
+        myPyvtTbl.write('myname.dat','\t')
 
         # clean up
         os.remove('./myname.dat')
@@ -1031,11 +1034,12 @@ class Test_writePivot(unittest.TestCase):
            'LAB,28.9375,10.7875,34.125,12.1375,37.0625,12.5375,36.4375,12.0375\r\n']
 
         
-        self.df.pivot('SUPPRESSION',
-                 rows=['GROUP'],
-                 cols=['CYCLE','AGE'],
-                 aggregate='avg')
-        self.df.writePivot('pivot_test2.csv')
+        myPyvtTbl = self.df.pivot('SUPPRESSION',
+                               rows=['GROUP'],
+                               cols=['CYCLE','AGE'],
+                               aggregate='avg')
+        
+        myPyvtTbl.write('pivot_test2.csv')
 
         D=[]
         # write pivot should generate this name
@@ -1049,9 +1053,11 @@ class Test_writePivot(unittest.TestCase):
         os.remove('./pivot_test2.csv')        
 
     def test3(self):
+
+        myPyvtTbl = PyvtTbl()
         # try to write pivot table when table doesn't exist
         with self.assertRaises(Exception) as cm:
-            self.df.writePivot('pivot_test3.csv')
+            myPyvtTbl.write('pivot_test3.csv')
 
         self.assertEqual(str(cm.exception),
                          'must call pivot before writing pivot table')        
@@ -1059,10 +1065,11 @@ class Test_writePivot(unittest.TestCase):
     def test4(self):
         R = 'avg(SUPPRESSION)\r\nCYCLE=1_AGE=old,CYCLE=1_AGE=young,CYCLE=2_AGE=old,CYCLE=2_AGE=young,CYCLE=3_AGE=old,CYCLE=3_AGE=young,CYCLE=4_AGE=old,CYCLE=4_AGE=young\r\n21.9791666667,8.79166666667,30.5625,11.1125,30.6875,11.45,30.7916666667,10.95\r\n'
         # rows not specified
-        self.df.pivot('SUPPRESSION',
-                 cols=['CYCLE','AGE'],
-                 aggregate='avg')
-        self.df.writePivot()
+        myPyvtTbl = self.df.pivot('SUPPRESSION',
+                               cols=['CYCLE','AGE'],
+                               aggregate='avg')
+
+        myPyvtTbl.write()
 
         # write pivot should generate this name
         with open('suppression~()Z(cycleXage).csv','rb') as f:
@@ -1076,10 +1083,10 @@ class Test_writePivot(unittest.TestCase):
     def test5(self):
         R = 'avg(SUPPRESSION)\r\nCYCLE,AGE,Value\r\n1,old,21.9791666667\r\n1,young,8.79166666667\r\n2,old,30.5625\r\n2,young,11.1125\r\n3,old,30.6875\r\n3,young,11.45\r\n4,old,30.7916666667\r\n4,young,10.95\r\n'
         # cols not specified
-        self.df.pivot('SUPPRESSION',
-                 rows=['CYCLE','AGE'],
-                 aggregate='avg')
-        self.df.writePivot()
+        myPyvtTbl = self.df.pivot('SUPPRESSION',
+                               rows=['CYCLE','AGE'],
+                               aggregate='avg')
+        myPyvtTbl.write()
 
         # write pivot should generate this name
         with open('suppression~(cycleXage)Z().csv','rb') as f:
@@ -1094,9 +1101,9 @@ class Test_writePivot(unittest.TestCase):
         R = 'count(SUPPRESSION)\r\nValue\r\n384\r\n'
         
         # no rows or cols not specified
-        self.df.pivot('SUPPRESSION',
+        myPyvtTbl = self.df.pivot('SUPPRESSION',
                  aggregate='count')
-        self.df.writePivot(delimiter='\t') # check .tsv functionality
+        myPyvtTbl.write(delimiter='\t') # check .tsv functionality
 
         # write pivot should generate this name
         with open('suppression~()Z().tsv','rb') as f:
@@ -1109,39 +1116,38 @@ class Test_writePivot(unittest.TestCase):
 
     def test7(self):        
         # no rows or cols not specified
-        self.df.pivot('SUPPRESSION',
-                 aggregate='count')
+        myPyvtTbl = self.df.pivot('SUPPRESSION',
+                               aggregate='count')
         
         with self.assertRaises(Exception) as cm:
-            self.df.writePivot([]) # non-str filename
+            myPyvtTbl.write([]) # non-str filename
 
         self.assertEqual(str(cm.exception),
                          'fname must be a string')
         
 class Test_marginals(unittest.TestCase):
     def test0(self):
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         self.df.readTbl('words~ageXcondition.csv')
 
         x=self.df.marginals('WORDS',factors=['AGE','CONDITION'])
-        [f,dmu,dN,dsem,dlower,dupper]=x
 
-        for d,r in zip(dmu,[11,7,13.4,12,6.9,14.8,6.5,17.6,19.3,7.6]):
+        for d,r in zip(x['dmu'],[11,7,13.4,12,6.9,14.8,6.5,17.6,19.3,7.6]):
             self.failUnlessAlmostEqual(d,r)
 
-        for d,r in zip(dN,[10,10,10,10,10,10,10,10,10,10]):
+        for d,r in zip(x['dN'],[10,10,10,10,10,10,10,10,10,10]):
             self.failUnlessAlmostEqual(d,r)
 
-        for d,r in zip(dsem,[0.788810638,
-                             0.577350269,
-                             1.423610434,
-                             1.183215957,
-                             0.674124947,
-                             1.103529690,
-                             0.453382350,
-                             0.819213715,
-                             0.843932593,
-                             0.618241233]):
+        for d,r in zip(x['dsem'],[0.788810638,
+                                  0.577350269,
+                                  1.423610434,
+                                  1.183215957,
+                                  0.674124947,
+                                  1.103529690,
+                                  0.453382350,
+                                  0.819213715,
+                                  0.843932593,
+                                  0.618241233]):
             self.failUnlessAlmostEqual(d,r)
 
 class Test_hist(unittest.TestCase):
@@ -1149,7 +1155,7 @@ class Test_hist(unittest.TestCase):
         R=[[4.0, 14.0, 17.0, 12.0, 15.0, 10.0, 9.0, 5.0, 6.0, 8.0],
            [3.0, 5.0, 7.0, 9.0, 11.0, 13.0, 15.0, 17.0, 19.0, 21.0, 23.0]]
         
-        df=PyvtTbl()
+        df=DataFrame()
         df.readTbl('words~ageXcondition.csv')
         D=df.hist('WORDS')
         D=[D[0],D[1]]
@@ -1157,16 +1163,16 @@ class Test_hist(unittest.TestCase):
         for (d,r) in zip(_flatten(D),_flatten(R)):
             self.assertAlmostEqual(d,r)
 
-class Test_plotBox(unittest.TestCase):
+class Test_box_plot(unittest.TestCase):
     def test0(self):
         R = {'d': [9.0, 8.0, 6.0, 8.0, 10.0, 4.0, 6.0, 5.0, 7.0, 7.0, 7.0, 9.0, 6.0, 6.0, 6.0, 11.0, 6.0, 3.0, 8.0, 7.0, 11.0, 13.0, 8.0, 6.0, 14.0, 11.0, 13.0, 13.0, 10.0, 11.0, 12.0, 11.0, 16.0, 11.0, 9.0, 23.0, 12.0, 10.0, 19.0, 11.0, 10.0, 19.0, 14.0, 5.0, 10.0, 11.0, 14.0, 15.0, 11.0, 11.0, 8.0, 6.0, 4.0, 6.0, 7.0, 6.0, 5.0, 7.0, 9.0, 7.0, 10.0, 7.0, 8.0, 10.0, 4.0, 7.0, 10.0, 6.0, 7.0, 7.0, 14.0, 11.0, 18.0, 14.0, 13.0, 22.0, 17.0, 16.0, 12.0, 11.0, 20.0, 16.0, 16.0, 15.0, 18.0, 16.0, 20.0, 22.0, 14.0, 19.0, 21.0, 19.0, 17.0, 15.0, 22.0, 16.0, 22.0, 22.0, 18.0, 21.0],
              'fname': 'box(words).png',
              'maintitle': 'WORDS',
              'val': 'WORDS'}
-        df=PyvtTbl()
+        df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=df.plotBox('WORDS')
+        D=df.box_plot('WORDS')
         
         self.assertEqual(D['fname'],R['fname'])
         self.assertEqual(D['maintitle'],R['maintitle'])
@@ -1186,10 +1192,10 @@ class Test_plotBox(unittest.TestCase):
              'maintitle': 'WORDS by AGE',
              'xlabels': [u'AGE = old', u'AGE = young']}
         
-        df=PyvtTbl()
+        df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=df.plotBox('WORDS',['AGE'])
+        D=df.box_plot('WORDS',['AGE'])
 
         self.assertEqual(D['fname'],R['fname'])
         self.assertEqual(D['maintitle'],R['maintitle'])
@@ -1213,10 +1219,10 @@ class Test_plotBox(unittest.TestCase):
              'maintitle': 'WORDS by AGE * CONDITION',
              'xlabels': [u'AGE = old\nCONDITION = adjective', u'AGE = old\nCONDITION = counting', u'AGE = old\nCONDITION = imagery', u'AGE = old\nCONDITION = intention', u'AGE = old\nCONDITION = rhyming', u'AGE = young\nCONDITION = adjective', u'AGE = young\nCONDITION = counting', u'AGE = young\nCONDITION = imagery', u'AGE = young\nCONDITION = intention', u'AGE = young\nCONDITION = rhyming']}
         
-        df=PyvtTbl()
+        df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=df.plotBox('WORDS',['AGE','CONDITION'])
+        D=df.box_plot('WORDS',['AGE','CONDITION'])
 
         self.assertEqual(D['fname'],R['fname'])
         self.assertEqual(D['maintitle'],R['maintitle'])
@@ -1226,43 +1232,43 @@ class Test_plotBox(unittest.TestCase):
             self.assertAlmostEqual(d,r)
 
     def test3(self):
-        df=PyvtTbl()
+        df=DataFrame()
   
         with self.assertRaises(Exception) as cm:
-            df.plotBox('a')
+            df.box_plot('a')
 
         self.assertEqual(str(cm.exception),
                          'Table must have data to print data')
 
     def test4(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df['a']=[2]
         df['b']=[2,3]
   
         with self.assertRaises(Exception) as cm:
-            df.plotBox('a')
+            df.box_plot('a')
 
         self.assertEqual(str(cm.exception),
                          'columns have unequal lengths')
 
     def test5(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df['a']=[2,5]
         df['b']=[2,3]
   
         with self.assertRaises(Exception) as cm:
-            df.plotBox('a',42)
+            df.box_plot('a',42)
 
         self.assertEqual(str(cm.exception),
                          "'int' object is not iterable")
         
     def test6(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df['a']=[2,5]
         df['b']=[2,3]
   
         with self.assertRaises(KeyError) as cm:
-            df.plotBox('c')
+            df.box_plot('c')
 
         self.assertEqual(str(cm.exception),"'c'")
         
@@ -1271,7 +1277,7 @@ class Test_plotHist(unittest.TestCase):
         R = {'bins': np.array([ 4, 14, 17, 12, 15, 10,  9,  5,  6,  8]),
              'counts': np.array([  3.,   5.,   7.,   9.,  11.,  13.,  15.,  17.,  19.,  21.,  23.]),
              'fname': 'hist(words).png'}
-        df=PyvtTbl()
+        df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
         D=df.plotHist('WORDS')
@@ -1284,7 +1290,7 @@ class Test_plotHist(unittest.TestCase):
         for d,r in zip(D['counts'].flat,R['counts'].flat):
             self.assertAlmostEqual(d,r)
             
-class Test_plotMarginals(unittest.TestCase):
+class Test_interaction_plot(unittest.TestCase):
     # TODO: check checking
     def test0(self):
         R = {'aggregate': None,
@@ -1303,10 +1309,10 @@ class Test_plotMarginals(unittest.TestCase):
              'ymax': 27.183257964740832}
         
         # a simple plot
-        df=PyvtTbl()
+        df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=df.plotMarginals('WORDS','AGE','CONDITION')
+        D=df.interaction_plot('WORDS','AGE','CONDITION')
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1342,10 +1348,10 @@ class Test_plotMarginals(unittest.TestCase):
              'ymin': 0.0}
         
         # specify yerr
-        df=PyvtTbl()
+        df=DataFrame()
         df.TESTMODE = True
         df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-        D=df.plotMarginals('ERROR','TIMEOFDAY',
+        D=df.interaction_plot('ERROR','TIMEOFDAY',
                                 seplines='COURSE',
                                 sepxplots='MODEL',yerr=1.)
 
@@ -1383,11 +1389,11 @@ class Test_plotMarginals(unittest.TestCase):
              'ymin': 0.0}
         
         # generate yerr
-        df=PyvtTbl()
+        df=DataFrame()
         df.TESTMODE = True
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
-        D = df.plotMarginals('SUPPRESSION','CYCLE',
+        D = df.interaction_plot('SUPPRESSION','CYCLE',
                             seplines='AGE',
                             sepyplots='PHASE',yerr='ci')
 
@@ -1428,11 +1434,11 @@ class Test_plotMarginals(unittest.TestCase):
              'ymin': 0.0}
                     
         # separate y plots and separate x plots
-        df=PyvtTbl()
+        df=DataFrame()
         df.TESTMODE = True
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
-        D = df.plotMarginals('SUPPRESSION','CYCLE',
+        D = df.interaction_plot('SUPPRESSION','CYCLE',
                               seplines='AGE',
                               sepxplots='PHASE',
                               sepyplots='GROUP',yerr='ci',
@@ -1476,10 +1482,10 @@ class Test_plotMarginals(unittest.TestCase):
              'ymin': 0.0}
         
         # a simple plot
-        df=PyvtTbl()
+        df=DataFrame()
         df.TESTMODE = True
         df.readTbl('words~ageXcondition.csv')
-        D = df.plotMarginals('WORDS','AGE',sepxplots='CONDITION')
+        D = df.interaction_plot('WORDS','AGE',sepxplots='CONDITION')
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1515,10 +1521,10 @@ class Test_plotMarginals(unittest.TestCase):
              'ymin': 0.0}
                     
         # specify yerr
-        df=PyvtTbl()
+        df=DataFrame()
         df.TESTMODE = True
         df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-        D = df.plotMarginals('ERROR','TIMEOFDAY',
+        D = df.interaction_plot('ERROR','TIMEOFDAY',
                                 sepxplots='MODEL',yerr=1.) 
 
         self.assertEqual(D['aggregate'],R['aggregate'])
@@ -1555,10 +1561,10 @@ class Test_plotMarginals(unittest.TestCase):
              'ymin': 0.0}
         
         # generate yerr
-        df=PyvtTbl()
+        df=DataFrame()
         df.TESTMODE = True
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
-        D = df.plotMarginals('SUPPRESSION','CYCLE',
+        D = df.interaction_plot('SUPPRESSION','CYCLE',
                               sepyplots='PHASE',yerr='ci') 
 
         self.assertEqual(D['aggregate'],R['aggregate'])
@@ -1595,11 +1601,11 @@ class Test_plotMarginals(unittest.TestCase):
              'ymin': 0.0}
         
         # separate y plots and separate x plots
-        df=PyvtTbl()
+        df=DataFrame()
         df.TESTMODE = True
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
-        D = df.plotMarginals('SUPPRESSION','CYCLE',
+        D = df.interaction_plot('SUPPRESSION','CYCLE',
                               sepxplots='PHASE',
                               sepyplots='GROUP',yerr='ci',
                               where=[('GROUP','not in',['LAB'])])
@@ -1623,7 +1629,7 @@ class Test_plotMarginals(unittest.TestCase):
             
 class Test_descriptives(unittest.TestCase):
     def test0(self):
-        self.df=PyvtTbl()
+        self.df=DataFrame()
         self.df.readTbl('words~ageXcondition.csv')
 
         D=self.df.descriptives('WORDS')
@@ -1649,7 +1655,7 @@ class Test_validate(unittest.TestCase):
     def test0(self):
         from pyvttbl import _isint, _isfloat
 
-        df=PyvtTbl()
+        df=DataFrame()
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
         df['RANDDATA'][42]='nan'
 
@@ -1664,7 +1670,7 @@ class Test_validate(unittest.TestCase):
     def test1(self):
         from pyvttbl import _isint, _isfloat
 
-        df=PyvtTbl()
+        df=DataFrame()
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
         ##df['RANDDATA'][42]='nan'
 
@@ -1678,7 +1684,7 @@ class Test_validate(unittest.TestCase):
     def test2(self):
         from pyvttbl import _isint, _isfloat
 
-        df=PyvtTbl()
+        df=DataFrame()
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
         ##df['RANDDATA'][42]='nan'
 
@@ -1692,7 +1698,7 @@ class Test_validate(unittest.TestCase):
         self.assertFalse(R)
 
     def test3(self):
-        df=PyvtTbl()
+        df=DataFrame()
         
         with self.assertRaises(Exception) as cm:
             df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB']})
@@ -1701,7 +1707,7 @@ class Test_validate(unittest.TestCase):
                          'table must have data to validate data')
 
     def test4(self):
-        df=PyvtTbl()
+        df=DataFrame()
         df.insert([('GROUP','AA'),('VAL',1)])
         
         with self.assertRaises(Exception) as cm:
@@ -1726,9 +1732,9 @@ def suite():
             unittest.makeSuite(Test_marginals),
             unittest.makeSuite(Test_select_col),
             unittest.makeSuite(Test_hist),
-            unittest.makeSuite(Test_plotBox),
-            unittest.makeSuite(Test_plotHist),
-            unittest.makeSuite(Test_plotMarginals),
+            unittest.makeSuite(Test_box_plot),
+##            unittest.makeSuite(Test_plotHist),
+            unittest.makeSuite(Test_interaction_plot),
             unittest.makeSuite(Test_writeTable),
             unittest.makeSuite(Test_writePivot),
             unittest.makeSuite(Test_descriptives),
