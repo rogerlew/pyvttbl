@@ -22,6 +22,8 @@ from rl_lib import _flatten
 from rl_lib import _ifelse
 from rl_lib import _xunique_combinations
 
+import plot
+
 def fcmp(d,r):
     """
     Compares two files, d and r, cell by cell. Float comparisons 
@@ -218,19 +220,19 @@ class Test__delitem__(unittest.TestCase):
         del self.df['COURSE']
 
     def test0(self):
-        self.assertEqual(self.df.names,
+        self.assertEqual(list(self.df.names()),
                          ['SUBJECT', 'TIMEOFDAY', 'MODEL', 'ERROR'])
 
     def test1(self):
-        self.assertEqual(self.df.types,
+        self.assertEqual(list(self.df.types()),
                          ['integer', 'text', 'text', 'integer'])
 
     def test2(self):
-        self.assertEqual(self.df.conditions.keys(),
-                         ['SUBJECT', 'MODEL', 'TIMEOFDAY', 'ERROR'])
+        self.assertEqual(list(self.df.names()),
+                         ['SUBJECT', 'TIMEOFDAY', 'MODEL', 'ERROR'])
 
     def test3(self):
-        self.assertEqual(self.df.N, 4)
+        self.assertEqual(len(self.df), 4)
         
 class Test__are_col_lengths_equal(unittest.TestCase):
     def test0(self):
@@ -268,37 +270,37 @@ class Test__checktype(unittest.TestCase):
     def test0(self):
         df=DataFrame()
         df[1]=[]
-        self.assertEqual(df._checktype(1),'null')
+        self.assertEqual(df._check_sqlite3_type(df[1]),'null')
 
     def test1(self):
         df=DataFrame()
         df[1]=[1,2,3.,5.,8.]
-        self.assertEqual(df._checktype(1),'integer')
+        self.assertEqual(df._check_sqlite3_type(df[1]),'integer')
 
     def test2(self):
         df=DataFrame()
         df[1]=[1,2,3.,5.,8.]
-        self.assertEqual(df._checktype(1),'integer')
+        self.assertEqual(df._check_sqlite3_type(df[1]),'integer')
 
     def test3(self):
         df=DataFrame()
         df[1]=[1,2,3.,5.,8.0001]
-        self.assertEqual(df._checktype(1),'real')
+        self.assertEqual(df._check_sqlite3_type(df[1]),'real')
 
     def test4(self):
         df=DataFrame()
         df[1]=[1e4,3e3,5e1,6e0]
-        self.assertEqual(df._checktype(1),'integer')
+        self.assertEqual(df._check_sqlite3_type(df[1]),'integer')
 
     def test5(self):
         df=DataFrame()
         df[1]=[1e4,3e3,5e1,6.001e0]
-        self.assertEqual(df._checktype(1),'real')
+        self.assertEqual(df._check_sqlite3_type(df[1]),'real')
         
     def test6(self):
         df=DataFrame()
         df[1]=[1,2,3.,5.,8.0001,'a']
-        self.assertEqual(df._checktype(1),'text')
+        self.assertEqual(df._check_sqlite3_type(df[1]),'text')
 
 class Test__build_sqlite3_tbl(unittest.TestCase):
     def test0(self):
@@ -313,7 +315,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
         shuffle(df[3])
         shuffle(df[4])
 
-        df._build_sqlite3_tbl(df.names)
+        df._build_sqlite3_tbl(df.names())
         
         df._execute('select * from TBL')
         for i,(a,b,c,d) in enumerate(df.cur):
@@ -334,7 +336,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
         shuffle(df[3])
         shuffle(df[4])
 
-        df._build_sqlite3_tbl(df.names[:2])
+        df._build_sqlite3_tbl(df.names()[:2])
         
         df._execute('select * from TBL')
         for i,(a,b) in enumerate(df.cur):
@@ -352,7 +354,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
         shuffle(df[2])
         shuffle(df[3])
 
-        df._build_sqlite3_tbl(df.names[:2], [(4,'not in',['bob'])])
+        df._build_sqlite3_tbl(df.names()[:2], [(4,'not in',['bob'])])
         
         df._execute('select * from TBL')
         for i,(a,b) in enumerate(df.cur):
@@ -370,7 +372,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
         shuffle(df[2])
         shuffle(df[3])
 
-        df._build_sqlite3_tbl(df.names[:2], [(4,'!=','bob')])
+        df._build_sqlite3_tbl(df.names()[:2], [(4,'!=','bob')])
         
         df._execute('select * from TBL')
         for i,(a,b) in enumerate(df.cur):
@@ -385,7 +387,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
         df[4]=['bob' for i in range(50)]+range(50)
 
         with self.assertRaises(TypeError) as cm:
-            df._build_sqlite3_tbl(df.names[:2], 42)
+            df._build_sqlite3_tbl(df.names()[:2], 42)
         
         self.assertEqual(str(cm.exception),
                          "'int' object is not iterable")
@@ -398,7 +400,7 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
         df[4]=['bob' for i in range(50)]+range(50)
 
         with self.assertRaises(Exception) as cm:
-            df._build_sqlite3_tbl(df.names[:2], [4, 'not in', 'bob'])
+            df._build_sqlite3_tbl(df.names()[:2], [4, 'not in', 'bob'])
         
         self.assertEqual(str(cm.exception),
                          'cannot unpack tuples from where')
@@ -453,7 +455,7 @@ class Test_insert(unittest.TestCase):
     def test4(self):
         df=DataFrame()
         df.insert([('A',1.23), ('B',2), ('C','A')])
-        self.assertEqual(df.types, ['real', 'integer', 'text'])
+        self.assertEqual(df.types(), ('real', 'integer', 'text'))
         
 class Test_attach(unittest.TestCase):
     def test0(self):
@@ -487,17 +489,17 @@ class Test_attach(unittest.TestCase):
         df1.readTbl('words~ageXcondition.csv')
         df2.readTbl('words~ageXcondition.csv')
 
-        M=df1.M
+        M=df1.shape()[1]
 
         # this should work
         df1.attach(df2)
 
         # df1 should have twice as many rows now
-        self.assertEqual(df1.M/2,df2.M)
+        self.assertEqual(df1.shape()[1]/2,df2.shape()[1])
 
         # go through and check data
         for i in range(M):
-            for n in df1.names:
+            for n in df1.keys():
                 if _isfloat(df1[n][i]):
                     self.assertAlmostEqual(df1[n][i],df1[n][M+i])
                 else:
@@ -1150,15 +1152,15 @@ class Test_marginals(unittest.TestCase):
                                   0.618241233]):
             self.failUnlessAlmostEqual(d,r)
 
-class Test_hist(unittest.TestCase):
+class Test_histogram(unittest.TestCase):
     def test0(self):
         R=[[4.0, 14.0, 17.0, 12.0, 15.0, 10.0, 9.0, 5.0, 6.0, 8.0],
            [3.0, 5.0, 7.0, 9.0, 11.0, 13.0, 15.0, 17.0, 19.0, 21.0, 23.0]]
         
         df=DataFrame()
         df.readTbl('words~ageXcondition.csv')
-        D=df.hist('WORDS')
-        D=[D[0],D[1]]
+        D=df.histogram('WORDS')
+        D=[D['values'],D['bin_edges']]
 
         for (d,r) in zip(_flatten(D),_flatten(R)):
             self.assertAlmostEqual(d,r)
@@ -1172,7 +1174,7 @@ class Test_box_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=df.box_plot('WORDS')
+        D=plot.box(df,'WORDS', TESTMODE=True)
         
         self.assertEqual(D['fname'],R['fname'])
         self.assertEqual(D['maintitle'],R['maintitle'])
@@ -1195,7 +1197,7 @@ class Test_box_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=df.box_plot('WORDS',['AGE'])
+        D=plot.box(df,'WORDS',['AGE'], TESTMODE=True)
 
         self.assertEqual(D['fname'],R['fname'])
         self.assertEqual(D['maintitle'],R['maintitle'])
@@ -1222,7 +1224,7 @@ class Test_box_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=df.box_plot('WORDS',['AGE','CONDITION'])
+        D=plot.box(df,'WORDS',['AGE','CONDITION'], TESTMODE=True)
 
         self.assertEqual(D['fname'],R['fname'])
         self.assertEqual(D['maintitle'],R['maintitle'])
@@ -1235,7 +1237,7 @@ class Test_box_plot(unittest.TestCase):
         df=DataFrame()
   
         with self.assertRaises(Exception) as cm:
-            df.box_plot('a')
+            plot.box(df,'a', TESTMODE=True)
 
         self.assertEqual(str(cm.exception),
                          'Table must have data to print data')
@@ -1246,7 +1248,7 @@ class Test_box_plot(unittest.TestCase):
         df['b']=[2,3]
   
         with self.assertRaises(Exception) as cm:
-            df.box_plot('a')
+            plot.box(df,'a', TESTMODE=True)
 
         self.assertEqual(str(cm.exception),
                          'columns have unequal lengths')
@@ -1257,7 +1259,7 @@ class Test_box_plot(unittest.TestCase):
         df['b']=[2,3]
   
         with self.assertRaises(Exception) as cm:
-            df.box_plot('a',42)
+            plot.box(df,'a',42, TESTMODE=True)
 
         self.assertEqual(str(cm.exception),
                          "'int' object is not iterable")
@@ -1268,7 +1270,7 @@ class Test_box_plot(unittest.TestCase):
         df['b']=[2,3]
   
         with self.assertRaises(KeyError) as cm:
-            df.box_plot('c')
+            plot.box(df,'c', TESTMODE=True)
 
         self.assertEqual(str(cm.exception),"'c'")
         
@@ -1280,7 +1282,7 @@ class Test_plotHist(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=df.plotHist('WORDS')
+        D=plot.hist(df,'WORDS', TESTMODE=True)
 
         self.assertEqual(D['fname'],R['fname'])
         
@@ -1312,7 +1314,8 @@ class Test_interaction_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE=True
         df.readTbl('words~ageXcondition.csv')
-        D=df.interaction_plot('WORDS','AGE','CONDITION')
+        D=plot.interaction(df,'WORDS','AGE','CONDITION',
+                             TESTMODE=True)
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1351,9 +1354,10 @@ class Test_interaction_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE = True
         df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-        D=df.interaction_plot('ERROR','TIMEOFDAY',
+        D=plot.interaction(df,'ERROR','TIMEOFDAY',
                                 seplines='COURSE',
-                                sepxplots='MODEL',yerr=1.)
+                                sepxplots='MODEL',yerr=1.,
+                             TESTMODE=True)
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1393,9 +1397,10 @@ class Test_interaction_plot(unittest.TestCase):
         df.TESTMODE = True
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
-        D = df.interaction_plot('SUPPRESSION','CYCLE',
+        D = plot.interaction(df,'SUPPRESSION','CYCLE',
                             seplines='AGE',
-                            sepyplots='PHASE',yerr='ci')
+                            sepyplots='PHASE',yerr='ci',
+                             TESTMODE=True)
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1438,11 +1443,12 @@ class Test_interaction_plot(unittest.TestCase):
         df.TESTMODE = True
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
-        D = df.interaction_plot('SUPPRESSION','CYCLE',
+        D = plot.interaction(df,'SUPPRESSION','CYCLE',
                               seplines='AGE',
                               sepxplots='PHASE',
                               sepyplots='GROUP',yerr='ci',
-                              where=[('GROUP','not in',['LAB'])])
+                              where=[('GROUP','not in',['LAB'])],
+                             TESTMODE=True)
    
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1485,7 +1491,8 @@ class Test_interaction_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE = True
         df.readTbl('words~ageXcondition.csv')
-        D = df.interaction_plot('WORDS','AGE',sepxplots='CONDITION')
+        D = plot.interaction(df,'WORDS','AGE',sepxplots='CONDITION',
+                             TESTMODE=True)
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1524,8 +1531,9 @@ class Test_interaction_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE = True
         df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-        D = df.interaction_plot('ERROR','TIMEOFDAY',
-                                sepxplots='MODEL',yerr=1.) 
+        D = plot.interaction(df,'ERROR','TIMEOFDAY',
+                                sepxplots='MODEL',yerr=1.,
+                             TESTMODE=True) 
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1564,8 +1572,9 @@ class Test_interaction_plot(unittest.TestCase):
         df=DataFrame()
         df.TESTMODE = True
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
-        D = df.interaction_plot('SUPPRESSION','CYCLE',
-                              sepyplots='PHASE',yerr='ci') 
+        D = plot.interaction(df,'SUPPRESSION','CYCLE',
+                              sepyplots='PHASE',yerr='ci',
+                             TESTMODE=True) 
 
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1605,10 +1614,11 @@ class Test_interaction_plot(unittest.TestCase):
         df.TESTMODE = True
         df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
-        D = df.interaction_plot('SUPPRESSION','CYCLE',
+        D = plot.interaction(df,'SUPPRESSION','CYCLE',
                               sepxplots='PHASE',
                               sepyplots='GROUP',yerr='ci',
-                              where=[('GROUP','not in',['LAB'])])
+                              where=[('GROUP','not in',['LAB'])],
+                             TESTMODE=True)
         
         self.assertEqual(D['aggregate'],R['aggregate'])
         self.assertEqual(D['clevels'],R['clevels'])
@@ -1731,7 +1741,7 @@ def suite():
             unittest.makeSuite(Test_pivot_2),
             unittest.makeSuite(Test_marginals),
             unittest.makeSuite(Test_select_col),
-            unittest.makeSuite(Test_hist),
+            unittest.makeSuite(Test_histogram),
             unittest.makeSuite(Test_box_plot),
 ##            unittest.makeSuite(Test_plotHist),
             unittest.makeSuite(Test_interaction_plot),

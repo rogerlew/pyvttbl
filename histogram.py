@@ -25,9 +25,11 @@ from rl_lib import _ifelse
 from rl_lib import _xunique_combinations
 
 from texttable import Texttable as TextTable
+import pystaggrelite3
 
-class Descriptives(OrderedDict):
-    def __init__(self, V, cname=None):
+class Histogram(OrderedDict):
+    def __init__(self, V, cname=None, bins=10,
+                 range=None, density=False, cumulative=False):
         V = _flatten(list(V))
 
         try:
@@ -35,32 +37,26 @@ class Descriptives(OrderedDict):
         except:
             raise TypeError('V must be a list-like object')
             
-        super(Descriptives, self).__init__()
+        super(Histogram, self).__init__()
+
 
         if cname == None:
             self.cname = ''
         else:
             self.cname = cname
             
-        self.V = V
-        N = len(V)
+        values, bin_edges = pystaggrelite3.hist(V, bins=bins,
+                   range=range, density=density, cumulative=cumulative)
 
-        self['count'] = N
-        self['mean'] = sum(V) / N
-        self['var'] = sum([(self['mean']-v)**2 for v in V]) / (N - 1)
-        self['stdev']= math.sqrt(self['var'])
-        self['sem'] = self['stdev'] / math.sqrt(N)
-        self['rms'] = math.sqrt(sum([v**2 for v in V]) / N)
-        self['min'] = min(V)
-        self['max'] = max(V)
-        self['range'] = self['max'] - self['min']
-        self['median'] = V[int(N/2)]
-        if self['count'] % 2 == 0:
-            self['median'] += V[int(N/2)-1]
-            self['median'] /= 2.
-        self['95ci_lower'] = self['mean'] - 1.96*self['sem']
-        self['95ci_upper'] = self['mean'] + 1.96*self['sem']
-    
+        self['values'] = values
+        self['bin_edges'] = bin_edges
+
+        self.V = V
+        self.bins = bins
+        self.range = range
+        self.density = density
+        self.cumulative = cumulative
+        
     def __str__(self):
 
         tt = TextTable(48)
@@ -76,7 +72,23 @@ class Descriptives(OrderedDict):
                          tt.draw()])
 
     def __repr__(self):
-        if self.cname == '':
-            return 'Descriptives(%s)'%repr(self.V)
-        else:
-            return 'Descriptives(%s, %s)'%(repr(self.V),self.cname)
+        s = 'Histogram(%s'%repr(self.V)
+
+        if self.cname != '':
+            s += ', cname=%s'%repr(self.cname)
+
+        if self.bins != 10:
+            s += ', bins=%i'%self.bins
+
+        if self.range != None:
+            s += ', range=%s'%repr(self.range)
+
+        if density != False:
+            s += ', density=True'
+            
+        if cumulative != False:
+            s += ', cumulative=True'
+
+        s+= ')'
+
+        return s

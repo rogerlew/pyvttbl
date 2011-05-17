@@ -24,7 +24,7 @@ class Marginals(OrderedDict):
             raise Exception('columns have unequal lengths')
 
         for cname in [val]+factors:
-            if cname not in df:
+            if cname not in df.names():
                 raise KeyError(cname)
 
         # check for duplicate names
