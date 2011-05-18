@@ -238,7 +238,7 @@ class DataFrame(OrderedDict):
           sqlite3.
 
           The assigned item must be iterable. To add a single row use
-          the insert method. To attach another table to this one use
+          the insert method. To  another table to this one use
           the attach method.
         """
         if not isinstance(key, collections.Hashable):
@@ -459,8 +459,6 @@ class DataFrame(OrderedDict):
         # orders nsubset2 to match the order in self.names()
         nsubset2 = [n for n in self.names() if n in nsubset2]
 
-        print(nsubset2)
-        
         #  3. Build a table
         ##############################################################
         self.conn.commit()
@@ -1023,6 +1021,9 @@ class DataFrame(OrderedDict):
                 # build and return test dictionary
                 return {'bins':tup[0], 'counts':tup[1], 'fname':fname}
 
+
+    # conditionally load plot methods
+    if HAS_NUMPY and HAS_PYLAB:
         def box_plot(self, val, factors=None, where=None,
                 fname=None, quality='medium'):
             """
@@ -1135,6 +1136,8 @@ class DataFrame(OrderedDict):
             if self.TESTMODE:
                 return test
 
+    # conditionally load plot methods
+    if HAS_NUMPY and HAS_PYLAB:
         def interaction_plot(self, val, xaxis, 
                         seplines=None, sepxplots=None, sepyplots=None,
                         xmin='AUTO', xmax='AUTO', ymin='AUTO', ymax='AUTO',
@@ -1445,7 +1448,8 @@ class DataFrame(OrderedDict):
                         
                     else:
                         title = '%s = %s, %s = %s' \
-                                % (sepyplots, _str(rlevel), sepxplots, _str(rlevel))
+                                % (sepyplots, _str(rlevel),
+                                   sepxplots, _str(rlevel))
                         
                     pylab.title(title, fontsize='medium')
                     test['subplot_titles'].append(title)
@@ -1518,7 +1522,7 @@ class PyvtTbl(list):
     """
     list of lists container holding the pivoted data
     """
-    def __init__(self, df=None, val=None, rows=None, cols=None,
+    def __init__(self, df, val, rows=None, cols=None,
                  aggregate='avg', where=None, flatten=False,
                  attach_rlabels=False):
         
@@ -1534,7 +1538,7 @@ class PyvtTbl(list):
                   http://www.sqlite.org/lang_aggfunc.html
         where = list of tuples or list of strings for filtering data
         """
-        if df == None or df == {}:
+        if df == {}:
             self.df=None
             self.val=None
             self.rows=None
@@ -1561,7 +1565,6 @@ class PyvtTbl(list):
         if where == None:
             where = []
             
-
         ##############################################################
         # pivot programmatic flow                                    #
         ##############################################################
@@ -1832,8 +1835,7 @@ class PyvtTbl(list):
         rows = self._get_rows()
         cols = self._get_cols()
 
-        # build first line
-        first = '%s(%s)'%(self.aggregate, self.val)
+        # initialize table
         tt = TextTable(max_width=10000000)
 
         # no rows or cols were specified
@@ -1886,7 +1888,7 @@ class PyvtTbl(list):
         tt.set_deco(TextTable.HEADER)
 
         # return the formatted table
-        return '%s\n%s'%(first,tt.draw())
+        return '%s(%s)\n%s'%(self.aggregate, self.val, tt.draw())
 
     def write(self, fname=None, delimiter=','):
         """
@@ -1920,7 +1922,7 @@ class PyvtTbl(list):
                 fname += '.txt'
         
         # build and write first line
-        first = '%s(%s)'%(self.aggregate, self.val)
+        first = ['%s(%s)'%(self.aggregate, self.val)]
 
         data = [] # append the rows to this list and write with
                   # csv writer in one call
@@ -1966,21 +1968,19 @@ class PyvtTbl(list):
             wtr.writerow(header)
             wtr.writerows(data)
 
-			
 class Descriptives(OrderedDict):
-    def __init__(self, V=None, cname=None):
+    def __init__(self, V, cname=None):
         """
         generates and stores descriptive statistics for the
         numerical data in V
         """
+        super(Descriptives, self).__init__()
         
         try:
             V = sorted(_flatten(list(V)))
         except:
             raise TypeError('V must be a list-like object')
             
-        super(Descriptives, self).__init__()
-
         if cname == None:
             self.cname = ''
         else:
@@ -2009,6 +2009,9 @@ class Descriptives(OrderedDict):
     
     def __str__(self):
 
+        if self == {}:
+            return '(no data in object)'
+
         tt = TextTable(48)
         tt.set_cols_dtype(['t', 'f'])
         tt.set_cols_align(['l', 'r'])
@@ -2022,39 +2025,43 @@ class Descriptives(OrderedDict):
                          tt.draw()])
 
     def __repr__(self):
-        if self.cname == '':
-            return 'Descriptives(%s)'%repr(self.V)
-        else:
-            return 'Descriptives(%s, %s)'%(repr(self.V),self.cname)
-
+        return 'Descriptives(' + ''.join([
+            ('V=%s'%repr(self.V), '')[self.V == None],
+            (',cname=%s'%repr(self.cname), '')[self.cname == None] ]) + ')'
 			
 class Histogram(OrderedDict):
-    def __init__(self, V=None, cname=None, bins=10,
+    def __init__(self, V, cname=None, bins=10,
                  range=None, density=False, cumulative=False):   
         """
         generates and stores histogram data for numerical data in V
         """
-        V = _flatten(list(V))
-
+        
+        super(Histogram, self).__init__()
+        
         try:
-            V = _flatten(list(V))
+            V = sorted(_flatten(list(V)))
         except:
             raise TypeError('V must be a list-like object')
+
+        if len(V) == 0:
+            raise Exception('V has zero length')
             
-        super(Histogram, self).__init__()
-
-
         if cname == None:
             self.cname = ''
         else:
             self.cname = cname
-            
+
         values, bin_edges = pystaggrelite3.hist(V, bins=bins,
                    range=range, density=density, cumulative=cumulative)
 
         self['values'] = values
         self['bin_edges'] = bin_edges
-
+        
+        if cname == None:
+            self.cname = ''
+        else:
+            self.cname = cname
+            
         self.V = V
         self.bins = bins
         self.range = range
@@ -2064,20 +2071,21 @@ class Histogram(OrderedDict):
     def __str__(self):
 
         tt = TextTable(48)
-        tt.set_cols_dtype(['t', 'f'])
-        tt.set_cols_align(['l', 'r'])
-        for (k, v) in self.items():
-            tt.add_row([' %s'%k, v])
+        tt.set_cols_dtype(['f', 'f'])
+        tt.set_cols_align(['r', 'r'])
+        for (b, v) in zip(self['bin_edges'],self['values']+['']):
+            tt.add_row([b, v])
         tt.set_deco(TextTable.HEADER)
+        tt.header(['Bins','Values'])
 
-        return ''.join(['Descriptive Statistics\n  ',
-                         self.cname,
-                         '\n==========================\n',
-                         tt.draw()])
+        return ''.join([('','Cumulative ')[self.cumulative],
+                        ('','Density ')[self.density],
+                        'Histogram for ', self.cname, '\n',
+                        tt.draw()])
 
     def __repr__(self):
         return 'Histogram(' + ''.join([
-            (',V=%s'%%repr(self.V), '')[self.V == None],
+            ('V=%s'%repr(self.V), '')[self.V == None],
             (',cname=%s'%repr(self.cname), '')[self.cname == None],
             (',bins=%i'%self.bins, '')[self.bins == 10],
             (',range=%s'%repr(self.range), '')[self.range == None],
@@ -2086,7 +2094,7 @@ class Histogram(OrderedDict):
                                        ]) + ')'
 
 class Marginals(OrderedDict):
-    def __init__(self, df=None, val=None, factors=None, where=None):   
+    def __init__(self, df, val, factors, where=None):   
         """
         generates and stores marginal data from the DataFrame df
         and column labels in factors.
@@ -2128,14 +2136,14 @@ class Marginals(OrderedDict):
                               aggregate='sem', flatten=True)
          
         # build factors from r_list
-        factors = OrderedDict()
+        factorials = OrderedDict()
         for i, r in enumerate(dN.rnames):
             if i == 0:
                 for c in r:
-                    factors[c[0]] = []
+                    factorials[c[0]] = []
             
             for j, c in enumerate(r):
-                factors[c[0]].append(c[1])
+                factorials[c[0]].append(c[1])
 
         dlower = copy(dN)
         dupper = copy(dN)
@@ -2145,7 +2153,7 @@ class Marginals(OrderedDict):
 
         super(Marginals, self).__init__()
         
-        self['factors'] = factors
+        self['factorials'] = factorials
         self['dmu'] = dmu
         self['dN'] = dN
         self['dsem'] = dsem
@@ -2160,31 +2168,29 @@ class Marginals(OrderedDict):
     def __str__(self):
         """Returns human readable string representaition of Marginals"""
 
-        # marginals handles checking
-        [f, dmu, dN, dsem, dlower, dupper] = self.values()
-
         M = []
-        for v in f.values():
+        for v in self['factorials'].values():
             M.append(v)
             
-        M.append(dmu)
-        M.append(dN)
-        M.append(dsem)
-        M.append(dlower)
-        M.append(dupper)
+        M.append(self['dmu'])
+        M.append(self['dN'])
+        M.append(self['dsem'])
+        M.append(self['dlower'])
+        M.append(self['dupper'])
         M = zip(*M) # transpose
 
         # figure out the width needed by the condition labels so we can
         # set the width of the table
-        flength = sum([max([len(v) for c in v]) for v in f.values()])
-        flength += len(f) * 2
+        flength = sum([max([len(v) for c in v])
+                       for v in self['factorials'].values()])
+        flength += len(self['factorials']) * 2
 
         # build the header
-        header = factors + 'Mean;Count;Std.\nError;'\
+        header = self.factors + 'Mean;Count;Std.\nError;'\
                            '95% CI\nlower;95% CI\nupper'.split(';')
 
-        dtypes = ['t'] * len(factors) + ['f', 'i', 'f', 'f', 'f']
-        aligns = ['l'] * len(factors) + ['r', 'l', 'r', 'r', 'r']
+        dtypes = ['t'] * len(self.factors) + ['f', 'i', 'f', 'f', 'f']
+        aligns = ['l'] * len(self.factors) + ['r', 'l', 'r', 'r', 'r']
         
         # initialize the texttable and add stuff
         tt = TextTable(max_width=flength+48)
@@ -2198,8 +2204,6 @@ class Marginals(OrderedDict):
         return tt.draw()
 
     def __repr__(self):
-        return 'Marginals(' + ''.join([
-            ('df=%s'%repr(self.df), '')[self.df == None],
-            (',val=%5'%self.val, '')[self.val == None],
-            (',factors=%s'%repr(self.factors), '')[self.factors == None],
-            (',where=%s'%repr(self.where), '')[self.where == False] ]) + ')'
+        return r'Marginals(' + ''.join([
+            repr(self.df), ', %s'%repr(self.val), ', %s'%repr(self.factors),
+            (',where=%s'%repr(self.where), '')[self.where == []] ]) + ')'

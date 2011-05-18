@@ -1199,7 +1199,7 @@ class Test_writePivot(unittest.TestCase):
     def test0(self):
         # self.assertEqual doesn't like really long comparisons
         # so we will break it up into lines
-        R=['"avg(SUPPRESSION) where GROUP not in [\'AB\'] and  CYCLE not in [1, 2]"\r\n',
+        R=['avg(SUPPRESSION)\r\n',
            'GROUP,CYCLE=3_AGE=old,CYCLE=3_AGE=young,CYCLE=4_AGE=old,CYCLE=4_AGE=young\r\n',
            'AA,21.9375,10.0125,22.25,10.5125\r\n',
            'LAB,37.0625,12.5375,36.4375,12.0375\r\n']
@@ -1222,7 +1222,7 @@ class Test_writePivot(unittest.TestCase):
             self.failUnlessEqual(d,r)
 
         # clean up
-##        os.remove('./suppression~(group)Z(cycleXage).csv')
+        os.remove('./suppression~(group)Z(cycleXage).csv')
             
     def test1(self):
         # same as test0 except we are specifying a filename
@@ -1273,7 +1273,7 @@ class Test_writePivot(unittest.TestCase):
 
     def test3(self):
 
-        myPyvtTbl = PyvtTbl()
+        myPyvtTbl = PyvtTbl(DataFrame(),'key')
         # try to write pivot table when table doesn't exist
         with self.assertRaises(Exception) as cm:
             myPyvtTbl.write('pivot_test3.csv')
@@ -1346,10 +1346,10 @@ class Test_writePivot(unittest.TestCase):
         
 class Test_marginals(unittest.TestCase):
     def test0(self):
-        self.df=DataFrame()
-        self.df.readTbl('words~ageXcondition.csv')
+        df=DataFrame()
+        df.readTbl('words~ageXcondition.csv')
 
-        x=self.df.marginals('WORDS',factors=['AGE','CONDITION'])
+        x=df.marginals('WORDS',factors=['AGE','CONDITION'])
 
         for d,r in zip(x['dmu'],[11,7,13.4,12,6.9,14.8,6.5,17.6,19.3,7.6]):
             self.failUnlessAlmostEqual(d,r)
@@ -1369,6 +1369,57 @@ class Test_marginals(unittest.TestCase):
                                   0.618241233]):
             self.failUnlessAlmostEqual(d,r)
 
+    def test02(self):
+        df=DataFrame()
+        df.readTbl('words~ageXcondition.csv')
+        D = str(df.marginals('WORDS',factors=['AGE','CONDITION']))
+        R = """ AGE    CONDITION    Mean    Count   Std.    95% CI   95% CI 
+                                     Error   lower    upper  
+============================================================
+old     adjective   11.000   10      0.789    9.454   12.546 
+old     counting     7.000   10      0.577    5.868    8.132 
+old     imagery     13.400   10      1.424   10.610   16.190 
+old     intention   12.000   10      1.183    9.681   14.319 
+old     rhyming      6.900   10      0.674    5.579    8.221 
+young   adjective   14.800   10      1.104   12.637   16.963 
+young   counting     6.500   10      0.453    5.611    7.389 
+young   imagery     17.600   10      0.819   15.994   19.206 
+young   intention   19.300   10      0.844   17.646   20.954 
+young   rhyming      7.600   10      0.618    6.388    8.812 """
+        self.assertEqual(D, R)
+
+    def test03(self):
+        df=DataFrame()
+        df.readTbl('words~ageXcondition.csv')
+        D = repr(df.marginals('WORDS',factors=['AGE','CONDITION']))
+        R = "Marginals(DataFrame([(('SUBJECT', 'integer'), [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0, 48.0, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0, 64.0, 65.0, 66.0, 67.0, 68.0, 69.0, 70.0, 71.0, 72.0, 73.0, 74.0, 75.0, 76.0, 77.0, 78.0, 79.0, 80.0, 81.0, 82.0, 83.0, 84.0, 85.0, 86.0, 87.0, 88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0, 99.0, 100.0]), (('AGE', 'text'), ['old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young']), (('CONDITION', 'text'), ['counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention']), (('WORDS', 'integer'), [9.0, 8.0, 6.0, 8.0, 10.0, 4.0, 6.0, 5.0, 7.0, 7.0, 7.0, 9.0, 6.0, 6.0, 6.0, 11.0, 6.0, 3.0, 8.0, 7.0, 11.0, 13.0, 8.0, 6.0, 14.0, 11.0, 13.0, 13.0, 10.0, 11.0, 12.0, 11.0, 16.0, 11.0, 9.0, 23.0, 12.0, 10.0, 19.0, 11.0, 10.0, 19.0, 14.0, 5.0, 10.0, 11.0, 14.0, 15.0, 11.0, 11.0, 8.0, 6.0, 4.0, 6.0, 7.0, 6.0, 5.0, 7.0, 9.0, 7.0, 10.0, 7.0, 8.0, 10.0, 4.0, 7.0, 10.0, 6.0, 7.0, 7.0, 14.0, 11.0, 18.0, 14.0, 13.0, 22.0, 17.0, 16.0, 12.0, 11.0, 20.0, 16.0, 16.0, 15.0, 18.0, 16.0, 20.0, 22.0, 14.0, 19.0, 21.0, 19.0, 17.0, 15.0, 22.0, 16.0, 22.0, 22.0, 18.0, 21.0]), (('X', 'integer'), [81.0, 64.0, 36.0, 64.0, 100.0, 16.0, 36.0, 25.0, 49.0, 49.0, 49.0, 81.0, 36.0, 36.0, 36.0, 121.0, 36.0, 9.0, 64.0, 49.0, 121.0, 169.0, 64.0, 36.0, 196.0, 121.0, 169.0, 169.0, 100.0, 121.0, 144.0, 121.0, 256.0, 121.0, 81.0, 529.0, 144.0, 100.0, 361.0, 121.0, 100.0, 361.0, 196.0, 25.0, 100.0, 121.0, 196.0, 225.0, 121.0, 121.0, 64.0, 36.0, 16.0, 36.0, 49.0, 36.0, 25.0, 49.0, 81.0, 49.0, 100.0, 49.0, 64.0, 100.0, 16.0, 49.0, 100.0, 36.0, 49.0, 49.0, 196.0, 121.0, 324.0, 196.0, 169.0, 484.0, 289.0, 256.0, 144.0, 121.0, 400.0, 256.0, 256.0, 225.0, 324.0, 256.0, 400.0, 484.0, 196.0, 361.0, 441.0, 361.0, 289.0, 225.0, 484.0, 256.0, 484.0, 484.0, 324.0, 441.0])]), 'WORDS', ['AGE', 'CONDITION'])"
+        self.assertEqual(D, R)
+
+    def test04(self):
+        df=DataFrame()
+        df.readTbl('words~ageXcondition.csv')
+        D = str(df.marginals('WORDS',
+                              factors=['AGE','CONDITION'],
+                              where='AGE == "old"'))
+        R = """AGE   CONDITION    Mean    Count   Std.    95% CI   95% CI 
+                                   Error   lower    upper  
+==========================================================
+old   adjective   11.000   10      0.789    9.454   12.546 
+old   counting     7.000   10      0.577    5.868    8.132 
+old   imagery     13.400   10      1.424   10.610   16.190 
+old   intention   12.000   10      1.183    9.681   14.319 
+old   rhyming      6.900   10      0.674    5.579    8.221 """
+        self.assertEqual(D, R)
+
+    def test05(self):
+        df=DataFrame()
+        df.readTbl('words~ageXcondition.csv')
+        D = repr(df.marginals('WORDS',
+                              factors=['AGE','CONDITION'],
+                              where='AGE == "old"'))
+        R = """Marginals(DataFrame([(('SUBJECT', 'integer'), [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0, 48.0, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0, 64.0, 65.0, 66.0, 67.0, 68.0, 69.0, 70.0, 71.0, 72.0, 73.0, 74.0, 75.0, 76.0, 77.0, 78.0, 79.0, 80.0, 81.0, 82.0, 83.0, 84.0, 85.0, 86.0, 87.0, 88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0, 99.0, 100.0]), (('AGE', 'text'), ['old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young']), (('CONDITION', 'text'), ['counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention']), (('WORDS', 'integer'), [9.0, 8.0, 6.0, 8.0, 10.0, 4.0, 6.0, 5.0, 7.0, 7.0, 7.0, 9.0, 6.0, 6.0, 6.0, 11.0, 6.0, 3.0, 8.0, 7.0, 11.0, 13.0, 8.0, 6.0, 14.0, 11.0, 13.0, 13.0, 10.0, 11.0, 12.0, 11.0, 16.0, 11.0, 9.0, 23.0, 12.0, 10.0, 19.0, 11.0, 10.0, 19.0, 14.0, 5.0, 10.0, 11.0, 14.0, 15.0, 11.0, 11.0, 8.0, 6.0, 4.0, 6.0, 7.0, 6.0, 5.0, 7.0, 9.0, 7.0, 10.0, 7.0, 8.0, 10.0, 4.0, 7.0, 10.0, 6.0, 7.0, 7.0, 14.0, 11.0, 18.0, 14.0, 13.0, 22.0, 17.0, 16.0, 12.0, 11.0, 20.0, 16.0, 16.0, 15.0, 18.0, 16.0, 20.0, 22.0, 14.0, 19.0, 21.0, 19.0, 17.0, 15.0, 22.0, 16.0, 22.0, 22.0, 18.0, 21.0]), (('X', 'integer'), [81.0, 64.0, 36.0, 64.0, 100.0, 16.0, 36.0, 25.0, 49.0, 49.0, 49.0, 81.0, 36.0, 36.0, 36.0, 121.0, 36.0, 9.0, 64.0, 49.0, 121.0, 169.0, 64.0, 36.0, 196.0, 121.0, 169.0, 169.0, 100.0, 121.0, 144.0, 121.0, 256.0, 121.0, 81.0, 529.0, 144.0, 100.0, 361.0, 121.0, 100.0, 361.0, 196.0, 25.0, 100.0, 121.0, 196.0, 225.0, 121.0, 121.0, 64.0, 36.0, 16.0, 36.0, 49.0, 36.0, 25.0, 49.0, 81.0, 49.0, 100.0, 49.0, 64.0, 100.0, 16.0, 49.0, 100.0, 36.0, 49.0, 49.0, 196.0, 121.0, 324.0, 196.0, 169.0, 484.0, 289.0, 256.0, 144.0, 121.0, 400.0, 256.0, 256.0, 225.0, 324.0, 256.0, 400.0, 484.0, 196.0, 361.0, 441.0, 361.0, 289.0, 225.0, 484.0, 256.0, 484.0, 484.0, 324.0, 441.0])]), 'WORDS', ['AGE', 'CONDITION'],where='AGE == "old"')"""
+        self.assertEqual(D, R)
+        
 class Test_histogram(unittest.TestCase):
     def test0(self):
         R=[[4.0, 14.0, 17.0, 12.0, 15.0, 10.0, 9.0, 5.0, 6.0, 8.0],
@@ -1382,6 +1433,33 @@ class Test_histogram(unittest.TestCase):
         for (d,r) in zip(_flatten(D),_flatten(R)):
             self.assertAlmostEqual(d,r)
 
+    def test01(self):
+        df=DataFrame()
+        df.readTbl('words~ageXcondition.csv')
+        D=str(df.histogram('WORDS',cumulative=True))
+        R = """Cumulative Histogram for WORDS
+ Bins    Values  
+================
+ 3.000     4.000 
+ 5.000    18.000 
+ 7.000    35.000 
+ 9.000    47.000 
+11.000    62.000 
+13.000    72.000 
+15.000    81.000 
+17.000    86.000 
+19.000    92.000 
+21.000   100.000 
+23.000           """
+        self.assertEqual(D, R)
+        
+    def test02(self):
+        df=DataFrame()
+        df.readTbl('words~ageXcondition.csv')
+        D = repr(df.histogram('WORDS'))
+        R = """Histogram(V=[3.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 9.0, 9.0, 9.0, 9.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 12.0, 12.0, 12.0, 13.0, 13.0, 13.0, 13.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 15.0, 15.0, 15.0, 16.0, 16.0, 16.0, 16.0, 16.0, 16.0, 17.0, 17.0, 18.0, 18.0, 18.0, 19.0, 19.0, 19.0, 19.0, 20.0, 20.0, 21.0, 21.0, 22.0, 22.0, 22.0, 22.0, 22.0, 23.0],cname='WORDS')"""
+        self.assertEqual(D, R)
+        
 class Test_box_plot(unittest.TestCase):
     def test0(self):
         R = {'d': [9.0, 8.0, 6.0, 8.0, 10.0, 4.0, 6.0, 5.0, 7.0, 7.0, 7.0, 9.0, 6.0, 6.0, 6.0, 11.0, 6.0, 3.0, 8.0, 7.0, 11.0, 13.0, 8.0, 6.0, 14.0, 11.0, 13.0, 13.0, 10.0, 11.0, 12.0, 11.0, 16.0, 11.0, 9.0, 23.0, 12.0, 10.0, 19.0, 11.0, 10.0, 19.0, 14.0, 5.0, 10.0, 11.0, 14.0, 15.0, 11.0, 11.0, 8.0, 6.0, 4.0, 6.0, 7.0, 6.0, 5.0, 7.0, 9.0, 7.0, 10.0, 7.0, 8.0, 10.0, 4.0, 7.0, 10.0, 6.0, 7.0, 7.0, 14.0, 11.0, 18.0, 14.0, 13.0, 22.0, 17.0, 16.0, 12.0, 11.0, 20.0, 16.0, 16.0, 15.0, 18.0, 16.0, 20.0, 22.0, 14.0, 19.0, 21.0, 19.0, 17.0, 15.0, 22.0, 16.0, 22.0, 22.0, 18.0, 21.0],
@@ -1871,6 +1949,35 @@ class Test_descriptives(unittest.TestCase):
         for k in D.keys():
             self.failUnlessAlmostEqual(D[k],R[k])
 
+    def test01(self):
+        df = DataFrame()
+        df.readTbl('words~ageXcondition.csv')
+        D = repr(df.descriptives('WORDS'))        
+        R = "Descriptives(V=[3.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 9.0, 9.0, 9.0, 9.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 12.0, 12.0, 12.0, 13.0, 13.0, 13.0, 13.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 15.0, 15.0, 15.0, 16.0, 16.0, 16.0, 16.0, 16.0, 16.0, 17.0, 17.0, 18.0, 18.0, 18.0, 19.0, 19.0, 19.0, 19.0, 20.0, 20.0, 21.0, 21.0, 22.0, 22.0, 22.0, 22.0, 22.0, 23.0],cname='WORDS')"
+        self.assertEqual(D, R)
+
+    def test02(self):
+        df = DataFrame()
+        df.readTbl('words~ageXcondition.csv')
+        D = str(df.descriptives('WORDS'))
+        R = """Descriptive Statistics
+  WORDS
+==========================
+ count        100.000 
+ mean          11.610 
+ var           26.947 
+ stdev          5.191 
+ sem            0.519 
+ rms           12.707 
+ min            3.000 
+ max           23.000 
+ range         20.000 
+ median        11.000 
+ mode          11.000 
+ 95ci_lower    10.593 
+ 95ci_upper    12.627 """
+        self.assertEqual(D, R)
+        
     def test1(self):
         df=DataFrame()
         df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
@@ -1894,6 +2001,37 @@ class Test_descriptives(unittest.TestCase):
 
         for k in D.keys():
             self.failUnlessAlmostEqual(D[k],R[k])
+
+    def test11(self):
+        df = DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+
+        D = str(df.descriptives('ERROR'))
+        
+        R = """Descriptive Statistics
+  ERROR
+==========================
+ count        48.000 
+ mean          3.896 
+ var           5.797 
+ stdev         2.408 
+ sem           0.348 
+ rms           4.567 
+ min           0.000 
+ max          10.000 
+ range        10.000 
+ median        3.000 
+ mode          3.000 
+ 95ci_lower    3.215 
+ 95ci_upper    4.577 """
+        self.assertEqual(D, R)
+
+    def test12(self):
+        df = DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        D = repr(df.descriptives('ERROR'))
+        R = "Descriptives(V=[0.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 5.0, 5.0, 6.0, 6.0, 6.0, 7.0, 7.0, 7.0, 8.0, 8.0, 9.0, 10.0, 10.0],cname='ERROR')"
+        self.assertEqual(D, R)
 
 class Test_validate(unittest.TestCase):
     def test0(self):
