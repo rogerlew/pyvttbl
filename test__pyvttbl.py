@@ -6,6 +6,7 @@ from __future__ import print_function
 import unittest
 import warnings
 import os
+import math
 
 from random import shuffle
 from collections import Counter
@@ -172,38 +173,61 @@ x,y,z
         os.remove('./test.csv')
 
 class Test__setitem__(unittest.TestCase):
-    def setUp(self):
-        self.df=DataFrame()
-        self.df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-
+    def test1(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df['DUM']=range(48) # Shouldn't complain
+                
     def test2(self):
-        self.df['DUM']=range(48) # Shouldn't complain
+        df=DataFrame()
+        df['DUM']=range(48) # Shouldn't complain
+        self.assertEqual(df.keys(),[('DUM','integer')])
+        
+        df['DUM']=['A' for i in range(48)] # Shouldn't complain
+        self.assertEqual(df.keys(),[('DUM','text')])
+
+    def test21(self):
+        df=DataFrame()
+        df[1]=range(48) # 1 becomes a string
+        self.assertEqual(df.keys(),[('1','integer')])
 
     def test3(self):
-        self.df['DUM']=range(48)
-        self.df['DUM'].pop()
+        df=DataFrame()
+        df['DUM']=range(48)
+        df['DUM'].pop()
 
         # user should be able to freely manipulate data, but should
         # complain if the user tries to pivot with unequal columns
         with self.assertRaises(Exception) as cm:
-            self.df.pivot('DUM',['COURSE'])
+            df.pivot('DUM',['COURSE'])
 
         self.assertEqual(str(cm.exception),
                          'columns have unequal lengths')
 
     def test2(self):
+        df=DataFrame()
         with self.assertRaises(TypeError) as cm:
-            self.df['DUM']=42
+            df['DUM']=42
 
         self.assertEqual(str(cm.exception),
                          "'int' object is not iterable")
         
     def test3(self):
+        df=DataFrame()
         with self.assertRaises(TypeError) as cm:
-            self.df[set('DUM')]=42
+            df[set('DUM')]=42
 
         self.assertEqual(str(cm.exception),
                          "'set' object is not hashable")
+
+    def test4(self):
+        df=DataFrame()
+        df['DUM']=[42]
+        with self.assertRaises(Exception) as cm:
+            df['dum']=[42]
+
+        self.assertEqual(str(cm.exception),
+                         "a case variant of 'dum' already exists")
         
 class Test__delitem__(unittest.TestCase):
     def setUp(self):
@@ -420,18 +444,183 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
         self.assertEqual(str(cm.exception),
                          "'int' object is not iterable")
 
-##    def test5(self):
-##        df=DataFrame()
-##        df[1]=range(100)
-##        df[2]=['bob' for i in range(100)]
-##        df[3]=[i*1.234232 for i in range(100)]
-##        df[4]=['bob' for i in range(50)]+range(50)
-##
-##        with self.assertRaises(Exception) as cm:
-##            df._build_sqlite3_tbl(df.names()[:2], [4, 'not in', 'bob'])
-##        
-##        self.assertEqual(str(cm.exception),
-##                         'cannot unpack tuples from where')
+class Test_where(unittest.TestCase):
+    def test0(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df2 = df.where('ERROR = 10')
+        self.assertEqual(repr(df2),"DataFrame([(('SUBJECT', 'integer'), [1, 2]), (('TIMEOFDAY', 'text'), [u'T1', u'T1']), (('COURSE', 'text'), [u'C1', u'C2']), (('MODEL', 'text'), [u'M1', u'M1']), (('ERROR', 'integer'), [10, 10])])")
+
+    def test1(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df2 = df.where(['ERROR = 10'])
+        self.assertEqual(repr(df2),"DataFrame([(('SUBJECT', 'integer'), [1, 2]), (('TIMEOFDAY', 'text'), [u'T1', u'T1']), (('COURSE', 'text'), [u'C1', u'C2']), (('MODEL', 'text'), [u'M1', u'M1']), (('ERROR', 'integer'), [10, 10])])")
+
+    def test2(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df2 = df.where([('ERROR', '=', 10)])
+        self.assertEqual(repr(df2),"DataFrame([(('SUBJECT', 'integer'), [1, 2]), (('TIMEOFDAY', 'text'), [u'T1', u'T1']), (('COURSE', 'text'), [u'C1', u'C2']), (('MODEL', 'text'), [u'M1', u'M1']), (('ERROR', 'integer'), [10, 10])])")
+
+    def test3(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df2 = df.where('COURSE = "C1" and TIMEOFDAY in ("T1", "T2")')
+        self.assertEqual(repr(df2),"DataFrame([(('SUBJECT', 'integer'), [1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3]), (('TIMEOFDAY', 'text'), [u'T1', u'T1', u'T1', u'T2', u'T2', u'T2', u'T2', u'T2', u'T2', u'T1', u'T1', u'T1', u'T2', u'T2', u'T2']), (('COURSE', 'text'), [u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1']), (('MODEL', 'text'), [u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3']), (('ERROR', 'integer'), [10, 8, 6, 5, 4, 3, 4, 3, 3, 8, 7, 4, 4, 1, 2])])")
+
+    def test5(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df2 = df.where(['COURSE = "C1"','TIMEOFDAY in ("T1", "T2")'])
+        self.assertEqual(repr(df2),"DataFrame([(('SUBJECT', 'integer'), [1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3]), (('TIMEOFDAY', 'text'), [u'T1', u'T1', u'T1', u'T2', u'T2', u'T2', u'T2', u'T2', u'T2', u'T1', u'T1', u'T1', u'T2', u'T2', u'T2']), (('COURSE', 'text'), [u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1']), (('MODEL', 'text'), [u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3']), (('ERROR', 'integer'), [10, 8, 6, 5, 4, 3, 4, 3, 3, 8, 7, 4, 4, 1, 2])])")
+
+    def test6(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df2 = df.where([('COURSE','=',['C1']),('TIMEOFDAY','in',["T1", "T2"])])
+        self.assertEqual(repr(df2),"DataFrame([(('SUBJECT', 'integer'), [1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3]), (('TIMEOFDAY', 'text'), [u'T1', u'T1', u'T1', u'T2', u'T2', u'T2', u'T2', u'T2', u'T2', u'T1', u'T1', u'T1', u'T2', u'T2', u'T2']), (('COURSE', 'text'), [u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1']), (('MODEL', 'text'), [u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3']), (('ERROR', 'integer'), [10, 8, 6, 5, 4, 3, 4, 3, 3, 8, 7, 4, 4, 1, 2])])")
+
+class Test_where_update(unittest.TestCase):
+    def test0(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.where_update('ERROR = 10')
+        self.assertEqual(repr(df),"DataFrame([(('SUBJECT', 'integer'), [1, 2]), (('TIMEOFDAY', 'text'), [u'T1', u'T1']), (('COURSE', 'text'), [u'C1', u'C2']), (('MODEL', 'text'), [u'M1', u'M1']), (('ERROR', 'integer'), [10, 10])])")
+
+    def test1(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.where_update(['ERROR = 10'])
+        self.assertEqual(repr(df),"DataFrame([(('SUBJECT', 'integer'), [1, 2]), (('TIMEOFDAY', 'text'), [u'T1', u'T1']), (('COURSE', 'text'), [u'C1', u'C2']), (('MODEL', 'text'), [u'M1', u'M1']), (('ERROR', 'integer'), [10, 10])])")
+
+    def test2(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.where_update([('ERROR', '=', 10)])
+        self.assertEqual(repr(df),"DataFrame([(('SUBJECT', 'integer'), [1, 2]), (('TIMEOFDAY', 'text'), [u'T1', u'T1']), (('COURSE', 'text'), [u'C1', u'C2']), (('MODEL', 'text'), [u'M1', u'M1']), (('ERROR', 'integer'), [10, 10])])")
+
+    def test3(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.where_update('COURSE = "C1" and TIMEOFDAY in ("T1", "T2")')
+        self.assertEqual(repr(df),"DataFrame([(('SUBJECT', 'integer'), [1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3]), (('TIMEOFDAY', 'text'), [u'T1', u'T1', u'T1', u'T2', u'T2', u'T2', u'T2', u'T2', u'T2', u'T1', u'T1', u'T1', u'T2', u'T2', u'T2']), (('COURSE', 'text'), [u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1']), (('MODEL', 'text'), [u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3']), (('ERROR', 'integer'), [10, 8, 6, 5, 4, 3, 4, 3, 3, 8, 7, 4, 4, 1, 2])])")
+
+    def test5(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.where_update(['COURSE = "C1"','TIMEOFDAY in ("T1", "T2")'])
+        self.assertEqual(repr(df),"DataFrame([(('SUBJECT', 'integer'), [1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3]), (('TIMEOFDAY', 'text'), [u'T1', u'T1', u'T1', u'T2', u'T2', u'T2', u'T2', u'T2', u'T2', u'T1', u'T1', u'T1', u'T2', u'T2', u'T2']), (('COURSE', 'text'), [u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1']), (('MODEL', 'text'), [u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3']), (('ERROR', 'integer'), [10, 8, 6, 5, 4, 3, 4, 3, 3, 8, 7, 4, 4, 1, 2])])")
+
+    def test6(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.where_update([('COURSE','=',['C1']),('TIMEOFDAY','in',["T1", "T2"])])
+        self.assertEqual(repr(df),"DataFrame([(('SUBJECT', 'integer'), [1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3]), (('TIMEOFDAY', 'text'), [u'T1', u'T1', u'T1', u'T2', u'T2', u'T2', u'T2', u'T2', u'T2', u'T1', u'T1', u'T1', u'T2', u'T2', u'T2']), (('COURSE', 'text'), [u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1']), (('MODEL', 'text'), [u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3']), (('ERROR', 'integer'), [10, 8, 6, 5, 4, 3, 4, 3, 3, 8, 7, 4, 4, 1, 2])])")
+
+class Test_df__str__(unittest.TestCase):
+    def test0(self):
+        R = """SUBJECT   TIMEOFDAY   COURSE   MODEL   ERROR 
+============================================
+      1   T1          C1       M2          8 
+      1   T1          C1       M3          6 
+      1   T1          C2       M1          9 
+      1   T1          C3       M1          7 
+      1   T1          C3       M2          6 
+      1   T1          C3       M3          3 
+      1   T2          C1       M1          5 
+      1   T2          C1       M2          4 
+      1   T2          C1       M3          3 
+      1   T2          C2       M1          4 
+      1   T2          C2       M2          3 
+      1   T2          C2       M3          3 
+      1   T2          C3       M1          2 
+      1   T2          C3       M2          2 
+      1   T2          C3       M3          1 
+      2   T1          C2       M1         10 
+      2   T1          C2       M2          6 
+      2   T1          C2       M3          4 
+      2   T1          C3       M1          4 
+      2   T1          C3       M2          5 
+      2   T1          C3       M3          2 
+      2   T2          C1       M1          4 
+      2   T2          C1       M2          3 
+      2   T2          C1       M3          3 
+      2   T2          C2       M1          4 
+      2   T2          C2       M2          2 
+      2   T2          C2       M3          2 
+      2   T2          C3       M1          2 
+      2   T2          C3       M2          3 
+      2   T2          C3       M3          2 
+      3   T1          C1       M1          8 
+      3   T1          C1       M2          7 
+      3   T1          C1       M3          4 
+      3   T1          C2       M1          7 
+      3   T1          C2       M3          3 
+      3   T1          C3       M1          3 
+      3   T1          C3       M2          4 
+      3   T1          C3       M3          2 
+      3   T2          C1       M1          4 
+      3   T2          C1       M2          1 
+      3   T2          C1       M3          2 
+      3   T2          C2       M1          3 
+      3   T2          C2       M2          3 
+      3   T2          C2       M3          2 
+      3   T2          C3       M1          1 
+      3   T2          C3       M2          0 
+      3   T2          C3       M3          1 """
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+
+        self.assertEqual(str(df),R)
+
+class Test_pt__str__(unittest.TestCase):
+    def test0(self):
+        
+        R = """avg(ERROR)
+TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3 
+=============================================
+T1              7.167       6.500           4 
+T2              3.222       2.889       1.556 """
+
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
+        self.assertEqual(str(pt),R)
+
+    def test1(self):
+        
+        R = """avg(ERROR)
+TIMEOFDAY   MODEL   COURSE=C1   COURSE=C2   COURSE=C3 
+=====================================================
+T1          M1              9       8.667       4.667 
+T1          M2          7.500           6           5 
+T1          M3              5       3.500       2.333 
+T2          M1          4.333       3.667       1.667 
+T2          M2          2.667       2.667       1.667 
+T2          M3          2.667       2.333       1.333 """
+
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        pt = df.pivot('ERROR', ['TIMEOFDAY','MODEL'],['COURSE'])
+        self.assertEqual(str(pt),R)
+
+    def test2(self):
+        
+        R = """avg(ERROR)
+MODEL   TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3 
+=====================================================
+M1      T1                  8       8.500       3.500 
+M1      T2                  4       3.500       1.500 
+M2      T1                  7           6       4.500 
+M2      T2                  2       2.500       1.500 
+M3      T1                  4       3.500           2 
+M3      T2              2.500           2       1.500 """
+
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        pt = df.pivot('ERROR', ['MODEL','TIMEOFDAY'],['COURSE'],where=['SUBJECT != 1'])
+        self.assertEqual(str(pt),R)
 
 class Test_insert(unittest.TestCase):
     def test0(self):
@@ -1659,10 +1848,10 @@ class Test_interaction_plot(unittest.TestCase):
             
 class Test_descriptives(unittest.TestCase):
     def test0(self):
-        self.df=DataFrame()
-        self.df.readTbl('words~ageXcondition.csv')
+        df=DataFrame()
+        df.readTbl('words~ageXcondition.csv')
 
-        D=self.df.descriptives('WORDS')
+        D=df.descriptives('WORDS')
         
         R={}
         R['count']      = 100.
@@ -1675,8 +1864,33 @@ class Test_descriptives(unittest.TestCase):
         R['max']        = 23.
         R['range']      = 20.
         R['median']     = 11.
+        R['mode']       = 11.
         R['95ci_lower'] = 11.61-.5191085988*1.96
         R['95ci_upper'] = 11.61+.5191085988*1.96
+
+        for k in D.keys():
+            self.failUnlessAlmostEqual(D[k],R[k])
+
+    def test1(self):
+        df=DataFrame()
+        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+
+        D=df.descriptives('ERROR')
+        
+        R={}
+        R['count']      = 48.
+        R['mean']       = 3.895833333
+        R['var']        = 5.797429078
+        R['stdev']      = 2.407785098
+        R['sem']        = 2.407785098/math.sqrt(48.)
+        R['rms']        = 4.566636253
+        R['min']        = 0.
+        R['max']        = 10.
+        R['range']      = 10.
+        R['median']     = 3.
+        R['mode']       = 3.
+        R['95ci_lower'] = R['mean'] - R['sem'] * 1.96
+        R['95ci_upper'] = R['mean'] + R['sem'] * 1.96
 
         for k in D.keys():
             self.failUnlessAlmostEqual(D[k],R[k])
@@ -1754,6 +1968,10 @@ def suite():
             unittest.makeSuite(Test__are_col_lengths_equal),
             unittest.makeSuite(Test__checktype),
             unittest.makeSuite(Test__build_sqlite3_tbl),
+            unittest.makeSuite(Test_where),
+            unittest.makeSuite(Test_where_update),
+            unittest.makeSuite(Test_df__str__),
+            unittest.makeSuite(Test_pt__str__),
             unittest.makeSuite(Test_insert),
             unittest.makeSuite(Test_attach),
             unittest.makeSuite(Test_sort),

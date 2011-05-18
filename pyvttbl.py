@@ -42,6 +42,10 @@ except:
     HAS_NUMPY = False
 
 def _isfloat(string):
+    """
+    returns true if string can be cast as a float,
+    returns zero otherwise
+    """
     try:
         float(string)
     except:
@@ -49,6 +53,10 @@ def _isfloat(string):
     return True
 
 def _isint(string):
+    """
+    returns true if string can be cast as an int,
+    returns zero otherwise
+    """
     try:
         f = float(string)
     except:
@@ -56,11 +64,6 @@ def _isint(string):
     if round(f) - f == 0:
         return True
     return False
-
-def _ifelse(condition, ifTrue, ifFalse):
-    if condition:
-        return ifTrue
-    return ifFalse
 
 def _flatten(x):
     """_flatten(sequence) -> list
@@ -85,6 +88,10 @@ def _flatten(x):
     return result
 
 def _xunique_combinations(items, n):
+    """
+    returns the unique combinations of items. the n parameter controls
+    the number of elements in items to combine in each combination
+    """
     if n == 0:
         yield []
     else:
@@ -116,7 +123,8 @@ def _str(x, dtype='a', n=3):
                 return '%.*f'%(n, f)
             
 # the dataframe class
-class DataFrame(OrderedDict):                            
+class DataFrame(OrderedDict):
+    """holds the data in a dummy-coded group format"""
     def __init__(self, *args, **kwds):
         """
         initialize a PyvtTbl object
@@ -223,6 +231,12 @@ class DataFrame(OrderedDict):
         """
         assign a column in the table
 
+          the key should be a string (it will be converted to a string)
+          if it is not supplied as one. The key must also not have white
+          space and must not be a case variant of an existing key. These
+          constraints are to avoid problems when placing data into
+          sqlite3.
+
           The assigned item must be iterable. To add a single row use
           the insert method. To attach another table to this one use
           the attach method.
@@ -230,14 +244,12 @@ class DataFrame(OrderedDict):
         if not isinstance(key, collections.Hashable):
             raise TypeError("'%s' object is not hashable"%type(key).__name__)
         
-        try:
-            item = list(item)
-        except:
+        if not hasattr(item, '__iter__'):
             raise TypeError("'%s' object is not iterable"%type(item).__name__)
 
         old = None
         if isinstance(key, tuple):
-            name_type = (str(item) for item in key)
+            name_type = (str(key[0]),str(key[1]))
         else:
             # check to see if we need to do type checking after
             # the item is set
@@ -254,7 +266,7 @@ class DataFrame(OrderedDict):
         n = name_type[0]
         if isinstance(n, _strobj) and (n not in self.names()) and \
           (n.lower() in map(str.lower, self.names())):
-            raise Exception('sqlite3 keys are case-insensitive')
+            raise Exception("a case variant of '%s' already exists"%n)
             
         super(DataFrame, self).__setitem__(name_type, item)
 
@@ -277,6 +289,9 @@ class DataFrame(OrderedDict):
         super(DataFrame, self).__delitem__(name_type)
 
     def __getitem__(self, key):
+        """
+        returns an item
+        """
         if isinstance(key, tuple):
             name_type = key
         else:
@@ -286,6 +301,9 @@ class DataFrame(OrderedDict):
         return super(DataFrame, self).__getitem__(name_type)
 
     def __str__(self):
+        """
+        returns human friendly string representation of object
+        """
         if self == {}:
             return '(table is empty)'
         
@@ -294,7 +312,7 @@ class DataFrame(OrderedDict):
         dtypes = list(''.join(dtypes).replace('r', 'f'))
         tt.set_cols_dtype(dtypes)
 
-        aligns = [_ifelse(dt in 'fi','r','l') for dt in dtypes]
+        aligns = [('l','r')[dt in 'fi'] for dt in dtypes]
         tt.set_cols_align(aligns)
 
         if self.shape()[1] > 0:
@@ -307,21 +325,36 @@ class DataFrame(OrderedDict):
         return tt.draw()
         
     def names(self):
+        """
+        returns a list of the column labels
+        """
         if len(self) == 0:
             return tuple()
         
         return list(zip(*list(self.keys())))[0]
 
     def types(self):
+        """
+        returns a list of the sqlite3 datatypes of the columns 
+        """
         if len(self) == 0:
             return tuple()
         
         return list(zip(*list(self.keys())))[1]
 
     def typesdict(self):
+        """
+        returns a lookup dictionary of names and datatypes
+        """
         return OrderedDict(self.keys())
 
     def shape(self):
+        """
+        returns the size of the table as a tuple
+
+          The first element is the number of columns.
+          The second element is the number of rows
+        """
         if len(self) == 0:
             return (0, 0)
         
@@ -391,13 +424,18 @@ class DataFrame(OrderedDict):
         build or rebuild sqlite table with columns in nsubset based on
         the where list
 
-          where should be a list of tuples. Each tuple should have three
+          where can be a list of tuples. Each tuple should have three
           elements. The first should be a column key (label). The second
           should be an operator: in, =, !=, <, >. The third element
           should contain value for the operator.
+
+          where can also be a list of strings. or a single string.
         """
         if where == None:
             where = []
+
+        if isinstance(where, _strobj):
+            where = [where]
             
         #  1. Perform some checkings
         ##############################################################
@@ -407,20 +445,24 @@ class DataFrame(OrderedDict):
 
         nsubset = map(str, nsubset)
 
-        #  2. Get the neccesary data into a temparary table          
+        #  2. Figure out which columns need to go into the table
+        #     to be able to filter the data
         ##############################################################           
         nsubset2 = set(nsubset)
         for item in where:
             if isinstance(item, _strobj):
-                nsubset2.update(w for w in item if w in self.names())
+                nsubset2.update(w for w in item.split() if w in self.names())
             else:
                 if str(item[0]) in self.names():
                     nsubset2.add(str(item[0]))
 
         # orders nsubset2 to match the order in self.names()
         nsubset2 = [n for n in self.names() if n in nsubset2]
+
+        print(nsubset2)
         
-        # initialize table
+        #  3. Build a table
+        ##############################################################
         self.conn.commit()
         self._execute('drop table if exists TBL2')
 
@@ -436,7 +478,8 @@ class DataFrame(OrderedDict):
         self._executemany(query, zip(*[self[n] for n in nsubset2]))
         self.conn.commit()
 
-        #  3. Use sqlite3 to eliminate rows that should be excluded  
+        #  4. If where == None then we are done. Otherwise we need
+        #     to build query to filter the rows
         ##############################################################
         if where == []:
             self._execute('drop table if exists TBL')
@@ -445,6 +488,7 @@ class DataFrame(OrderedDict):
             self._execute('alter table TBL2 rename to TBL')
             self.conn.commit()
         else:
+            # Initialize another temparary table
             self._execute('drop table if exists TBL')
             self.conn.commit()
             
@@ -453,10 +497,9 @@ class DataFrame(OrderedDict):
                 query.append('_%s_ %s'%(n, self.typesdict()[n]))
             query = ', '.join(query)
             query =  'create temp table TBL\n  (' + query + ')'
-            
             self._execute(query)
 
-            # build insert query
+            # build filter query
             query = []
             for item in where:
                 # process item as a string
@@ -487,7 +530,6 @@ class DataFrame(OrderedDict):
                     else:
                         query.append(' _%s_ %s "%s"'%(k, op, value))
                     
-
             query = ' and '.join(query)
             nstr = ', '.join('_%s_'%n for n in nsubset)
             query = 'insert into TBL select %s from TBL2\n where '%nstr + query
@@ -515,6 +557,9 @@ class DataFrame(OrderedDict):
     
     def pivot(self, val, rows=None, cols=None, aggregate='avg',
               where=None, flatten=False, attach_rlabels=False):
+        """
+        instance method of DataFrame which returns a PyvtTbl object
+        """
 
         if rows == None:
             rows = []
@@ -530,7 +575,8 @@ class DataFrame(OrderedDict):
     
     def select_col(self, val, where=None):
         """
-        Returns the a copy of the selected values based on the where parameter
+        returns the a copy of the selected values based on the
+        where parameter
         """
         if where == None:
             where = []
@@ -746,8 +792,9 @@ class DataFrame(OrderedDict):
 
     def attach(self, other):
         """
-        attaches a second pivot table to this pivot table
-        if the second table has a superset of columns
+        attaches a second DataFrame to this DataFrame
+
+          both DataFrames must have the same columns
         """
 
         # do some checking
@@ -778,8 +825,8 @@ class DataFrame(OrderedDict):
         """
         insert a row into the table
 
-        The row should be mappable. e.g. a dict or a list with key/value
-        pairs. 
+          The row should be mappable. e.g. a dict or a list with
+          key/value pairs. 
         """
         try:
             c = set(dict(row).keys())
@@ -807,6 +854,9 @@ class DataFrame(OrderedDict):
             raise Exception('row must have the same keys as the table')
 
     def write(self, where=None, fname=None, delimiter=','):
+        """
+        write the contents of the DataFrame to a plaintext file
+        """
         if where == None:
             where = []
 
@@ -848,7 +898,7 @@ class DataFrame(OrderedDict):
 
     def descriptives(self, cname, where=None):
         """
-        Returns a dict of descriptive statistics for column cname
+        returns a dict of descriptive statistics for column cname
         """
 
         if where == None:
@@ -864,8 +914,20 @@ class DataFrame(OrderedDict):
         if cname not in self.names():
             raise KeyError(cname)
         
-        V = sorted(self.select_col(cname, where=where))
+        V = self.select_col(cname, where=where)
         return Descriptives(V, cname)
+
+    def summary(self, where=None):
+        """
+        prints a the Descriptives(cname) for each column in the DataFrame
+        """
+        for (cname,dtype) in self.keys():
+            if dtype in ['real', 'integer']:
+                print(self.descriptives(cname, where))
+                print()
+
+            else:
+                print('%s contains non-numerical data\n'%cname)
 
     def marginals(self, val, factors, where=None):
         """
@@ -1454,7 +1516,7 @@ class DataFrame(OrderedDict):
 
 class PyvtTbl(list):
     """
-    container holding the pivoted data
+    list of lists container holding the pivoted data
     """
     def __init__(self, df=None, val=None, rows=None, cols=None,
                  aggregate='avg', where=None, flatten=False,
@@ -1462,22 +1524,33 @@ class PyvtTbl(list):
         
         # public method, saves table to df variables after pivoting
         """
-        Returns a PyvtTbl object.
-
-        Behavior is modeled after the PivotTables in Excel 2007.
-
-            val = the colname to place as the data in the table
-            rows = list of colnames whos combinations will become rows
-                   in the table if left blank their will be one row
-            cols = list of colnames whos combinations will become cols
-                   in the table if left blank their will be one col
-            aggregate = function applied across data going into each cell
-                      of the table
-                      http://www.sqlite.org/lang_aggfunc.html
-            where = list of tuples
+        val = the colname to place as the data in the table
+        rows = list of colnames whos combinations will become rows
+               in the table if left blank their will be one row
+        cols = list of colnames whos combinations will become cols
+               in the table if left blank their will be one col
+        aggregate = function applied across data going into each cell
+                  of the table
+                  http://www.sqlite.org/lang_aggfunc.html
+        where = list of tuples or list of strings for filtering data
         """
-        if df == None:
-            df = DataFrame()
+        if df == None or df == {}:
+            self.df=None
+            self.val=None
+            self.rows=None
+            self.cols=None
+            self.aggregate='avg'
+            self.where=None
+            self.flatten=False
+            self.attach_rlabels=False
+
+            self.rnames = [1]
+            self.cnames = [1]
+            self.Conditions = DictSet()
+            
+            super(PyvtTbl, self).__init__()
+
+            return
             
         if rows == None:
             rows = []
@@ -1488,15 +1561,6 @@ class PyvtTbl(list):
         if where == None:
             where = []
             
-        if df == {}:
-            super(PyvtTbl, self).__init__()
-        else:
-            self.update(df, val, rows, cols, aggregate,
-                        where, flatten, attach_rlabels)
-
-    def update(self, df=None, val=None, rows=None, cols=None,
-               aggregate='avg', where=None, flatten=False,
-               attach_rlabels=False):
 
         ##############################################################
         # pivot programmatic flow                                    #
@@ -1555,10 +1619,6 @@ class PyvtTbl(list):
                 raise KeyError(k)
             
         for k in cols:
-            if k not in df.names():
-                raise KeyError(k)
-
-        for k in [tup[0] for tup in where]:
             if k not in df.names():
                 raise KeyError(k)
 
@@ -1709,71 +1769,61 @@ class PyvtTbl(list):
 
         #  9. return data, rnames, and cnames
         ##############################################################
-
-
-        # the key of the value that was aggregated in the pivot
-        # table
+        self.df = df
         self.val = val
-        
-        # list of lists of paired tuples where the paired tuples
-        # hold the (factor, conditions) of the cooresponding row
-        self.rnames = rnames 
-
-        # list of lists of paired tuples where the paired tuples
-        # hold the (factor, conditions) of the cooresponding column
-        self.cnames = cnames
-
-        # string specifing the aggregate function used to summarize
-        # data
+        self.rows = rows
+        self.cols = cols
         self.aggregate = aggregate
-
-        # a DictSet to hold the factor/levels that are not included
-        # in the pivot table
-        self.conditions = Zconditions
-
-        # a list of tuples specifying the filtering applied to the
-        # the pivot table
         self.where = where
+        self.flatten = flatten
+        self.attach_rlabels = attach_rlabels
 
-        # a bool stating whether the first columns represent the
-        # rlabels
-        self.rlabels_attached = attach_rlabels
+        self.rnames = rnames 
+        self.cnames = cnames
+        self.aggregate = aggregate
+        self.conditions = Zconditions
 
         super(PyvtTbl, self).__init__(d)
 
     def _get_rows(self):
+        """
+        returns a list of tuples containing row labels and conditions
+        """
         if self.rnames == [1]:
             return [1]
         else:
             return [str(k) for (k, v) in self.rnames[0]]
 
     def _get_cols(self):
+        """
+        returns a list of tuples containing column labels and conditions
+        """
         if self.cnames == [1]:
             return [1]
         else:
             return [str(k) for (k, v) in self.cnames[0]]
         
     def __repr__(self):
-        return """PyvtTbl(%s,
-    val='%s',
-    rnames=%s,
-    cnames=%s,
-    aggregate='%s',
-    conditions=%s,
-    where=%s,
-    rlabels_attached=%s)"""%(
-    super(PyvtTbl, self).__repr__(),
-    self.val,
-    repr(self.rnames),
-    repr(self.cnames),
-    repr(self.aggregate),
-    repr(self.conditions),
-    repr(self.where),
-    repr(self.rlabels_attached))
-                                    
+        """
+        returns a machine friendly string representation of the object
+        """ 
+        rows = self._get_rows()
+        cols = self._get_cols()
+        
+        rlabel = self.attach_rlabels
+        return 'PyvtTbl(' + ''.join([
+            ('df=%s'%repr(self.df), '')[self.df == None],
+            (',val=%s'%repr(self.val), '')[self.val == None],
+            (',rows=%s'%repr(rows), '')[rows == [1]],
+            (',cols=%s'%repr(cols), '')[cols == [1]],
+            (',aggregate=%s'%self.aggregate, '')[self.aggregate == 'avg'],
+            (',where=%s'%repr(self.where), '')[self.where == None],
+            (',flatten=%s'%self.flatten, '')[self.flatten == False],
+            (',attach_rlabels=%s'%rlabel, '')[rlabel == False] ]) + ')'   
+            
     def __str__(self):
         """
-        pivots, sets, and prints pivot table
+        returns a human friendly string representaiton of the table
         """
 
         if self == []:
@@ -1784,12 +1834,6 @@ class PyvtTbl(list):
 
         # build first line
         first = '%s(%s)'%(self.aggregate, self.val)
-        if self.conditions != []:
-            query = []
-            for k, op, value in self.where:
-                query.append(' %s %s %s'%(k, str(op), str(value)))
-            first += ' where' + ' and '.join(query)
-
         tt = TextTable(max_width=10000000)
 
         # no rows or cols were specified
@@ -1845,6 +1889,9 @@ class PyvtTbl(list):
         return '%s\n%s'%(first,tt.draw())
 
     def write(self, fname=None, delimiter=','):
+        """
+        writes the pivot table to a plaintext file
+        """
         
         if self == []:
             raise Exception('must call pivot before writing pivot table')
@@ -1874,12 +1921,6 @@ class PyvtTbl(list):
         
         # build and write first line
         first = '%s(%s)'%(self.aggregate, self.val)
-        if self.where != []:
-            query = []
-            for k, op, value in self.where:
-                query.append(' %s %s %s'%(k, str(op), str(value)))
-            first += ' where' + ' and '.join(query)
-        first = [first]
 
         data = [] # append the rows to this list and write with
                   # csv writer in one call
@@ -1927,11 +1968,14 @@ class PyvtTbl(list):
 
 			
 class Descriptives(OrderedDict):
-    def __init__(self, V, cname=None):
-        V = _flatten(list(V))
-
+    def __init__(self, V=None, cname=None):
+        """
+        generates and stores descriptive statistics for the
+        numerical data in V
+        """
+        
         try:
-            V = _flatten(list(V))
+            V = sorted(_flatten(list(V)))
         except:
             raise TypeError('V must be a list-like object')
             
@@ -1944,7 +1988,7 @@ class Descriptives(OrderedDict):
             
         self.V = V
 
-        N = len(V)
+        N = float(len(V))
 
         self['count'] = N
         self['mean'] = sum(V) / N
@@ -1959,6 +2003,7 @@ class Descriptives(OrderedDict):
         if self['count'] % 2 == 0:
             self['median'] += V[int(N/2)-1]
             self['median'] /= 2.
+        self['mode'] = Counter(V).most_common()[0][0]
         self['95ci_lower'] = self['mean'] - 1.96*self['sem']
         self['95ci_upper'] = self['mean'] + 1.96*self['sem']
     
@@ -1984,8 +2029,11 @@ class Descriptives(OrderedDict):
 
 			
 class Histogram(OrderedDict):
-    def __init__(self, V, cname=None, bins=10,
-                 range=None, density=False, cumulative=False):
+    def __init__(self, V=None, cname=None, bins=10,
+                 range=None, density=False, cumulative=False):   
+        """
+        generates and stores histogram data for numerical data in V
+        """
         V = _flatten(list(V))
 
         try:
@@ -2028,30 +2076,21 @@ class Histogram(OrderedDict):
                          tt.draw()])
 
     def __repr__(self):
-        s = 'Histogram(%s'%repr(self.V)
+        return 'Histogram(' + ''.join([
+            (',V=%s'%%repr(self.V), '')[self.V == None],
+            (',cname=%s'%repr(self.cname), '')[self.cname == None],
+            (',bins=%i'%self.bins, '')[self.bins == 10],
+            (',range=%s'%repr(self.range), '')[self.range == None],
+            (',density=%s'%self.density, '')[self.density == False],
+            (',cumulative=%s'%self.cumulative, '')[self.cumulative == False]
+                                       ]) + ')'
 
-        if self.cname != '':
-            s += ', cname=%s'%repr(self.cname)
-
-        if self.bins != 10:
-            s += ', bins=%i'%self.bins
-
-        if self.range != None:
-            s += ', range=%s'%repr(self.range)
-
-        if density != False:
-            s += ', density=True'
-            
-        if cumulative != False:
-            s += ', cumulative=True'
-
-        s+= ')'
-
-        return s
-
-		
 class Marginals(OrderedDict):
-    def __init__(self, df, val, factors, where=None):
+    def __init__(self, df=None, val=None, factors=None, where=None):   
+        """
+        generates and stores marginal data from the DataFrame df
+        and column labels in factors.
+        """
 
         if where == None:
             where = []
@@ -2111,7 +2150,12 @@ class Marginals(OrderedDict):
         self['dN'] = dN
         self['dsem'] = dsem
         self['dlower'] = dlower
-        self['dupper'] = dupper           
+        self['dupper'] = dupper
+
+        self.df = df
+        self.val = val
+        self.factors = factors
+        self.where = where
         
     def __str__(self):
         """Returns human readable string representaition of Marginals"""
@@ -2153,3 +2197,9 @@ class Marginals(OrderedDict):
         # output the table
         return tt.draw()
 
+    def __repr__(self):
+        return 'Marginals(' + ''.join([
+            ('df=%s'%repr(self.df), '')[self.df == None],
+            (',val=%5'%self.val, '')[self.val == None],
+            (',factors=%s'%repr(self.factors), '')[self.factors == None],
+            (',where=%s'%repr(self.where), '')[self.where == False] ]) + ')'
