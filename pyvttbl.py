@@ -105,6 +105,9 @@ def _str(x, dtype='a', n=3):
     """
     try    : f=float(x)
     except : return str(x)
+
+    if math.isnan(f) : return 'nan'
+    if math.isinf(f) : return 'inf'
     
     if   dtype == 'i' : return str(int(round(f)))
     elif dtype == 'f' : return '%.*f'%(n, f)
@@ -137,16 +140,13 @@ class DataFrame(OrderedDict):
         # Initialize sqlite3
         self.conn = sqlite3.connect(':memory:')
         self.cur = self.conn.cursor()
-        self.aggregates = 'avg count count group_concat '  \
-                          'group_concat max min sum total tolist' \
-                          .split()
+        self.aggregates = tuple('avg count count group_concat '  \
+                                'group_concat max min sum total tolist' \
+                                .split())
 
         # Bind pystaggrelite3 aggregators to sqlite3
         for n, a, f in pystaggrelite3.getaggregators():
-            self.conn.create_aggregate(n, a, f)
-            self.aggregates.append(n)
-
-        self.aggregates = tuple(self.aggregates)
+            self.bind_aggregate(n, a, f)
 
         # holds the factors conditions (and all the data values)
         # maybe this should be built on the fly for necessary
@@ -162,7 +162,14 @@ class DataFrame(OrderedDict):
 
         super(DataFrame, self).update(*args, **kwds)
 
-    def readTbl(self, fname, skip=0, delimiter=',',labels=True):
+    def bind_aggregate(self, name, arity, func):
+        self.conn.create_aggregate(name, arity, func)
+        
+        self.aggregates = list(self.aggregates)
+        self.aggregates.append(name)
+        self.aggregates = tuple(self.aggregates)
+
+    def read_tbl(self, fname, skip=0, delimiter=',',labels=True):
         """
         loads tabulated data from a plain text file
 
@@ -227,6 +234,9 @@ class DataFrame(OrderedDict):
         del d
         self.conditions = DictSet(self)
 
+    def __contains__(self, key):
+        return key in self.names()
+        
     def __setitem__(self, key, item):
         """
         assign a column in the table
@@ -314,11 +324,10 @@ class DataFrame(OrderedDict):
 
         aligns = [('l','r')[dt in 'fi'] for dt in dtypes]
         tt.set_cols_align(aligns)
-
-        if self.shape()[1] > 0:
-            tt.add_rows(zip(*list(self.values())))
-            
+        
         tt.header(self.names())
+        if self.shape()[1] > 0:
+            tt.add_rows(zip(*list(self.values())), header=False)
         tt.set_deco(TextTable.HEADER)
 
         # output the table
@@ -681,12 +690,12 @@ class DataFrame(OrderedDict):
     
     def where_update(self, where):
         """
-        Applies the where filter in-place. The associated DataFrame is
-        not updated.
+        Applies the where filter in-place.
         """
         self._build_sqlite3_tbl(self.names(), where)
         self._execute('select * from TBL')
         for n, values in zip(self.names(), zip(*list(self.cur))):
+            del self[n]
             self[n] = list(values)
     
     def validate(self, criteria, verbose=False, report=False):
@@ -1147,7 +1156,7 @@ class DataFrame(OrderedDict):
             """
 
             ##############################################################
-            # plotMarginals programmatic flow                            #
+            # interaction_plot programmatic flow                         #
             ##############################################################
             #  1. Check to make sure a plot can be generated with the    # 
             #     specified arguments and parameter                      #
@@ -1805,6 +1814,16 @@ class PyvtTbl(list):
             return [1]
         else:
             return [str(k) for (k, v) in self.cnames[0]]
+
+    def shape(self):
+        """
+        returns the size of the pivot table as a tuple. Does not
+        include row label columns.
+
+          The first element is the number of columns.
+          The second element is the number of rows
+        """
+        return tuple(len(self._get_rows()), len(self._get_cols()))
         
     def __repr__(self):
         """
@@ -2193,10 +2212,10 @@ class Marginals(OrderedDict):
         aligns = ['l'] * len(self.factors) + ['r', 'l', 'r', 'r', 'r']
         
         # initialize the texttable and add stuff
-        tt = TextTable(max_width=flength+48)
+        tt = TextTable(max_width=10000000)
         tt.set_cols_dtype(dtypes)
         tt.set_cols_align(aligns)
-        tt.add_rows(M,header=False)
+        tt.add_rows(M, header=False)
         tt.header(header)
         tt.set_deco(TextTable.HEADER)
 

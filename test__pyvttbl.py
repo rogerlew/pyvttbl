@@ -51,7 +51,7 @@ def fcmp(d,r):
     else:
         return False
 
-class Test_readTbl(unittest.TestCase):
+class Test_read_tbl(unittest.TestCase):
     def test01(self):
 
         # skip 4 lines
@@ -68,7 +68,7 @@ x,y,z
 4,8,12""")
             
         self.df=DataFrame()
-        self.df.readTbl('skiptest.csv',skip=4)
+        self.df.read_tbl('skiptest.csv',skip=4)
         D=self.df['x']+self.df['y']+self.df['z']
         R=range(1,13)
         
@@ -86,7 +86,7 @@ x,y,z
 4,8,12""")
             
         self.df=DataFrame()
-        self.df.readTbl('test.csv',skip=1,labels=False)
+        self.df.read_tbl('test.csv',skip=1,labels=False)
         D=self.df['COL_1']+self.df['COL_2']+self.df['COL_3']
         R=range(1,13)
         
@@ -111,7 +111,7 @@ x,x,x
             warnings.simplefilter("always")
             
             # Trigger a warning.    
-            self.df.readTbl('test.csv',skip=1,labels=True)
+            self.df.read_tbl('test.csv',skip=1,labels=True)
         
             assert issubclass(w[-1].category, RuntimeWarning)
             
@@ -139,7 +139,7 @@ x,y,z
             warnings.simplefilter("always")
             
             # Trigger a warning.    
-            self.df.readTbl('test.csv',skip=1,labels=True)
+            self.df.read_tbl('test.csv',skip=1,labels=True)
         
             assert issubclass(w[-1].category, RuntimeWarning)
             
@@ -161,7 +161,7 @@ x,y,z
 4,8,12""")
             
         self.df=DataFrame()
-        self.df.readTbl('test.csv',skip=1,labels=True)
+        self.df.read_tbl('test.csv',skip=1,labels=True)
         
         D=self.df['x']+self.df['y']+self.df['z']
         R=[1,2,3,4,5,6,7,8,9,'',11,12]
@@ -175,7 +175,7 @@ x,y,z
 class Test__setitem__(unittest.TestCase):
     def test1(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df['DUM']=range(48) # Shouldn't complain
                 
     def test2(self):
@@ -232,7 +232,7 @@ class Test__setitem__(unittest.TestCase):
 class Test__delitem__(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
-        self.df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        self.df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         del self.df['COURSE']
 
     def test0(self):
@@ -447,74 +447,74 @@ class Test__build_sqlite3_tbl(unittest.TestCase):
 class Test_where(unittest.TestCase):
     def test0(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df2 = df.where('ERROR = 10')
         self.assertEqual(repr(df2),"DataFrame([(('SUBJECT', 'integer'), [1, 2]), (('TIMEOFDAY', 'text'), [u'T1', u'T1']), (('COURSE', 'text'), [u'C1', u'C2']), (('MODEL', 'text'), [u'M1', u'M1']), (('ERROR', 'integer'), [10, 10])])")
 
     def test1(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df2 = df.where(['ERROR = 10'])
         self.assertEqual(repr(df2),"DataFrame([(('SUBJECT', 'integer'), [1, 2]), (('TIMEOFDAY', 'text'), [u'T1', u'T1']), (('COURSE', 'text'), [u'C1', u'C2']), (('MODEL', 'text'), [u'M1', u'M1']), (('ERROR', 'integer'), [10, 10])])")
 
     def test2(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df2 = df.where([('ERROR', '=', 10)])
         self.assertEqual(repr(df2),"DataFrame([(('SUBJECT', 'integer'), [1, 2]), (('TIMEOFDAY', 'text'), [u'T1', u'T1']), (('COURSE', 'text'), [u'C1', u'C2']), (('MODEL', 'text'), [u'M1', u'M1']), (('ERROR', 'integer'), [10, 10])])")
 
     def test3(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df2 = df.where('COURSE = "C1" and TIMEOFDAY in ("T1", "T2")')
         self.assertEqual(repr(df2),"DataFrame([(('SUBJECT', 'integer'), [1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3]), (('TIMEOFDAY', 'text'), [u'T1', u'T1', u'T1', u'T2', u'T2', u'T2', u'T2', u'T2', u'T2', u'T1', u'T1', u'T1', u'T2', u'T2', u'T2']), (('COURSE', 'text'), [u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1']), (('MODEL', 'text'), [u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3']), (('ERROR', 'integer'), [10, 8, 6, 5, 4, 3, 4, 3, 3, 8, 7, 4, 4, 1, 2])])")
 
     def test5(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df2 = df.where(['COURSE = "C1"','TIMEOFDAY in ("T1", "T2")'])
         self.assertEqual(repr(df2),"DataFrame([(('SUBJECT', 'integer'), [1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3]), (('TIMEOFDAY', 'text'), [u'T1', u'T1', u'T1', u'T2', u'T2', u'T2', u'T2', u'T2', u'T2', u'T1', u'T1', u'T1', u'T2', u'T2', u'T2']), (('COURSE', 'text'), [u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1']), (('MODEL', 'text'), [u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3']), (('ERROR', 'integer'), [10, 8, 6, 5, 4, 3, 4, 3, 3, 8, 7, 4, 4, 1, 2])])")
 
     def test6(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df2 = df.where([('COURSE','=',['C1']),('TIMEOFDAY','in',["T1", "T2"])])
         self.assertEqual(repr(df2),"DataFrame([(('SUBJECT', 'integer'), [1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3]), (('TIMEOFDAY', 'text'), [u'T1', u'T1', u'T1', u'T2', u'T2', u'T2', u'T2', u'T2', u'T2', u'T1', u'T1', u'T1', u'T2', u'T2', u'T2']), (('COURSE', 'text'), [u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1']), (('MODEL', 'text'), [u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3']), (('ERROR', 'integer'), [10, 8, 6, 5, 4, 3, 4, 3, 3, 8, 7, 4, 4, 1, 2])])")
 
 class Test_where_update(unittest.TestCase):
     def test0(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df.where_update('ERROR = 10')
         self.assertEqual(repr(df),"DataFrame([(('SUBJECT', 'integer'), [1, 2]), (('TIMEOFDAY', 'text'), [u'T1', u'T1']), (('COURSE', 'text'), [u'C1', u'C2']), (('MODEL', 'text'), [u'M1', u'M1']), (('ERROR', 'integer'), [10, 10])])")
 
     def test1(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df.where_update(['ERROR = 10'])
         self.assertEqual(repr(df),"DataFrame([(('SUBJECT', 'integer'), [1, 2]), (('TIMEOFDAY', 'text'), [u'T1', u'T1']), (('COURSE', 'text'), [u'C1', u'C2']), (('MODEL', 'text'), [u'M1', u'M1']), (('ERROR', 'integer'), [10, 10])])")
 
     def test2(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df.where_update([('ERROR', '=', 10)])
         self.assertEqual(repr(df),"DataFrame([(('SUBJECT', 'integer'), [1, 2]), (('TIMEOFDAY', 'text'), [u'T1', u'T1']), (('COURSE', 'text'), [u'C1', u'C2']), (('MODEL', 'text'), [u'M1', u'M1']), (('ERROR', 'integer'), [10, 10])])")
 
     def test3(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df.where_update('COURSE = "C1" and TIMEOFDAY in ("T1", "T2")')
         self.assertEqual(repr(df),"DataFrame([(('SUBJECT', 'integer'), [1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3]), (('TIMEOFDAY', 'text'), [u'T1', u'T1', u'T1', u'T2', u'T2', u'T2', u'T2', u'T2', u'T2', u'T1', u'T1', u'T1', u'T2', u'T2', u'T2']), (('COURSE', 'text'), [u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1']), (('MODEL', 'text'), [u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3']), (('ERROR', 'integer'), [10, 8, 6, 5, 4, 3, 4, 3, 3, 8, 7, 4, 4, 1, 2])])")
 
     def test5(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df.where_update(['COURSE = "C1"','TIMEOFDAY in ("T1", "T2")'])
         self.assertEqual(repr(df),"DataFrame([(('SUBJECT', 'integer'), [1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3]), (('TIMEOFDAY', 'text'), [u'T1', u'T1', u'T1', u'T2', u'T2', u'T2', u'T2', u'T2', u'T2', u'T1', u'T1', u'T1', u'T2', u'T2', u'T2']), (('COURSE', 'text'), [u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1']), (('MODEL', 'text'), [u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3']), (('ERROR', 'integer'), [10, 8, 6, 5, 4, 3, 4, 3, 3, 8, 7, 4, 4, 1, 2])])")
 
     def test6(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df.where_update([('COURSE','=',['C1']),('TIMEOFDAY','in',["T1", "T2"])])
         self.assertEqual(repr(df),"DataFrame([(('SUBJECT', 'integer'), [1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3]), (('TIMEOFDAY', 'text'), [u'T1', u'T1', u'T1', u'T2', u'T2', u'T2', u'T2', u'T2', u'T2', u'T1', u'T1', u'T1', u'T2', u'T2', u'T2']), (('COURSE', 'text'), [u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1', u'C1']), (('MODEL', 'text'), [u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3', u'M1', u'M2', u'M3']), (('ERROR', 'integer'), [10, 8, 6, 5, 4, 3, 4, 3, 3, 8, 7, 4, 4, 1, 2])])")
 
@@ -522,6 +522,7 @@ class Test_df__str__(unittest.TestCase):
     def test0(self):
         R = """SUBJECT   TIMEOFDAY   COURSE   MODEL   ERROR 
 ============================================
+      1   T1          C1       M1         10 
       1   T1          C1       M2          8 
       1   T1          C1       M3          6 
       1   T1          C2       M1          9 
@@ -570,7 +571,7 @@ class Test_df__str__(unittest.TestCase):
       3   T2          C3       M2          0 
       3   T2          C3       M3          1 """
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
 
         self.assertEqual(str(df),R)
 
@@ -584,7 +585,7 @@ T1              7.167       6.500           4
 T2              3.222       2.889       1.556 """
 
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
         self.assertEqual(str(pt),R)
 
@@ -601,7 +602,7 @@ T2          M2          2.667       2.667       1.667
 T2          M3          2.667       2.333       1.333 """
 
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         pt = df.pivot('ERROR', ['TIMEOFDAY','MODEL'],['COURSE'])
         self.assertEqual(str(pt),R)
 
@@ -618,7 +619,7 @@ M3      T1                  4       3.500           2
 M3      T2              2.500           2       1.500 """
 
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         pt = df.pivot('ERROR', ['MODEL','TIMEOFDAY'],['COURSE'],where=['SUBJECT != 1'])
         self.assertEqual(str(pt),R)
 
@@ -677,7 +678,7 @@ class Test_insert(unittest.TestCase):
 class Test_attach(unittest.TestCase):
     def test0(self):
         self.df1=DataFrame()
-        self.df1.readTbl('words~ageXcondition.csv')
+        self.df1.read_tbl('words~ageXcondition.csv')
 
         with self.assertRaises(Exception) as cm:
             self.df1.attach('s')
@@ -688,8 +689,8 @@ class Test_attach(unittest.TestCase):
     def test1(self):
         self.df1=DataFrame()
         self.df2=DataFrame()
-        self.df1.readTbl('words~ageXcondition.csv')
-        self.df2.readTbl('words~ageXcondition.csv')
+        self.df1.read_tbl('words~ageXcondition.csv')
+        self.df2.read_tbl('words~ageXcondition.csv')
 
         # add an extra key to df1
         self.df1['EXTRA'] = [5 for a in self.df1['AGE']]
@@ -703,8 +704,8 @@ class Test_attach(unittest.TestCase):
     def test2(self):
         df1=DataFrame()
         df2=DataFrame()
-        df1.readTbl('words~ageXcondition.csv')
-        df2.readTbl('words~ageXcondition.csv')
+        df1.read_tbl('words~ageXcondition.csv')
+        df2.read_tbl('words~ageXcondition.csv')
 
         M=df1.shape()[1]
 
@@ -821,7 +822,7 @@ class Test_pivot_1(unittest.TestCase):
            }
         
         self.df=DataFrame()
-        self.df.readTbl('words~ageXcondition.csv')
+        self.df.read_tbl('words~ageXcondition.csv')
         
     def test001(self):
         with self.assertRaises(KeyError) as cm:
@@ -1079,7 +1080,7 @@ class Test_pivot_1(unittest.TestCase):
 class Test_pivot_2(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
-        self.df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        self.df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         
     def test0(self):
               # M 1  2  3
@@ -1159,7 +1160,7 @@ class Test_pivot_2(unittest.TestCase):
 class Test_writeTable(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
-        self.df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        self.df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
     def test0(self):
         d='suppression~subjectXgroupXageXcycleXphase.csv'
@@ -1183,7 +1184,7 @@ class Test_writeTable(unittest.TestCase):
 class Test_select_col(unittest.TestCase):
     def test0(self):
         self.df=DataFrame()
-        self.df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        self.df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
         R=[33.0, 43.0, 40.0, 52.0, 39.0, 52.0, 38.0, 48.0, 4.0, 35.0, 9.0, 42.0, 4.0, 46.0, 23.0, 51.0, 32.0, 39.0, 38.0, 47.0, 24.0, 44.0, 16.0, 40.0, 17.0, 34.0, 21.0, 41.0, 27.0, 50.0, 13.0, 40.0, 44.0, 52.0, 37.0, 48.0, 33.0, 53.0, 33.0, 43.0, 12.0, 16.0, 9.0, 39.0, 9.0, 59.0, 13.0, 45.0, 18.0, 42.0, 3.0, 62.0, 45.0, 49.0, 60.0, 57.0, 13.0, 29.0, 14.0, 44.0, 9.0, 50.0, 15.0, 48.0]
         D=self.df.select_col('SUPPRESSION',
                             where=[('AGE','not in',['young']),
@@ -1194,7 +1195,7 @@ class Test_select_col(unittest.TestCase):
 class Test_writePivot(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
-        self.df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        self.df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
     def test0(self):
         # self.assertEqual doesn't like really long comparisons
@@ -1347,7 +1348,7 @@ class Test_writePivot(unittest.TestCase):
 class Test_marginals(unittest.TestCase):
     def test0(self):
         df=DataFrame()
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
 
         x=df.marginals('WORDS',factors=['AGE','CONDITION'])
 
@@ -1371,7 +1372,7 @@ class Test_marginals(unittest.TestCase):
 
     def test02(self):
         df=DataFrame()
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D = str(df.marginals('WORDS',factors=['AGE','CONDITION']))
         R = """ AGE    CONDITION    Mean    Count   Std.    95% CI   95% CI 
                                      Error   lower    upper  
@@ -1390,14 +1391,14 @@ young   rhyming      7.600   10      0.618    6.388    8.812 """
 
     def test03(self):
         df=DataFrame()
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D = repr(df.marginals('WORDS',factors=['AGE','CONDITION']))
         R = "Marginals(DataFrame([(('SUBJECT', 'integer'), [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0, 48.0, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0, 64.0, 65.0, 66.0, 67.0, 68.0, 69.0, 70.0, 71.0, 72.0, 73.0, 74.0, 75.0, 76.0, 77.0, 78.0, 79.0, 80.0, 81.0, 82.0, 83.0, 84.0, 85.0, 86.0, 87.0, 88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0, 99.0, 100.0]), (('AGE', 'text'), ['old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young']), (('CONDITION', 'text'), ['counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention']), (('WORDS', 'integer'), [9.0, 8.0, 6.0, 8.0, 10.0, 4.0, 6.0, 5.0, 7.0, 7.0, 7.0, 9.0, 6.0, 6.0, 6.0, 11.0, 6.0, 3.0, 8.0, 7.0, 11.0, 13.0, 8.0, 6.0, 14.0, 11.0, 13.0, 13.0, 10.0, 11.0, 12.0, 11.0, 16.0, 11.0, 9.0, 23.0, 12.0, 10.0, 19.0, 11.0, 10.0, 19.0, 14.0, 5.0, 10.0, 11.0, 14.0, 15.0, 11.0, 11.0, 8.0, 6.0, 4.0, 6.0, 7.0, 6.0, 5.0, 7.0, 9.0, 7.0, 10.0, 7.0, 8.0, 10.0, 4.0, 7.0, 10.0, 6.0, 7.0, 7.0, 14.0, 11.0, 18.0, 14.0, 13.0, 22.0, 17.0, 16.0, 12.0, 11.0, 20.0, 16.0, 16.0, 15.0, 18.0, 16.0, 20.0, 22.0, 14.0, 19.0, 21.0, 19.0, 17.0, 15.0, 22.0, 16.0, 22.0, 22.0, 18.0, 21.0]), (('X', 'integer'), [81.0, 64.0, 36.0, 64.0, 100.0, 16.0, 36.0, 25.0, 49.0, 49.0, 49.0, 81.0, 36.0, 36.0, 36.0, 121.0, 36.0, 9.0, 64.0, 49.0, 121.0, 169.0, 64.0, 36.0, 196.0, 121.0, 169.0, 169.0, 100.0, 121.0, 144.0, 121.0, 256.0, 121.0, 81.0, 529.0, 144.0, 100.0, 361.0, 121.0, 100.0, 361.0, 196.0, 25.0, 100.0, 121.0, 196.0, 225.0, 121.0, 121.0, 64.0, 36.0, 16.0, 36.0, 49.0, 36.0, 25.0, 49.0, 81.0, 49.0, 100.0, 49.0, 64.0, 100.0, 16.0, 49.0, 100.0, 36.0, 49.0, 49.0, 196.0, 121.0, 324.0, 196.0, 169.0, 484.0, 289.0, 256.0, 144.0, 121.0, 400.0, 256.0, 256.0, 225.0, 324.0, 256.0, 400.0, 484.0, 196.0, 361.0, 441.0, 361.0, 289.0, 225.0, 484.0, 256.0, 484.0, 484.0, 324.0, 441.0])]), 'WORDS', ['AGE', 'CONDITION'])"
         self.assertEqual(D, R)
 
     def test04(self):
         df=DataFrame()
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D = str(df.marginals('WORDS',
                               factors=['AGE','CONDITION'],
                               where='AGE == "old"'))
@@ -1413,7 +1414,7 @@ old   rhyming      6.900   10      0.674    5.579    8.221 """
 
     def test05(self):
         df=DataFrame()
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D = repr(df.marginals('WORDS',
                               factors=['AGE','CONDITION'],
                               where='AGE == "old"'))
@@ -1426,7 +1427,7 @@ class Test_histogram(unittest.TestCase):
            [3.0, 5.0, 7.0, 9.0, 11.0, 13.0, 15.0, 17.0, 19.0, 21.0, 23.0]]
         
         df=DataFrame()
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D=df.histogram('WORDS')
         D=[D['values'],D['bin_edges']]
 
@@ -1435,7 +1436,7 @@ class Test_histogram(unittest.TestCase):
 
     def test01(self):
         df=DataFrame()
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D=str(df.histogram('WORDS',cumulative=True))
         R = """Cumulative Histogram for WORDS
  Bins    Values  
@@ -1455,7 +1456,7 @@ class Test_histogram(unittest.TestCase):
         
     def test02(self):
         df=DataFrame()
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D = repr(df.histogram('WORDS'))
         R = """Histogram(V=[3.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 9.0, 9.0, 9.0, 9.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 12.0, 12.0, 12.0, 13.0, 13.0, 13.0, 13.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 15.0, 15.0, 15.0, 16.0, 16.0, 16.0, 16.0, 16.0, 16.0, 17.0, 17.0, 18.0, 18.0, 18.0, 19.0, 19.0, 19.0, 19.0, 20.0, 20.0, 21.0, 21.0, 22.0, 22.0, 22.0, 22.0, 22.0, 23.0],cname='WORDS')"""
         self.assertEqual(D, R)
@@ -1468,7 +1469,7 @@ class Test_box_plot(unittest.TestCase):
              'val': 'WORDS'}
         df=DataFrame()
         df.TESTMODE=True
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D=df.box_plot('WORDS')
         
         self.assertEqual(D['fname'],R['fname'])
@@ -1491,7 +1492,7 @@ class Test_box_plot(unittest.TestCase):
         
         df=DataFrame()
         df.TESTMODE=True
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D=df.box_plot('WORDS',['AGE'])
 
         self.assertEqual(D['fname'],R['fname'])
@@ -1518,7 +1519,7 @@ class Test_box_plot(unittest.TestCase):
         
         df=DataFrame()
         df.TESTMODE=True
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D=df.box_plot('WORDS',['AGE','CONDITION'])
 
         self.assertEqual(D['fname'],R['fname'])
@@ -1576,7 +1577,7 @@ class Test_plotHist(unittest.TestCase):
              'fname': 'hist(words).png'}
         df=DataFrame()
         df.TESTMODE=True
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D=df.histogram_plot('WORDS')
 
         self.assertEqual(D['fname'],R['fname'])
@@ -1608,7 +1609,7 @@ class Test_interaction_plot(unittest.TestCase):
         # a simple plot
         df=DataFrame()
         df.TESTMODE=True
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D=df.interaction_plot('WORDS','AGE','CONDITION')
 
         self.assertEqual(D['aggregate'],R['aggregate'])
@@ -1647,7 +1648,7 @@ class Test_interaction_plot(unittest.TestCase):
         # specify yerr
         df=DataFrame()
         df.TESTMODE = True
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         D=df.interaction_plot('ERROR','TIMEOFDAY',
                                 seplines='COURSE',
                                 sepxplots='MODEL',yerr=1.)
@@ -1688,7 +1689,7 @@ class Test_interaction_plot(unittest.TestCase):
         # generate yerr
         df=DataFrame()
         df.TESTMODE = True
-        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
         D = df.interaction_plot('SUPPRESSION','CYCLE',
                             seplines='AGE',
@@ -1733,7 +1734,7 @@ class Test_interaction_plot(unittest.TestCase):
         # separate y plots and separate x plots
         df=DataFrame()
         df.TESTMODE = True
-        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
         D = df.interaction_plot('SUPPRESSION','CYCLE',
                               seplines='AGE',
@@ -1781,7 +1782,7 @@ class Test_interaction_plot(unittest.TestCase):
         # a simple plot
         df=DataFrame()
         df.TESTMODE = True
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D = df.interaction_plot('WORDS','AGE',sepxplots='CONDITION')
         
         self.assertEqual(D['aggregate'],R['aggregate'])
@@ -1820,7 +1821,7 @@ class Test_interaction_plot(unittest.TestCase):
         # specify yerr
         df=DataFrame()
         df.TESTMODE = True
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         D = df.interaction_plot('ERROR','TIMEOFDAY',
                                 sepxplots='MODEL',yerr=1.)
 
@@ -1860,7 +1861,7 @@ class Test_interaction_plot(unittest.TestCase):
         # generate yerr
         df=DataFrame()
         df.TESTMODE = True
-        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
         D = df.interaction_plot('SUPPRESSION','CYCLE',
                               sepyplots='PHASE',yerr='ci')
 
@@ -1900,7 +1901,7 @@ class Test_interaction_plot(unittest.TestCase):
         # separate y plots and separate x plots
         df=DataFrame()
         df.TESTMODE = True
-        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
 
         D = df.interaction_plot('SUPPRESSION','CYCLE',
                               sepxplots='PHASE',
@@ -1927,7 +1928,7 @@ class Test_interaction_plot(unittest.TestCase):
 class Test_descriptives(unittest.TestCase):
     def test0(self):
         df=DataFrame()
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
 
         D=df.descriptives('WORDS')
         
@@ -1951,14 +1952,14 @@ class Test_descriptives(unittest.TestCase):
 
     def test01(self):
         df = DataFrame()
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D = repr(df.descriptives('WORDS'))        
         R = "Descriptives(V=[3.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 9.0, 9.0, 9.0, 9.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 12.0, 12.0, 12.0, 13.0, 13.0, 13.0, 13.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 15.0, 15.0, 15.0, 16.0, 16.0, 16.0, 16.0, 16.0, 16.0, 17.0, 17.0, 18.0, 18.0, 18.0, 19.0, 19.0, 19.0, 19.0, 20.0, 20.0, 21.0, 21.0, 22.0, 22.0, 22.0, 22.0, 22.0, 23.0],cname='WORDS')"
         self.assertEqual(D, R)
 
     def test02(self):
         df = DataFrame()
-        df.readTbl('words~ageXcondition.csv')
+        df.read_tbl('words~ageXcondition.csv')
         D = str(df.descriptives('WORDS'))
         R = """Descriptive Statistics
   WORDS
@@ -1980,7 +1981,7 @@ class Test_descriptives(unittest.TestCase):
         
     def test1(self):
         df=DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
 
         D=df.descriptives('ERROR')
         
@@ -2004,7 +2005,7 @@ class Test_descriptives(unittest.TestCase):
 
     def test11(self):
         df = DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
 
         D = str(df.descriptives('ERROR'))
         
@@ -2028,7 +2029,7 @@ class Test_descriptives(unittest.TestCase):
 
     def test12(self):
         df = DataFrame()
-        df.readTbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         D = repr(df.descriptives('ERROR'))
         R = "Descriptives(V=[0.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 5.0, 5.0, 6.0, 6.0, 6.0, 7.0, 7.0, 7.0, 8.0, 8.0, 9.0, 10.0, 10.0],cname='ERROR')"
         self.assertEqual(D, R)
@@ -2038,7 +2039,7 @@ class Test_validate(unittest.TestCase):
         from pyvttbl import _isint, _isfloat
 
         df=DataFrame()
-        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
         df['RANDDATA'][42]='nan'
 
         R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
@@ -2053,7 +2054,7 @@ class Test_validate(unittest.TestCase):
         from pyvttbl import _isint, _isfloat
 
         df=DataFrame()
-        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
         ##df['RANDDATA'][42]='nan'
 
         R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
@@ -2067,7 +2068,7 @@ class Test_validate(unittest.TestCase):
         from pyvttbl import _isint, _isfloat
 
         df=DataFrame()
-        df.readTbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
         ##df['RANDDATA'][42]='nan'
 
         R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
@@ -2100,7 +2101,7 @@ class Test_validate(unittest.TestCase):
 
 def suite():
     return unittest.TestSuite((
-            unittest.makeSuite(Test_readTbl),
+            unittest.makeSuite(Test_read_tbl),
             unittest.makeSuite(Test__setitem__),
             unittest.makeSuite(Test__delitem__),
             unittest.makeSuite(Test__are_col_lengths_equal),

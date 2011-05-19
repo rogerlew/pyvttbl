@@ -79,6 +79,7 @@ Roger Lew:
 
 import sys
 import string
+import math
 
 try:
     if sys.version >= '2.3':
@@ -117,6 +118,9 @@ def _str(x, dtype='a', n=3):
     """
     try    : f=float(x)
     except : return str(x)
+
+    if math.isnan(f) : return 'nan'
+    if math.isinf(f) : return 'inf'
     
     if   dtype == 'i' : return str(int(round(f)))
     elif dtype == 'f' : return '%.*f'%(n, f)
