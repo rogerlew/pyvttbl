@@ -178,7 +178,7 @@ class Test__setitem__(unittest.TestCase):
         df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df['DUM']=range(48) # Shouldn't complain
                 
-    def test2(self):
+    def test11(self):
         df=DataFrame()
         df['DUM']=range(48) # Shouldn't complain
         self.assertEqual(df.keys(),[('DUM','integer')])
@@ -191,19 +191,6 @@ class Test__setitem__(unittest.TestCase):
         df[1]=range(48) # 1 becomes a string
         self.assertEqual(df.keys(),[('1','integer')])
 
-    def test3(self):
-        df=DataFrame()
-        df['DUM']=range(48)
-        df['DUM'].pop()
-
-        # user should be able to freely manipulate data, but should
-        # complain if the user tries to pivot with unequal columns
-        with self.assertRaises(Exception) as cm:
-            df.pivot('DUM',['COURSE'])
-
-        self.assertEqual(str(cm.exception),
-                         'columns have unequal lengths')
-
     def test2(self):
         df=DataFrame()
         with self.assertRaises(TypeError) as cm:
@@ -211,14 +198,6 @@ class Test__setitem__(unittest.TestCase):
 
         self.assertEqual(str(cm.exception),
                          "'int' object is not iterable")
-        
-    def test3(self):
-        df=DataFrame()
-        with self.assertRaises(TypeError) as cm:
-            df[set('DUM')]=42
-
-        self.assertEqual(str(cm.exception),
-                         "'set' object is not hashable")
 
     def test4(self):
         df=DataFrame()
@@ -622,6 +601,32 @@ M3      T2              2.500           2       1.500 """
         df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         pt = df.pivot('ERROR', ['MODEL','TIMEOFDAY'],['COURSE'],where=['SUBJECT != 1'])
         self.assertEqual(str(pt),R)
+
+class Test_pt__repr__(unittest.TestCase):
+    def test0(self):
+        
+        R = "PyvtTbl([[7.166666666666667, 6.5, 4.0], [3.2222222222222223, 2.888888888888889, 1.5555555555555556]], val='ERROR', rnames=[[('TIMEOFDAY', u'T1')], [('TIMEOFDAY', u'T2')]], cnames=[[('COURSE', u'C1')], [('COURSE', u'C2')], [('COURSE', u'C3')]])"
+        df=DataFrame()
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
+        self.assertEqual(repr(pt),R)
+
+    def test1(self):
+        
+        R = "PyvtTbl([[9.0, 8.666666666666666, 4.666666666666667], [7.5, 6.0, 5.0], [5.0, 3.5, 2.3333333333333335], [4.333333333333333, 3.6666666666666665, 1.6666666666666667], [2.6666666666666665, 2.6666666666666665, 1.6666666666666667], [2.6666666666666665, 2.3333333333333335, 1.3333333333333333]], val='ERROR', rnames=[[('TIMEOFDAY', u'T1'), ('MODEL', u'M1')], [('TIMEOFDAY', u'T1'), ('MODEL', u'M2')], [('TIMEOFDAY', u'T1'), ('MODEL', u'M3')], [('TIMEOFDAY', u'T2'), ('MODEL', u'M1')], [('TIMEOFDAY', u'T2'), ('MODEL', u'M2')], [('TIMEOFDAY', u'T2'), ('MODEL', u'M3')]], cnames=[[('COURSE', u'C1')], [('COURSE', u'C2')], [('COURSE', u'C3')]])"
+        df=DataFrame()
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        pt = df.pivot('ERROR', ['TIMEOFDAY','MODEL'],['COURSE'])
+        self.assertEqual(repr(pt),R)
+
+    def test2(self):
+        
+        R = "PyvtTbl([[8.0, 8.5, 3.5], [4.0, 3.5, 1.5], [7.0, 6.0, 4.5], [2.0, 2.5, 1.5], [4.0, 3.5, 2.0], [2.5, 2.0, 1.5]], val='ERROR', rnames=[[('MODEL', u'M1'), ('TIMEOFDAY', u'T1')], [('MODEL', u'M1'), ('TIMEOFDAY', u'T2')], [('MODEL', u'M2'), ('TIMEOFDAY', u'T1')], [('MODEL', u'M2'), ('TIMEOFDAY', u'T2')], [('MODEL', u'M3'), ('TIMEOFDAY', u'T1')], [('MODEL', u'M3'), ('TIMEOFDAY', u'T2')]], cnames=[[('COURSE', u'C1')], [('COURSE', u'C2')], [('COURSE', u'C3')]], where=['SUBJECT != 1'])"
+
+        df=DataFrame()
+        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        pt = df.pivot('ERROR', ['MODEL','TIMEOFDAY'],['COURSE'],where=['SUBJECT != 1'])
+        self.assertEqual(repr(pt),R)
 
 class Test_insert(unittest.TestCase):
     def test0(self):
@@ -1274,7 +1279,7 @@ class Test_writePivot(unittest.TestCase):
 
     def test3(self):
 
-        myPyvtTbl = PyvtTbl(DataFrame(),'key')
+        myPyvtTbl = PyvtTbl()
         # try to write pivot table when table doesn't exist
         with self.assertRaises(Exception) as cm:
             myPyvtTbl.write('pivot_test3.csv')
@@ -1393,7 +1398,7 @@ young   rhyming      7.600   10      0.618    6.388    8.812 """
         df=DataFrame()
         df.read_tbl('words~ageXcondition.csv')
         D = repr(df.marginals('WORDS',factors=['AGE','CONDITION']))
-        R = "Marginals(DataFrame([(('SUBJECT', 'integer'), [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0, 48.0, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0, 64.0, 65.0, 66.0, 67.0, 68.0, 69.0, 70.0, 71.0, 72.0, 73.0, 74.0, 75.0, 76.0, 77.0, 78.0, 79.0, 80.0, 81.0, 82.0, 83.0, 84.0, 85.0, 86.0, 87.0, 88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0, 99.0, 100.0]), (('AGE', 'text'), ['old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young']), (('CONDITION', 'text'), ['counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention']), (('WORDS', 'integer'), [9.0, 8.0, 6.0, 8.0, 10.0, 4.0, 6.0, 5.0, 7.0, 7.0, 7.0, 9.0, 6.0, 6.0, 6.0, 11.0, 6.0, 3.0, 8.0, 7.0, 11.0, 13.0, 8.0, 6.0, 14.0, 11.0, 13.0, 13.0, 10.0, 11.0, 12.0, 11.0, 16.0, 11.0, 9.0, 23.0, 12.0, 10.0, 19.0, 11.0, 10.0, 19.0, 14.0, 5.0, 10.0, 11.0, 14.0, 15.0, 11.0, 11.0, 8.0, 6.0, 4.0, 6.0, 7.0, 6.0, 5.0, 7.0, 9.0, 7.0, 10.0, 7.0, 8.0, 10.0, 4.0, 7.0, 10.0, 6.0, 7.0, 7.0, 14.0, 11.0, 18.0, 14.0, 13.0, 22.0, 17.0, 16.0, 12.0, 11.0, 20.0, 16.0, 16.0, 15.0, 18.0, 16.0, 20.0, 22.0, 14.0, 19.0, 21.0, 19.0, 17.0, 15.0, 22.0, 16.0, 22.0, 22.0, 18.0, 21.0]), (('X', 'integer'), [81.0, 64.0, 36.0, 64.0, 100.0, 16.0, 36.0, 25.0, 49.0, 49.0, 49.0, 81.0, 36.0, 36.0, 36.0, 121.0, 36.0, 9.0, 64.0, 49.0, 121.0, 169.0, 64.0, 36.0, 196.0, 121.0, 169.0, 169.0, 100.0, 121.0, 144.0, 121.0, 256.0, 121.0, 81.0, 529.0, 144.0, 100.0, 361.0, 121.0, 100.0, 361.0, 196.0, 25.0, 100.0, 121.0, 196.0, 225.0, 121.0, 121.0, 64.0, 36.0, 16.0, 36.0, 49.0, 36.0, 25.0, 49.0, 81.0, 49.0, 100.0, 49.0, 64.0, 100.0, 16.0, 49.0, 100.0, 36.0, 49.0, 49.0, 196.0, 121.0, 324.0, 196.0, 169.0, 484.0, 289.0, 256.0, 144.0, 121.0, 400.0, 256.0, 256.0, 225.0, 324.0, 256.0, 400.0, 484.0, 196.0, 361.0, 441.0, 361.0, 289.0, 225.0, 484.0, 256.0, 484.0, 484.0, 324.0, 441.0])]), 'WORDS', ['AGE', 'CONDITION'])"
+        R = "Marginals([('factorials', OrderedDict([('AGE', [u'old', u'old', u'old', u'old', u'old', u'young', u'young', u'young', u'young', u'young']), ('CONDITION', [u'adjective', u'counting', u'imagery', u'intention', u'rhyming', u'adjective', u'counting', u'imagery', u'intention', u'rhyming'])])), ('dmu', PyvtTbl([11.0, 7.0, 13.4, 12.0, 6.9, 14.8, 6.5, 17.6, 19.3, 7.6], val='WORDS', rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')], [('AGE', u'young'), ('CONDITION', u'adjective')], [('AGE', u'young'), ('CONDITION', u'counting')], [('AGE', u'young'), ('CONDITION', u'imagery')], [('AGE', u'young'), ('CONDITION', u'intention')], [('AGE', u'young'), ('CONDITION', u'rhyming')]], cnames=[1], flatten=True)), ('dN', PyvtTbl([10, 10, 10, 10, 10, 10, 10, 10, 10, 10], val='WORDS', rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')], [('AGE', u'young'), ('CONDITION', u'adjective')], [('AGE', u'young'), ('CONDITION', u'counting')], [('AGE', u'young'), ('CONDITION', u'imagery')], [('AGE', u'young'), ('CONDITION', u'intention')], [('AGE', u'young'), ('CONDITION', u'rhyming')]], cnames=[1], aggregate='count', flatten=True)), ('dsem', PyvtTbl([0.7888106377466154, 0.5773502691896257, 1.4236104336041748, 1.1832159566199232, 0.6741249472052228, 1.103529690483123, 0.4533823502911814, 0.8192137151629671, 0.8439325934114773, 0.6182412330330468], val='WORDS', rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')], [('AGE', u'young'), ('CONDITION', u'adjective')], [('AGE', u'young'), ('CONDITION', u'counting')], [('AGE', u'young'), ('CONDITION', u'imagery')], [('AGE', u'young'), ('CONDITION', u'intention')], [('AGE', u'young'), ('CONDITION', u'rhyming')]], cnames=[1], aggregate='sem', flatten=True)), ('dlower', PyvtTbl([9.453931150016635, 5.868393472388334, 10.609723550135818, 9.680896725024951, 5.578715103477764, 12.637081806653079, 5.611370593429284, 15.994341118280586, 17.645892116913505, 6.388247183255228], val='WORDS', rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')], [('AGE', u'young'), ('CONDITION', u'adjective')], [('AGE', u'young'), ('CONDITION', u'counting')], [('AGE', u'young'), ('CONDITION', u'imagery')], [('AGE', u'young'), ('CONDITION', u'intention')], [('AGE', u'young'), ('CONDITION', u'rhyming')]], cnames=[1], aggregate='count', flatten=True)), ('dupper', PyvtTbl([12.546068849983365, 8.131606527611666, 16.190276449864182, 14.319103274975049, 8.221284896522237, 16.962918193346923, 7.388629406570716, 19.205658881719415, 20.954107883086497, 8.811752816744772], val='WORDS', rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')], [('AGE', u'young'), ('CONDITION', u'adjective')], [('AGE', u'young'), ('CONDITION', u'counting')], [('AGE', u'young'), ('CONDITION', u'imagery')], [('AGE', u'young'), ('CONDITION', u'intention')], [('AGE', u'young'), ('CONDITION', u'rhyming')]], cnames=[1], aggregate='count', flatten=True))], val='WORDS', factors=['AGE', 'CONDITION'])"
         self.assertEqual(D, R)
 
     def test04(self):
@@ -1415,11 +1420,11 @@ old   rhyming      6.900   10      0.674    5.579    8.221 """
     def test05(self):
         df=DataFrame()
         df.read_tbl('words~ageXcondition.csv')
-        D = repr(df.marginals('WORDS',
+        D = df.marginals('WORDS',
                               factors=['AGE','CONDITION'],
-                              where='AGE == "old"'))
-        R = """Marginals(DataFrame([(('SUBJECT', 'integer'), [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0, 48.0, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0, 64.0, 65.0, 66.0, 67.0, 68.0, 69.0, 70.0, 71.0, 72.0, 73.0, 74.0, 75.0, 76.0, 77.0, 78.0, 79.0, 80.0, 81.0, 82.0, 83.0, 84.0, 85.0, 86.0, 87.0, 88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0, 98.0, 99.0, 100.0]), (('AGE', 'text'), ['old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'old', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young', 'young']), (('CONDITION', 'text'), ['counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'counting', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'rhyming', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'adjective', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'imagery', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention', 'intention']), (('WORDS', 'integer'), [9.0, 8.0, 6.0, 8.0, 10.0, 4.0, 6.0, 5.0, 7.0, 7.0, 7.0, 9.0, 6.0, 6.0, 6.0, 11.0, 6.0, 3.0, 8.0, 7.0, 11.0, 13.0, 8.0, 6.0, 14.0, 11.0, 13.0, 13.0, 10.0, 11.0, 12.0, 11.0, 16.0, 11.0, 9.0, 23.0, 12.0, 10.0, 19.0, 11.0, 10.0, 19.0, 14.0, 5.0, 10.0, 11.0, 14.0, 15.0, 11.0, 11.0, 8.0, 6.0, 4.0, 6.0, 7.0, 6.0, 5.0, 7.0, 9.0, 7.0, 10.0, 7.0, 8.0, 10.0, 4.0, 7.0, 10.0, 6.0, 7.0, 7.0, 14.0, 11.0, 18.0, 14.0, 13.0, 22.0, 17.0, 16.0, 12.0, 11.0, 20.0, 16.0, 16.0, 15.0, 18.0, 16.0, 20.0, 22.0, 14.0, 19.0, 21.0, 19.0, 17.0, 15.0, 22.0, 16.0, 22.0, 22.0, 18.0, 21.0]), (('X', 'integer'), [81.0, 64.0, 36.0, 64.0, 100.0, 16.0, 36.0, 25.0, 49.0, 49.0, 49.0, 81.0, 36.0, 36.0, 36.0, 121.0, 36.0, 9.0, 64.0, 49.0, 121.0, 169.0, 64.0, 36.0, 196.0, 121.0, 169.0, 169.0, 100.0, 121.0, 144.0, 121.0, 256.0, 121.0, 81.0, 529.0, 144.0, 100.0, 361.0, 121.0, 100.0, 361.0, 196.0, 25.0, 100.0, 121.0, 196.0, 225.0, 121.0, 121.0, 64.0, 36.0, 16.0, 36.0, 49.0, 36.0, 25.0, 49.0, 81.0, 49.0, 100.0, 49.0, 64.0, 100.0, 16.0, 49.0, 100.0, 36.0, 49.0, 49.0, 196.0, 121.0, 324.0, 196.0, 169.0, 484.0, 289.0, 256.0, 144.0, 121.0, 400.0, 256.0, 256.0, 225.0, 324.0, 256.0, 400.0, 484.0, 196.0, 361.0, 441.0, 361.0, 289.0, 225.0, 484.0, 256.0, 484.0, 484.0, 324.0, 441.0])]), 'WORDS', ['AGE', 'CONDITION'],where='AGE == "old"')"""
-        self.assertEqual(D, R)
+                              where='AGE == "old"')
+        R = """Marginals([('factorials', OrderedDict([('AGE', [u'old', u'old', u'old', u'old', u'old']), ('CONDITION', [u'adjective', u'counting', u'imagery', u'intention', u'rhyming'])])), ('dmu', PyvtTbl([11.0, 7.0, 13.4, 12.0, 6.9], val='WORDS', rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')]], cnames=[1], flatten=True, where='AGE == "old"')), ('dN', PyvtTbl([10, 10, 10, 10, 10], val='WORDS', rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')]], cnames=[1], aggregate='count', flatten=True, where='AGE == "old"')), ('dsem', PyvtTbl([0.7888106377466154, 0.5773502691896257, 1.4236104336041748, 1.1832159566199232, 0.6741249472052228], val='WORDS', rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')]], cnames=[1], aggregate='sem', flatten=True, where='AGE == "old"')), ('dlower', PyvtTbl([9.453931150016635, 5.868393472388334, 10.609723550135818, 9.680896725024951, 5.578715103477764], val='WORDS', rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')]], cnames=[1], aggregate='count', flatten=True, where='AGE == "old"')), ('dupper', PyvtTbl([12.546068849983365, 8.131606527611666, 16.190276449864182, 14.319103274975049, 8.221284896522237], val='WORDS', rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')]], cnames=[1], aggregate='count', flatten=True, where='AGE == "old"'))], val='WORDS', factors=['AGE', 'CONDITION'], where='AGE == "old"')"""
+        self.assertEqual(repr(D), R)
         
 class Test_histogram(unittest.TestCase):
     def test0(self):
@@ -1458,7 +1463,7 @@ class Test_histogram(unittest.TestCase):
         df=DataFrame()
         df.read_tbl('words~ageXcondition.csv')
         D = repr(df.histogram('WORDS'))
-        R = """Histogram(V=[3.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 9.0, 9.0, 9.0, 9.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 12.0, 12.0, 12.0, 13.0, 13.0, 13.0, 13.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 15.0, 15.0, 15.0, 16.0, 16.0, 16.0, 16.0, 16.0, 16.0, 17.0, 17.0, 18.0, 18.0, 18.0, 19.0, 19.0, 19.0, 19.0, 20.0, 20.0, 21.0, 21.0, 22.0, 22.0, 22.0, 22.0, 22.0, 23.0],cname='WORDS')"""
+        R = "Histogram([('values', [4.0, 14.0, 17.0, 12.0, 15.0, 10.0, 9.0, 5.0, 6.0, 8.0]), ('bin_edges', [3.0, 5.0, 7.0, 9.0, 11.0, 13.0, 15.0, 17.0, 19.0, 21.0, 23.0])], cname='WORDS')"
         self.assertEqual(D, R)
         
 class Test_box_plot(unittest.TestCase):
@@ -1954,7 +1959,7 @@ class Test_descriptives(unittest.TestCase):
         df = DataFrame()
         df.read_tbl('words~ageXcondition.csv')
         D = repr(df.descriptives('WORDS'))        
-        R = "Descriptives(V=[3.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 9.0, 9.0, 9.0, 9.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 11.0, 12.0, 12.0, 12.0, 13.0, 13.0, 13.0, 13.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 15.0, 15.0, 15.0, 16.0, 16.0, 16.0, 16.0, 16.0, 16.0, 17.0, 17.0, 18.0, 18.0, 18.0, 19.0, 19.0, 19.0, 19.0, 20.0, 20.0, 21.0, 21.0, 22.0, 22.0, 22.0, 22.0, 22.0, 23.0],cname='WORDS')"
+        R = "Descriptives([('count', 100.0), ('mean', 11.61), ('var', 26.947373737373752), ('stdev', 5.191085988246944), ('sem', 0.5191085988246944), ('rms', 12.707084638106414), ('min', 3.0), ('max', 23.0), ('range', 20.0), ('median', 11.0), ('mode', 11.0), ('95ci_lower', 10.592547146303598), ('95ci_upper', 12.6274528536964)], cname='WORDS')"
         self.assertEqual(D, R)
 
     def test02(self):
@@ -2031,7 +2036,7 @@ class Test_descriptives(unittest.TestCase):
         df = DataFrame()
         df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         D = repr(df.descriptives('ERROR'))
-        R = "Descriptives(V=[0.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 5.0, 5.0, 6.0, 6.0, 6.0, 7.0, 7.0, 7.0, 8.0, 8.0, 9.0, 10.0, 10.0],cname='ERROR')"
+        R = "Descriptives([('count', 48.0), ('mean', 3.8958333333333335), ('var', 5.797429078014184), ('stdev', 2.4077850979716158), ('sem', 0.34753384361617046), ('rms', 4.566636252940086), ('min', 0.0), ('max', 10.0), ('range', 10.0), ('median', 3.0), ('mode', 3.0), ('95ci_lower', 3.2146669998456394), ('95ci_upper', 4.5769996668210275)], cname='ERROR')"
         self.assertEqual(D, R)
 
 class Test_validate(unittest.TestCase):
@@ -2111,6 +2116,7 @@ def suite():
             unittest.makeSuite(Test_where_update),
             unittest.makeSuite(Test_df__str__),
             unittest.makeSuite(Test_pt__str__),
+            unittest.makeSuite(Test_pt__repr__),
             unittest.makeSuite(Test_insert),
             unittest.makeSuite(Test_attach),
             unittest.makeSuite(Test_sort),

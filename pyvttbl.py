@@ -27,6 +27,7 @@ from collections import OrderedDict, Counter
 import pystaggrelite3
 from dictset import DictSet
 from texttable import Texttable as TextTable
+from stats import jsci, stats, pstat
 
 # check for third party packages
 try:
@@ -158,7 +159,7 @@ class DataFrame(OrderedDict):
         self.PRINTQUERIES = False
 
         # controls whether plot functions return the test dictionaries
-        self.TESTMODE = True
+        self.TESTMODE = False
 
         super(DataFrame, self).update(*args, **kwds)
 
@@ -251,39 +252,97 @@ class DataFrame(OrderedDict):
           the insert method. To  another table to this one use
           the attach method.
         """
-        if not isinstance(key, collections.Hashable):
-            raise TypeError("'%s' object is not hashable"%type(key).__name__)
-        
         if not hasattr(item, '__iter__'):
             raise TypeError("'%s' object is not iterable"%type(item).__name__)
 
-        old = None
         if isinstance(key, tuple):
-            name_type = (str(key[0]),str(key[1]))
-        else:
-            # check to see if we need to do type checking after
-            # the item is set
-            key = str(key)
-
-            if ''.join(key.split()) != key:
-                raise Exception('keys cannot contain whitespace')
+            name, dtype = key
+            if name.lower() in map(str.lower, self.names()) and \
+               name not in self.names():
+                raise Exception("a case variant of '%s' already exists"%name)
+            if name in self.names() and dtype != self.typesdict()[name]:
+                del self[name]
+            super(DataFrame, self).__setitem__((name, dtype), item)
+            self.conditions[(name, dtype)] = self[key]
+            return
+    
+        split_key = str(key).split()
+        name = split_key[0]
+        if len(split_key) == 1:
+            dtype = self._check_sqlite3_type(item)
+            if name.lower() in map(str.lower, self.names()) and \
+               name not in self.names():
+                raise Exception("a case variant of '%s' already exists"%name)
+            if name in self.names() and dtype != self.typesdict()[name]:
+                del self[name]
+            super(DataFrame, self).__setitem__((name, dtype), item)
+            self.conditions[(name, dtype)] = self[key]
+            return
             
-            if key in self.names():
-                old = (key, self.typesdict()[key])
-                
-            name_type = (key, self._check_sqlite3_type(item))
+        if split_key[0] not in self.names():
+            raise KeyError(split_key[0])
+        self._get_indices_where(split_key[1:])
 
-        n = name_type[0]
-        if isinstance(n, _strobj) and (n not in self.names()) and \
-          (n.lower() in map(str.lower, self.names())):
-            raise Exception("a case variant of '%s' already exists"%n)
-            
-        super(DataFrame, self).__setitem__(name_type, item)
+        indices = [tup[0] for tup in list(self.cur)]
 
-        if old != None and old != name_type:
-            del self[old]
+        if len(indices) != len(items):
+            raise Exception('Length of items must length '
+                            'of conditions in selection')
+        for i,v in zip(indices, item):
+            self[split_key[0]][i] = v
+
+
         
-        self.conditions[name_type] = self[key]
+        
+
+
+##        old = None
+##        if isinstance(key, tuple):
+##            name_type = (str(key[0]),str(key[1]))
+##        else:
+##            # check to see if we need to do type checking after
+##            # the item is set
+##            key = str(key)
+##
+##            if ''.join(key.split()) != key:
+##                raise Exception('keys cannot contain whitespace')
+##            
+##            if key in self.names():
+##                old = (key, self.typesdict()[key])
+##                
+##            name_type = (key, self._check_sqlite3_type(item))
+##
+##        n = name_type[0]
+##        if isinstance(n, _strobj) and (n not in self.names()) and \
+##          (n.lower() in map(str.lower, self.names())):
+##            raise Exception("a case variant of '%s' already exists"%n)
+##            
+##        super(DataFrame, self).__setitem__(name_type, item)
+##
+##        if old != None and old != name_type:
+##            del self[old]
+##        
+##        self.conditions[name_type] = self[key]
+
+    def __getitem__(self, key):
+        """
+        returns an item
+        """
+        if isinstance(key, tuple):
+            name_type = key
+            return super(DataFrame, self).__getitem__(name_type)
+        
+        split_key = str(key).split()
+        if len(split_key) == 1:
+            name_type = (split_key[0], self.typesdict()[split_key[0]])
+            return super(DataFrame, self).__getitem__(name_type)
+
+        if split_key[0] not in self.names():
+            raise KeyError(split_key[0])
+
+        self._get_indices_where(split_key[1:])
+
+        return [self[split_key[0]][tup[0]] for tup in self.cur]
 
     def __delitem__(self, key):
         """
@@ -297,19 +356,7 @@ class DataFrame(OrderedDict):
             
         del self.conditions[name_type]
         super(DataFrame, self).__delitem__(name_type)
-
-    def __getitem__(self, key):
-        """
-        returns an item
-        """
-        if isinstance(key, tuple):
-            name_type = key
-        else:
-            key = str(key)
-            name_type = (key, self.typesdict()[key])
-            
-        return super(DataFrame, self).__getitem__(name_type)
-
+        
     def __str__(self):
         """
         returns human friendly string representation of object
@@ -427,6 +474,49 @@ class DataFrame(OrderedDict):
             print('   ...\n')
 
         self.cur.executemany(query, tlist)
+
+    def _get_indices_where(self, where):
+        # where should be a split string. No sense splitting it twice
+        
+        # preprocess where
+        tokens = []
+        nsubset2 = set()
+        names = self.names()
+        for w in where:
+            if w in names:
+                tokens.append('_%s_'%w)
+                nsubset2.add(w)
+            else:
+                tokens.append(w)
+        where = ' '.join(tokens)
+
+        super(DataFrame, self).__setitem__(('INDICES','integer'),
+                                         range(self.shape()[1]))
+                                         
+        nsubset2.add('INDICES')
+
+        # build the table
+        self.conn.commit()
+        self._execute('drop table if exists GTBL')
+
+        self.conn.commit()
+        query =  'create temp table GTBL\n  ('
+        query += ', '.join('_%s_ %s'%(n, self.typesdict()[n]) for n in nsubset2)
+        query += ')'
+        self._execute(query)
+
+        # build insert query
+        query = 'insert into GTBL values ('
+        query += ','.join('?' for n in nsubset2) + ')'
+        self._executemany(query, zip(*[self[n] for n in nsubset2]))
+        self.conn.commit()
+
+        super(DataFrame, self).__delitem__(('INDICES','integer'))
+
+        # get the indices
+        query = 'select _INDICES_ from GTBL %s'%where
+        self._execute(query)
+        
 
     def _build_sqlite3_tbl(self, nsubset, where=None):
         """
@@ -577,8 +667,11 @@ class DataFrame(OrderedDict):
         if where == None:
             where = []
 
-        return PyvtTbl(self, val, rows, cols, aggregate,
+        p = PyvtTbl()
+        p.run(self, val, rows, cols, aggregate,
                        where, flatten, attach_rlabels)
+        return p
+        
     
     def select_col(self, val, where=None):
         """
@@ -922,11 +1015,13 @@ class DataFrame(OrderedDict):
             raise KeyError(cname)
         
         V = self.select_col(cname, where=where)
-        return Descriptives(V, cname)
+        d = Descriptives()
+        d.run(V, cname)
+        return d
 
     def summary(self, where=None):
         """
-        prints a the Descriptives(cname) for each column in the DataFrame
+        prints a the (cname) for each column in the DataFrame
         """
         for (cname,dtype) in self.keys():
             if dtype in ['real', 'integer']:
@@ -953,7 +1048,9 @@ class DataFrame(OrderedDict):
         if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
         
-        return Marginals(self, val, factors, where)
+        m = Marginals()
+        m.run(self, val, factors, where)
+        return m
         
     def histogram(self, cname, where=None, bins=10,
                   range=None, density=False, cumulative=False):
@@ -974,10 +1071,10 @@ class DataFrame(OrderedDict):
             raise KeyError(cname)
         
         V = sorted(self.select_col(cname, where=where))
-        return Histogram(V, cname=cname, bins=bins, range=range,
-                         density=density, cumulative=cumulative)
-
-
+        h = Histogram()
+        h.run(V, cname=cname, bins=bins, range=range,
+              density=density, cumulative=cumulative)
+        return h
 
     # conditionally load plot methods
     if HAS_NUMPY and HAS_PYLAB:
@@ -1531,7 +1628,51 @@ class PyvtTbl(list):
     """
     list of lists container holding the pivoted data
     """
-    def __init__(self, df, val, rows=None, cols=None,
+    def __init__(self, *args, **kwds):
+        if len(args) > 1:
+            raise Exception('expecting only 1 argument')
+
+        if kwds.has_key('val'):
+            self.val = kwds['val']
+        else:
+            self.val = None
+
+        if kwds.has_key('rnames'):
+            self.rnames = kwds['rnames']
+        else:
+            self.rnames = None
+
+        if kwds.has_key('cnames'):
+            self.cnames = kwds['cnames']
+        else:
+            self.cnames = None
+
+        if kwds.has_key('aggregate'):
+            self.aggregate = kwds['aggregate']
+        else:
+            self.aggregate = 'avg'
+            
+        if kwds.has_key('flatten'):
+            self.flatten = kwds['flatten']
+        else:
+            self.flatten = False
+            
+        if kwds.has_key('where'):
+            self.where = kwds['where']
+        else:
+            self.where = []
+
+        if kwds.has_key('attach_rlabels'):
+            self.attach_rlabels = kwds['attach_rlabels']
+        else:
+            self.attach_rlabels = False
+
+        if len(args) == 1:
+            super(PyvtTbl, self).__init__(args[0])
+        else:
+            super(PyvtTbl, self).__init__()
+            
+    def run(self, df, val, rows=None, cols=None,
                  aggregate='avg', where=None, flatten=False,
                  attach_rlabels=False):
         
@@ -1547,23 +1688,6 @@ class PyvtTbl(list):
                   http://www.sqlite.org/lang_aggfunc.html
         where = list of tuples or list of strings for filtering data
         """
-        if df == {}:
-            self.df=None
-            self.val=None
-            self.rows=None
-            self.cols=None
-            self.aggregate='avg'
-            self.where=None
-            self.flatten=False
-            self.attach_rlabels=False
-
-            self.rnames = [1]
-            self.cnames = [1]
-            self.Conditions = DictSet()
-            
-            super(PyvtTbl, self).__init__()
-
-            return
             
         if rows == None:
             rows = []
@@ -1597,18 +1721,7 @@ class PyvtTbl(list):
         #  This may seem excessive but it provides better feedback
         #  to the user if the errors can be parsed out before had
         #  instead of crashing on confusing looking code segments
-
-        if df == None:
-            df = DataFrame()
             
-        if rows == None:
-            rows = []
-            
-        if cols == None:
-            cols = []
-            
-        if where == None:
-            where = []
                 
         # check to see if data columns have equal lengths
         if not df._are_col_lengths_equal():
@@ -1828,20 +1941,40 @@ class PyvtTbl(list):
     def __repr__(self):
         """
         returns a machine friendly string representation of the object
-        """ 
-        rows = self._get_rows()
-        cols = self._get_cols()
-        
-        rlabel = self.attach_rlabels
-        return 'PyvtTbl(' + ''.join([
-            ('df=%s'%repr(self.df), '')[self.df == None],
-            (',val=%s'%repr(self.val), '')[self.val == None],
-            (',rows=%s'%repr(rows), '')[rows == [1]],
-            (',cols=%s'%repr(cols), '')[cols == [1]],
-            (',aggregate=%s'%self.aggregate, '')[self.aggregate == 'avg'],
-            (',where=%s'%repr(self.where), '')[self.where == None],
-            (',flatten=%s'%self.flatten, '')[self.flatten == False],
-            (',attach_rlabels=%s'%rlabel, '')[rlabel == False] ]) + ')'   
+        """
+        if self == []:
+            return 'PyvtTbl()'
+
+        args = super(PyvtTbl, self).__repr__()
+        kwds = []
+        if self.val != None:
+            kwds.append(", val='%s'"%self.val)
+
+        if self.rnames != None:
+            kwds.append(', rnames=%s'%repr(self.rnames))
+
+        if self.cnames != None:
+            kwds.append(', cnames=%s'%repr(self.cnames))
+
+        if self.aggregate != 'avg':
+            kwds.append(", aggregate='%s'"%self.aggregate)
+            
+        if self.flatten != False:
+            kwds.append(', flatten=%s'%self.flatten)
+            
+        if self.where != []:
+            if isinstance(self.where, _strobj):
+                kwds.append(", where='%s'"%self.where)
+            else:
+                kwds.append(", where=%s"%self.where)
+
+        if self.attach_rlabels != False:
+            kwds.append(', attach_rlabels=%s'%self.attach_rlabels)
+
+        if len(kwds)>1:
+            kwds = ''.join(kwds)
+            
+        return 'PyvtTbl(%s%s)'%(args,kwds)
             
     def __str__(self):
         """
@@ -1987,16 +2120,235 @@ class PyvtTbl(list):
             wtr.writerow(header)
             wtr.writerows(data)
 
-class Descriptives(OrderedDict):
-    def __init__(self, V, cname=None):
+class Ttest(OrderedDict):
+    def __init__(self, *args, **kwds):
+        if len(args) > 1:
+            raise Exception('expecting only 1 argument')
+
+        if kwds.has_key('paired'):
+            self.paired = kwds['paired']
+        else:
+            self.paired = False
+
+        if kwds.has_key('equal_variance'):
+            self.equal_variance = kwds['equal_variance']
+        else:
+            self.equal_variance = True
+
+        if kwds.has_key('alpha'):
+            self.alpha = kwds['alpha']
+        else:
+            self.alpha = 0.05
+
+        if kwds.has_key('aname'):
+            self.aname = kwds['aname']
+        else:
+            self.aname = None
+            
+        if kwds.has_key('bname'):
+            self.bname = kwds['bname']
+        else:
+            self.bname = None
+
+        if len(args) == 1:
+            super(Ttest, self).__init__(args[0])
+        else:
+            super(Ttest, self).__init__()
+            
+    def run(self, A, B, paired=False, equal_variance=True,
+                 alpha=0.05, aname=None, bname=None):
         """
         generates and stores descriptive statistics for the
         numerical data in V
         """
-        super(Descriptives, self).__init__()
         
         try:
-            V = sorted(_flatten(list(V)))
+            A = _flatten(list(copy(A)))
+        except:
+            raise TypeError('A must be a list-like object')
+            
+        try:
+            B = _flatten(list(copy(B)))
+        except:
+            raise TypeError('B must be a list-like object')
+
+        if aname == None:
+            self.aname = 'A'
+        else:
+            self.aname = aname
+
+        if bname == None:
+            self.bname = 'B'
+        else:
+            self.bname = bname
+            
+        self.A = A
+        self.B = B
+        self.paired = paired
+        self.equal_variance = equal_variance
+        alpha = alpha
+
+        if paired == True:
+            if len(A) - len(B) != 0:
+                raise Exception('A and B must have equal lengths '
+                                'for paired comparisons')
+            
+            t, prob2, n, df, mu1, mu2, v1, v2 = stats.ttest_rel(A, B)
+            r, rprob2 = stats.pearsonr(A,B)
+        
+            self['t'] = t
+            self['p2tail'] = prob2
+            self['p1tail'] = prob2 / 2.
+            self['n1'] = n
+            self['n2'] = n
+            self['r'] = r
+            self['df'] = df
+            self['mu1'] = mu1
+            self['mu2'] = mu2
+            self['var1'] = v1
+            self['var2'] = v2
+            self['tc2tail'] = jsci.tinv(alpha,df)
+            self['tc1tail'] = jsci.tinv(2. * alpha,df)
+            
+        elif equal_variance:
+            t, prob2, n1, n2, df, mu1, mu2, v1, v2, svar = stats.ttest_ind(A, B)
+        
+            self['t'] = t
+            self['p2tail'] = prob2
+            self['p1tail'] = prob2 / 2.
+            self['n1'] = n1
+            self['n2'] = n2
+            self['df'] = df
+            self['mu1'] = mu1
+            self['mu2'] = mu2
+            self['var1'] = v1
+            self['var2'] = v2
+            self['vpooled'] = svar
+            self['tc2tail'] = jsci.tinv(alpha,df)
+            self['tc1tail'] = jsci.tinv(2. * alpha,df)            
+            
+        else:            
+            t, prob2, n1, n2, df, mu1, mu2, v1, v2 = stats.ttest_ind_uneq(A, B)
+        
+            self['t'] = t
+            self['p2tail'] = prob2
+            self['p1tail'] = prob2 / 2.
+            self['n1'] = n1
+            self['n2'] = n2
+            self['df'] = df
+            self['mu1'] = mu1
+            self['mu2'] = mu2
+            self['var1'] = v1
+            self['var2'] = v2
+            self['tc2tail'] = jsci.tinv(alpha,df)
+            self['tc1tail'] = jsci.tinv(2. * alpha,df)            
+        
+    def __str__(self):
+
+        if self == {}:
+            return '(no data in object)'
+
+        tt = TextTable(max_width=100000000)
+        tt.set_cols_dtype(['t', 'a', 'a'])
+        tt.set_cols_align(['l', 'r', 'r'])
+        tt.set_deco(TextTable.HEADER)
+
+        if self.paired == True:
+            first = 't-Test: Paired Two Sample for means\n'
+            tt.header( ['',                    self.aname,      self.bname])
+            tt.add_row(['Mean',                self['mu1'],     self['mu2']])
+            tt.add_row(['Variance',            self['var1'],    self['var2']])
+            tt.add_row(['Observations',        self['n1'],      self['n2']])
+            tt.add_row(['Pearson Correlation', self['r'],      ''])
+            tt.add_row(['df',                  self['df'],      ''])
+            tt.add_row(['t Stat',              self['t'],       ''])
+            tt.add_row(['P(T<=t) one-tail',    self['p1tail'],  ''])
+            tt.add_row(['t Critical one-tail', self['tc1tail'], ''])
+            tt.add_row(['P(T<=t) two-tail',    self['p2tail'],  ''])
+            tt.add_row(['t Critical two-tail', self['tc2tail'], ''])
+
+        elif self.equal_variance:
+            first = 't-Test: Two-Sample Assuming Equal Variances\n'
+            tt.header( ['',                    self.aname,      self.bname])
+            tt.add_row(['Mean',                self['mu1'],     self['mu2']])
+            tt.add_row(['Variance',            self['var1'],    self['var2']])
+            tt.add_row(['Observations',        self['n1'],      self['n2']])
+            tt.add_row(['Pooled Variance',     self['vpooled'], ''])
+            tt.add_row(['df',                  self['df'],      ''])
+            tt.add_row(['t Stat',              self['t'],       ''])
+            tt.add_row(['P(T<=t) one-tail',    self['p1tail'],  ''])
+            tt.add_row(['t Critical one-tail', self['tc1tail'], ''])
+            tt.add_row(['P(T<=t) two-tail',    self['p2tail'],  ''])
+            tt.add_row(['t Critical two-tail', self['tc2tail'], ''])
+        
+        else:
+            first = 't-Test: Two-Sample Assuming Unequal Variances\n'
+            tt.header( ['',                    self.aname,      self.bname])
+            tt.add_row(['Mean',                self['mu1'],     self['mu2']])
+            tt.add_row(['Variance',            self['var1'],    self['var2']])
+            tt.add_row(['Observations',        self['n1'],      self['n2']])
+            tt.add_row(['df',                  self['df'],      ''])
+            tt.add_row(['t Stat',              self['t'],       ''])
+            tt.add_row(['P(T<=t) one-tail',    self['p1tail'],  ''])
+            tt.add_row(['t Critical one-tail', self['tc1tail'], ''])
+            tt.add_row(['P(T<=t) two-tail',    self['p2tail'],  ''])
+            tt.add_row(['t Critical two-tail', self['tc2tail'], ''])
+            
+        return ''.join([first,tt.draw()])
+
+    def __repr__(self):
+        if self == {}:
+            return 'Ttest()'
+
+        s = []
+        for k, v in self.items():
+            s.append("('%s', %s)"%(k, repr(v)))
+        args = '[' + ', '.join(s) + ']'
+        
+        kwds = []            
+        if self.paired != False:
+            kwds.append(", paired=%s"%self.paired)
+
+        if self.equal_variance != True:
+            kwds.append(", equal_variance=%s"%self.equal_variance)
+
+        if self.alpha != 0.05:
+            kwds.append(", alpha=%s"%self.alpha)
+
+        if self.aname != None:
+            kwds.append(", aname='%s'"%self.aname)
+            
+        if self.bname != None:
+            kwds.append(", bname='%s'"%self.bname)
+            
+        kwds= ''.join(kwds)
+        
+        return 'Ttest(%s%s)'%(args,kwds)
+			
+class Descriptives(OrderedDict):
+    def __init__(self, *args, **kwds):
+        if len(args) > 1:
+            raise Exception('expecting only 1 argument')
+
+        if kwds.has_key('cname'):
+            self.cname = kwds['cname']
+        else:
+            self.cname = None
+            
+        if len(args) == 1:
+            super(Descriptives, self).__init__(args[0])
+        else:
+            super(Descriptives, self).__init__()
+            
+    def run(self, V, cname=None):
+        """
+        generates and stores descriptive statistics for the
+        numerical data in V
+        """
+        
+        
+        try:
+            V = sorted(_flatten(list(copy(V))))
         except:
             raise TypeError('V must be a list-like object')
             
@@ -2005,8 +2357,6 @@ class Descriptives(OrderedDict):
         else:
             self.cname = cname
             
-        self.V = V
-
         N = float(len(V))
 
         self['count'] = N
@@ -2044,12 +2394,57 @@ class Descriptives(OrderedDict):
                          tt.draw()])
 
     def __repr__(self):
-        return 'Descriptives(' + ''.join([
-            ('V=%s'%repr(self.V), '')[self.V == None],
-            (',cname=%s'%repr(self.cname), '')[self.cname == None] ]) + ')'
+        if self == {}:
+            return 'Descriptives()'
+        
+        s = []
+        for k, v in self.items():
+            s.append("('%s', %s)"%(k, repr(v)))
+        args = '[' + ', '.join(s) + ']'
+        
+        kwds = ''     
+        if self.cname != None:
+            kwds = ", cname='%s'"%self.cname
+
+
+        return 'Descriptives(%s%s)'%(args, kwds)
 			
 class Histogram(OrderedDict):
-    def __init__(self, V, cname=None, bins=10,
+    def __init__(self, *args, **kwds):
+        if len(args) > 1:
+            raise Exception('expecting only 1 argument')
+
+        if kwds.has_key('cname'):
+            self.cname = kwds['cname']
+        else:
+            self.cname = None
+
+        if kwds.has_key('bins'):
+            self.bins = kwds['bins']
+        else:
+            self.bins = 10.
+
+        if kwds.has_key('range'):
+            self.range = kwds['range']
+        else:
+            self.range = None
+
+        if kwds.has_key('density'):
+            self.density = kwds['density']
+        else:
+            self.density = False
+
+        if kwds.has_key('cumulative'):
+            self.cumulative = kwds['cumulative']
+        else:
+            self.cumulative = False 
+            
+        if len(args) == 1:
+            super(Histogram, self).__init__(args[0])
+        else:
+            super(Histogram, self).__init__()
+            
+    def run(self, V, cname=None, bins=10,
                  range=None, density=False, cumulative=False):   
         """
         generates and stores histogram data for numerical data in V
@@ -2081,7 +2476,6 @@ class Histogram(OrderedDict):
         else:
             self.cname = cname
             
-        self.V = V
         self.bins = bins
         self.range = range
         self.density = density
@@ -2103,17 +2497,60 @@ class Histogram(OrderedDict):
                         tt.draw()])
 
     def __repr__(self):
-        return 'Histogram(' + ''.join([
-            ('V=%s'%repr(self.V), '')[self.V == None],
-            (',cname=%s'%repr(self.cname), '')[self.cname == None],
-            (',bins=%i'%self.bins, '')[self.bins == 10],
-            (',range=%s'%repr(self.range), '')[self.range == None],
-            (',density=%s'%self.density, '')[self.density == False],
-            (',cumulative=%s'%self.cumulative, '')[self.cumulative == False]
-                                       ]) + ')'
+        if self == {}:
+            return 'Histogram()'
+        
+        s = []
+        for k, v in self.items():
+            s.append("('%s', %s)"%(k, repr(v)))
+        args = '[' + ', '.join(s) + ']'
+        
+        kwds = []            
+        if self.cname != None:
+            kwds.append(", cname='%s'"%self.cname)
+
+        if self.bins != 10:
+            kwds.append(', bins=%s'%self.bins)
+
+        if self.range != None:
+            kwds.append(', range=%s'%repr(range))
+
+        if self.density != False:
+            kwds.append(', density=%s'%density)
+            
+        if self.cumulative != False:
+            kwds.append(', cumulative=%s'%cumulative)
+            
+        kwds= ''.join(kwds)
+
+        return 'Histogram(%s%s)'%(args, kwds)
 
 class Marginals(OrderedDict):
-    def __init__(self, df, val, factors, where=None):   
+    def __init__(self, *args, **kwds):
+        if len(args) > 1:
+            raise Exception('expecting only 1 argument')
+
+        if kwds.has_key('val'):
+            self.val = kwds['val']
+        else:
+            self.val = None
+
+        if kwds.has_key('factors'):
+            self.factors = kwds['factors']
+        else:
+            self.factors = None
+            
+        if kwds.has_key('where'):
+            self.where = kwds['where']
+        else:
+            self.where = []
+            
+        if len(args) == 1:
+            super(Marginals, self).__init__(args[0])
+        else:
+            super(Marginals, self).__init__()
+            
+    def run(self, df, val, factors, where=None):   
         """
         generates and stores marginal data from the DataFrame df
         and column labels in factors.
@@ -2179,7 +2616,6 @@ class Marginals(OrderedDict):
         self['dlower'] = dlower
         self['dupper'] = dupper
 
-        self.df = df
         self.val = val
         self.factors = factors
         self.where = where
@@ -2223,6 +2659,27 @@ class Marginals(OrderedDict):
         return tt.draw()
 
     def __repr__(self):
-        return r'Marginals(' + ''.join([
-            repr(self.df), ', %s'%repr(self.val), ', %s'%repr(self.factors),
-            (',where=%s'%repr(self.where), '')[self.where == []] ]) + ')'
+        if self == {}:
+            return 'Marginals()'
+        
+        s = []
+        for k, v in self.items():
+            s.append("('%s', %s)"%(k, repr(v)))
+        args = '[' + ', '.join(s) + ']'
+        
+        kwds = []            
+        if self.val != None:
+            kwds.append(", val='%s'"%self.val)
+            
+        if self.factors != None:
+            kwds.append(", factors=%s"%self.factors)
+            
+        if self.where != []:
+            if isinstance(self.where, _strobj):
+                kwds.append(", where='%s'"%self.where)
+            else:
+                kwds.append(", where=%s"%self.where)
+        kwds= ''.join(kwds)
+
+        return 'Marginals(%s%s)'%(args, kwds)
+        
