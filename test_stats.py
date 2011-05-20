@@ -15,8 +15,20 @@ from math import isnan, isinf
 import numpy as np
 from pprint import pprint as pp
 from pyvttbl import DataFrame, PyvtTbl, Descriptives,  Marginals, Histogram, \
-     Ttest, _flatten, _isfloat, _isint
+     Ttest, Ttest1sample, _flatten, _isfloat, _isint
 
+class Test_ttest1sample(unittest.TestCase):
+    def test0(self):
+        """1 sample ttest"""
+        R=OrderedDict([('t', -17.797126310672542), ('p2tail', 1.0172137120313963e-07), ('p1tail', 5.086068560156982e-08), ('n', 9), ('df', 8), ('mu', 4.555555555555555), ('pop_mu', 20), ('var', 6.777777777777778), ('tc2tail', 2.3060059174895287), ('tc1tail', 1.8595485016703606)])
+        A=[3,4, 5,8,9, 1,2,4, 5]
+        pop_mu=20
+      
+        D=Ttest1sample()
+        D.run(A,pop_mu)
+
+        for k in R.keys():
+            self.assertTrue(D[k],R[k])
 
 class Test_ttest(unittest.TestCase):
     def test0(self):
@@ -180,6 +192,7 @@ t Critical two-tail     2.025           """
             
 def suite():
     return unittest.TestSuite((
+            unittest.makeSuite(Test_ttest1sample),
             unittest.makeSuite(Test_ttest)
                               ))
 

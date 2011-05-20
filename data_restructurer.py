@@ -11,22 +11,23 @@ elif sys.version_info[0] == 3:
     _xrange = range
     
 import csv
-from pyvttbl import PyvtTbl, _xunique_combinations
+from pyvttbl import DataFrame, _xunique_combinations
 
 def long2wide(in_fname, id, dvs, between=[], within=[],
          covariates=[], out_fname=None, nested=True):
 
     # load in_fname into a PyvtTbl object
     print('reading "%s"...'%in_fname)
-    cls = PyvtTbl()
-    cls.readTbl(in_fname)
+    cls = DataFrame()
+    cls.read_tbl(in_fname)
         
     # loop through DVs and append within columns
     d = [sorted(set(cls[id]))]
     header = [id] + covariates + between
 
     for col in covariates+between:
-        d.extend(cls._pvt(col, cols=[id], aggregate='arbitrary')[0])
+        z = cls.pivot(col, cols=[id], aggregate='arbitrary')
+        d.extend(list(z))
         
     # start controls whether nested factors are examined
     if nested : start = 1
@@ -38,13 +39,13 @@ def long2wide(in_fname, id, dvs, between=[], within=[],
             
             for factors in _xunique_combinations(within, j):
                 print('  pivoting', factors, '...')
-                z, clist = cls._pvt(dv, rows=factors, cols=[id],
-                                    aggregate='avg')[:2]
-                d.extend(z)
+                z = cls.pivot(dv, rows=factors, cols=[id],
+                                    aggregate='avg')
+                d.extend(list(z))
                 
                 # process headers
-                for names in clist:
-                    h = ','.join(('%s_%s'%(f, str(c)) for (f,c) in names))
+                for names in z.rnames:
+                    h = ';'.join(('%s_%s'%(f, str(c)) for (f,c) in names))
                     header.append('%s__%s'%(dv, h))
 
     # Now we can write the data
@@ -56,43 +57,43 @@ def long2wide(in_fname, id, dvs, between=[], within=[],
         wtr.writerow([n.upper() for n in header])
         wtr.writerows(zip(*d)) # transpose and write
         
-##long2wide(in_fname='long_test_data.csv',
-##          id='participant',
-##          dvs=['dv1','dv2'],
-##          between=['bfactor1'],
-##          within=['wfactor1','wfactor2','wfactor3'],
-##          covariates=['cov1','cov2'],
-##          out_fname='formatted.csv',
-##          nested=False)
-
-import time
-
-t0=time.time()
-print('need to format data for spss... (this may take a few minutes)')
-
-fname='collaborated.csv'
-
-covariates='age,gender,dicho_correct,dicho_misses,dicho_FA,SAAT_noncomp_correct,'\
-           'SAAT_noncomp_incorrect,SAAT_comp_correct,SAAT_comp_incorrect'.split(',')
-
-within='speed,target_dir,agreement'.split(',')
-
-dvs='correct_decision_raw,decision_at_safe_distance_raw,decision_distance_raw,'\
-    'decision_latency_raw,decision_proportion_raw,decision_ttc_proportion_raw,'\
-    'decision_ttc_raw,detection_distance_raw,detection_latency_raw,'\
-    'detection_proportion_raw,detection_ttc_proportion_raw,detection_ttc_raw,'\
-    'position_distance_raw,position_latency_raw,risk_level_raw,trial_raw'.split(',')
- 
-##long2wide(fname, 'participant',dvs=dvs,within=within,covariates=covariates,nested=False)
-
-long2wide(in_fname=fname,
+long2wide(in_fname='long_test_data.csv',
           id='participant',
-          dvs=dvs,
-          between=[],
-          within=within,
-          covariates=covariates,
+          dvs=['dv1','dv2'],
+          between=['bfactor1'],
+          within=['wfactor1','wfactor2','wfactor3'],
+          covariates=['cov1','cov2'],
           out_fname='formatted.csv',
-          nested=True)
+          nested=False)
 
-print('\ndone.')
-print(time.time()-t0)
+##import time
+##
+##t0=time.time()
+##print('need to format data for spss... (this may take a few minutes)')
+##
+##fname='collaborated.csv'
+##
+##covariates='age,gender,dicho_correct,dicho_misses,dicho_FA,SAAT_noncomp_correct,'\
+##           'SAAT_noncomp_incorrect,SAAT_comp_correct,SAAT_comp_incorrect'.split(',')
+##
+##within='speed,target_dir,agreement'.split(',')
+##
+##dvs='correct_decision_raw,decision_at_safe_distance_raw,decision_distance_raw,'\
+##    'decision_latency_raw,decision_proportion_raw,decision_ttc_proportion_raw,'\
+##    'decision_ttc_raw,detection_distance_raw,detection_latency_raw,'\
+##    'detection_proportion_raw,detection_ttc_proportion_raw,detection_ttc_raw,'\
+##    'position_distance_raw,position_latency_raw,risk_level_raw,trial_raw'.split(',')
+## 
+####long2wide(fname, 'participant',dvs=dvs,within=within,covariates=covariates,nested=False)
+##
+##long2wide(in_fname=fname,
+##          id='participant',
+##          dvs=dvs,
+##          between=[],
+##          within=within,
+##          covariates=covariates,
+##          out_fname='formatted.csv',
+##          nested=True)
+##
+##print('\ndone.')
+##print(time.time()-t0)

@@ -1018,7 +1018,7 @@ Returns: t-value, two-tailed prob
                           'Population','--',popmean,0,0,0,
                           name,n,x,v,min(a),max(a),
                           statname,t,prob)
-    return t,prob
+    return t, prob, n, df, x, v
 
 
 def lttest_ind (a, b, printit=0, name1='Samp1', name2='Samp2', writemode='a'):
@@ -1695,7 +1695,7 @@ Returns: F value, one-tailed p-value
     msw = sswn/float(dfwn)
     f = msb/msw
     prob = fprob(dfbn,dfwn,f)
-    return f, prob
+    return f, prob, ns, means, vars, ssbn, sswn, dfbn, dfwn
 
 
 def lF_value (ER,EF,dfnum,dfden):
