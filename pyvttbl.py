@@ -1024,29 +1024,75 @@ class DataFrame(OrderedDict):
         m.run(self, val, factors, where)
         return m
 
-##    def ttest(self, val, factor, paired=False,
-##              equal_variance=True, where=None):
-##        """
-##        performs a T-test on val based on the conditions in factor.
-##        The con
-##        """
-##        if where == None:
-##            where = []
-##
-##        if self == {}:
-##            raise Exception('Table must have data to find marginals')
-##
-##        # check to see if data columns have equal lengths
-##        if not self._are_col_lengths_equal():
-##            raise Exception('columns have unequal lengths')
-##        
-##        adata = self.select_col(aname, where)
-##        bdata = self.select_col(bname, where)
-##        
-##        t = Ttest()
-##        t.run(adata, bdata, paired=paired, equal_variance=equal_variance,
-##              aname=aname, bname=bname)
-##        return t
+    def anova1way(self, val, factor, where=None):
+        """
+        returns an ANOVA1way object containing the results of a
+        one-way analysis of variance on val over the conditions
+        in factor. The conditions do not necessarily need to have
+        equal numbers of samples.
+        """
+        if where == None:
+            where = []
+
+        if self == {}:
+            raise Exception('Table must have data to find marginals')
+
+        # check to see if data columns have equal lengths
+        if not self._are_col_lengths_equal():
+            raise Exception('columns have unequal lengths')
+
+        # build list of lists for ANOVA1way object
+        list_o_lists = []
+        pt = self.pivot(val,rows=[factor],
+                        aggregate='tolist',
+                        where=where)
+        for L in pt:
+            list_o_lists.append(L[0])
+
+        # build list of condiitons
+        conditions_list = [tup[1] for [tup] in pt.rnames]
+
+        a = ANOVA1way()
+        a.run(list_o_lists, val, factor, conditions_list)
+        return a
+    
+
+    def ttest(self, aname, bname=None, pop_mean=0., paired=False,
+              equal_variance=True, where=None):
+        """
+        If bname is not specified a one-way t-test is performed on
+        comparing the values in column aname with a hypothesized
+        population mean of 0. The hypothesized population mean can
+        be specified through the pop_mean parameter.
+
+        If bname is provided the values in aname and bname are
+        compared. When paired is True. A matched pairs t-test is
+        performed and the equal_variance parameter is ignored.
+
+        When paired is false the samples in aname and bname are
+        treated as independent.
+        """
+        if where == None:
+            where = []
+
+        if self == {}:
+            raise Exception('Table must have data to find marginals')
+
+        # check to see if data columns have equal lengths
+        if not self._are_col_lengths_equal():
+            raise Exception('columns have unequal lengths')
+        
+        adata = self.select_col(aname, where=where)
+        if bname != None:
+            bdata = self.select_col(bname, where=where)
+        else:
+            bdata = None
+        
+        t = Ttest()
+        t.run(adata, bdata, pop_mean=pop_mean,
+              paired=paired, equal_variance=equal_variance,
+              aname=aname, bname=bname)
+        return t
         
     def histogram(self, cname, where=None, bins=10,
                   range=None, density=False, cumulative=False):
@@ -1670,7 +1716,6 @@ class DataFrame(OrderedDict):
             if self.TESTMODE:
                 return test
 
-
 class PyvtTbl(list):
     """
     list of lists container holding the pivoted data
@@ -1957,6 +2002,20 @@ class PyvtTbl(list):
 
         super(PyvtTbl, self).__init__(d)
 
+    def _are_row_lengths_equal(self):
+        """
+        private method to check if the lists in self have equal lengths
+
+          returns True if all the items are equal
+          returns False otherwise
+        """
+        # if self is not empty
+        counts = map(len, self.__iter__())
+        if all(c - counts[0] + 1 == 1 for c in counts):
+            return True
+        else:
+            return False
+        
     def _get_rows(self):
         """
         returns a list of tuples containing row labels and conditions
@@ -1983,7 +2042,10 @@ class PyvtTbl(list):
           The first element is the number of columns.
           The second element is the number of rows
         """
-        return tuple(len(self._get_rows()), len(self._get_cols()))
+        if len(self) == 0:
+            return tuple(0, 0)
+        
+        return tuple(len(self._get_rows()), len(self[0]))
         
     def __repr__(self):
         """
@@ -2167,106 +2229,106 @@ class PyvtTbl(list):
             wtr.writerow(header)
             wtr.writerows(data)
 
-class Ttest1sample(OrderedDict):
-    """Student's 1 sample t-test"""
-    def __init__(self, *args, **kwds):
-        if len(args) > 1:
-            raise Exception('expecting only 1 argument')
-
-        if kwds.has_key('aname'):
-            self.aname = kwds['aname']
-        else:
-            self.aname = None
-
-        if kwds.has_key('alpha'):
-            self.alpha = kwds['alpha']
-        else:
-            self.alpha = 0.05
-
-        if len(args) == 1:
-            super(Ttest1sample, self).__init__(args[0])
-        else:
-            super(Ttest1sample, self).__init__()
-
-    def run(self, A, pop_mu, alpha=0.05, aname=None):
-        """
-        Compares the data in A to the population mean of mu.
-
-         t = \frac{\overline{x} - \mu_0}{\frac{s}{\sqrt{n}}},
-         where:
-           s = sample standard deviation
-        """
-           
-        try:
-            A = _flatten(list(copy(A)))
-        except:
-            raise TypeError('A must be a list-like object')
-
-        if aname == None:
-            self.aname = 'Measure'
-        else:
-            self.aname = aname
-            
-        self.A = A
-        self.alpha = alpha
-
-        t, prob2, n, df, mu, v = stats.lttest_1samp(A, pop_mu)
-    
-        self['t'] = t
-        self['p2tail'] = prob2
-        self['p1tail'] = prob2 / 2.
-        self['n'] = n
-        self['df'] = df
-        self['mu'] = mu
-        self['pop_mu'] = pop_mu
-        self['var'] = v
-        self['tc2tail'] = jsci.tinv(alpha,df)
-        self['tc1tail'] = jsci.tinv(2. * alpha,df)
-            
-    def __str__(self):
-
-        if self == {}:
-            return '(no data in object)'
-
-        tt = TextTable(max_width=100000000)
-        tt.set_cols_dtype(['t', 'a'])
-        tt.set_cols_align(['l', 'r'])
-        tt.set_deco(TextTable.HEADER)
-
-        first = 't-Test: One Sample for means\n'
-        tt.header( ['',                       self.aname])
-        tt.add_row(['Sample Mean',            self['mu']])
-        tt.add_row(['Hypothesized Pop. Mean', self['pop_mu']])
-        tt.add_row(['Variance',               self['var']])
-        tt.add_row(['Observations',           self['n']])
-        tt.add_row(['df',                     self['df']])
-        tt.add_row(['t Stat',                 self['t']])
-        tt.add_row(['P(T<=t) one-tail',       self['p1tail']])
-        tt.add_row(['t Critical one-tail',    self['tc1tail']])
-        tt.add_row(['P(T<=t) two-tail',       self['p2tail']])
-        tt.add_row(['t Critical two-tail',    self['tc2tail']])
-
-        return '%s\n%s'%(first, tt.draw())
-
-    def __repr__(self):
-        if self == {}:
-            return 'Ttest1sample()'
-
-        s = []
-        for k, v in self.items():
-            s.append("('%s', %s)"%(k, repr(v)))
-        args = '[' + ', '.join(s) + ']'
-        
-        kwds = []            
-        if self.alpha != 0.05:
-            kwds.append(", alpha=%s"%self.alpha)
-
-        if self.aname != None:
-            kwds.append(", aname='%s'"%self.aname)
-            
-        kwds= ''.join(kwds)
-        
-        return 'Ttest1sample(%s%s)'%(args,kwds)
+##class Ttest1sample(OrderedDict):
+##    """Student's 1 sample t-test"""
+##    def __init__(self, *args, **kwds):
+##        if len(args) > 1:
+##            raise Exception('expecting only 1 argument')
+##
+##        if kwds.has_key('aname'):
+##            self.aname = kwds['aname']
+##        else:
+##            self.aname = None
+##
+##        if kwds.has_key('alpha'):
+##            self.alpha = kwds['alpha']
+##        else:
+##            self.alpha = 0.05
+##
+##        if len(args) == 1:
+##            super(Ttest1sample, self).__init__(args[0])
+##        else:
+##            super(Ttest1sample, self).__init__()
+##
+##    def run(self, A, pop_mean, alpha=0.05, aname=None):
+##        """
+##        Compares the data in A to the population mean of mu.
+##
+##         t = \frac{\overline{x} - \mu_0}{\frac{s}{\sqrt{n}}},
+##         where:
+##           s = sample standard deviation
+##        """
+##           
+##        try:
+##            A = _flatten(list(copy(A)))
+##        except:
+##            raise TypeError('A must be a list-like object')
+##
+##        if aname == None:
+##            self.aname = 'Measure'
+##        else:
+##            self.aname = aname
+##            
+##        self.A = A
+##        self.alpha = alpha
+##
+##        t, prob2, n, df, mu, v = stats.lttest_1samp(A, pop_mean)
+##    
+##        self['t'] = t
+##        self['p2tail'] = prob2
+##        self['p1tail'] = prob2 / 2.
+##        self['n'] = n
+##        self['df'] = df
+##        self['mu'] = mu
+##        self['pop_mean'] = pop_mean
+##        self['var'] = v
+##        self['tc2tail'] = jsci.tinv(alpha,df)
+##        self['tc1tail'] = jsci.tinv(2. * alpha,df)
+##            
+##    def __str__(self):
+##
+##        if self == {}:
+##            return '(no data in object)'
+##
+##        tt = TextTable(max_width=100000000)
+##        tt.set_cols_dtype(['t', 'a'])
+##        tt.set_cols_align(['l', 'r'])
+##        tt.set_deco(TextTable.HEADER)
+##
+##        first = 't-Test: One Sample for means\n'
+##        tt.header( ['',                       self.aname])
+##        tt.add_row(['Sample Mean',            self['mu']])
+##        tt.add_row(['Hypothesized Pop. Mean', self['pop_mu']])
+##        tt.add_row(['Variance',               self['var']])
+##        tt.add_row(['Observations',           self['n']])
+##        tt.add_row(['df',                     self['df']])
+##        tt.add_row(['t Stat',                 self['t']])
+##        tt.add_row(['P(T<=t) one-tail',       self['p1tail']])
+##        tt.add_row(['t Critical one-tail',    self['tc1tail']])
+##        tt.add_row(['P(T<=t) two-tail',       self['p2tail']])
+##        tt.add_row(['t Critical two-tail',    self['tc2tail']])
+##
+##        return '%s\n%s'%(first, tt.draw())
+##
+##    def __repr__(self):
+##        if self == {}:
+##            return 'Ttest1sample()'
+##
+##        s = []
+##        for k, v in self.items():
+##            s.append("('%s', %s)"%(k, repr(v)))
+##        args = '[' + ', '.join(s) + ']'
+##        
+##        kwds = []            
+##        if self.alpha != 0.05:
+##            kwds.append(", alpha=%s"%self.alpha)
+##
+##        if self.aname != None:
+##            kwds.append(", aname='%s'"%self.aname)
+##            
+##        kwds= ''.join(kwds)
+##        
+##        return 'Ttest1sample(%s%s)'%(args,kwds)
 			
     
 class Ttest(OrderedDict):
@@ -2294,18 +2356,23 @@ class Ttest(OrderedDict):
             self.aname = kwds['aname']
         else:
             self.aname = None
-            
+                
         if kwds.has_key('bname'):
             self.bname = kwds['bname']
         else:
             self.bname = None
 
+        if kwds.has_key('type'):
+            self.type = kwds['type']
+        else:
+            self.type = None
+            
         if len(args) == 1:
             super(Ttest, self).__init__(args[0])
         else:
             super(Ttest, self).__init__()
             
-    def run(self, A, B, paired=False, equal_variance=True,
+    def run(self, A, B=None, pop_mean=None, paired=False, equal_variance=True,
                  alpha=0.05, aname=None, bname=None):
         """
         Compares the data in A to the data in B. If A or B are
@@ -2346,7 +2413,8 @@ class Ttest(OrderedDict):
             raise TypeError('A must be a list-like object')
             
         try:
-            B = _flatten(list(copy(B)))
+            if B != None:
+                B = _flatten(list(copy(B)))
         except:
             raise TypeError('B must be a list-like object')
 
@@ -2366,14 +2434,30 @@ class Ttest(OrderedDict):
         self.equal_variance = equal_variance
         self.alpha = alpha
 
-        if paired == True:
+        if B == None:
+            t, prob2, n, df, mu, v = stats.lttest_1samp(A, pop_mean)
+
+            self.type = 't-Test: One Sample for means'
+            self['t'] = t
+            self['p2tail'] = prob2
+            self['p1tail'] = prob2 / 2.
+            self['n'] = n
+            self['df'] = df
+            self['mu'] = mu
+            self['pop_mean'] = pop_mean
+            self['var'] = v
+            self['tc2tail'] = jsci.tinv(alpha,df)
+            self['tc1tail'] = jsci.tinv(2. * alpha,df)
+                
+        elif paired == True:
             if len(A) - len(B) != 0:
                 raise Exception('A and B must have equal lengths '
                                 'for paired comparisons')
             
             t, prob2, n, df, mu1, mu2, v1, v2 = stats.ttest_rel(A, B)
             r, rprob2 = stats.pearsonr(A,B)
-        
+            
+            self.type = 't-Test: Paired Two Sample for means'
             self['t'] = t
             self['p2tail'] = prob2
             self['p1tail'] = prob2 / 2.
@@ -2390,7 +2474,8 @@ class Ttest(OrderedDict):
             
         elif equal_variance:
             t, prob2, n1, n2, df, mu1, mu2, v1, v2, svar = stats.ttest_ind(A, B)
-        
+
+            self.type = 't-Test: Two-Sample Assuming Equal Variances'
             self['t'] = t
             self['p2tail'] = prob2
             self['p1tail'] = prob2 / 2.
@@ -2408,6 +2493,7 @@ class Ttest(OrderedDict):
         else:            
             t, prob2, n1, n2, df, mu1, mu2, v1, v2 = stats.ttest_ind_uneq(A, B)
         
+            self.type = 't-Test: Two-Sample Assuming Unequal Variances'
             self['t'] = t
             self['p2tail'] = prob2
             self['p1tail'] = prob2 / 2.
@@ -2426,11 +2512,34 @@ class Ttest(OrderedDict):
         if self == {}:
             return '(no data in object)'
 
+
+        if self.B == None:
+            tt = TextTable(max_width=100000000)
+            tt.set_cols_dtype(['t', 'a'])
+            tt.set_cols_align(['l', 'r'])
+            tt.set_deco(TextTable.HEADER)
+
+            first = 't-Test: One Sample for means\n'
+            tt.header( ['',                       self.aname])
+            tt.add_row(['Sample Mean',            self['mu']])
+            tt.add_row(['Hypothesized Pop. Mean', self['pop_mean']])
+            tt.add_row(['Variance',               self['var']])
+            tt.add_row(['Observations',           self['n']])
+            tt.add_row(['df',                     self['df']])
+            tt.add_row(['t Stat',                 self['t']])
+            tt.add_row(['P(T<=t) one-tail',       self['p1tail']])
+            tt.add_row(['t Critical one-tail',    self['tc1tail']])
+            tt.add_row(['P(T<=t) two-tail',       self['p2tail']])
+            tt.add_row(['t Critical two-tail',    self['tc2tail']])
+
+            return '%s\n%s'%(first, tt.draw())
+
+
         tt = TextTable(max_width=100000000)
         tt.set_cols_dtype(['t', 'a', 'a'])
         tt.set_cols_align(['l', 'r', 'r'])
         tt.set_deco(TextTable.HEADER)
-
+        
         if self.paired == True:
             first = 't-Test: Paired Two Sample for means\n'
             tt.header( ['',                    self.aname,      self.bname])
@@ -2499,111 +2608,139 @@ class Ttest(OrderedDict):
         if self.bname != None:
             kwds.append(", bname='%s'"%self.bname)
             
+        if self.type != None:
+            kwds.append(", type='%s'"%self.type)
+                
         kwds= ''.join(kwds)
         
         return 'Ttest(%s%s)'%(args,kwds)
 
 
-##class ANOVA1way(OrderedDict):
-##    """1-way ANOVA"""
-##    def __init__(self, *args, **kwds):
-##        if len(args) > 1:
-##            raise Exception('expecting only 1 argument')
-##
-##        if kwds.has_key('aname'):
-##            self.aname = kwds['aname']
-##        else:
-##            self.aname = None
-##
-##        if kwds.has_key('alpha'):
-##            self.alpha = kwds['alpha']
-##        else:
-##            self.alpha = 0.05
-##
-##        if len(args) == 1:
-##            super(Ttest1sample, self).__init__(args[0])
-##        else:
-##            super(Ttest1sample, self).__init__()
-##
-##    def run(self, *lists, alpha=0.05, condition=None, factor=None):
-##        """
-##        Compares the data in A to the population mean of mu.
-##
-##         t = \frac{\overline{x} - \mu_0}{\frac{s}{\sqrt{n}}},
-##         where:
-##           s = sample standard deviation
-##        """
-##           
-##        try:
-##            A = _flatten(list(copy(A)))
-##        except:
-##            raise TypeError('A must be a list-like object')
-##
-##        if aname == None:
-##            self.aname = 'Measure'
-##        else:
-##            self.aname = aname
-##            
-##        self.A = A
-##        self.alpha = alpha
-##
-##        t, prob2, n, df, mu, v = stats.lttest_1samp(A, pop_mu)
-##    
-##        self['t'] = t
-##        self['p2tail'] = prob2
-##        self['p1tail'] = prob2 / 2.
-##        self['n'] = n
-##        self['df'] = df
-##        self['mu'] = mu
-##        self['pop_mu'] = pop_mu
-##        self['var'] = v
-##        self['tc2tail'] = jsci.tinv(alpha,df)
-##        self['tc1tail'] = jsci.tinv(2. * alpha,df)
-##            
-##    def __str__(self):
-##
-##        if self == {}:
-##            return '(no data in object)'
-##
-##        tt = TextTable(max_width=100000000)
-##        tt.set_cols_dtype(['t', 'a'])
-##        tt.set_cols_align(['l', 'r'])
-##        tt.set_deco(TextTable.HEADER)
-##
-##        first = 't-Test: One Sample for means\n'
-##        tt.header( ['',                       self.aname])
-##        tt.add_row(['Sample Mean',            self['mu']])
-##        tt.add_row(['Hypothesized Pop. Mean', self['pop_mu']])
-##        tt.add_row(['Variance',               self['var']])
-##        tt.add_row(['Observations',           self['n']])
-##        tt.add_row(['df',                     self['df']])
-##        tt.add_row(['t Stat',                 self['t']])
-##        tt.add_row(['P(T<=t) one-tail',       self['p1tail']])
-##        tt.add_row(['t Critical one-tail',    self['tc1tail']])
-##        tt.add_row(['P(T<=t) two-tail',       self['p2tail']])
-##        tt.add_row(['t Critical two-tail',    self['tc2tail']])
-##
-##        return '%s\n%s'%(first, tt.draw())
-##
-##    def __repr__(self):
-##        if self == {}:
-##            return 'Ttest1sample()'
-##
-##        s = []
-##        for k, v in self.items():
-##            s.append("('%s', %s)"%(k, repr(v)))
-##        args = '[' + ', '.join(s) + ']'
-##        
-##        kwds = []            
-##        if self.alpha != 0.05:
-##            kwds.append(", alpha=%s"%self.alpha)
-##
-##        if self.aname != None:
-##            kwds.append(", aname='%s'"%self.aname)
-##            
-##        kwds= ''.join(kwds)
-##        
-##        return 'Ttest1sample(%s%s)'%(args,kwds)
+class ANOVA1way(OrderedDict):
+    """1-way ANOVA"""
+    def __init__(self, *args, **kwds):
+        if len(args) > 1:
+            raise Exception('expecting only 1 argument')
+
+        if kwds.has_key('val'):
+            self.val = kwds['val']
+        else:
+            self.val = 'Measure'
+            
+        if kwds.has_key('factor'):
+            self.factor = kwds['factor']
+        else:
+            self.factor = 'Factor'
+            
+        if kwds.has_key('conditions_list'):
+            self.conditions_list = kwds['conditions_list']
+        else:
+            self.conditions_list = []
+            
+        if kwds.has_key('alpha'):
+            self.alpha = kwds['alpha']
+        else:
+            self.alpha = 0.05
+
+        if len(args) == 1:
+            super(ANOVA1way, self).__init__(args[0])
+        else:
+            super(ANOVA1way, self).__init__()
+
+    def run(self, list_of_lists, val='Measure',
+            factor='Factor', conditions_list=None, alpha=0.05):
+        """
+        
+        """
+
+        self.L = list_of_lists
+        self.val = val
+        self.factor = factor
+        self.alpha = alpha
+        
+        if conditions_list == None:
+            abc = lambda i : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'\
+                             [i%26]*(int(math.floor(i/26))+1)
+            for i in _xrange(len(list_of_lists)):
+                self.conditions_list.append(abc(i))
+        else:
+            self.conditions_list = conditions_list
+
+        f, prob, ns, means, vars, ssbn, sswn, dfbn, dfwn = \
+           stats.lF_oneway(list_of_lists)
+
+        self['f'] = f
+        self['p'] = prob
+        self['ns'] = ns
+        self['mus'] = means
+        self['vars'] = vars
+        self['ssbn'] = ssbn
+        self['sswn'] = sswn
+        self['dfbn'] = dfbn
+        self['dfwn'] = dfwn
+        self['msbn'] = ssbn/dfbn
+        self['mswn'] = sswn/dfwn
+        
+    def __str__(self):
+
+        if self == {}:
+            return '(no data in object)'
+
+        tt_s = TextTable(max_width=100000000)
+        tt_s.set_cols_dtype(['t', 'a', 'a', 'a', 'a'])
+        tt_s.set_cols_align(['l', 'r', 'r', 'r', 'r'])
+        tt_s.set_deco(TextTable.HEADER)
+
+        tt_s.header( ['Groups','Count','Sum', 'Average','Variance'])
+        for g, c, a, v in zip(self.conditions_list,
+                              self['ns'],
+                              self['mus'],
+                              self['vars']):
+            tt_s.add_row([g, c, c * a, a, v])
+
+        tt_a = TextTable(max_width=100000000)
+        tt_a.set_cols_dtype(['t', 'a', 'a', 'a', 'a', 'a'])
+        tt_a.set_cols_align(['l', 'r', 'r', 'r', 'r', 'r'])
+        tt_a.set_deco(TextTable.HEADER)
+
+        tt_a.header( ['Source of Variation','SS','df','MS','F','P-value'])
+        tt_a.add_row(['Treatments',self['ssbn'],self['dfbn'],
+                                   self['msbn'],self['f'],self['p']])
+        tt_a.add_row(['Error', self['sswn'],self['dfwn'],
+                               self['mswn'],' ', ''])
+        tt_a.add_row([' ',' ',' ',' ',' ',' '])
+        tt_a.add_row(['Total',self['ssbn']+self['sswn'],
+                              self['dfbn']+self['dfwn'],' ',' ',' '])
+            
+        return 'Anova: Single Factor on %s\n\n'%self.val + \
+               'SUMMARY\n%s\n\n'%tt_s.draw() + \
+               'ANOVA\n%s'%tt_a.draw()
+
+    def __repr__(self):
+        if self == {}:
+            return 'ANOVA1way()'
+
+        s = []
+        for k, v in self.items():
+            s.append("('%s', %s)"%(k, repr(v)))
+        args = '[' + ', '.join(s) + ']'
+
+        kwds = []
+        if self.val != 'Measure':
+            kwds.append(', val="%s"'%self.val)
+            
+        if self.factor != 'Factor':
+            kwds.append(', factor="%s"'%self.factor)
+            
+        if self.conditions_list != []:
+            kwds.append(', conditions_list=%s'%repr(self.conditions_list))
+            
+        if self.alpha != 0.05:
+            kwds.append('alpha=%s'%str(self.alpha))
+            
+        kwds= ''.join(kwds)
+        
+        return 'ANOVA1way(%s%s)'%(args,kwds)
     
 class Descriptives(OrderedDict):
     def __init__(self, *args, **kwds):

@@ -589,7 +589,7 @@ Returns: transformed data for use in an ANOVA
         v[i] = var(nargs[i])
         m[i] = mean(nargs[i])
     for j in range(k):
-        for i in range(n[j]):
+        for i in range(int(n[j])):
             t1 = (n[j]-1.5)*n[j]*(nargs[j][i]-m[j])**2
             t2 = 0.5*v[j]*(n[j]-1.0)
             t3 = (n[j]-1.0)*(n[j]-2.0)
@@ -1661,7 +1661,7 @@ Usage:   lbetai(a,b,x)
 #######  ANOVA CALCULATIONS  #######
 ####################################
 
-def lF_oneway(*lists):
+def lF_oneway(lists):
     """
 Performs a 1-way ANOVA, returning an F-value and probability given
 any number of groups.  From Heiman, pp.394-7.
@@ -1671,23 +1671,25 @@ Usage:   F_oneway(*lists)    where *lists is any number of lists, one per
 Returns: F value, one-tailed p-value
 """
     a = len(lists)           # ANOVA on 'a' groups, each in it's own list
-    means = [0]*a
-    vars = [0]*a
-    ns = [0]*a
+##    means = [0]*a
+##    vars = [0]*a
+##    ns = [0]*a
     alldata = []
-    tmp = map(N.array,lists)
-    means = map(amean,tmp)
-    vars = map(avar,tmp)
+##    tmp = map(N.array,lists)
+##    means = map(amean,tmp)
+##    vars = map(avar,tmp)
+    means = map(mean, lists)
+    vars = map(var, lists)
     ns = map(len,lists)
     for i in range(len(lists)):
         alldata = alldata + lists[i]
-    alldata = N.array(alldata)
+##    alldata = N.array(alldata)
     bign = len(alldata)
-    sstot = ass(alldata)-(asquare_of_sums(alldata)/float(bign))
+    sstot = ss(alldata)-(square_of_sums(alldata)/float(bign))
     ssbn = 0
     for list in lists:
-        ssbn = ssbn + asquare_of_sums(N.array(list))/float(len(list))
-    ssbn = ssbn - (asquare_of_sums(alldata)/float(bign))
+        ssbn = ssbn + square_of_sums(list)/float(len(list))
+    ssbn = ssbn - (square_of_sums(alldata)/float(bign))
     sswn = sstot-ssbn
     dfbn = a-1
     dfwn = bign - a

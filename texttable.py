@@ -133,7 +133,7 @@ def _str(x, dtype='a', n=3):
             else:
                 return str(int(round(f)))
         else:
-            if abs(f) > 1e8 or abs(f) < 1e-8:
+            if abs(f) > 1e8 or abs(f) < float('1e-%i'%n):
                 return '%.*e'%(n, f)
             else:
                 return '%.*f'%(n, f)
