@@ -64,7 +64,7 @@ __revision__ = '$Id: texttable.py 128 2009-10-04 15:16:22Z jef $'
 __credits__ = """\
 Jeff Kowalczyk:
     - textwrap improved import
-    - comment concerning header output
+    - comment concerning  output
 
 Anonymous:
     - add_rows method, for adding rows in one go
@@ -156,6 +156,7 @@ class Texttable:
     HEADER = 1 << 1
     HLINES = 1 << 2
     VLINES = 1 << 3
+    FOOTER = 1 << 4
 
     def __init__(self, max_width=80):
         """Constructor
@@ -170,7 +171,7 @@ class Texttable:
         self._float_precision=3
         
         self._deco = Texttable.VLINES | Texttable.HLINES | Texttable.BORDER | \
-            Texttable.HEADER
+            Texttable.HEADER | Texttable.FOOTER
         self.set_chars(['-', '|', '+', '='])
         self.reset()
 
@@ -183,6 +184,7 @@ class Texttable:
         self._hline_string = None
         self._row_size = None
         self._header = []
+        self._footer = []
         self._rows = []
 
     def header(self, array):
@@ -190,8 +192,15 @@ class Texttable:
         """
 
         self._check_row_size(array)
-        self._header = map(str, array)
+        self._header = map(_str, array)
 
+    def footer(self, array):
+        """Specify the footer of the table
+        """
+
+        self._check_row_size(array)
+        self._footer = map(_str, array)
+        
     def add_row(self, array):
         """Add a row in the rows stack
 
@@ -255,6 +264,7 @@ class Texttable:
             Texttable.HEADER: Horizontal line below the header
             Texttable.HLINES: Horizontal lines between rows
             Texttable.VLINES: Vertical lines between columns
+            Texttable.FOOTER: Horizontal line above the footer
 
            All of them are enabled by default
 
@@ -354,6 +364,10 @@ class Texttable:
             out += self._draw_line(row)
             if self._has_hlines() and length < len(self._rows):
                 out += self._hline()
+        if self._footer:
+            if self._has_footer():
+                out += self._hline_header()
+            out += self._draw_line(self._footer)
         if self._has_border():
             out += self._hline()
         return out[:-1]
@@ -391,6 +405,12 @@ class Texttable:
         """
 
         return self._deco & Texttable.HEADER > 0
+
+    def _has_footer(self):
+        """Return a boolean, if header line is required or not
+        """
+
+        return self._deco & Texttable.FOOTER > 0
 
     def _hline_header(self):
         """Print header's horizontal line
@@ -550,7 +570,7 @@ if __name__ == '__main__':
 
     # Roger Lew also add this example/test
     table= Texttable()
-    table.set_deco(Texttable.HEADER)
+    table.set_deco(Texttable.HEADER | Texttable.FOOTER)
 
     # set the datatypes, this must be called before we start adding rows
     table.set_cols_dtype(['t',  # text 
@@ -566,6 +586,7 @@ if __name__ == '__main__':
                     ['abcd', '67',    654,     89,      128.001],
                     ['efgh', 67.5434, .654,    89.6,    12800000000000000000000.00023],
                     ['ijkl', 5e-78,   5e-78,   89.4,    .000000000000128],
-                    ['mnop', .023,    5e+78,   92.,     12800000000000000000000]])
+                    ['mnop', float('nan'),    5e+78,   92.,     12800000000000000000000]])
+    table.footer(['a','b','c','d','e'])
     print(table.draw())
 

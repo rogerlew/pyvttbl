@@ -131,7 +131,7 @@ class DataFrame(OrderedDict):
     """holds the data in a dummy-coded group format"""
     def __init__(self, *args, **kwds):
         """
-        initialize a PyvtTbl object
+        initialize a DataFrame object
 
           keep in mind that because this class uses sqlite3
           behind the scenes the keys are case-insensitive
@@ -627,7 +627,7 @@ class DataFrame(OrderedDict):
     def pivot(self, val, rows=None, cols=None, aggregate='avg',
               where=None, flatten=False, attach_rlabels=False):
         """
-        instance method of DataFrame which returns a PyvtTbl object
+        returns a PyvtTbl object
         """
 
         if rows == None:
@@ -1729,6 +1729,31 @@ class PyvtTbl(list):
         else:
             self.val = None
 
+        if kwds.has_key('show_tots'):
+            self.show_tots = kwds['show_tots']
+        else:
+            self.show_tots = True
+
+        if kwds.has_key('calc_tots'):
+            self.calc_tots = kwds['calc_tots']
+        else:
+            self.calc_tots = True
+            
+        if kwds.has_key('row_tots'):
+            self.row_tots = kwds['row_tots']
+        else:
+            self.row_tots = None
+                
+        if kwds.has_key('col_tots'):
+            self.col_tots = kwds['col_tots']
+        else:
+            self.col_tots = None
+            
+        if kwds.has_key('grand_tot'):
+            self.grand_tot = kwds['grand_tot']
+        else:
+            self.grand_tot = None
+            
         if kwds.has_key('rnames'):
             self.rnames = kwds['rnames']
         else:
@@ -1766,7 +1791,7 @@ class PyvtTbl(list):
             
     def run(self, df, val, rows=None, cols=None,
                  aggregate='avg', where=None, flatten=False,
-                 attach_rlabels=False):
+                 attach_rlabels=False, calc_tots=True):
         
         # public method, saves table to df variables after pivoting
         """
@@ -1793,18 +1818,19 @@ class PyvtTbl(list):
         ##############################################################
         # pivot programmatic flow                                    #
         ##############################################################
-        #  1. Check to make sure the table can be pivoted with the   #
-        #     specified parameters                                   #
-        #  2. Create a sqlite table with only the data in columns    #
-        #     specified by val, rows, and cols. Also eliminate       #
-        #     rows that meet the exclude conditions                  #
-        #  3. Build rnames and cnames lists                          #
-        #  4. Build query based on val, rows, and cols               #
-        #  5. Run query                                              #
-        #  6. Read data to from cursor into a list of lists          #
-        #  7. Clean up                                               #
-        #  8. flatten if specified                                   #
-        #  9. return data, rnames, and cnames                        #
+        #  1.  Check to make sure the table can be pivoted with the  #
+        #      specified parameters                                  #
+        #  2.  Create a sqlite table with only the data in columns   #
+        #      specified by val, rows, and cols. Also eliminate      #
+        #      rows that meet the exclude conditions                 #
+        #  3.  Build rnames and cnames lists                         #
+        #  4.  Build query based on val, rows, and cols              #
+        #  5.  Run query                                             #
+        #  6.  Read data to from cursor into a list of lists         #
+        #  7.  Query grand, row, and column totals                   #
+        #  8.  Clean up                                              #
+        #  9.  flatten if specified                                  #
+        #  10. return data, rnames, and cnames                       #
         ##############################################################
 
         #  1. Check to make sure the table can be pivoted with the
@@ -1907,22 +1933,19 @@ class PyvtTbl(list):
             if rnames == [1]:
                 query.append('_%s_'%val)
             else:
-                for i, r in enumerate(rows):
-                    if i != 0:
-                        query.append(', ')
-                    query.append('_%s_'%r)
+                query.append(', '.join('_%s_'%r for r in rows))
 
             if cnames == [1]:
                 query.append('\n  , %s( _%s_ )'%(agg, val))
             else:
-                for cols in cnames:
+                for cs in cnames:
                     query.append('\n  , %s( case when '%agg)
                     if all(map(_isfloat, zip(*cols)[1])):
-                        query.append(' and '\
-                             .join(('_%s_=%s'%(k, v) for k, v in cols)))
+                        query.append(
+                        ' and '.join(('_%s_=%s'%(k, v) for k, v in cs)))
                     else:
-                        query.append(' and '\
-                             .join(('_%s_="%s"'%(k ,v) for k, v in cols)))
+                        query.append(
+                        ' and '.join(('_%s_="%s"'%(k ,v) for k, v in cs)))
                     query.append(' then _%s_ end )'%val)
 
             if rnames == [1]:
@@ -1975,16 +1998,37 @@ class PyvtTbl(list):
                 for row in df.cur:
                     d.append(list(row)[-len(cnames):])
 
-        #  7. Clean up
+        #  7. Get totals
+        ##############################################################
+        if calc_tots:
+            if aggregate in ['tolist', 'group_concat', 'arbitrary']:
+                self.calc_tots = False
+            else:
+                query = 'select %s( _%s_ ) from TBL'%(agg, val)
+                df._execute(query)
+                self.grand_tot = list(df.cur)[0][0]
+
+                if cnames != [1] and rnames != [1]:
+                    query = ['select %s( _%s_ ) from TBL group by'%(agg, val)]
+                    query.append(', '.join('_%s_'%r for r in rows))
+                    df._execute(' '.join(query))
+                    self.row_tots = [tup[0] for tup in df.cur]
+                    
+                    query = ['select %s( _%s_ ) from TBL group by'%(agg, val)]
+                    query.append(', '.join('_%s_'%r for r in cols))
+                    df._execute(' '.join(query))
+                    self.col_tots = [tup[0] for tup in df.cur]                
+        
+        #  8. Clean up
         ##############################################################
         df.conn.commit()
 
-        #  8. flatten if specified
+        #  9. flatten if specified
         ##############################################################
         if flatten:
             d = _flatten(d)
 
-        #  9. return data, rnames, and cnames
+        #  10. set data, rnames, and cnames
         ##############################################################
         self.df = df
         self.val = val
@@ -2001,6 +2045,14 @@ class PyvtTbl(list):
         self.conditions = Zconditions
 
         super(PyvtTbl, self).__init__(d)
+
+    def transpose(self):
+        """
+        tranpose the pivot table in place
+        """
+        super(PyvtTbl,self).__init__([list(r) for r in zip(*self)])
+        self.rnames,self.cnames = self.cnames,self.rnames
+        self.row_tots,self.col_tots = self.col_tots,self.row_tots
 
     def _are_row_lengths_equal(self):
         """
@@ -2046,114 +2098,12 @@ class PyvtTbl(list):
             return tuple(0, 0)
         
         return tuple(len(self._get_rows()), len(self[0]))
-        
-    def __repr__(self):
-        """
-        returns a machine friendly string representation of the object
-        """
-        if self == []:
-            return 'PyvtTbl()'
-
-        args = super(PyvtTbl, self).__repr__()
-        kwds = []
-        if self.val != None:
-            kwds.append(", val='%s'"%self.val)
-
-        if self.rnames != None:
-            kwds.append(', rnames=%s'%repr(self.rnames))
-
-        if self.cnames != None:
-            kwds.append(', cnames=%s'%repr(self.cnames))
-
-        if self.aggregate != 'avg':
-            kwds.append(", aggregate='%s'"%self.aggregate)
-            
-        if self.flatten != False:
-            kwds.append(', flatten=%s'%self.flatten)
-            
-        if self.where != []:
-            if isinstance(self.where, _strobj):
-                kwds.append(", where='%s'"%self.where)
-            else:
-                kwds.append(", where=%s"%self.where)
-
-        if self.attach_rlabels != False:
-            kwds.append(', attach_rlabels=%s'%self.attach_rlabels)
-
-        if len(kwds)>1:
-            kwds = ''.join(kwds)
-            
-        return 'PyvtTbl(%s%s)'%(args,kwds)
-            
-    def __str__(self):
-        """
-        returns a human friendly string representaiton of the table
-        """
-
-        if self == []:
-            return '(table is empty)'
-
-        rows = self._get_rows()
-        cols = self._get_cols()
-
-        # initialize table
-        tt = TextTable(max_width=10000000)
-
-        # no rows or cols were specified
-        if self.rnames == [1] and self.cnames == [1]:
-            # build the header
-            header = ['Value']
-
-            # initialize the texttable and add stuff
-            tt.set_cols_dtype(['t'])
-            tt.set_cols_dtype(['l'])
-            tt.add_row(self[0])
-            
-        elif self.rnames == [1]: # no rows were specified
-            # build the header
-            header = [',\n'.join('%s=%s'%(f, c) for (f, c) in L) \
-                      for L in self.cnames]
-            
-            # initialize the texttable and add stuff
-            tt.set_cols_dtype(['a'] * len(self.cnames))
-            tt.set_cols_align(['r'] * len(self.cnames))
-            tt.add_row(self[0])
-            
-        elif self.cnames == [1]: # no cols were specified
-            # build the header
-            header = rows + ['Value']
-            
-            # initialize the texttable and add stuff
-            tt.set_cols_dtype(['t'] * len(rows) + ['a'])
-            tt.set_cols_align(['l'] * len(rows) + ['r'])
-            for i, L in enumerate(self.rnames):
-                tt.add_row([c for (f, c) in L] + self[i])
-            
-        else: # table has rows and cols
-            # build the header
-            header = copy(rows)
-            for L in self.cnames:
-                header.append(',\n'.join('%s=%s'%(f, c) for (f, c) in L))
-
-            dtypes = ['t'] * len(rows) + ['a'] * len(self.cnames)
-            aligns = ['l'] * len(rows) + ['r'] * len(self.cnames)
-
-            # initialize the texttable and add stuff
-            tt.set_cols_dtype(dtypes)
-            tt.set_cols_align(aligns)
-            for i, L in enumerate(self.rnames):
-                tt.add_row([c for (f, c) in L] + self[i])
-
-        # add header and decoration
-        tt.header(header)
-        tt.set_deco(TextTable.HEADER)
-
-        # return the formatted table
-        return '%s(%s)\n%s'%(self.aggregate, self.val, tt.draw())
 
     def write(self, fname=None, delimiter=','):
         """
         writes the pivot table to a plaintext file
+
+          as currently implemented does not write grandtotals
         """
         
         if self == []:
@@ -2228,109 +2178,146 @@ class PyvtTbl(list):
             wtr.writerow(first)
             wtr.writerow(header)
             wtr.writerows(data)
+            
+    def __str__(self):
+        """
+        returns a human friendly string representation of the table
+        """        
+        if self == []:
+            return '(table is empty)'
 
-##class Ttest1sample(OrderedDict):
-##    """Student's 1 sample t-test"""
-##    def __init__(self, *args, **kwds):
-##        if len(args) > 1:
-##            raise Exception('expecting only 1 argument')
-##
-##        if kwds.has_key('aname'):
-##            self.aname = kwds['aname']
-##        else:
-##            self.aname = None
-##
-##        if kwds.has_key('alpha'):
-##            self.alpha = kwds['alpha']
-##        else:
-##            self.alpha = 0.05
-##
-##        if len(args) == 1:
-##            super(Ttest1sample, self).__init__(args[0])
-##        else:
-##            super(Ttest1sample, self).__init__()
-##
-##    def run(self, A, pop_mean, alpha=0.05, aname=None):
-##        """
-##        Compares the data in A to the population mean of mu.
-##
-##         t = \frac{\overline{x} - \mu_0}{\frac{s}{\sqrt{n}}},
-##         where:
-##           s = sample standard deviation
-##        """
-##           
-##        try:
-##            A = _flatten(list(copy(A)))
-##        except:
-##            raise TypeError('A must be a list-like object')
-##
-##        if aname == None:
-##            self.aname = 'Measure'
-##        else:
-##            self.aname = aname
-##            
-##        self.A = A
-##        self.alpha = alpha
-##
-##        t, prob2, n, df, mu, v = stats.lttest_1samp(A, pop_mean)
-##    
-##        self['t'] = t
-##        self['p2tail'] = prob2
-##        self['p1tail'] = prob2 / 2.
-##        self['n'] = n
-##        self['df'] = df
-##        self['mu'] = mu
-##        self['pop_mean'] = pop_mean
-##        self['var'] = v
-##        self['tc2tail'] = jsci.tinv(alpha,df)
-##        self['tc1tail'] = jsci.tinv(2. * alpha,df)
-##            
-##    def __str__(self):
-##
-##        if self == {}:
-##            return '(no data in object)'
-##
-##        tt = TextTable(max_width=100000000)
-##        tt.set_cols_dtype(['t', 'a'])
-##        tt.set_cols_align(['l', 'r'])
-##        tt.set_deco(TextTable.HEADER)
-##
-##        first = 't-Test: One Sample for means\n'
-##        tt.header( ['',                       self.aname])
-##        tt.add_row(['Sample Mean',            self['mu']])
-##        tt.add_row(['Hypothesized Pop. Mean', self['pop_mu']])
-##        tt.add_row(['Variance',               self['var']])
-##        tt.add_row(['Observations',           self['n']])
-##        tt.add_row(['df',                     self['df']])
-##        tt.add_row(['t Stat',                 self['t']])
-##        tt.add_row(['P(T<=t) one-tail',       self['p1tail']])
-##        tt.add_row(['t Critical one-tail',    self['tc1tail']])
-##        tt.add_row(['P(T<=t) two-tail',       self['p2tail']])
-##        tt.add_row(['t Critical two-tail',    self['tc2tail']])
-##
-##        return '%s\n%s'%(first, tt.draw())
-##
-##    def __repr__(self):
-##        if self == {}:
-##            return 'Ttest1sample()'
-##
-##        s = []
-##        for k, v in self.items():
-##            s.append("('%s', %s)"%(k, repr(v)))
-##        args = '[' + ', '.join(s) + ']'
-##        
-##        kwds = []            
-##        if self.alpha != 0.05:
-##            kwds.append(", alpha=%s"%self.alpha)
-##
-##        if self.aname != None:
-##            kwds.append(", aname='%s'"%self.aname)
-##            
-##        kwds= ''.join(kwds)
-##        
-##        return 'Ttest1sample(%s%s)'%(args,kwds)
-			
-    
+        showtots = self.show_tots and self.calc_tots
+
+        rows = self._get_rows()
+        cols = self._get_cols()
+
+        # initialize table
+        tt = TextTable(max_width=0)
+
+        # no rows or cols were specified
+        if self.rnames == [1] and self.cnames == [1]:
+            # build the header
+            header = ['Value']
+
+            # initialize the texttable and add stuff
+            tt.set_cols_dtype(['t'])
+            tt.set_cols_dtype(['l'])
+            tt.add_row(self[0])
+            
+        elif self.rnames == [1]: # no rows were specified
+            # build the header
+            header = [',\n'.join('%s=%s'%(f, c) for (f, c) in L) \
+                      for L in self.cnames]
+            if showtots:
+                header.append('Grand\nTotal')
+            
+            # initialize the texttable and add stuff
+            # False and True evaluate as 0 and 1 for integer addition
+            # and list indexing
+            tt.set_cols_dtype(['a'] * (len(self.cnames)+showtots))
+            tt.set_cols_align(['r'] * (len(self.cnames)+showtots))
+            tt.add_row(self[0]+([],[self.grand_tot])[showtots])
+            
+        elif self.cnames == [1]: # no cols were specified
+            # build the header
+            header = rows + ['Value']
+            
+            # initialize the texttable and add stuff
+            tt.set_cols_dtype(['t'] * len(rows) + ['a'])
+            tt.set_cols_align(['l'] * len(rows) + ['r'])
+            for i, L in enumerate(self.rnames):
+                tt.add_row([c for (f, c) in L] + self[i])
+
+            if showtots:
+                tt.footer(['Grand Total'] + 
+                          ['']*(len(rows)-1) +
+                          [self.grand_tot])
+            
+        else: # table has rows and cols
+            # build the header
+            header = copy(rows)
+            for L in self.cnames:
+                header.append(',\n'.join('%s=%s'%(f, c) for (f, c) in L))
+            if showtots:
+                header.append('Grand\nTotal')
+
+            dtypes = ['t'] * len(rows) + ['a'] * (len(self.cnames)+showtots)
+            aligns = ['l'] * len(rows) + ['r'] * (len(self.cnames)+showtots)
+
+            # initialize the texttable and add stuff
+            tt.set_cols_dtype(dtypes)
+            tt.set_cols_align(aligns)
+            for i, L in enumerate(self.rnames):
+                tt.add_row([c for (f, c) in L] +
+                           self[i] +
+                           ([],[self.row_tots[i]])[showtots])
+
+            if showtots:
+                tt.footer(['Grand Total'] + 
+                          ['']*(len(rows)-1) +
+                          self.col_tots +
+                          [self.grand_tot])
+
+        # add header and decoration
+        tt.header(header)
+        tt.set_deco(TextTable.HEADER | TextTable.FOOTER)
+
+        # return the formatted table
+        return '%s(%s)\n%s'%(self.aggregate, self.val, tt.draw())
+
+    def __repr__(self):
+        """
+        returns a machine friendly string representation of the object
+        """
+        if self == []:
+            return 'PyvtTbl()'
+
+        args = super(PyvtTbl, self).__repr__()
+        kwds = []
+        if self.val != None:
+            kwds.append(", val='%s'"%self.val)
+
+        if self.show_tots != True:
+            kwds.append(", show_tots=False")
+
+        if self.calc_tots != True:
+            kwds.append(", calc_tots=False")
+
+        if self.row_tots != None:
+            kwds.append(', row_tots=%s'%repr(self.row_tots))
+                
+        if self.col_tots != None:
+            kwds.append(', col_tots=%s'%repr(self.col_tots))
+            
+        if self.grand_tot != None:
+            kwds.append(', grand_tot=%s'%repr(self.grand_tot))
+            
+        if self.rnames != None:
+            kwds.append(', rnames=%s'%repr(self.rnames))
+
+        if self.cnames != None:
+            kwds.append(', cnames=%s'%repr(self.cnames))
+
+        if self.aggregate != 'avg':
+            kwds.append(", aggregate='%s'"%self.aggregate)
+            
+        if self.flatten != False:
+            kwds.append(', flatten=%s'%self.flatten)
+            
+        if self.where != []:
+            if isinstance(self.where, _strobj):
+                kwds.append(", where='%s'"%self.where)
+            else:
+                kwds.append(", where=%s"%self.where)
+
+        if self.attach_rlabels != False:
+            kwds.append(', attach_rlabels=%s'%self.attach_rlabels)
+
+        if len(kwds)>1:
+            kwds = ''.join(kwds)
+            
+        return 'PyvtTbl(%s%s)'%(args,kwds)
+	    
 class Ttest(OrderedDict):
     """Student's t-test"""
     def __init__(self, *args, **kwds):
@@ -2701,7 +2688,7 @@ class Anova1way(OrderedDict):
         tt_a = TextTable(max_width=100000000)
         tt_a.set_cols_dtype(['t', 'a', 'a', 'a', 'a', 'a'])
         tt_a.set_cols_align(['l', 'r', 'r', 'r', 'r', 'r'])
-        tt_a.set_deco(TextTable.HEADER)
+        tt_a.set_deco(TextTable.HEADER | TextTable.FOOTER)
 
         tt_a.header( ['Source of Variation','SS','df','MS','F','P-value'])
         tt_a.add_row(['Treatments',self['ssbn'],self['dfbn'],
@@ -2709,7 +2696,7 @@ class Anova1way(OrderedDict):
         tt_a.add_row(['Error', self['sswn'],self['dfwn'],
                                self['mswn'],' ', ''])
         tt_a.add_row([' ',' ',' ',' ',' ',' '])
-        tt_a.add_row(['Total',self['ssbn']+self['sswn'],
+        tt_a.footer( ['Total',self['ssbn']+self['sswn'],
                               self['dfbn']+self['dfwn'],' ',' ',' '])
             
         return 'Anova: Single Factor on %s\n\n'%self.val + \
