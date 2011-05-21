@@ -15,17 +15,17 @@ from math import isnan, isinf, floor
 import numpy as np
 from pprint import pprint as pp
 from pyvttbl import DataFrame, PyvtTbl, Descriptives,  Marginals, Histogram, \
-     Ttest, ANOVA1way, _flatten, _isfloat, _isint
+     Ttest, Anova1way, _flatten, _isfloat, _isint
 
 class Test_anova1way(unittest.TestCase):
     def test0(self):
         """1 way anova"""
-        R="ANOVA1way([('f', 16.70726997413529), ('p', 4.5885798225758395e-06), ('ns', [14, 15, 16]), ('mus', [62.142857142857146, 57.2, 94.375]), ('vars', [202.13186813186815, 584.7428571428571, 339.5833333333333]), ('ssbn', 12656.046825396828), ('sswn', 15907.864285714284), ('dfbn', 2), ('dfwn', 42), ('msbn', 6328.023412698414), ('mswn', 378.7586734693877)], conditions_list=['A', 'B', 'C'])"
+        R="Anova1way([('f', 16.70726997413529), ('p', 4.5885798225758395e-06), ('ns', [14, 15, 16]), ('mus', [62.142857142857146, 57.2, 94.375]), ('vars', [202.13186813186815, 584.7428571428571, 339.5833333333333]), ('ssbn', 12656.046825396828), ('sswn', 15907.864285714284), ('dfbn', 2), ('dfwn', 42), ('msbn', 6328.023412698414), ('mswn', 378.7586734693877)], conditions_list=['A', 'B', 'C'])"
         listOflists=[[42,52,55,59,75,40,79,79,44,56,68,77,75,69],
                      [29,36,29,31,97,88,27,57,54,77,54,52,58,91,78],
                      [91,79,73,75,99,66,114,120,102,68,114,79,115,104,107,104]]
 
-        D=ANOVA1way()
+        D=Anova1way()
         D.run(listOflists)
         self.assertEqual(repr(D),R)
 
@@ -51,7 +51,7 @@ Total                 28563.911   44                                 """
                      [29,36,29,31,97,88,27,57,54,77,54,52,58,91,78],
                      [91,79,73,75,99,66,114,120,102,68,114,79,115,104,107,104]]
 
-        D=ANOVA1way()
+        D=Anova1way()
         D.run(listOflists)
         self.assertEqual(str(D),R)
 

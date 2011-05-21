@@ -1052,7 +1052,7 @@ class DataFrame(OrderedDict):
         # build list of condiitons
         conditions_list = [tup[1] for [tup] in pt.rnames]
 
-        a = ANOVA1way()
+        a = Anova1way()
         a.run(list_o_lists, val, factor, conditions_list)
         return a
     
@@ -2616,7 +2616,7 @@ class Ttest(OrderedDict):
         return 'Ttest(%s%s)'%(args,kwds)
 
 
-class ANOVA1way(OrderedDict):
+class Anova1way(OrderedDict):
     """1-way ANOVA"""
     def __init__(self, *args, **kwds):
         if len(args) > 1:
@@ -2643,9 +2643,9 @@ class ANOVA1way(OrderedDict):
             self.alpha = 0.05
 
         if len(args) == 1:
-            super(ANOVA1way, self).__init__(args[0])
+            super(Anova1way, self).__init__(args[0])
         else:
-            super(ANOVA1way, self).__init__()
+            super(Anova1way, self).__init__()
 
     def run(self, list_of_lists, val='Measure',
             factor='Factor', conditions_list=None, alpha=0.05):
@@ -2718,7 +2718,7 @@ class ANOVA1way(OrderedDict):
 
     def __repr__(self):
         if self == {}:
-            return 'ANOVA1way()'
+            return 'Anova1way()'
 
         s = []
         for k, v in self.items():
@@ -2740,7 +2740,7 @@ class ANOVA1way(OrderedDict):
             
         kwds= ''.join(kwds)
         
-        return 'ANOVA1way(%s%s)'%(args,kwds)
+        return 'Anova1way(%s%s)'%(args,kwds)
     
 class Descriptives(OrderedDict):
     def __init__(self, *args, **kwds):
