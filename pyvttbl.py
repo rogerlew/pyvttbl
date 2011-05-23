@@ -1112,6 +1112,24 @@ class DataFrame(OrderedDict):
         x2= ChiSquare2way()
         x2.run(row_factor, col_factor, alpha=alpha)
         return x2
+
+
+    def correlation(self, variables, coefficient='pearson',
+                    alpha=0.05, where=None):
+        """
+        calculates a correlation matrix between the measures
+        in the the variables parameter. The correlation
+        coefficient can be set to pearson, spearman,
+        kendalltau, or pointbiserial.
+        """
+        list_of_lists = []
+        for var in sorted(variables):
+            list_of_lists.append(self.select_col(var, where))
+
+        cor= Correlation()
+        cor.run(list_of_lists, sorted(variables),
+                coefficient=coefficient, alpha=alpha)
+        return cor
                 
     def ttest(self, aname, bname=None, pop_mean=0., paired=False,
               equal_variance=True, where=None):
