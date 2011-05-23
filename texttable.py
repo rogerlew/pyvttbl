@@ -478,6 +478,8 @@ class Texttable:
         maxi = []
         if self._header:
             maxi = [ self._len_cell(x) for x in self._header ]
+        if self._footer:
+            maxi = [ self._len_cell(x) for x in self._footer ]
         for row in self._rows:
             for cell,i in zip(row, range(len(row))):
                 try:

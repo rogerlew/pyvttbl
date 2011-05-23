@@ -15,8 +15,168 @@ from math import isnan, isinf, floor
 import numpy as np
 from pprint import pprint as pp
 from pyvttbl import DataFrame, PyvtTbl, Descriptives,  Marginals, Histogram, \
-     Ttest, Anova1way, _flatten, _isfloat, _isint
+     Ttest, Anova1way, ChiSquare1way, ChiSquare2way, _flatten, _isfloat, _isint
 
+class Test_chisquare2way(unittest.TestCase):
+    def test0(self):
+        """chi-square 2-way"""
+        R="""Chi-Square: two Factor
+
+SUMMARY
+         Guilty     NotGuilt   Tot 
+                       y       al  
+==================================
+High          105         76   181 
+        (130.441)   (50.559)       
+Low           153         24   177 
+        (127.559)   (49.441)       
+==================================
+Total         258        100   358 
+
+SYMMETRIC MEASURES
+                          Value    Approx.  
+                                    Sig.    
+===========================================
+Cramer's V                0.317   8.686e-10 
+Contingency Coefficient   0.302   5.510e-09 
+N of Valid Cases            358             
+
+CHI-SQUARE TESTS
+                     Value    df       P     
+============================================
+Pearson Chi-Square   35.930    1   2.053e-09 
+Likelihood Ratio     37.351    1           0 
+N of Valid Cases        358                  """
+        df=DataFrame()
+        df['FAULTS']=list(Counter(Low=177,High=181).elements())
+        df['FAULTS'].reverse()
+        df['VERDICT']=list(Counter(Guilty=153, NotGuilty=24).elements())
+        df['VERDICT'].extend(list(Counter(Guilty=105, NotGuilty=76).elements()))
+
+        x2= df.chisquare2way('FAULTS','VERDICT')
+        self.assertEqual(str(x2), R)
+
+    def test1(self):
+        """chi-square 2-way"""
+        R="""Chi-Square: two Factor
+
+SUMMARY
+            Litter      Removed     Trash     Tota 
+                                     Can       l   
+==================================================
+Countrol         385         477         41    903 
+           (343.976)   (497.363)   (61.661)        
+Message          290         499         80    869 
+           (331.024)   (478.637)   (59.339)        
+==================================================
+Total            675         976        121   1772 
+
+SYMMETRIC MEASURES
+                          Value    Approx.  
+                                    Sig.    
+===========================================
+Cramer's V                0.121   3.510e-07 
+Contingency Coefficient   0.120   4.263e-07 
+N of Valid Cases           1772             
+
+CHI-SQUARE TESTS
+                     Value    df       P     
+============================================
+Pearson Chi-Square   25.794    2   2.506e-06 
+Likelihood Ratio     26.056    2   2.198e-06 
+N of Valid Cases       1772                  """
+        
+        df=DataFrame()
+        rfactors=['Countrol']*903 + ['Message']*869
+        cfactors=['Trash Can']*41 + ['Litter']*385 + ['Removed']*477
+        cfactors+=['Trash Can']*80 + ['Litter']*290 + ['Removed']*499
+        
+        x2= ChiSquare2way()
+        x2.run(rfactors, cfactors)
+        self.assertEqual(str(x2), R)
+
+    def test2(self):
+        """chi-square 2-way"""
+        R="""ChiSquare2way([('chisq', 25.79364579345589), ('p', 2.5059995107347527e-06), ('df', 2), ('lnchisq', 26.055873891205664), ('lnp', 2.1980566132523407e-06), ('N', 1772.0), ('C', 0.11978058926585373), ('CramerV', 0.12064921681366868), ('CramerV_prob', 3.50998747929475e-07), ('C_prob', 4.26267335738495e-07)], counter=Counter({('Message', 'Removed'): 499.0, ('Countrol', 'Removed'): 477.0, ('Countrol', 'Litter'): 385.0, ('Message', 'Litter'): 290.0, ('Message', 'Trash Can'): 80.0, ('Countrol', 'Trash Can'): 41.0}), row_counter=Counter({'Countrol': 903.0, 'Message': 869.0}), col_counter=Counter({'Removed': 976.0, 'Litter': 675.0, 'Trash Can': 121.0}), N_r=2, N_c=3)"""
+        
+        rfactors=['Countrol']*903 + ['Message']*869
+        cfactors=['Trash Can']*41 + ['Litter']*385 + ['Removed']*477
+        cfactors+=['Trash Can']*80 + ['Litter']*290 + ['Removed']*499
+        
+        x2= ChiSquare2way()
+        x2.run(rfactors, cfactors)
+        self.assertEqual(repr(x2), R)
+        
+class Test_chisquare1way(unittest.TestCase):
+    def test0(self):
+        """chi-square 1-way"""
+        R="""Chi-Square: Single Factor
+
+SUMMARY
+           A   B   C   D  
+=========================
+Observed   4   5   8   15 
+Expected   8   8   8    8 
+
+CHI-SQUARE TESTS
+                     Value   df     P   
+=======================================
+Pearson Chi-Square   9.250    3   0.026 
+Likelihood Ratio     8.613    3   0.035 
+Observations            32              """
+
+        D=ChiSquare1way()
+        D.run([4,5,8,15])
+        self.assertEqual(str(D),R)
+
+    def test1(self):
+        R="ChiSquare1way([('chisq', 9.25), ('p', 0.026145200026967786), ('df', 3), ('lnchisq', 8.613046045734304), ('lnp', 0.03490361434485369), ('lndf', 3)], conditions_list=['A', 'B', 'C', 'D'])"
+        D=ChiSquare1way()
+        D.run([4,5,8,15])
+        self.assertEqual(repr(D),R)
+        
+    def test1(self):
+        R="""Chi-Square: Single Factor
+
+SUMMARY
+             1        2        3        4    
+============================================
+Observed        7       20       23        9 
+Expected   14.750   14.750   14.750   14.750 
+
+CHI-SQUARE TESTS
+                     Value    df     P   
+========================================
+Pearson Chi-Square   12.797    3   0.005 
+Likelihood Ratio     13.288    3   0.004 
+Observations             59              """
+
+        df = DataFrame()
+        df.read_tbl('chi_test.csv')
+        X=df.chisquare1way('RESULT')
+        self.assertEqual(str(X),R)
+
+    def test2(self):
+        R="""Chi-Square: Single Factor
+
+SUMMARY
+             1        2        3        4        5    
+=====================================================
+Observed        7       20       23        9        0 
+Expected   11.800   11.800   11.800   11.800   11.800 
+
+CHI-SQUARE TESTS
+                     Value    df        P     
+=============================================
+Pearson Chi-Square   30.746     4   3.450e-06 
+Likelihood Ratio        nan   nan         nan 
+Observations             59                   """
+
+        df = DataFrame()
+        df.read_tbl('chi_test.csv')
+        X=df.chisquare1way('RESULT',{1:11.8 ,2:11.8 ,3:11.8 ,4:11.8 ,5:11.8})
+        self.assertEqual(str(X),R)
+        
 class Test_anova1way(unittest.TestCase):
     def test0(self):
         """1 way anova"""
@@ -42,12 +202,13 @@ B           15    858    57.200    584.743
 C           16   1510    94.375    339.583 
 
 ANOVA
-Source of Variation      SS       df      MS        F       P-value  
-====================================================================
-Treatments            12656.047    2   6328.023   16.707   4.589e-06 
-Error                 15907.864   42    378.759                      
-====================================================================
-Total                 28563.911   44                                 """
+Source of       SS       df      MS        F       P-value  
+Variation                                                   
+===========================================================
+Treatments   12656.047    2   6328.023   16.707   4.589e-06 
+Error        15907.864   42    378.759                      
+===========================================================
+Total        28563.911   44                                 """
         listOflists=[[42,52,55,59,75,40,79,79,44,56,68,77,75,69],
                      [29,36,29,31,97,88,27,57,54,77,54,52,58,91,78],
                      [91,79,73,75,99,66,114,120,102,68,114,79,115,104,107,104]]
@@ -67,12 +228,13 @@ AB         128   2510.600    19.614    250.326
 LAB        128   2945.000    23.008    264.699 
 
 ANOVA
-Source of Variation      SS       df       MS        F      P-value  
-====================================================================
-Treatments             3144.039     2   1572.020   7.104   9.348e-04 
-Error                 84304.687   381    221.272                     
-====================================================================
-Total                 87448.726   383                                """
+Source of       SS       df       MS        F      P-value  
+Variation                                                   
+===========================================================
+Treatments    3144.039     2   1572.020   7.104   9.348e-04 
+Error        84304.687   381    221.272                     
+===========================================================
+Total        87448.726   383                                """
         
         df = DataFrame()
         df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
@@ -293,6 +455,8 @@ t Critical two-tail      2.201            """
             
 def suite():
     return unittest.TestSuite((
+            unittest.makeSuite(Test_chisquare2way),
+            unittest.makeSuite(Test_chisquare1way),
             unittest.makeSuite(Test_anova1way),
             unittest.makeSuite(Test_ttest1sample),
             unittest.makeSuite(Test_ttest)

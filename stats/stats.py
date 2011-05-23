@@ -1119,9 +1119,9 @@ Returns: t-value, two-tailed prob
     return t, prob, n, df, x1, x2, v1, v2
 
 
-def lchisquare(f_obs,f_exp=None):
+def lchisquare(f_obs, f_exp=None, df=None):
     """
-Calculates a one-way chi square for list of observed frequencies and returns
+Calculates a one-way pearsonchi square for list of observed frequencies and returns
 the result.  If no expected frequencies are given, the total N is assumed to
 be equally distributed across all groups.
 
@@ -1133,9 +1133,36 @@ Returns: chisquare-statistic, associated p-value
         f_exp = [sum(f_obs)/float(k)] * len(f_obs) # create k bins with = freq.
     chisq = 0
     for i in range(len(f_obs)):
-        chisq = chisq + (f_obs[i]-f_exp[i])**2 / float(f_exp[i])
-    return chisq, chisqprob(chisq, k-1)
+        chisq += (f_obs[i]-f_exp[i])**2 / float(f_exp[i])
 
+    if df == None:
+        df = k-1
+        
+    return chisq, chisqprob(chisq, df), df, f_exp
+
+def llnchisquare(f_obs,f_exp=None, df=None):
+    """
+Calculates a one-way log-likelihood chi square for list of observed frequencies and returns
+the result.  If no expected frequencies are given, the total N is assumed to
+be equally distributed across all groups.
+
+Usage:   lchisquare(f_obs, f_exp=None)   f_obs = list of observed cell freq.
+Returns: chisquare-statistic, associated p-value
+"""
+    k = len(f_obs)                 # number of groups
+    if f_exp == None:
+        f_exp = [sum(f_obs)/float(k)] * len(f_obs) # create k bins with = freq.
+
+    chisq = 0
+    for i in range(len(f_obs)):
+        chisq += f_obs[i]*math.log(f_obs[i]/float(f_exp[i]))
+
+    chisq *= 2
+    
+    if df == None:
+        df = k-1
+        
+    return chisq, chisqprob(chisq, df), df, f_exp
 
 def lks_2samp (data1,data2):
     """

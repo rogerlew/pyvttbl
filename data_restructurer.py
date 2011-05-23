@@ -45,7 +45,7 @@ def long2wide(in_fname, id, dvs, between=[], within=[],
                 
                 # process headers
                 for names in z.rnames:
-                    h = ';'.join(('%s_%s'%(f, str(c)) for (f,c) in names))
+                    h = '_'.join(('%s.%s'%(f, str(c)) for (f,c) in names))
                     header.append('%s__%s'%(dv, h))
 
     # Now we can write the data
@@ -57,14 +57,14 @@ def long2wide(in_fname, id, dvs, between=[], within=[],
         wtr.writerow([n.upper() for n in header])
         wtr.writerows(zip(*d)) # transpose and write
         
-long2wide(in_fname='long_test_data.csv',
-          id='participant',
-          dvs=['dv1','dv2'],
-          between=['bfactor1'],
-          within=['wfactor1','wfactor2','wfactor3'],
-          covariates=['cov1','cov2'],
-          out_fname='formatted.csv',
-          nested=False)
+##long2wide(in_fname='long_test_data.csv',
+##          id='participant',
+##          dvs=['dv1','dv2'],
+##          between=['bfactor1'],
+##          within=['wfactor1','wfactor2','wfactor3'],
+##          covariates=['cov1','cov2'],
+##          out_fname='formatted.csv',
+##          nested=False)
 
 ##import time
 ##

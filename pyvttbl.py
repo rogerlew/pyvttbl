@@ -1042,21 +1042,78 @@ class DataFrame(OrderedDict):
             raise Exception('columns have unequal lengths')
 
         # build list of lists for ANOVA1way object
-        list_o_lists = []
+        list_of_lists = []
         pt = self.pivot(val,rows=[factor],
                         aggregate='tolist',
                         where=where)
         for L in pt:
-            list_o_lists.append(L[0])
+            list_of_lists.append(L[0])
 
         # build list of condiitons
         conditions_list = [tup[1] for [tup] in pt.rnames]
 
         a = Anova1way()
-        a.run(list_o_lists, val, factor, conditions_list)
+        a.run(list_of_lists, val, factor, conditions_list)
         return a
     
+    def chisquare1way(self, observed, expected_dict=None,
+                      alpha=0.05, where=None):
+        """
+        Returns a ChiSquare1way object containing the results of a
+        chi-square goodness-of-fit test on the data in observed. The data
+        in the observed column are treated a categorical. Expected counts
+        can be given with the expected_dict. It should be a dictionary
+        object with keys matching the categories in observed and values
+        with the expected counts. The categories in the observed column
+        must be a subset of the keys in the expected_dict. If
+        expected_dict is None,the total N is assumed to be equally
+        distributed across all groups.
+        """
+        # ched the expected_dict
+        if expected_dict != None:
+            try:
+                expected_dict2 = dict(copy(expected_dict))
+            except:
+                raise TypeError("'%s' is not a mappable type"
+                                %type(expected_dict).__name__())
 
+            if not self.conditions[(observed,self.typesdict()[observed])] <= \
+                   set(expected_dict2.keys()):
+                raise Exception('expected_dict must contain a superset of  '
+                                'of the observed categories')
+        else:
+            expected_dict2 = Counter()
+
+        # find the counts
+        observed_dict=Counter(self.select_col(observed, where))
+
+        # build arguments for ChiSquare1way
+        observed_list = []
+        expected_list = []
+        conditions_list = sorted(set(observed_dict.keys()) |
+                                 set(expected_dict2.keys()))
+        for key in conditions_list:
+            observed_list.append(observed_dict[key])
+            expected_list.append(expected_dict2[key])
+
+        if expected_dict == None:
+            expected_list = None
+
+        # run analysis
+        x = ChiSquare1way()
+        x.run(observed_list, expected_list, conditions_list=conditions_list,
+              measure=observed, alpha=alpha)
+
+        return x
+
+    def chisquare2way(self, rfactor, cfactor, alpha=0.05, where=None):
+        row_factor = self.select_col(rfactor, where)
+        col_factor = self.select_col(cfactor, where)
+
+        x2= ChiSquare2way()
+        x2.run(row_factor, col_factor, alpha=alpha)
+        return x2
+                
     def ttest(self, aname, bname=None, pop_mean=0., paired=False,
               equal_variance=True, where=None):
         """
@@ -2095,9 +2152,9 @@ class PyvtTbl(list):
           The second element is the number of rows
         """
         if len(self) == 0:
-            return tuple(0, 0)
+            return (0, 0)
         
-        return tuple(len(self._get_rows()), len(self[0]))
+        return (len(self.rnames), len(self[0]))
 
     def write(self, fname=None, delimiter=','):
         """
@@ -2185,6 +2242,9 @@ class PyvtTbl(list):
         """        
         if self == []:
             return '(table is empty)'
+
+        if self.flatten:
+            return super(PyvtTbl, self).__str__()
 
         showtots = self.show_tots and self.calc_tots
 
@@ -2602,7 +2662,6 @@ class Ttest(OrderedDict):
         
         return 'Ttest(%s%s)'%(args,kwds)
 
-
 class Anova1way(OrderedDict):
     """1-way ANOVA"""
     def __init__(self, *args, **kwds):
@@ -2637,9 +2696,11 @@ class Anova1way(OrderedDict):
     def run(self, list_of_lists, val='Measure',
             factor='Factor', conditions_list=None, alpha=0.05):
         """
-        
+        performs a one way analysis of variance on the data in
+        list_of_lists. Each sub-list is treated as a group. factor
+        is a label for the independent variable and conditions_list
+        is a list of labels for the different treatment groups.
         """
-
         self.L = list_of_lists
         self.val = val
         self.factor = factor
@@ -2728,6 +2789,313 @@ class Anova1way(OrderedDict):
         kwds= ''.join(kwds)
         
         return 'Anova1way(%s%s)'%(args,kwds)
+
+class ChiSquare1way(OrderedDict):
+    """1-way Chi-Square Test"""
+    def __init__(self, *args, **kwds):
+        if len(args) > 1:
+            raise Exception('expecting only 1 argument')
+
+        if kwds.has_key('measure'):
+            self.measure = kwds['measure']
+        else:
+            self.measure = 'Measure'
+            
+        if kwds.has_key('conditions_list'):
+            self.conditions_list = kwds['conditions_list']
+        else:
+            self.conditions_list = []
+            
+        if kwds.has_key('alpha'):
+            self.alpha = kwds['alpha']
+        else:
+            self.alpha = 0.05
+
+        if len(args) == 1:
+            super(ChiSquare1way, self).__init__(args[0])
+        else:
+            super(ChiSquare1way, self).__init__()
+
+    def run(self, observed, expected=None, conditions_list=None,
+            measure='Measure', alpha=0.05):
+        """
+        
+        """
+        chisq, prob, df, expected = stats.lchisquare(observed, expected)
+        try:
+            lnchisq, lnprob, lndf, lnexpected = \
+                     stats.llnchisquare(observed, expected)
+        except:
+            lnchisq, lnprob, lndf, lnexpected = 'nan','nan','nan','nan'
+            
+        self.observed = observed
+        self.expected = expected
+        self.alpha = alpha
+        
+        if conditions_list == None:
+            self.conditions_list = []
+            abc = lambda i : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'\
+                             [i%26]*(int(math.floor(i/26))+1)
+            for i in _xrange(len(observed)):
+                self.conditions_list.append(abc(i))
+        else:
+            self.conditions_list = conditions_list
+
+        self['chisq'] = chisq
+        self['p'] = prob
+        self['df'] = df
+        self['lnchisq'] = lnchisq
+        self['lnp'] = lnprob
+        self['lndf'] = lndf
+        self.observed = observed
+        self.expected = expected
+        
+    def __str__(self):
+
+        if self == {}:
+            return '(no data in object)'
+
+        tt_s = TextTable(max_width=0)
+        tt_s.set_cols_dtype(['t'] + ['a']*len(self.observed))
+        tt_s.set_cols_align(['l'] + ['r']*len(self.observed))
+        tt_s.set_deco(TextTable.HEADER)
+
+        tt_s.header( [' '] + self.conditions_list)
+
+        tt_s.add_row(['Observed'] + self.observed)
+        tt_s.add_row(['Expected'] + self.expected)
+
+        tt_a = TextTable(max_width=0)
+        tt_a.set_cols_dtype(['t', 'a', 'a', 'a'])
+        tt_a.set_cols_align(['l', 'r', 'r', 'r'])
+        tt_a.set_deco(TextTable.HEADER)
+
+        tt_a.header([' ', 'Value', 'df', 'P'])
+        tt_a.add_row(['Pearson Chi-Square',
+                      self['chisq'], self['df'], self['p']])
+        tt_a.add_row(['Likelihood Ratio',
+                      self['lnchisq'], self['lndf'], self['lnp']])
+        tt_a.add_row(['Observations', sum(self.observed),'',''])
+                     
+        return 'Chi-Square: Single Factor\n\n' + \
+               'SUMMARY\n%s\n\n'%tt_s.draw() + \
+               'CHI-SQUARE TESTS\n%s'%tt_a.draw()
+
+    def __repr__(self):
+        if self == {}:
+            return 'ChiSquare1way()'
+
+        s = []
+        for k, v in self.items():
+            s.append("('%s', %s)"%(k, repr(v)))
+        args = '[' + ', '.join(s) + ']'
+
+        kwds = []
+        if self.measure != 'Measure':
+            kwds.append(', val="%s"'%self.measure)
+            
+        if self.conditions_list != []:
+            kwds.append(', conditions_list=%s'%repr(self.conditions_list))
+            
+        if self.alpha != 0.05:
+            kwds.append('alpha=%s'%str(self.alpha))
+            
+        kwds= ''.join(kwds)
+        
+        return 'ChiSquare1way(%s%s)'%(args,kwds)
+
+
+class ChiSquare2way(OrderedDict):
+    def __init__(self, *args, **kwds):
+        if len(args) > 1:
+            raise Exception('expecting only 1 argument')
+
+        if kwds.has_key('counter'):
+            self.counter = kwds['counter']
+        else:
+            self.counter = None
+
+        if kwds.has_key('row_counter'):
+            self.row_counter = kwds['row_counter']
+        else:
+            self.row_counter = None
+
+        if kwds.has_key('col_counter'):
+            self.col_counter = kwds['col_counter']
+        else:
+            self.col_counter = None
+
+        if kwds.has_key('N_r'):
+            self.N_r = kwds['N_r']
+        else:
+            self.N_r = None
+
+        if kwds.has_key('N_c'):
+            self.N_c = kwds['N_c']
+        else:
+            self.N_c = None
+
+        if kwds.has_key('alpha'):
+            self.alpha = kwds['alpha']
+        else:
+            self.alpha = 0.05
+            
+        if len(args) == 1:
+            super(ChiSquare2way, self).__init__(args[0])
+        else:
+            super(ChiSquare2way, self).__init__()
+            
+    def run(self, row_factor, col_factor, alpha=0.05):   
+        """
+        runs a 2-way chi square on the matched data in row_factor
+        and col_factor.
+        """
+
+        if len(row_factor) != len(col_factor):
+            raise Exception('row_factor and col_factor must be equal lengths')
+
+        counter = Counter()
+        row_counter= Counter()
+        col_counter= Counter()
+        for r,c in zip(row_factor, col_factor):
+            counter[(r,c)] += 1.
+            row_counter[r] += 1.
+            col_counter[c] += 1.
+
+        N = float(sum(counter.values()))
+        observed = []
+        expected = []
+        for r in sorted(row_counter):
+            observed.append([])
+            expected.append([])
+            for c in sorted(col_counter):
+                observed[-1].append(counter[(r,c)])
+                expected[-1].append((row_counter[r]*col_counter[c])/N)
+
+        N_r, N_c = len(row_counter), len(col_counter)
+        df = (N_r - 1) * (N_c - 1)
+
+        chisq = sum((o-e)**2/e for o,e in
+                    zip(_flatten(observed),_flatten(expected)))
+        prob = stats.chisqprob(chisq,df)
+
+        try:        
+            lnchisq = 2.*sum(o*math.log(o/e) for o,e in
+                             zip(_flatten(observed),_flatten(expected)))
+            lnprob = stats.chisqprob(lnchisq,df)
+        except:
+            lnchisq = 'nan'
+            lnprob = 'nan'
+
+        def rprob(r,df):
+            TINY = 1e-30
+            t = r*math.sqrt(df/((1.0-r+TINY)*(1.0+r+TINY)))
+            return stats.betai(0.5*df,0.5,df/(df+t*t))
+            
+        k = min([N_r, N_c])
+        cramerV = math.sqrt(chisq/(N*(k-1)))
+        cramerV_prob = rprob(cramerV, N-2)
+        C = math.sqrt(chisq/(chisq + N))
+        C_prob = rprob(C, N-2)
+                
+        self['chisq'] = chisq
+        self['p'] = prob
+        self['df'] = df
+        self['lnchisq'] = lnchisq
+        self['lnp'] = lnprob
+        self['N'] = N
+        self['C'] = C
+        self['CramerV'] = cramerV
+        self['CramerV_prob'] = cramerV_prob
+        self['C'] = C
+        self['C_prob'] = C_prob
+        
+        self.counter = counter
+        self.row_counter = row_counter
+        self.col_counter = col_counter
+        self.N_r = N_r
+        self.N_c = N_c
+        
+    def __str__(self):
+        """Returns human readable string representaition of Marginals"""
+
+        if self == {}:
+            return '(no data in object)'
+
+        tt_s = TextTable(max_width=0)
+        tt_s.set_cols_dtype(['t'] + ['a']*(self.N_c + 1))
+        tt_s.set_cols_align(['l'] + ['r']*(self.N_c + 1))
+        tt_s.set_deco(TextTable.HEADER | TextTable.FOOTER)
+        tt_s.header( [' '] + sorted(self.col_counter) + ['Total'])
+
+        for r, rv in sorted(self.row_counter.items()):
+            line = [r]
+            for c, cv in sorted(self.col_counter.items()):
+                o = self.counter[(r,c)]
+                e = (rv*cv)/self['N']
+                line.append('%s\n(%s)'%(_str(o), _str(e)))
+            line.append(rv)
+            tt_s.add_row(line)
+        tt_s.footer(['Total'] +
+                    [v for c,v in sorted(self.col_counter.items())] +
+                    [self['N']])
+
+        tt_sym = TextTable(max_width=0)
+        tt_sym.set_cols_dtype(['t', 'a', 'a'])
+        tt_sym.set_cols_align(['l', 'r', 'r'])
+        tt_sym.set_deco(TextTable.HEADER)
+        tt_sym.header(['','Value','Approx.\nSig.'])
+        tt_sym.add_row(["Cramer's V", self['CramerV'], self['CramerV_prob']])
+        tt_sym.add_row(["Contingency Coefficient", self['C'], self['C_prob']])
+        tt_sym.add_row(["N of Valid Cases", self['N'], ''])
+                              
+
+        tt_a = TextTable(max_width=0)
+        tt_a.set_cols_dtype(['t', 'a', 'a', 'a'])
+        tt_a.set_cols_align(['l', 'r', 'r', 'r'])
+        tt_a.set_deco(TextTable.HEADER)
+        tt_a.header([' ', 'Value', 'df', 'P'])
+        tt_a.add_row(['Pearson Chi-Square',
+                      self['chisq'], self['df'], self['p']])
+        tt_a.add_row(['Likelihood Ratio',
+                      self['lnchisq'], self['df'], self['lnp']])
+        tt_a.add_row(["N of Valid Cases", self['N'], '', ''])
+        
+        return 'Chi-Square: two Factor\n\n' + \
+               'SUMMARY\n%s\n\n'%tt_s.draw() + \
+               'SYMMETRIC MEASURES\n%s\n\n'%tt_sym.draw() + \
+               'CHI-SQUARE TESTS\n%s'%tt_a.draw()
+
+
+    def __repr__(self):
+        if self == {}:
+            return 'ChiSquare2way()'
+        
+        s = []
+        for k, v in self.items():
+            s.append("('%s', %s)"%(k, repr(v)))
+        args = '[' + ', '.join(s) + ']'
+        
+        kwds = []                        
+        if self.counter != None:
+            kwds.append(', counter=%s'%repr(self.counter))
+
+        if self.row_counter != None:
+            kwds.append(', row_counter=%s'%repr(self.row_counter))
+
+        if self.col_counter != None:
+            kwds.append(', col_counter=%s'%repr(self.col_counter))
+
+        if self.N_r != None:
+            kwds.append(', N_r=%i'%self.N_r)
+
+        if self.N_c != None:
+            kwds.append(', N_c=%i'%self.N_c)
+
+        if self.alpha != 0.05:
+            kwds.append('alpha=%s'%str(self.alpha))
+            
+        return 'ChiSquare2way(%s%s)'%(args, ''.join(kwds))
     
 class Descriptives(OrderedDict):
     def __init__(self, *args, **kwds):
@@ -2748,9 +3116,7 @@ class Descriptives(OrderedDict):
         """
         generates and stores descriptive statistics for the
         numerical data in V
-        """
-        
-        
+        """        
         try:
             V = sorted(_flatten(list(copy(V))))
         except:
