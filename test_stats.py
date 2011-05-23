@@ -8,30 +8,41 @@ import warnings
 import os
 import math
 
-from random import shuffle
+from random import shuffle, random
 from collections import Counter,OrderedDict
 from dictset import DictSet,_rep_generator
 from math import isnan, isinf, floor
 import numpy as np
 from pprint import pprint as pp
 from pyvttbl import DataFrame, PyvtTbl, Descriptives,  Marginals, Histogram, \
-     Ttest, Anova1way, ChiSquare1way, ChiSquare2way, _flatten, _isfloat, _isint
+     Ttest, Anova1way, ChiSquare1way, ChiSquare2way, Correlation, \
+     _flatten, _isfloat, _isint
 
+class Test_correlation(unittest.TestCase):
+    def test0(self):
+        R="""Correlation([(('t1', 't2'), {'p': 7.244581351822648e-12, 'r': 0.9590909090909091}), (('t1', 't3'), {'p': 3.734186811576215e-08, 'r': -0.8967532467532469}), (('t2', 't3'), {'p': 1.0810361295619094e-09, 'r': -0.92987012987013}), ('N', 21)], conditions_list=['t1', 't2', 't3'], coefficient='spearman')"""
+        df=DataFrame()
+        A=[24,61,59,46,43,44,52,43,58,67,62,57,71,49,54,43,53,57,49,56,33]
+        B=[a+10+random()*10 for a in A]
+        C=[-1.*(b+random()*20) for b in B]
+
+        Cor=Correlation()
+        Cor.run([A,B,C],['t1','t2','t3'],coefficient='spearman')
+        self.assertEqual(repr(Cor),R)
+        
 class Test_chisquare2way(unittest.TestCase):
     def test0(self):
-        """chi-square 2-way"""
         R="""Chi-Square: two Factor
 
 SUMMARY
-         Guilty     NotGuilt   Tot 
-                       y       al  
-==================================
-High          105         76   181 
-        (130.441)   (50.559)       
-Low           153         24   177 
-        (127.559)   (49.441)       
-==================================
-Total         258        100   358 
+         Guilty     NotGuilty   Total 
+=========================================
+High          105          76     181 
+        (130.441)    (50.559)         
+Low           153          24     177 
+        (127.559)    (49.441)         
+=========================================
+Total         258         100     358 
 
 SYMMETRIC MEASURES
                           Value    Approx.  
@@ -42,11 +53,12 @@ Contingency Coefficient   0.302   5.510e-09
 N of Valid Cases            358             
 
 CHI-SQUARE TESTS
-                     Value    df       P     
-============================================
-Pearson Chi-Square   35.930    1   2.053e-09 
-Likelihood Ratio     37.351    1           0 
-N of Valid Cases        358                  """
+                        Value    df       P     
+===============================================
+Pearson Chi-Square      35.930    1   2.053e-09 
+Continuity Correction   34.532    1   4.201e-09 
+Likelihood Ratio        37.351    1           0 
+N of Valid Cases           358                  """
         df=DataFrame()
         df['FAULTS']=list(Counter(Low=177,High=181).elements())
         df['FAULTS'].reverse()
@@ -61,15 +73,14 @@ N of Valid Cases        358                  """
         R="""Chi-Square: two Factor
 
 SUMMARY
-            Litter      Removed     Trash     Tota 
-                                     Can       l   
-==================================================
-Countrol         385         477         41    903 
-           (343.976)   (497.363)   (61.661)        
-Message          290         499         80    869 
-           (331.024)   (478.637)   (59.339)        
-==================================================
-Total            675         976        121   1772 
+            Litter      Removed    Trash Can   Total 
+====================================================
+Countrol         385         477          41     903 
+           (343.976)   (497.363)    (61.661)         
+Message          290         499          80     869 
+           (331.024)   (478.637)    (59.339)         
+====================================================
+Total            675         976         121    1772 
 
 SYMMETRIC MEASURES
                           Value    Approx.  
@@ -97,7 +108,7 @@ N of Valid Cases       1772                  """
 
     def test2(self):
         """chi-square 2-way"""
-        R="""ChiSquare2way([('chisq', 25.79364579345589), ('p', 2.5059995107347527e-06), ('df', 2), ('lnchisq', 26.055873891205664), ('lnp', 2.1980566132523407e-06), ('N', 1772.0), ('C', 0.11978058926585373), ('CramerV', 0.12064921681366868), ('CramerV_prob', 3.50998747929475e-07), ('C_prob', 4.26267335738495e-07)], counter=Counter({('Message', 'Removed'): 499.0, ('Countrol', 'Removed'): 477.0, ('Countrol', 'Litter'): 385.0, ('Message', 'Litter'): 290.0, ('Message', 'Trash Can'): 80.0, ('Countrol', 'Trash Can'): 41.0}), row_counter=Counter({'Countrol': 903.0, 'Message': 869.0}), col_counter=Counter({'Removed': 976.0, 'Litter': 675.0, 'Trash Can': 121.0}), N_r=2, N_c=3)"""
+        R="""ChiSquare2way([('chisq', 25.79364579345589), ('p', 2.5059995107347527e-06), ('df', 2), ('lnchisq', 26.055873891205664), ('lnp', 2.1980566132523407e-06), ('ccchisq', None), ('ccp', None), ('N', 1772.0), ('C', 0.11978058926585373), ('CramerV', 0.12064921681366868), ('CramerV_prob', 3.50998747929475e-07), ('C_prob', 4.26267335738495e-07)], counter=Counter({('Message', 'Removed'): 499.0, ('Countrol', 'Removed'): 477.0, ('Countrol', 'Litter'): 385.0, ('Message', 'Litter'): 290.0, ('Message', 'Trash Can'): 80.0, ('Countrol', 'Trash Can'): 41.0}), row_counter=Counter({'Countrol': 903.0, 'Message': 869.0}), col_counter=Counter({'Removed': 976.0, 'Litter': 675.0, 'Trash Can': 121.0}), N_r=2, N_c=3)"""
         
         rfactors=['Countrol']*903 + ['Message']*869
         cfactors=['Trash Can']*41 + ['Litter']*385 + ['Removed']*477
@@ -455,9 +466,10 @@ t Critical two-tail      2.201            """
             
 def suite():
     return unittest.TestSuite((
+            unittest.makeSuite(Test_correlation),
             unittest.makeSuite(Test_chisquare2way),
             unittest.makeSuite(Test_chisquare1way),
-            unittest.makeSuite(Test_anova1way),
+##            unittest.makeSuite(Test_anova1way),
             unittest.makeSuite(Test_ttest1sample),
             unittest.makeSuite(Test_ttest)
                               ))

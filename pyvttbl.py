@@ -22,7 +22,7 @@ import warnings
 
 from pprint import pprint as pp
 from copy import copy, deepcopy
-from collections import OrderedDict, Counter
+from collections import OrderedDict, Counter, namedtuple
 
 import pystaggrelite3
 from dictset import DictSet
@@ -152,7 +152,7 @@ class DataFrame(OrderedDict):
         # holds the factors conditions (and all the data values)
         # maybe this should be built on the fly for necessary
         # columns only?
-        self.conditions = DictSet(self) 
+        self.conditions = DictSet([(n, self[n]) for n in self.names()]) 
 
         # prints the sqlite3 queries to stdout before
         # executing them for debugging purposes
@@ -233,7 +233,7 @@ class DataFrame(OrderedDict):
             super(DataFrame, self).__setitem__(name_type, v)
             
         del d
-        self.conditions = DictSet(self)
+        self.conditions = DictSet([(n,self[n]) for n in self.names()])
 
     def __contains__(self, key):
         return key in self.names()
@@ -265,7 +265,7 @@ class DataFrame(OrderedDict):
             if name in self.names() and dtype != self.typesdict()[name]:
                 del self[name]
             super(DataFrame, self).__setitem__((name, dtype), item)
-            self.conditions[(name, dtype)] = self[key]
+            self.conditions[name] = self[key]
             return
 
         # string, no where conditions to handle
@@ -279,7 +279,7 @@ class DataFrame(OrderedDict):
             if name in self.names() and dtype != self.typesdict()[name]:
                 del self[name]
             super(DataFrame, self).__setitem__((name, dtype), item)
-            self.conditions[(name, dtype)] = self[key]
+            self.conditions[name] = self[key]
             return
 
         # string, with where conditions to handle    
@@ -294,7 +294,7 @@ class DataFrame(OrderedDict):
                             'of conditions in selection')
         for i,v in zip(indices, item):
             self[name][i] = v
-        self.conditions[(name, self.typesdict()[name])] = self[key]
+        self.conditions[name] = self[key]
 
     def __getitem__(self, key):
         """
@@ -326,7 +326,7 @@ class DataFrame(OrderedDict):
             key = str(key)
             name_type = (key, self.typesdict()[key])
             
-        del self.conditions[name_type]
+        del self.conditions[key]
         super(DataFrame, self).__delitem__(name_type)
         
     def __str__(self):
@@ -891,7 +891,7 @@ class DataFrame(OrderedDict):
             self[n].extend(copy(other[n]))
 
         # update state variables
-        self.conditions = DictSet(self)
+        self.conditions = DictSet([(n, self[n]) for n in self.names()])
 
     def insert(self, row):
         """
@@ -1077,8 +1077,7 @@ class DataFrame(OrderedDict):
                 raise TypeError("'%s' is not a mappable type"
                                 %type(expected_dict).__name__())
 
-            if not self.conditions[(observed,self.typesdict()[observed])] <= \
-                   set(expected_dict2.keys()):
+            if not self.conditions[observed] <= set(expected_dict2.keys()):
                 raise Exception('expected_dict must contain a superset of  '
                                 'of the observed categories')
         else:
@@ -2269,7 +2268,7 @@ class PyvtTbl(list):
             header = [',\n'.join('%s=%s'%(f, c) for (f, c) in L) \
                       for L in self.cnames]
             if showtots:
-                header.append('Grand\nTotal')
+                header.append('Total')
             
             # initialize the texttable and add stuff
             # False and True evaluate as 0 and 1 for integer addition
@@ -2289,7 +2288,7 @@ class PyvtTbl(list):
                 tt.add_row([c for (f, c) in L] + self[i])
 
             if showtots:
-                tt.footer(['Grand Total'] + 
+                tt.footer(['Total'] + 
                           ['']*(len(rows)-1) +
                           [self.grand_tot])
             
@@ -2299,7 +2298,7 @@ class PyvtTbl(list):
             for L in self.cnames:
                 header.append(',\n'.join('%s=%s'%(f, c) for (f, c) in L))
             if showtots:
-                header.append('Grand\nTotal')
+                header.append('Total')
 
             dtypes = ['t'] * len(rows) + ['a'] * (len(self.cnames)+showtots)
             aligns = ['l'] * len(rows) + ['r'] * (len(self.cnames)+showtots)
@@ -2313,7 +2312,7 @@ class PyvtTbl(list):
                            ([],[self.row_tots[i]])[showtots])
 
             if showtots:
-                tt.footer(['Grand Total'] + 
+                tt.footer(['Total'] + 
                           ['']*(len(rows)-1) +
                           self.col_tots +
                           [self.grand_tot])
@@ -2784,11 +2783,149 @@ class Anova1way(OrderedDict):
             kwds.append(', conditions_list=%s'%repr(self.conditions_list))
             
         if self.alpha != 0.05:
-            kwds.append('alpha=%s'%str(self.alpha))
+            kwds.append(', alpha=%s'%str(self.alpha))
             
         kwds= ''.join(kwds)
         
         return 'Anova1way(%s%s)'%(args,kwds)
+
+class Correlation(OrderedDict):
+    """bivariate correlation matrix"""
+    def __init__(self, *args, **kwds):
+        if len(args) > 1:
+            raise Exception('expecting only 1 argument')
+
+        if kwds.has_key('conditions_list'):
+            self.conditions_list = kwds['conditions_list']
+        else:
+            self.conditions_list = []
+            
+        if kwds.has_key('coefficient'):
+            self.coefficient = kwds['coefficient']
+        else:
+            self.coefficient = 'pearson'
+            
+        if kwds.has_key('alpha'):
+            self.alpha = kwds['alpha']
+        else:
+            self.alpha = 0.05
+
+        if len(args) == 1:
+            super(Correlation, self).__init__(args[0])
+        else:
+            super(Correlation, self).__init__()
+
+    def run(self, list_of_lists, conditions_list=None,
+            coefficient='pearson', alpha=0.05):
+        """
+        
+        """
+
+        # check list_of_lists
+        if len(list_of_lists) < 2:
+            raise Exception('expecting 2 or more items in variables list')
+
+        lengths = [len(L) for L in list_of_lists]
+
+        if not all(L-lengths[0]+1 for L in lengths):
+            raise Exception('lists must be of equal length')
+
+        # check coefficient
+        if coefficient == 'pearson':
+            func = stats.pearsonr
+        elif coefficient == 'spearman':
+            func = stats.spearmanr
+        elif coefficient == 'pointbiserial':
+            func = stats.pointbiserialr
+        elif coefficient == 'kendalltau':
+            func = stats.kendalltau
+        else:
+            raise Exception('invalid coefficient parameter')
+        
+        self.coefficient = coefficient
+        
+        # build or check conditions list
+        if conditions_list == None:
+            self.conditions_list = []
+            abc = lambda i : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'\
+                             [i%26]*(int(math.floor(i/26))+1)
+            for i in _xrange(len(list_of_lists)):
+                self.conditions_list.append(abc(i))
+        else:
+            self.conditions_list = conditions_list
+
+        if len(list_of_lists) != len(self.conditions_list):
+            raise Exception('list_of_lists and conditions_list '
+                            'must be of equal length')
+
+        # put data into a dict
+        d=dict([(k,v) for k,v in zip(self.conditions_list, list_of_lists)])
+
+        # run correlations
+        for x,y in _xunique_combinations(self.conditions_list, 2):
+            r, prob = func(d[x],d[y])
+            self[(x,y)] = dict(r=r, p=prob)
+
+        self.alpha = alpha
+        self['N'] = lengths[0]
+        
+    def __str__(self):
+
+        if self == {}:
+            return '(no data in object)'
+
+        tt = TextTable(max_width=0)
+        tt.set_cols_dtype(['t', 't'] + ['a']*len(self.conditions_list))
+        tt.set_cols_align(['l', 'l'] + ['r']*len(self.conditions_list))
+        tt.set_deco(TextTable.HEADER | TextTable.HLINES)
+        tt.header(['',''] + sorted(self.conditions_list))
+        
+        for a in sorted(self.conditions_list):
+            rline = [a, self.coefficient]
+            pline = ['', 'Sig (2-tailed)']
+            nline = ['', 'N']
+            for b in sorted(self.conditions_list):
+                if a == b:
+                    rline.append('1')
+                    pline.append(' .')
+                    nline.append(self['N'])
+                elif self.has_key((a,b)):
+                    rline.append(self[(a,b)]['r'])
+                    pline.append(self[(a,b)]['p'])
+                    nline.append(self['N'])
+                elif self.has_key((b,a)):
+                    rline.append(self[(b,a)]['r'])
+                    pline.append(self[(b,a)]['p'])
+                    nline.append(self['N'])
+
+            tt.add_row(['%s\n%s\n%s'%(_str(r),_str(p),_str(n))
+                        for r,p,n in zip(rline,pline,nline)])
+
+        return 'Bivariate Correlations\n' + tt.draw()
+
+    def __repr__(self):
+        if self == {}:
+            return 'Correlation()'
+
+        s = []
+        for k, v in self.items():
+            s.append("(%s, %s)"%(repr(k), repr(v)))
+        args = '[' + ', '.join(s) + ']'
+
+        kwds = []
+            
+        if self.conditions_list != []:
+            kwds.append(', conditions_list=%s'%repr(self.conditions_list))
+            
+        if self.coefficient != 'pearson':
+            kwds.append(", coefficient='%s'"%str(self.coefficient))
+
+        if self.alpha != 0.05:
+            kwds.append(', alpha=%s'%str(self.alpha))
+            
+        kwds= ''.join(kwds)
+        
+        return 'Correlation(%s%s)'%(args,kwds)
 
 class ChiSquare1way(OrderedDict):
     """1-way Chi-Square Test"""
@@ -2898,7 +3035,7 @@ class ChiSquare1way(OrderedDict):
             kwds.append(', conditions_list=%s'%repr(self.conditions_list))
             
         if self.alpha != 0.05:
-            kwds.append('alpha=%s'%str(self.alpha))
+            kwds.append(', alpha=%s'%str(self.alpha))
             
         kwds= ''.join(kwds)
         
@@ -2977,15 +3114,24 @@ class ChiSquare2way(OrderedDict):
 
         chisq = sum((o-e)**2/e for o,e in
                     zip(_flatten(observed),_flatten(expected)))
-        prob = stats.chisqprob(chisq,df)
+        prob = stats.chisqprob(chisq, df)
 
         try:        
             lnchisq = 2.*sum(o*math.log(o/e) for o,e in
                              zip(_flatten(observed),_flatten(expected)))
-            lnprob = stats.chisqprob(lnchisq,df)
+            lnprob = stats.chisqprob(lnchisq, df)
         except:
             lnchisq = 'nan'
             lnprob = 'nan'
+
+        if N_r == N_c == 2:
+            ccchisq = sum((abs(o-e)-0.5)**2/e for o,e in
+                          zip(_flatten(observed),_flatten(expected)))
+            ccprob = stats.chisqprob(ccchisq, df)
+        else:
+            ccchisq = None
+            ccprob = None
+            
 
         def rprob(r,df):
             TINY = 1e-30
@@ -3003,6 +3149,8 @@ class ChiSquare2way(OrderedDict):
         self['df'] = df
         self['lnchisq'] = lnchisq
         self['lnp'] = lnprob
+        self['ccchisq'] = ccchisq
+        self['ccp'] = ccprob
         self['N'] = N
         self['C'] = C
         self['CramerV'] = cramerV
@@ -3057,6 +3205,9 @@ class ChiSquare2way(OrderedDict):
         tt_a.header([' ', 'Value', 'df', 'P'])
         tt_a.add_row(['Pearson Chi-Square',
                       self['chisq'], self['df'], self['p']])
+        if self['ccchisq'] != None:
+            tt_a.add_row(['Continuity Correction',
+                          self['ccchisq'], self['df'], self['ccp']])
         tt_a.add_row(['Likelihood Ratio',
                       self['lnchisq'], self['df'], self['lnp']])
         tt_a.add_row(["N of Valid Cases", self['N'], '', ''])
@@ -3093,7 +3244,7 @@ class ChiSquare2way(OrderedDict):
             kwds.append(', N_c=%i'%self.N_c)
 
         if self.alpha != 0.05:
-            kwds.append('alpha=%s'%str(self.alpha))
+            kwds.append(', alpha=%s'%str(self.alpha))
             
         return 'ChiSquare2way(%s%s)'%(args, ''.join(kwds))
     

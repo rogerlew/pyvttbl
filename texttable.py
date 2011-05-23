@@ -479,8 +479,9 @@ class Texttable:
         if self._header:
             maxi = [ self._len_cell(x) for x in self._header ]
         if self._footer:
-            maxi = [ self._len_cell(x) for x in self._footer ]
-        for row in self._rows:
+            for cell,i in zip(self._footer, range(len(self._footer))):
+                maxi[i] = max(maxi[i], self._len_cell(cell))
+        for row in self._rows +self._footer:
             for cell,i in zip(row, range(len(row))):
                 try:
                     maxi[i] = max(maxi[i], self._len_cell(cell))

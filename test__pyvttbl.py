@@ -558,14 +558,12 @@ class Test_pt__str__(unittest.TestCase):
     def test0(self):
         
         R = """avg(ERROR)
-TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Grand 
-                                                Total 
+TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total 
 =====================================================
 T1              7.167       6.500           4   5.619 
 T2              3.222       2.889       1.556   2.556 
 =====================================================
-Grand           4.800       4.333       2.778   3.896 
-Total                                                 """
+Total           4.800       4.333       2.778   3.896 """
 
         df=DataFrame()
         df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
@@ -575,8 +573,7 @@ Total                                                 """
     def test1(self):
         
         R = """avg(ERROR)
-TIMEOFDAY   MODEL   COURSE=C1   COURSE=C2   COURSE=C3   Grand 
-                                                        Total 
+TIMEOFDAY   MODEL   COURSE=C1   COURSE=C2   COURSE=C3   Total 
 =============================================================
 T1          M1              9       8.667       4.667   7.250 
 T1          M2          7.500           6           5       6 
@@ -585,8 +582,7 @@ T2          M1          4.333       3.667       1.667   3.222
 T2          M2          2.667       2.667       1.667   2.333 
 T2          M3          2.667       2.333       1.333   2.111 
 =============================================================
-Grand                   4.800       4.333       2.778   3.896 
-Total                                                         """
+Total                   4.800       4.333       2.778   3.896 """
 
         df=DataFrame()
         df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
