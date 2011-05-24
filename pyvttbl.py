@@ -28,6 +28,7 @@ import pystaggrelite3
 from dictset import DictSet
 from texttable import Texttable as TextTable
 from stats import jsci, stats, pstat
+from anova import Anova
 
 # check for third party packages
 try:
@@ -42,6 +43,12 @@ try:
 except:
     HAS_NUMPY = False
 
+try:
+    import scipy
+    HAS_SCIPY = True
+except:
+    HAS_SCIPY = False
+    
 def _isfloat(string):
     """
     returns true if string can be cast as a float,
@@ -1192,7 +1199,15 @@ class DataFrame(OrderedDict):
               density=density, cumulative=cumulative)
         return h
 
-
+# conditionally load plot methods
+    if HAS_NUMPY and HAS_PYLAB and HAS_SCIPY:
+        def anova(self, dv, sub='SUBJECT', wfactors=None, bfactors=None,
+                  measure='', transform='', alpha=0.05):
+            aov=Anova()
+            aov.run(self, dv, sub=sub, wfactors=wfactors, bfactors=bfactors,
+                    measure=measure, transform=transform, alpha=alpha)
+            return aov
+        
     # conditionally load plot methods
     if HAS_NUMPY and HAS_PYLAB:
         def histogram_plot(self, val, where=None, bins=10,

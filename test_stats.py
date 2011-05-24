@@ -18,6 +18,45 @@ from pyvttbl import DataFrame, PyvtTbl, Descriptives,  Marginals, Histogram, \
      Ttest, Anova1way, ChiSquare1way, ChiSquare2way, Correlation, \
      _flatten, _isfloat, _isint
 
+from anova import Anova
+
+
+class Test_anova(unittest.TestCase):
+    def test0(self):
+        ## Within test
+        df=DataFrame()
+        fname='error~subjectXtimeofdayXcourseXmodel.csv'
+        df.read_tbl(fname)
+        aov=Anova()
+        aov.run(df,'ERROR',wfactors=['TIMEOFDAY','COURSE','MODEL'])#,transform='windsor05')
+        aov.output2html(fname[:-4]+'RESULTS.htm')
+##        print(aov)
+        
+    def test1(self):
+        df=DataFrame()
+        fname='error~subjectXtimeofdayXcourseXmodel.csv'
+        df.read_tbl(fname)
+        aov=df.anova('ERROR',wfactors=['TIMEOFDAY','COURSE','MODEL'])#,transform='windsor05')
+        aov.output2html(fname[:-4]+'RESULTS.htm')
+
+    def test2(self):
+        ## Between-Subjects test
+        df=DataFrame()
+        fname='words~ageXcondition.csv'
+        df.read_tbl(fname)
+        aov=Anova()
+        aov.run(df,'WORDS',bfactors=['AGE','CONDITION'])
+
+    def test3(self):
+        ## Mixed Between/Within test
+        df=DataFrame()
+        fname='suppression~subjectXgroupXcycleXphase.csv'
+        df.read_tbl(fname)
+        df['SUPPRESSION']=[.01*x for x in df['SUPPRESSION']]
+        aov=Anova()
+        aov.run(df,'SUPPRESSION',wfactors=['CYCLE','PHASE'],bfactors=['GROUP'])#,transform='win
+##        print(repr(aov))
+        
 class Test_correlation(unittest.TestCase):
     def test0(self):
         R="""Correlation([(('t1', 't2'), {'p': 9.699461194116956e-12, 'r': 0.9577922077922078}), (('t1', 't3'), {'p': 2.2594982244811486e-09, 'r': -0.924025974025974}), (('t2', 't3'), {'p': 6.850166042119375e-08, 'r': -0.8896103896103895}), ('N', 21)], conditions_list=['t1', 't2', 't3'], coefficient='spearman')"""
@@ -488,6 +527,7 @@ t Critical two-tail      2.201            """
             
 def suite():
     return unittest.TestSuite((
+            unittest.makeSuite(Test_anova),
             unittest.makeSuite(Test_correlation),
             unittest.makeSuite(Test_chisquare2way),
             unittest.makeSuite(Test_chisquare1way),
