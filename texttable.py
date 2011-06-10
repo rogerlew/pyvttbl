@@ -481,7 +481,7 @@ class Texttable:
         if self._footer:
             for cell,i in zip(self._footer, range(len(self._footer))):
                 maxi[i] = max(maxi[i], self._len_cell(cell))
-        for row in self._rows +self._footer:
+        for row in self._rows:
             for cell,i in zip(row, range(len(row))):
                 try:
                     maxi[i] = max(maxi[i], self._len_cell(cell))
@@ -493,6 +493,7 @@ class Texttable:
             maxi = [(self._max_width - items*3 -1) / items \
                 for n in range(items)]
         self._width = maxi
+    
 
     def _check_align(self):
         """Check if alignment has been specified, set default one if not

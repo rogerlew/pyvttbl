@@ -28,6 +28,8 @@ import pystaggrelite3
 from dictset import DictSet
 from texttable import Texttable as TextTable
 from stats import jsci, stats, pstat
+from qsturng import qsturng, psturng 
+
 from anova import Anova
 
 # check for third party packages
@@ -48,7 +50,9 @@ try:
     HAS_SCIPY = True
 except:
     HAS_SCIPY = False
-    
+
+__version__ = '0.3.6.1'
+
 def _isfloat(string):
     """
     returns true if string can be cast as a float,
@@ -283,7 +287,7 @@ class DataFrame(OrderedDict):
             if name.lower() in map(str.lower, self.names()) and \
                name not in self.names():
                 raise Exception("a case variant of '%s' already exists"%name)
-            if name in self.names() and dtype != self.typesdict()[name]:
+            if name in self.names():
                 del self[name]
             super(DataFrame, self).__setitem__((name, dtype), item)
             self.conditions[name] = self[key]
@@ -1031,7 +1035,7 @@ class DataFrame(OrderedDict):
         m.run(self, val, factors, where)
         return m
 
-    def anova1way(self, val, factor, where=None):
+    def anova1way(self, val, factor, posthoc='tukey', where=None):
         """
         returns an ANOVA1way object containing the results of a
         one-way analysis of variance on val over the conditions
@@ -1060,7 +1064,7 @@ class DataFrame(OrderedDict):
         conditions_list = [tup[1] for [tup] in pt.rnames]
 
         a = Anova1way()
-        a.run(list_of_lists, val, factor, conditions_list)
+        a.run(list_of_lists, val, factor, conditions_list, posthoc='tukey')
         return a
     
     def chisquare1way(self, observed, expected_dict=None,
@@ -2700,6 +2704,16 @@ class Anova1way(OrderedDict):
         if len(args) > 1:
             raise Exception('expecting only 1 argument')
 
+        if kwds.has_key('posthoc'):
+            self.posthoc = kwds['posthoc']
+        else:
+            self.posthoc = 'tukey'
+
+        if kwds.has_key('multtest'):
+            self.multtest = kwds['multtest']
+        else:
+            self.multtest = None
+            
         if kwds.has_key('val'):
             self.val = kwds['val']
         else:
@@ -2726,7 +2740,8 @@ class Anova1way(OrderedDict):
             super(Anova1way, self).__init__()
 
     def run(self, list_of_lists, val='Measure',
-            factor='Factor', conditions_list=None, alpha=0.05):
+            factor='Factor', conditions_list=None,
+            posthoc='tukey', alpha=0.05):
         """
         performs a one way analysis of variance on the data in
         list_of_lists. Each sub-list is treated as a group. factor
@@ -2761,12 +2776,124 @@ class Anova1way(OrderedDict):
         self['msbn'] = ssbn/dfbn
         self['mswn'] = sswn/dfwn
         
+        o_f, o_prob, o_ns, o_means, o_vars, o_ssbn, o_sswn, o_dfbn, o_dfwn = \
+           stats.lF_oneway(stats.obrientransform(list_of_lists))
+
+        self['o_f'] = o_f
+        self['o_p'] = o_prob
+        self['o_ns'] = o_ns
+        self['o_mus'] = o_means
+        self['o_vars'] = o_vars
+        self['o_ssbn'] = o_ssbn
+        self['o_sswn'] = o_sswn
+        self['o_dfbn'] = o_dfbn
+        self['o_dfwn'] = o_dfwn
+        self['o_msbn'] = o_ssbn/o_dfbn
+        self['o_mswn'] = o_sswn/o_dfwn
+
+        if posthoc.lower() == 'tukey':
+            self._tukey()
+
+        elif posthoc.lower() == 'snk':
+            self._snk()
+
+    def _tukey(self):
+        # http://www.utdallas.edu/~herve/abdi-NewmanKeuls2010-pretty.pdf
+        # put means into a dict
+        d = dict([(k,v) for k,v in zip(self.conditions_list, self['mus'])])
+
+        # calculate the number of comparisons
+        s = sum(range(len(d)))
+
+        # calculate critical studentized range q statistic
+        k = len(d)
+        df = sum(self['ns']) - k
+        q_crit10 = qsturng(.9, k, df)
+        q_crit05 = qsturng(.95, k, df)
+        q_crit01 = qsturng(.99, k, df)
+
+        # run correlations
+        multtest = {}
+        
+        for x in sorted(self.conditions_list):
+            for y in sorted(self.conditions_list):
+                if not multtest.has_key((y,x)):
+                    abs_diff = abs(d[x]-d[y])
+                    q = abs_diff / math.sqrt(self['mswn']*(1./s))
+                    sig = 'ns'
+                    if  q > q_crit10:
+                        sig = '+'
+                    if q > q_crit05:
+                        sig = '*'
+                    if q > q_crit01:
+                        sig += '*'
+                    multtest[(x,y)] = dict(q=q,
+                                           sig=sig,
+                                           abs_diff=abs(d[x]-d[y]),
+                                           q_crit10=q_crit10,
+                                           q_crit05=q_crit05,
+                                           q_crit01=q_crit01,
+                                           q_k=k,
+                                           q_df=df)
+
+        self.multtest = multtest
+
+    def _snk(self):
+        # http://www.utdallas.edu/~herve/abdi-NewmanKeuls2010-pretty.pdf
+        # put means into a dict
+        d = dict([(k,v) for k,v in zip(self.conditions_list, self['mus'])])
+
+        # calculate the number of comparisons
+        s = sum(range(len(d)))
+
+        # figure out differences between pairs
+        L = {}
+        for x in sorted(self.conditions_list):
+            for y in sorted(self.conditions_list):
+                if not L.has_key((y,x)):
+                    L[(x,y)] = abs(d[x]-d[y])
+
+
+        # calculate critical studentized range q statistic
+        k = len(d)
+        df = sum(self['ns']) - k
+        
+        multtest = {}
+        for i,(pair,abs_diff) in enumerate(sorted(list(L.items),
+                                           key=lambda t: t[1],
+                                           reverse=True)):
+            q = abs_diff / math.sqrt(self['mswn']*(1./s))
+            q_crit10 = qsturng(.9, k, df)
+            q_crit05 = qsturng(.95, k, df)
+            q_crit01 = qsturng(.99, k, df)
+            
+            sig = 'ns'
+            if  q > q_crit10:
+                sig = '+'
+            if q > q_crit05:
+                sig = '*'
+            if q > q_crit01:
+                sig += '*'
+            multtest[(x,y)] = dict(q=q,
+                                   sig=sig,
+                                   abs_diff=abs(d[x]-d[y]),
+                                   q_crit10=q_crit10,
+                                   q_crit05=q_crit05,
+                                   q_crit01=q_crit01,
+                                   q_k=k,
+                                   q_df=df)
+
+            k -= 1
+                    
+
+        self.multtest = multtest
+        
     def __str__(self):
 
         if self == {}:
             return '(no data in object)'
 
-        tt_s = TextTable(max_width=100000000)
+        tt_s = TextTable(max_width=0)
         tt_s.set_cols_dtype(['t', 'a', 'a', 'a', 'a'])
         tt_s.set_cols_align(['l', 'r', 'r', 'r', 'r'])
         tt_s.set_deco(TextTable.HEADER)
@@ -2778,7 +2905,20 @@ class Anova1way(OrderedDict):
                               self['vars']):
             tt_s.add_row([g, c, c * a, a, v])
 
-        tt_a = TextTable(max_width=100000000)
+        tt_o = TextTable(max_width=0)
+        tt_o.set_cols_dtype(['t', 'a', 'a', 'a', 'a', 'a'])
+        tt_o.set_cols_align(['l', 'r', 'r', 'r', 'r', 'r'])
+        tt_o.set_deco(TextTable.HEADER | TextTable.FOOTER)
+
+        tt_o.header( ['Source of Variation','SS','df','MS','F','P-value'])
+        tt_o.add_row(['Treatments',self['o_ssbn'],self['o_dfbn'],
+                                   self['o_msbn'],self['o_f'],self['o_p']])
+        tt_o.add_row(['Error', self['o_sswn'],self['o_dfwn'],
+                               self['o_mswn'],' ', ''])
+        tt_o.footer( ['Total',self['o_ssbn']+self['o_sswn'],
+                              self['o_dfbn']+self['o_dfwn'],' ',' ',' '])
+        
+        tt_a = TextTable(max_width=0)
         tt_a.set_cols_dtype(['t', 'a', 'a', 'a', 'a', 'a'])
         tt_a.set_cols_align(['l', 'r', 'r', 'r', 'r', 'r'])
         tt_a.set_deco(TextTable.HEADER | TextTable.FOOTER)
@@ -2788,13 +2928,49 @@ class Anova1way(OrderedDict):
                                    self['msbn'],self['f'],self['p']])
         tt_a.add_row(['Error', self['sswn'],self['dfwn'],
                                self['mswn'],' ', ''])
-        tt_a.add_row([' ',' ',' ',' ',' ',' '])
         tt_a.footer( ['Total',self['ssbn']+self['sswn'],
                               self['dfbn']+self['dfwn'],' ',' ',' '])
+
+        posthoc = ''
+        if self.posthoc.lower() == 'tukey' and self.multtest != None:
+            tt_m = TextTable(max_width=0)
+            tt_m.set_cols_dtype(['t'] + ['a']*len(self.conditions_list))
+            tt_m.set_cols_align(['l'] + ['l']*len(self.conditions_list))
+            tt_m.set_deco(TextTable.HEADER | TextTable.FOOTER)
+            tt_m.header([''] + sorted(self.conditions_list))
             
+            for a in sorted(self.conditions_list):
+                rline = [a]
+                for b in sorted(self.conditions_list):
+                    if a == b:
+                        rline.append('0')
+                    elif self.multtest.has_key((a,b)):
+                        q = self.multtest[(a,b)]['q']
+                        sig = self.multtest[(a,b)]['sig']
+                        rline.append('%s %s'%(_str(q), sig))
+                    else:
+                        rline.append(' ')
+
+                tt_m.add_row(rline)
+            tt_m.footer(['']*(len(self.conditions_list) + 1))
+            q_crit10 = self.multtest[(a,b)]['q_crit10']
+            q_crit05 = self.multtest[(a,b)]['q_crit05']
+            q_crit01 = self.multtest[(a,b)]['q_crit01']
+            k = self.multtest[(a,b)]['q_k']
+            df = self.multtest[(a,b)]['q_df']
+            
+            posthoc = 'POSTHOC MULTIPLE COMPARISONS\n\n'
+            posthoc += 'Tukey HSD: Table of q-statistics\n'
+            posthoc += tt_m.draw()
+            posthoc += '\n  + p < .10 (q-critical[%i, %i] = %s)'%(k, df, q_crit10)
+            posthoc += '\n  * p < .05 (q-critical[%i, %i] = %s)'%(k, df, q_crit05)
+            posthoc += '\n ** p < .01 (q-critical[%i, %i] = %s)'%(k, df, q_crit01)
+     
         return 'Anova: Single Factor on %s\n\n'%self.val + \
                'SUMMARY\n%s\n\n'%tt_s.draw() + \
-               'ANOVA\n%s'%tt_a.draw()
+               "O'BRIEN TEST FOR HOMOGENEITY OF VARIANCE\n%s\n\n"%tt_o.draw() + \
+               'ANOVA\n%s\n\n'%tt_a.draw() + \
+               posthoc
 
     def __repr__(self):
         if self == {}:
@@ -2808,6 +2984,12 @@ class Anova1way(OrderedDict):
         kwds = []
         if self.val != 'Measure':
             kwds.append(', val="%s"'%self.val)
+
+        if self.posthoc != 'tukey':
+            kwds.append(', posthoc="%s"'%self.posthoc)
+
+        if self.multtest != None:
+            kwds.append(', multtest=%s'%repr(self.multtest))
             
         if self.factor != 'Factor':
             kwds.append(', factor="%s"'%self.factor)
@@ -2842,6 +3024,11 @@ class Correlation(OrderedDict):
             self.alpha = kwds['alpha']
         else:
             self.alpha = 0.05
+            
+        if kwds.has_key('N'):
+            self.N = kwds['N']
+        else:
+            self.N = 0
 
         if len(args) == 1:
             super(Correlation, self).__init__(args[0])
@@ -2900,7 +3087,31 @@ class Correlation(OrderedDict):
             self[(x,y)] = dict(r=r, p=prob)
 
         self.alpha = alpha
-        self['N'] = lengths[0]
+        self.N = lengths[0]
+
+        self.lm_significance_testing()
+        
+    def lm_significance_testing(self):
+        """
+        Performs Larzelere and Mulaik Significance Testing
+        on the paired correlations in self.
+
+        The testing follows a stepdown procedure similiar
+        to the Holm for multiple comparisons.
+        The absolute r values are are arranged in decreasing
+        order and the significant alpha level is adjusted
+        according to alpha/(k-i+1) where k is the total
+        number of tests and i the current pair.
+        """
+        
+        # perform post_hoc analysis
+        L = [(key, abs(self[key]['r'])) for key in self]
+        k = len(self)
+        self.lm = []
+        for i,(pair,r) in enumerate(sorted(
+                              L, key=lambda t: t[1], reverse=True)):
+            adj_alpha = self.alpha / (k - (i + 1) + 1)
+            self.lm.append([pair, i+1, r, self[pair]['p'], adj_alpha])
         
     def __str__(self):
 
@@ -2921,20 +3132,33 @@ class Correlation(OrderedDict):
                 if a == b:
                     rline.append('1')
                     pline.append(' .')
-                    nline.append(self['N'])
+                    nline.append(self.N)
                 elif self.has_key((a,b)):
                     rline.append(self[(a,b)]['r'])
                     pline.append(self[(a,b)]['p'])
-                    nline.append(self['N'])
+                    nline.append(self.N)
                 elif self.has_key((b,a)):
                     rline.append(self[(b,a)]['r'])
                     pline.append(self[(b,a)]['p'])
-                    nline.append(self['N'])
+                    nline.append(self.N)
 
             tt.add_row(['%s\n%s\n%s'%(_str(r),_str(p),_str(n))
                         for r,p,n in zip(rline,pline,nline)])
 
-        return 'Bivariate Correlations\n' + tt.draw()
+        tt_lm = TextTable(max_width=0)
+        tt_lm.set_cols_dtype(['t', 'i', 'f', 'a', 'a', 't'])
+        tt_lm.set_cols_align(['l', 'r', 'r', 'r', 'r', 'l'])
+        tt_lm.set_deco(TextTable.HEADER)
+        tt_lm.header(['Pair', 'i', 'Correlation', 'P', 'alpha/(k-i+1)', 'Sig.'])
+        
+        for row in self.lm:
+            x, y = row[0]
+            tt_lm.add_row(['%s vs. %s'%(x, y)] +
+                          row[1:] +
+                          ([''],['**'])[row[3] < row[4]])
+            
+        return 'Bivariate Correlations\n\n' + tt.draw() + \
+               '\n\nLarzelere and Mulaik Significance Testing\n\n' + tt_lm.draw()
 
     def __repr__(self):
         if self == {}:
@@ -2955,6 +3179,9 @@ class Correlation(OrderedDict):
 
         if self.alpha != 0.05:
             kwds.append(', alpha=%s'%str(self.alpha))
+            
+        if self.N != 0:
+            kwds.append(', N=%i'%self.N)
             
         kwds= ''.join(kwds)
         

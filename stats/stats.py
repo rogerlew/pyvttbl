@@ -568,7 +568,7 @@ Returns: list of cumfreq bin values, lowerreallimit, binsize, extrapoints
 #####  VARIABILITY FUNCTIONS  ######
 ####################################
 
-def lobrientransform(*args):
+def lobrientransform(args):
     """
 Computes a transform on input data (any number of columns).  Used to
 test for homogeneity of variance prior to running one-way stats.  From

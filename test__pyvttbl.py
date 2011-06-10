@@ -207,6 +207,15 @@ class Test__setitem__(unittest.TestCase):
 
         self.assertEqual(str(cm.exception),
                          "a case variant of 'dum' already exists")
+
+    def test_kn(self):
+        df = DataFrame()
+        df.read_tbl('example.csv')
+        y = [23]*len(df['X'])
+        df['X'] = y
+        
+        self.assertEqual(df.names(), ('CASE', 'TIME', 'CONDITION', 'X'))
+        
         
 class Test__delitem__(unittest.TestCase):
     def setUp(self):
