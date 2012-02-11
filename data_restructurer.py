@@ -66,34 +66,34 @@ def long2wide(in_fname, id, dvs, between=[], within=[],
 ##          out_fname='formatted.csv',
 ##          nested=False)
 
-##import time
-##
-##t0=time.time()
-##print('need to format data for spss... (this may take a few minutes)')
-##
-##fname='collaborated.csv'
-##
-##covariates='age,gender,dicho_correct,dicho_misses,dicho_FA,SAAT_noncomp_correct,'\
-##           'SAAT_noncomp_incorrect,SAAT_comp_correct,SAAT_comp_incorrect'.split(',')
-##
-##within='speed,target_dir,agreement'.split(',')
-##
-##dvs='correct_decision_raw,decision_at_safe_distance_raw,decision_distance_raw,'\
-##    'decision_latency_raw,decision_proportion_raw,decision_ttc_proportion_raw,'\
-##    'decision_ttc_raw,detection_distance_raw,detection_latency_raw,'\
-##    'detection_proportion_raw,detection_ttc_proportion_raw,detection_ttc_raw,'\
-##    'position_distance_raw,position_latency_raw,risk_level_raw,trial_raw'.split(',')
-## 
-####long2wide(fname, 'participant',dvs=dvs,within=within,covariates=covariates,nested=False)
-##
-##long2wide(in_fname=fname,
-##          id='participant',
-##          dvs=dvs,
-##          between=[],
-##          within=within,
-##          covariates=covariates,
-##          out_fname='formatted.csv',
-##          nested=True)
-##
-##print('\ndone.')
-##print(time.time()-t0)
+import time
+
+t0=time.time()
+print('need to format data for spss... (this may take a few minutes)')
+
+fname='collaborated.csv'
+
+covariates='age,gender,dicho_correct,dicho_misses,dicho_FA,SAAT_noncomp_correct,'\
+           'SAAT_noncomp_incorrect,SAAT_comp_correct,SAAT_comp_incorrect'.split(',')
+
+within='speed,target_dir,agreement'.split(',')
+
+dvs='correct_decision_raw,decision_at_safe_distance_raw,decision_distance_raw,'\
+    'decision_latency_raw,decision_proportion_raw,decision_ttc_proportion_raw,'\
+    'decision_ttc_raw,detection_distance_raw,detection_latency_raw,'\
+    'detection_proportion_raw,detection_ttc_proportion_raw,detection_ttc_raw,'\
+    'position_distance_raw,position_latency_raw,risk_level_raw,trial_raw'.split(',')
+ 
+##long2wide(fname, 'participant',dvs=dvs,within=within,covariates=covariates,nested=False)
+
+long2wide(in_fname=fname,
+          id='participant',
+          dvs=dvs,
+          between=[],
+          within=within,
+          covariates=covariates,
+          out_fname='formatted.csv',
+          nested=True)
+
+print('\ndone.')
+print(time.time()-t0)
