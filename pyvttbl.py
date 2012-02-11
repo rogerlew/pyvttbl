@@ -51,7 +51,7 @@ try:
 except:
     HAS_SCIPY = False
 
-__version__ = '0.3.6.1'
+__version__ = '0.3.6.3'
 
 def _isfloat(string):
     """
@@ -204,6 +204,7 @@ class DataFrame(OrderedDict):
             elif i == skip and labels:
                 colnameCounter = Counter()
                 for k, colname in enumerate(row):
+                    colname = colname.replace(' ','_')
                     colnameCounter[colname] += 1
                     if colnameCounter[colname] > 1:
                         warnings.warn("Duplicate label '%s' found"
@@ -230,7 +231,8 @@ class DataFrame(OrderedDict):
                                   %(i+1, len(colnames), len(row)),
                                   RuntimeWarning)
                 else:                    
-                    for j, colname in enumerate(colnames):
+                    for j, colname in enumerate(colnames):                        
+                        colname = colname.replace(' ','_')
                         if _isfloat(row[j]):
                             d[colname].append(float(row[j]))
                         else:
