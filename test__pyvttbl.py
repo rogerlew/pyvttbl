@@ -188,6 +188,27 @@ y 1,y 2,y 3
         
         for (d,r) in zip(D,R):
             self.assertAlmostEqual(d,r)
+
+
+    def test07(self):
+
+        # labels have spaces
+        with open('test.csv','wb') as f:
+            f.write("""
+y 1,   y 2   ,   y 3
+1,5,9
+2,6,
+3,7,11
+4,8,12""")
+            
+        self.df=DataFrame()
+        self.df.read_tbl('test.csv',skip=1,labels=True)
+        
+        D=self.df['y_1']+self.df['y_2']+self.df['y_3']
+        R=[1,2,3,4,5,6,7,8,9,'',11,12]
+        
+        for (d,r) in zip(D,R):
+            self.assertAlmostEqual(d,r)
             
     def tearDown(self):
         os.remove('./test.csv')
