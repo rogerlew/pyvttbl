@@ -51,7 +51,7 @@ try:
 except:
     HAS_SCIPY = False
 
-__version__ = '0.3.6.4'
+__version__ = '0.3.6.5'
 
 def _isfloat(string):
     """

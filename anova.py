@@ -11,6 +11,11 @@ from __future__ import print_function
 # 04/13/2010
 #   fixed bug affecting the non-centrality parameter calculation
 #   and the observed power estimates
+#
+# 02/12/2012
+#   fixed bug affecting the observed_power estimates for epsilon values
+#   less than 1.0
+
 
 """
 class to perform one-way and factorial analyses of variance on between,
@@ -113,6 +118,7 @@ class anova:
               http://epm.sagepub.com/content/55/6/998.full.pdf+html
               http://www.jstor.org/stable/3701269?seq=2
               http://zoe.bme.gatech.edu/~bv20/public/samplesize.pdf
+              http://www.jstor.org/stable/2289941?seq=1
           
         References:
           Glaser, D.E. (2003). Variance Components. In R.S.J. Frackowiak, K.J.
@@ -134,6 +140,9 @@ class anova:
           Masson, M.E., & Loftus, G.R. (2003). Using confidence intervals for
               graphically-based data interpretation. Canadian Journal of
               Experimental Pscyhology, 57(3), 203-220.
+          Muller, K.E. & Barton, C. N. (1989). Approximating power for repeated-
+              measures ANOVA lacking sphericity. Journal of the American
+              Statistical Association, 84 (406), 549-555.
 
     def _between(self)
 
@@ -236,13 +245,19 @@ def ncfcdf(x,df1,df2,nc):
     """
     return ncf(df1,df2,nc).cdf(x)
 
-def observed_power(df,dfe,nc,alpha=0.05):
+def observed_power(df,dfe,nc,alpha=0.05,eps=1.0):
     """
     http://zoe.bme.gatech.edu/~bv20/public/samplesize.pdf
        
     observed_power(3,30,16) should yield 0.916
+
+    Power estimates of when sphericity is violated require
+    specifying an epsilon value.
+
+    See Muller and Barton (1989).
+    http://www.jstor.org/stable/2289941?seq=1
     """
-    return 1.-ncfcdf(qf(1.-alpha,df,dfe), df,dfe,nc)
+    return 1.-ncfcdf(qf(1.-alpha, df*eps, dfe*eps), df,dfe,nc)
 
 def noncentrality_par(nj,Y,mu,var):
     """
@@ -1096,10 +1111,8 @@ class Anova(OrderedDict):
                                          r['critT%s'%x]
 
                         # calculate non-centrality and observed power
-                        r['lambda%s'%x] = r['lambda']
-                        r['power%s'%x] = observed_power( r['df%s'%x],
-                                                       r['df%s'%x],
-                                                       r['lambda'] )
+                        r['lambda%s'%x]=r['lambda']
+                        r['power%s'%x]=observed_power( r['df'], r['dfe'], r['lambda'] ,eps=r['eps%s'%x])
 
                     # record to dict
                     self[tuple(efs)]=r
@@ -1224,9 +1237,8 @@ class Anova(OrderedDict):
 
                 # calculate non-centrality and observed power
                 r['lambda%s'%x]=r['lambda']
-                r['power%s'%x]=observed_power( r['df%s'%x],
-                                               r['df%s'%x],
-                                               r['lambda'] )
+                r['power%s'%x]=observed_power( r['df'], r['dfe'], r['lambda'] ,eps=r['eps%s'%x])
+                
                 
             # record to dict
             self[tuple(efs)]=r
