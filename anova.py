@@ -1562,7 +1562,35 @@ class Anova(OrderedDict):
 
                 html.add(table(tbodys, thead))
 
-                          
+##    def summary(self, sig_only=True, criterion='gg',
+##                sphericity_assumed=True,
+##                greenhouse_geisser=True,
+##                huynh_feldt=True,
+##                box=True,
+##                marginals=False):
+##        if self.measure == '':
+##            title  = '%s ~'%self.dv
+##        else:
+##            title  = '%s of %s ~'%(measure, self.dv)
+##
+##        factors = self.wfactors + self.bfactors
+##        title += ''.join([' %s *'%f for f in factors])[:-2]
+##
+##        s = [title]
+##        if len(self.wfactors)!=0 and len(self.bfactors)==0:
+##            s.append(self._within_str())
+##            
+##        if len(self.wfactors)==0 and len(self.bfactors)!=0:
+##            s.append(self._between_str())
+##            
+##        if len(self.wfactors)!=0 and len(self.bfactors)!=0:
+##            s.append(self._mixed_str())
+##
+##        if marginals:
+##            s.append(self._summary_str(factors))
+##        return ''.join(s)
+
+        
     def __str__(self):
         if self.measure == '':
             title  = '%s ~'%self.dv

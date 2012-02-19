@@ -51,7 +51,7 @@ try:
 except:
     HAS_SCIPY = False
 
-__version__ = '0.3.6.5'
+__version__ = '0.3.6.6'
 
 def _isfloat(string):
     """
@@ -1627,6 +1627,11 @@ class DataFrame(OrderedDict):
 
             for r, rlevel in enumerate(rlevels):
                 for c, clevel in enumerate(clevels):
+                    where_extension = []
+                    if sepxplots!=None:
+                        where_extension.append((sepxplots, '=', [clevel]))
+                    if sepyplots!=None:
+                        where_extension.append((sepyplots, '=', [rlevel]))
                     
                     #  8.1 Create new axes for the subplot
                     ######################################################
@@ -1634,12 +1639,13 @@ class DataFrame(OrderedDict):
 
                     ######## If separate lines are not specified #########
                     if seplines == None:
-                        y = self.pivot(val, cols=[xaxis], where=where,
+                        y = self.pivot(val, cols=[xaxis],
+                                       where=where+where_extension,
                                        aggregate='avg', flatten=True)
 
                         if aggregate != None:
                             yerr = self.pivot(val, cols=[xaxis],
-                                              where=where,
+                                              where=where+where_extension,
                                               aggregate=aggregate,
                                               flatten=True)
                         
@@ -1667,16 +1673,17 @@ class DataFrame(OrderedDict):
                             axs[-1].plot([xmin, xmax], [0., 0.], 'k:')
 
                     ########## If separate lines are specified ###########
-                    else:
+                    else:                       
                         y = self.pivot(val, rows=[seplines], cols=[xaxis],
-                                       where=where, aggregate='avg',
+                                       where=where+where_extension,
+                                       aggregate='avg',
                                        flatten=False)
                         
                         if aggregate != None:
                             yerrs = self.pivot(val,
                                                rows=[seplines],
                                                cols=[xaxis],
-                                               where=where,
+                                               where=where+where_extension,
                                                aggregate=aggregate,
                                                flatten=False)
                             
