@@ -51,7 +51,7 @@ try:
 except:
     HAS_SCIPY = False
 
-__version__ = '0.3.6.6'
+__version__ = '0.3.6.7'
 
 def _isfloat(string):
     """
@@ -1763,12 +1763,10 @@ class DataFrame(OrderedDict):
                     # supress tick labels unless subplot is on the bottom
                     # row or the far left column
                     if r != (len(rlevels) - 1):
-                        locs, labels = pylab.xticks()
-                        pylab.xticks(locs, ['' for l in _xrange(len(locs))])
+                        pylab.setp(axs[-1].get_xticklabels(), visible=False)
                         
                     if c != 0:
-                        locs, labels = pylab.yticks()
-                        pylab.yticks(locs, ['' for l in _xrange(len(locs))])
+                        pylab.setp(axs[-1].get_yticklabels(), visible=False)
 
                     # Set the aspect ratio for the subplot
                     Dx = abs(axs[-1].get_xlim()[0] - axs[-1].get_xlim()[1])

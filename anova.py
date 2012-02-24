@@ -1361,8 +1361,8 @@ class Anova(OrderedDict):
         tbodys=[]
 
         tbodys.append([f2s(['Between Subjects',
-                            self[('SUBJECT',)]['ss'],
-                            self[('SUBJECT',)]['df'],
+                            self[(self.sub,)]['ss'],
+                            self[(self.sub,)]['df'],
                             '','','','','','','','',''])])
 
         tbodys.append([])
@@ -1376,9 +1376,9 @@ class Anova(OrderedDict):
                                        r['se'],r['ci'],r['lambda'],r['power']]))
 
         tbodys.append([f2s(['&nbsp;'*9+'Error',
-                            self[('SUBJECT',)]['sse'],
-                            self[('SUBJECT',)]['dfe'],
-                            self[('SUBJECT',)]['mse'],
+                            self[(self.sub,)]['sse'],
+                            self[(self.sub,)]['dfe'],
+                            self[(self.sub,)]['mse'],
                             '','','','','','','',''])])
         
         html.add(table(tbodys, thead))
@@ -1681,8 +1681,8 @@ class Anova(OrderedDict):
                   'Obs.,SE,95% CI,lambda,Obs.\nPower'.split(','))
 
         tt.add_row(['Between Subjects',
-                    self[('SUBJECT',)]['ss'],
-                    self[('SUBJECT',)]['df'],
+                    self[(self.sub,)]['ss'],
+                    self[(self.sub,)]['df'],
                     '','','','','','','','',''])
         
         for i in xrange(1,len(bfactors)+1):
@@ -1695,9 +1695,9 @@ class Anova(OrderedDict):
                             r['ci'],r['lambda'],r['power']])
 
         tt.footer(['Error',
-                   self[('SUBJECT',)]['sse'],
-                   self[('SUBJECT',)]['dfe'],
-                   self[('SUBJECT',)]['mse'],
+                   self[(self.sub,)]['sse'],
+                   self[(self.sub,)]['dfe'],
+                   self[(self.sub,)]['mse'],
                    '','','','','','','',''])
         s.append(tt.draw())
         

@@ -42,7 +42,7 @@ class Test_posthoc(unittest.TestCase):
         conditions_list = 'Contact Hit Bump Collide Smash'.split()
         D=Anova1way(posthoc='snk')
         D.run(d, conditions_list=conditions_list)
-        print(D)
+##        print(D)
         
 class Test_anova(unittest.TestCase):
     def test0(self):
@@ -127,7 +127,7 @@ B vs. C   3         0.890   6.850e-08           0.050   **   """
         df = DataFrame()
         df.read_tbl('iqbrainsize.txt', delimiter='\t')
         cor = df.correlation(df.names())
-        print(cor)
+##        print(cor)
         
 class Test_chisquare2way(unittest.TestCase):
     def test0(self):
