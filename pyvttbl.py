@@ -36,7 +36,7 @@ from qsturng import qsturng, psturng
 
 from anova import Anova
 
-__version__ = '0.4.0.0'
+__version__ = '0.4.0.1'
 
 def _isfloat(string):
     """
