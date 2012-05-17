@@ -20,29 +20,123 @@ from pyvttbl import DataFrame, PyvtTbl, Descriptives,  Marginals, Histogram, \
 from anova import Anova
 
 class Test_posthoc(unittest.TestCase):
-    def test0(self):
-        # http://www.utdallas.edu/~herve/abdi-NewmanKeuls2010-pretty.pdf
-        d = [[21.0, 20.0, 26.0, 46.0, 35.0, 13.0, 41.0, 30.0, 42.0, 26.0],
-             [23.0, 30.0, 34.0, 51.0, 20.0, 38.0, 34.0, 44.0, 41.0, 35.0],
-             [35.0, 35.0, 52.0, 29.0, 54.0, 32.0, 30.0, 42.0, 50.0, 21.0],
-             [44.0, 40.0, 33.0, 45.0, 45.0, 30.0, 46.0, 34.0, 49.0, 44.0],
-             [39.0, 44.0, 51.0, 47.0, 50.0, 45.0, 39.0, 51.0, 39.0, 55.0]]
-        conditions_list = 'Contact Hit Bump Collide Smash'.split()
-        D=Anova1way()
-        D.run(d, conditions_list=conditions_list)
-##        print(D)
+    def test31(self):
+        """1 way anova"""
 
-    def test1(self):
-        # http://www.utdallas.edu/~herve/abdi-NewmanKeuls2010-pretty.pdf
-        d = [[21.0, 20.0, 26.0, 46.0, 35.0, 13.0, 41.0, 30.0, 42.0, 26.0],
-             [23.0, 30.0, 34.0, 51.0, 20.0, 38.0, 34.0, 44.0, 41.0, 35.0],
-             [35.0, 35.0, 52.0, 29.0, 54.0, 32.0, 30.0, 42.0, 50.0, 21.0],
-             [44.0, 40.0, 33.0, 45.0, 45.0, 30.0, 46.0, 34.0, 49.0, 44.0],
-             [39.0, 44.0, 51.0, 47.0, 50.0, 45.0, 39.0, 51.0, 39.0, 55.0]]
-        conditions_list = 'Contact Hit Bump Collide Smash'.split()
-        D=Anova1way(posthoc='snk')
-        D.run(d, conditions_list=conditions_list)
-##        print(D)
+        R="""Anova: Single Factor on Measure
+
+SUMMARY
+Groups    Count   Sum   Average   Variance 
+==========================================
+Contact      10   300        30    116.444 
+Hit          10   350        35     86.444 
+Bump         10   380        38    122.222 
+Collide      10   410        41     41.556 
+Smash        10   460        46     33.333 
+
+O'BRIEN TEST FOR HOMOGENEITY OF VARIANCE
+Source of Variation       SS       df      MS         F     P-value   eta^2   Obs. power 
+========================================================================================
+Treatments             68081.975    4   17020.494   1.859     0.134   0.142        0.498 
+Error                 412050.224   45    9156.672                                        
+========================================================================================
+Total                 480132.199   49                                                    
+
+ANOVA
+Source of Variation    SS    df   MS      F     P-value   eta^2   Obs. power 
+============================================================================
+Treatments            1460    4   365   4.562     0.004   0.289        0.837 
+Error                 3600   45    80                                        
+============================================================================
+Total                 5060   49                                              
+
+POSTHOC MULTIPLE COMPARISONS
+
+SNK: Step-down table of q-statistics
+       Pair           i    |diff|     q     range   df     p     Sig. 
+=====================================================================
+Contact vs. Smash      1   16.000   5.657       5   45   0.002   **   
+Collide vs. Contact    2   11.000   3.889       4   45   0.041   *    
+Hit vs. Smash          3   11.000   3.889       4   45   0.041   *    
+Bump vs. Smash         4    8.000   2.828       3   45   0.124   ns   
+Bump vs. Contact       5    8.000   2.828       3   45   0.124   ns   
+Collide vs. Hit        6    6.000   2.121       2   45   0.141   ns   
+Collide vs. Smash      7    5.000       -       -    -       -   ns   
+Contact vs. Hit        8    5.000       -       -    -       -   ns   
+Bump vs. Collide       9    3.000       -       -    -       -   ns   
+Bump vs. Hit          10    3.000       -       -    -       -   ns   
+  + p < .10,   * p < .05,   ** p < .01,   *** p < .001"""
+        
+        listOflists=[[21,20,26,46,35,13,41,30,42,26],
+                     [23,30,34,51,20,38,34,44,41,35],
+                     [35,35,52,29,54,32,30,42,50,21],
+                     [44,40,33,45,45,30,46,34,49,44],
+                     [39,44,51,47,50,45,39,51,39,55]]
+
+        conditions_list = ['Contact','Hit','Bump','Collide','Smash']
+
+        D=Anova1way()
+        D.run(listOflists, conditions_list=conditions_list, posthoc='snk')
+        
+        self.assertEqual(str(D),R)
+
+    def test32(self):
+        """1 way anova"""
+
+        R="""Anova: Single Factor on Measure
+
+SUMMARY
+Groups    Count   Sum   Average   Variance 
+==========================================
+Contact      10   300        30    116.444 
+Hit          10   350        35     86.444 
+Bump         10   380        38    122.222 
+Collide      10   410        41     41.556 
+Smash        10   460        46     33.333 
+
+O'BRIEN TEST FOR HOMOGENEITY OF VARIANCE
+Source of Variation       SS       df      MS         F     P-value   eta^2   Obs. power 
+========================================================================================
+Treatments             68081.975    4   17020.494   1.859     0.134   0.142        0.498 
+Error                 412050.224   45    9156.672                                        
+========================================================================================
+Total                 480132.199   49                                                    
+
+ANOVA
+Source of Variation    SS    df   MS      F     P-value   eta^2   Obs. power 
+============================================================================
+Treatments            1460    4   365   4.562     0.004   0.289        0.837 
+Error                 3600   45    80                                        
+============================================================================
+Total                 5060   49                                              
+
+POSTHOC MULTIPLE COMPARISONS
+
+Tukey HSD: Table of q-statistics
+          Bump   Collide    Contact      Hit       Smash   
+==========================================================
+Bump      0      1.061 ns   2.828 ns   1.061 ns   2.828 ns 
+Collide          0          3.889 +    2.121 ns   1.768 ns 
+Contact                     0          1.768 ns   5.657 ** 
+Hit                                    0          3.889 +  
+Smash                                             0        
+==========================================================
+  + p < .10 (q-critical[5, 45] = 3.59038343675)
+  * p < .05 (q-critical[5, 45] = 4.01861178004)
+ ** p < .01 (q-critical[5, 45] = 4.89280842987)"""
+        
+        listOflists=[[21,20,26,46,35,13,41,30,42,26],
+                     [23,30,34,51,20,38,34,44,41,35],
+                     [35,35,52,29,54,32,30,42,50,21],
+                     [44,40,33,45,45,30,46,34,49,44],
+                     [39,44,51,47,50,45,39,51,39,55]]
+
+        conditions_list = ['Contact','Hit','Bump','Collide','Smash']
+
+        D=Anova1way()
+        D.run(listOflists, conditions_list=conditions_list, posthoc='tukey')
+        
+        self.assertEqual(str(D),R)
         
 class Test_anova(unittest.TestCase):
     def test0(self):
@@ -157,7 +251,15 @@ CHI-SQUARE TESTS
 Pearson Chi-Square      35.930    1   2.053e-09 
 Continuity Correction   34.532    1   4.201e-09 
 Likelihood Ratio        37.351    1           0 
-N of Valid Cases           358                  """
+N of Valid Cases           358                  
+
+CHI-SQUARE POST-HOC POWER
+       Measure                 
+==============================
+Effect size w            0.317 
+Non-centrality lambda   35.930 
+Critical Chi-Square      3.841 
+Power                    1.000 """
         df=DataFrame()
         df['FAULTS']=list(Counter(Low=177,High=181).elements())
         df['FAULTS'].reverse()
@@ -194,7 +296,15 @@ CHI-SQUARE TESTS
 ============================================
 Pearson Chi-Square   25.794    2   2.506e-06 
 Likelihood Ratio     26.056    2   2.198e-06 
-N of Valid Cases       1772                  """
+N of Valid Cases       1772                  
+
+CHI-SQUARE POST-HOC POWER
+       Measure                 
+==============================
+Effect size w            0.121 
+Non-centrality lambda   25.794 
+Critical Chi-Square      5.991 
+Power                    0.997 """
         
         df=DataFrame()
         rfactors=['Countrol']*903 + ['Message']*869
@@ -207,8 +317,8 @@ N of Valid Cases       1772                  """
 
     def test2(self):
         """chi-square 2-way"""
-        R="""ChiSquare2way([('chisq', 25.79364579345589), ('p', 2.5059995107347527e-06), ('df', 2), ('lnchisq', 26.055873891205664), ('lnp', 2.1980566132523407e-06), ('ccchisq', None), ('ccp', None), ('N', 1772.0), ('C', 0.11978058926585373), ('CramerV', 0.12064921681366868), ('CramerV_prob', 3.50998747929475e-07), ('C_prob', 4.26267335738495e-07)], counter=Counter({('Message', 'Removed'): 499.0, ('Countrol', 'Removed'): 477.0, ('Countrol', 'Litter'): 385.0, ('Message', 'Litter'): 290.0, ('Message', 'Trash Can'): 80.0, ('Countrol', 'Trash Can'): 41.0}), row_counter=Counter({'Countrol': 903.0, 'Message': 869.0}), col_counter=Counter({'Removed': 976.0, 'Litter': 675.0, 'Trash Can': 121.0}), N_r=2, N_c=3)"""
-        
+        R="""ChiSquare2way([('chisq', 25.79364579345589), ('p', 2.5059995107347527e-06), ('df', 2), ('lnchisq', 26.055873891205664), ('lnp', 2.1980566132523407e-06), ('ccchisq', None), ('ccp', None), ('N', 1772.0), ('C', 0.11978058926585373), ('CramerV', 0.12064921681366868), ('CramerV_prob', 3.50998747929475e-07), ('C_prob', 4.26267335738495e-07), ('w', 0.12064921681366868), ('lambda', 25.79364579345589), ('crit_chi2', 5.9914645471079799), ('power', 0.9972126147810455)], counter=Counter({('Message', 'Removed'): 499.0, ('Countrol', 'Removed'): 477.0, ('Countrol', 'Litter'): 385.0, ('Message', 'Litter'): 290.0, ('Message', 'Trash Can'): 80.0, ('Countrol', 'Trash Can'): 41.0}), row_counter=Counter({'Countrol': 903.0, 'Message': 869.0}), col_counter=Counter({'Removed': 976.0, 'Litter': 675.0, 'Trash Can': 121.0}), N_r=2, N_c=3)"""
+
         rfactors=['Countrol']*903 + ['Message']*869
         cfactors=['Trash Can']*41 + ['Litter']*385 + ['Removed']*477
         cfactors+=['Trash Can']*80 + ['Litter']*290 + ['Removed']*499
@@ -233,7 +343,15 @@ CHI-SQUARE TESTS
 =======================================
 Pearson Chi-Square   9.250    3   0.026 
 Likelihood Ratio     8.613    3   0.035 
-Observations            32              """
+Observations            32              
+
+POST-HOC POWER
+       Measure                
+=============================
+Effect size w           0.538 
+Non-centrality lambda   9.250 
+Critical Chi-Square     7.815 
+Power                   0.724 """
 
         D=ChiSquare1way()
         D.run([4,5,8,15])
@@ -259,7 +377,15 @@ CHI-SQUARE TESTS
 ========================================
 Pearson Chi-Square   12.797    3   0.005 
 Likelihood Ratio     13.288    3   0.004 
-Observations             59              """
+Observations             59              
+
+POST-HOC POWER
+       Measure                 
+==============================
+Effect size w            0.466 
+Non-centrality lambda   12.797 
+Critical Chi-Square      7.815 
+Power                    0.865 """
 
         df = DataFrame()
         df.read_tbl('chi_test.csv')
@@ -280,23 +406,62 @@ CHI-SQUARE TESTS
 =============================================
 Pearson Chi-Square   30.746     4   3.450e-06 
 Likelihood Ratio        nan   nan         nan 
-Observations             59                   """
+Observations             59                   
+
+POST-HOC POWER
+       Measure                 
+==============================
+Effect size w            0.722 
+Non-centrality lambda   30.746 
+Critical Chi-Square      9.488 
+Power                    0.998 """
 
         df = DataFrame()
         df.read_tbl('chi_test.csv')
         X=df.chisquare1way('RESULT',{1:11.8 ,2:11.8 ,3:11.8 ,4:11.8 ,5:11.8})
         self.assertEqual(str(X),R)
-        
+
+    def test3(self):
+        """chi-square 1-way"""
+        R="""Chi-Square: Single Factor
+
+SUMMARY
+            A     B     C     D  
+================================
+Observed   500   166   167   167 
+Expected   250   250   250   250 
+
+CHI-SQUARE TESTS
+                      Value    df   P 
+=====================================
+Pearson Chi-Square   333.336    3   0 
+Likelihood Ratio     287.686    3   0 
+Observations            1000          
+
+POST-HOC POWER
+       Measure                  
+===============================
+Effect size w             0.577 
+Non-centrality lambda   333.336 
+Critical Chi-Square       7.815 
+Power                         1 """
+
+        D=ChiSquare1way()
+        D.run(observed = [500,166,167,167],
+              expected = [250,250,250,250])
+        self.assertEqual(str(D),R)
+
 class Test_anova1way(unittest.TestCase):
     def test0(self):
         """1 way anova"""
-        R="Anova1way([('f', 16.70726997413529), ('p', 4.5885798225758395e-06), ('ns', [14, 15, 16]), ('mus', [62.142857142857146, 57.2, 94.375]), ('vars', [202.13186813186815, 584.7428571428571, 339.5833333333333]), ('ssbn', 12656.046825396828), ('sswn', 15907.864285714284), ('dfbn', 2), ('dfwn', 42), ('msbn', 6328.023412698414), ('mswn', 378.7586734693877)], conditions_list=['A', 'B', 'C'])"
+        R="Anova1way([('f', 16.70726997413529), ('p', 4.5885798225758395e-06), ('ns', [14, 15, 16]), ('mus', [62.142857142857146, 57.2, 94.375]), ('vars', [202.13186813186815, 584.7428571428571, 339.5833333333333]), ('ssbn', 12656.046825396828), ('sswn', 15907.864285714284), ('dfbn', 2), ('dfwn', 42), ('msbn', 6328.023412698414), ('mswn', 378.7586734693877), ('eta2', 0.4430782176910548), ('lambda', 19.938519796097456), ('power', 0.97789325536594729), ('o_f', 4.065448310574059), ('o_p', 0.02432317027325804), ('o_ns', [14, 15, 16]), ('o_mus', [202.1318681318681, 584.7428571428571, 339.58333333333326]), ('o_vars', [29343.831505443934, 296942.8951653527, 75450.48599697657]), ('o_ssbn', 1097753.8302903734), ('o_sswn', 5670427.631840358), ('o_dfbn', 2), ('o_dfwn', 42), ('o_msbn', 548876.9151451867), ('o_mswn', 135010.1817104847), ('o_eta2', 0.16219332126842578), ('o_lambda', 7.2986994570791506), ('o_power', 0.64138945570230277)], multtest={('B', 'C'): {'q_df': 42, 'q_crit01': 4.3543205404068921, 'q_crit10': 2.9836166391724004, 'q_k': 3, 'q_crit05': 3.4356970960072437, 'q': 3.3084936933598734, 'sig': '+', 'abs_diff': 37.175}, ('A', 'A'): {'q_df': 42, 'q_crit01': 4.3543205404068921, 'q_crit10': 2.9836166391724004, 'q_k': 3, 'q_crit05': 3.4356970960072437, 'q': 0.0, 'sig': 'ns', 'abs_diff': 0.0}, ('B', 'B'): {'q_df': 42, 'q_crit01': 4.3543205404068921, 'q_crit10': 2.9836166391724004, 'q_k': 3, 'q_crit05': 3.4356970960072437, 'q': 0.0, 'sig': 'ns', 'abs_diff': 0.0}, ('C', 'C'): {'q_df': 42, 'q_crit01': 4.3543205404068921, 'q_crit10': 2.9836166391724004, 'q_k': 3, 'q_crit05': 3.4356970960072437, 'q': 0.0, 'sig': 'ns', 'abs_diff': 0.0}, ('A', 'B'): {'q_df': 42, 'q_crit01': 4.3543205404068921, 'q_crit10': 2.9836166391724004, 'q_k': 3, 'q_crit05': 3.4356970960072437, 'q': 0.43990347503218996, 'sig': 'ns', 'abs_diff': 4.942857142857143}, ('A', 'C'): {'q_df': 42, 'q_crit01': 4.3543205404068921, 'q_crit10': 2.9836166391724004, 'q_k': 3, 'q_crit05': 3.4356970960072437, 'q': 2.8685902183276837, 'sig': 'ns', 'abs_diff': 32.232142857142854}}, conditions_list=['A', 'B', 'C'])"
         listOflists=[[42,52,55,59,75,40,79,79,44,56,68,77,75,69],
                      [29,36,29,31,97,88,27,57,54,77,54,52,58,91,78],
                      [91,79,73,75,99,66,114,120,102,68,114,79,115,104,107,104]]
 
         D=Anova1way()
         D.run(listOflists)
+                
         self.assertEqual(repr(D),R)
 
     def test1(self):
@@ -311,20 +476,89 @@ A           14    870    62.143    202.132
 B           15    858    57.200    584.743 
 C           16   1510    94.375    339.583 
 
+O'BRIEN TEST FOR HOMOGENEITY OF VARIANCE
+Source of Variation       SS        df       MS         F     P-value   eta^2   Obs. power 
+==========================================================================================
+Treatments            1097753.830    2   548876.915   4.065     0.024   0.162        0.641 
+Error                 5670427.632   42   135010.182                                        
+==========================================================================================
+Total                 6768181.462   44                                                     
+
 ANOVA
-Source of       SS       df      MS        F       P-value  
-Variation                                                   
-===========================================================
-Treatments   12656.047    2   6328.023   16.707   4.589e-06 
-Error        15907.864   42    378.759                      
-===========================================================
-Total        28563.911   44                                 """
+Source of Variation      SS       df      MS        F       P-value    eta^2   Obs. power 
+=========================================================================================
+Treatments            12656.047    2   6328.023   16.707   4.589e-06   0.443        0.978 
+Error                 15907.864   42    378.759                                           
+=========================================================================================
+Total                 28563.911   44                                                      
+
+POSTHOC MULTIPLE COMPARISONS
+
+Tukey HSD: Table of q-statistics
+    A      B          C     
+===========================
+A   0   0.440 ns   2.869 ns 
+B       0          3.308 +  
+C                  0        
+===========================
+  + p < .10 (q-critical[3, 42] = 2.98361663917)
+  * p < .05 (q-critical[3, 42] = 3.43569709601)
+ ** p < .01 (q-critical[3, 42] = 4.35432054041)"""
+        
         listOflists=[[42,52,55,59,75,40,79,79,44,56,68,77,75,69],
                      [29,36,29,31,97,88,27,57,54,77,54,52,58,91,78],
                      [91,79,73,75,99,66,114,120,102,68,114,79,115,104,107,104]]
 
         D=Anova1way()
         D.run(listOflists)
+        
+        self.assertEqual(str(D),R)
+        
+    def test11(self):
+        """1 way anova"""
+
+        R="""Anova: Single Factor on Measure
+
+SUMMARY
+Groups   Count   Sum    Average   Variance 
+==========================================
+A           14    870    62.143    202.132 
+B           15    858    57.200    584.743 
+C           16   1510    94.375    339.583 
+
+O'BRIEN TEST FOR HOMOGENEITY OF VARIANCE
+Source of Variation       SS        df       MS         F     P-value   eta^2   Obs. power 
+==========================================================================================
+Treatments            1097753.830    2   548876.915   4.065     0.024   0.162        0.641 
+Error                 5670427.632   42   135010.182                                        
+==========================================================================================
+Total                 6768181.462   44                                                     
+
+ANOVA
+Source of Variation      SS       df      MS        F       P-value    eta^2   Obs. power 
+=========================================================================================
+Treatments            12656.047    2   6328.023   16.707   4.589e-06   0.443        0.978 
+Error                 15907.864   42    378.759                                           
+=========================================================================================
+Total                 28563.911   44                                                      
+
+POSTHOC MULTIPLE COMPARISONS
+
+SNK: Step-down table of q-statistics
+ Pair     i   |diff|     q     range   df       p       Sig. 
+============================================================
+B vs. C   1   37.175   7.147       3   42   1.000e-03   **   
+A vs. C   2   32.232   6.197       2   42   1.000e-03   **   
+A vs. B   3    4.943       -       -    -           -   **   
+  + p < .10,   * p < .05,   ** p < .01,   *** p < .001"""
+        
+        listOflists=[[42,52,55,59,75,40,79,79,44,56,68,77,75,69],
+                     [29,36,29,31,97,88,27,57,54,77,54,52,58,91,78],
+                     [91,79,73,75,99,66,114,120,102,68,114,79,115,104,107,104]]
+
+        D=Anova1way()
+        D.run(listOflists, posthoc='snk')
+
         self.assertEqual(str(D),R)
 
     def test2(self):
@@ -337,19 +571,40 @@ AA         128       2048        16    148.792
 AB         128   2510.600    19.614    250.326 
 LAB        128   2945.000    23.008    264.699 
 
+O'BRIEN TEST FOR HOMOGENEITY OF VARIANCE
+Source of Variation        SS        df        MS         F     P-value   eta^2   Obs. power 
+============================================================================================
+Treatments             1021873.960     2   510936.980   5.229     0.006   0.027        0.823 
+Error                 37227154.824   381    97709.068                                        
+============================================================================================
+Total                 38249028.783   383                                                     
+
 ANOVA
-Source of       SS       df       MS        F      P-value  
-Variation                                                   
-===========================================================
-Treatments    3144.039     2   1572.020   7.104   9.348e-04 
-Error        84304.687   381    221.272                     
-===========================================================
-Total        87448.726   383                                """
+Source of Variation      SS       df       MS        F      P-value    eta^2   Obs. power 
+=========================================================================================
+Treatments             3144.039     2   1572.020   7.104   9.348e-04   0.036        0.922 
+Error                 84304.687   381    221.272                                          
+=========================================================================================
+Total                 87448.726   383                                                     
+
+POSTHOC MULTIPLE COMPARISONS
+
+Tukey HSD: Table of q-statistics
+      AA      AB        LAB    
+==============================
+AA    0    0.421 ns   0.816 ns 
+AB         0          0.395 ns 
+LAB                   0        
+==============================
+  + p < .10 (q-critical[3, 381] = 2.91125483514)
+  * p < .05 (q-critical[3, 381] = 3.32766157576)
+ ** p < .01 (q-critical[3, 381] = 4.14515568451)"""
         
         df = DataFrame()
         df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
-        aov=df.anova1way('SUPPRESSION','GROUP')
-        self.assertEqual(str(aov),R)
+        D=df.anova1way('SUPPRESSION','GROUP')
+        
+        self.assertEqual(str(D),R)
         
 class Test_ttest1sample(unittest.TestCase):
     def test0(self):
@@ -361,34 +616,41 @@ class Test_ttest1sample(unittest.TestCase):
         D=Ttest()
         D.run(A, pop_mean=pop_mean)
         
+        
         for k in R.keys():
             self.assertTrue(D[k],R[k])
 
     def test1(self):
         R="""t-Test: One Sample for means
 
-                         SUPPRESSION 
-====================================
-Sample Mean                   19.541 
-Hypothesized Pop. Mean             0 
-Variance                     228.326 
-Observations                     384 
-df                               383 
-t Stat                        25.341 
-P(T<=t) one-tail           3.347e-84 
-t Critical one-tail            1.649 
-P(T<=t) two-tail           6.694e-84 
-t Critical two-tail            1.966 """
+                          SUPPRESSION 
+=====================================
+Sample Mean                    19.541 
+Hypothesized Pop. Mean             17 
+Variance                      228.326 
+Observations                      384 
+df                                383 
+t Stat                          3.295 
+alpha                           0.050 
+P(T<=t) one-tail            5.384e-04 
+t Critical one-tail             1.966 
+P(T<=t) two-tail                0.001 
+t Critical two-tail             1.649 
+P(T<=t) two-tail                0.001 
+Effect size d                   0.168 
+delta                           3.295 
+Observed power one-tail         0.950 
+Observed power two-tail         0.908 """
+        
         df = DataFrame()
         df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
-        ttest=df.ttest('SUPPRESSION')
-        self.assertEqual(str(ttest),R)       
+        D=df.ttest('SUPPRESSION', pop_mean=17.)
+        self.assertEqual(str(D),R)       
 
 class Test_ttest(unittest.TestCase):
     def test0(self):
         """paired ttest"""
-        R=OrderedDict([('t', -1.4106912317171967), ('p2tail', 0.19601578492449323), ('p1tail', 0.09800789246224662), ('n1', 9), ('n2', 9), ('df', 8), ('mu1', 4.555555555555555), ('mu2', 7.888888888888889), ('var1', 6.777777777777778), ('var2', 47.111111111111114), ('tc2tail', 2.3060059174895287), ('tc1tail', 1.8595485016703606)])
-
+        R=Ttest([('t', -1.4106912317171967), ('p2tail', 0.19601578492449323), ('p1tail', 0.09800789246224662), ('n1', 9), ('n2', 9), ('r', 0.10182008678393427), ('df', 8), ('mu1', 4.555555555555555), ('mu2', 7.888888888888889), ('var1', 6.777777777777778), ('var2', 47.111111111111114), ('tc2tail', 1.8595480375228424), ('tc1tail', 2.3060041350333704), ('cohen_d', 0.47023041057239895), ('delta', 1.410691231717197), ('power1tail', 0.36186192660269623), ('power2tail', 0.23741605057147952)], paired=True, aname='A', bname='B', type='t-Test: Paired Two Sample for means')
         A=[3,4, 5,8,9, 1,2,4, 5]
         B=[6,19,3,2,14,4,5,17,1]
       
@@ -401,18 +663,24 @@ class Test_ttest(unittest.TestCase):
     def test01(self):
         """paired ttest"""
         R="""t-Test: Paired Two Sample for means
-                        A        B    
-=====================================
-Mean                   4.556    7.889 
-Variance               6.778   47.111 
-Observations               9        9 
-Pearson Correlation    0.102          
-df                         8          
-t Stat                -1.411          
-P(T<=t) one-tail       0.098          
-t Critical one-tail    1.860          
-P(T<=t) two-tail       0.196          
-t Critical two-tail    2.306          """
+                            A        B    
+=========================================
+Mean                       4.556    7.889 
+Variance                   6.778   47.111 
+Observations                   9        9 
+Pearson Correlation        0.102          
+df                             8          
+t Stat                    -1.411          
+alpha                      0.050          
+P(T<=t) one-tail           0.098          
+t Critical one-tail        2.306          
+P(T<=t) two-tail           0.196          
+t Critical two-tail        1.860          
+P(T<=t) two-tail           0.196          
+Effect size dz             0.470          
+delta                      1.411          
+Observed power one-tail    0.362          
+Observed power two-tail    0.237          """
         
         A=[3,4, 5,8,9, 1,2,4, 5]
         B=[6,19,3,2,14,4,5,17,1]
@@ -420,11 +688,12 @@ t Critical two-tail    2.306          """
         D=Ttest()
         D.run(A,B,paired=True)
 
+
         self.assertEqual(str(D),R)
 
     def test1(self):
         """independent equal variance ttest"""
-        R=OrderedDict([('t', -1.712764845721259), ('p2tail', 0.10493320627442616), ('p1tail', 0.05246660313721308), ('n1', 9), ('n2', 10), ('df', 17), ('mu1', 4.555555555555555), ('mu2', 9.0), ('var1', 6.777777777777777), ('var2', 54.22222222222222), ('vpooled', 31.895424836601304), ('tc2tail', 2.1098158322274685), ('tc1tail', 1.7396057955920696)])
+        R=Ttest([('t', -1.712764845721259), ('p2tail', 0.10493320627442616), ('p1tail', 0.05246660313721308), ('n1', 9), ('n2', 10), ('df', 17), ('mu1', 4.555555555555555), ('mu2', 9.0), ('var1', 6.777777777777777), ('var2', 54.22222222222222), ('vpooled', 31.895424836601304), ('tc2tail', 1.7396067260750672), ('tc1tail', 2.1098155778331806), ('cohen_d', 0.8047621870446092), ('delta', 1.6095243740892184), ('power1tail', 0.46028261750215127), ('power2tail', 0.32962069261917515)], aname='A', bname='B', type='t-Test: Two-Sample Assuming Equal Variances')
 
         A=[3,4, 5,8,9, 1,2,4, 5]
         B=[6,19,3,2,14,4,5,17,1,19]
@@ -438,31 +707,38 @@ t Critical two-tail    2.306          """
     def test11(self):
         """independent equal variance ttest"""
         R="""t-Test: Two-Sample Assuming Equal Variances
-                        A        B    
-=====================================
-Mean                   4.556        9 
-Variance               6.778   54.222 
-Observations               9       10 
-Pooled Variance       31.895          
-df                        17          
-t Stat                -1.713          
-P(T<=t) one-tail       0.052          
-t Critical one-tail    1.740          
-P(T<=t) two-tail       0.105          
-t Critical two-tail    2.110          """
+                            A        B    
+=========================================
+Mean                       4.556        9 
+Variance                   6.778   54.222 
+Observations                   9       10 
+Pooled Variance           31.895          
+df                            17          
+t Stat                    -1.713          
+alpha                      0.050          
+P(T<=t) one-tail           0.052          
+t Critical one-tail        2.110          
+P(T<=t) two-tail           0.105          
+t Critical two-tail        1.740          
+P(T<=t) two-tail           0.105          
+Effect size d              0.805          
+delta                      1.610          
+Observed power one-tail    0.460          
+Observed power two-tail    0.330          """
         
         A=[3,4, 5,8,9, 1,2,4, 5]
         B=[6,19,3,2,14,4,5,17,1,19]
+
       
         D=Ttest()
         D.run(A,B,equal_variance=True)
-        
+
         self.assertEqual(str(D),R)
 
     def test2(self):
         """independent unequal variance ttest"""
-        R=OrderedDict([('t', -1.7884967184189302), ('p2tail', 0.1002162848567985), ('p1tail', 0.05010814242839925), ('n1', 9), ('n2', 10), ('df', 11.425658453695835), ('mu1', 4.555555555555555), ('mu2', 9.0), ('var1', 6.777777777777777), ('var2', 54.22222222222222), ('tc2tail', 2.1910201758146286), ('tc1tail', 1.789783127605915)])
-
+        R=Ttest([('t', -1.7884967184189302), ('p2tail', 0.1002162848567985), ('p1tail', 0.05010814242839925), ('n1', 9), ('n2', 10), ('df', 11.425658453695835), ('mu1', 4.555555555555555), ('mu2', 9.0), ('var1', 6.777777777777777), ('var2', 54.22222222222222), ('tc2tail', 1.789781988406649), ('tc1tail', 2.1910222595585718), ('cohen_d', 0.8047621870446092), ('delta', 1.6095243740892184), ('power1tail', 0.44778738859279099), ('power2tail', 0.31400143046586182)], equal_variance=False, aname='A', bname='B', type='t-Test: Two-Sample Assuming Unequal Variances')
+        
         A=[3,4, 5,8,9, 1,2,4, 5]
         B=[6,19,3,2,14,4,5,17,1,19]
       
@@ -475,17 +751,23 @@ t Critical two-tail    2.110          """
     def test21(self):
         """independent unequal variance ttest"""
         R="""t-Test: Two-Sample Assuming Unequal Variances
-                        A        B    
-=====================================
-Mean                   4.556        9 
-Variance               6.778   54.222 
-Observations               9       10 
-df                    11.426          
-t Stat                -1.788          
-P(T<=t) one-tail       0.050          
-t Critical one-tail    1.790          
-P(T<=t) two-tail       0.100          
-t Critical two-tail    2.191          """
+                            A        B    
+=========================================
+Mean                       4.556        9 
+Variance                   6.778   54.222 
+Observations                   9       10 
+df                        11.426          
+t Stat                    -1.788          
+alpha                      0.050          
+P(T<=t) one-tail           0.050          
+t Critical one-tail        2.191          
+P(T<=t) two-tail           0.100          
+t Critical two-tail        1.790          
+P(T<=t) two-tail           0.100          
+Effect size d              0.805          
+delta                      1.610          
+Observed power one-tail    0.448          
+Observed power two-tail    0.314          """
         
         A=[3,4, 5,8,9, 1,2,4, 5]
         B=[6,19,3,2,14,4,5,17,1,19]
@@ -498,13 +780,13 @@ t Critical two-tail    2.191          """
     def test3(self):
         """independent unequal variance ttest
         http://alamos.math.arizona.edu/~rychlik/math263/class_notes/Chapter7/R/"""
-        R=OrderedDict([('t', 2.310889197854228), ('p2tail', 0.026382412254338405), ('p1tail', 0.013191206127169203), ('n1', 21), ('n2', 23), ('df', 37.855400659439084), ('mu1', 51.476190476190474), ('mu2', 41.52173913043478), ('var1', 121.16190476190475), ('var2', 294.0790513833993), ('tc2tail', 2.0246487110853195), ('tc1tail', 1.6861152835190296)])
-
+        R=Ttest([('t', 2.310889197854228), ('p2tail', 0.026382412254338405), ('p1tail', 0.013191206127169203), ('n1', 21), ('n2', 23), ('df', 37.855400659439084), ('mu1', 51.476190476190474), ('mu2', 41.52173913043478), ('var1', 121.16190476190475), ('var2', 294.0790513833993), ('tc2tail', 1.6861153650443554), ('tc1tail', 2.0246481352107009), ('cohen_d', 0.6908475708680588), ('delta', 2.1846518399376538), ('power1tail', 0.6916337616595899), ('power2tail', 0.56712772561445368)], equal_variance=False, aname='A', bname='B', type='t-Test: Two-Sample Assuming Unequal Variances')
         A=[24,61,59,46,43,44,52,43,58,67,62,57,71,49,54,43,53,57,49,56,33]
         B=[42,33,46,37,43,41,10,42,55,19,17,55,26,54,60,28,62,20,53,48,37,85,42]
       
         D=Ttest()
         D.run(A,B,equal_variance=False)
+
 
         for k in R.keys():
             self.assertTrue(D[k],R[k])
@@ -513,17 +795,23 @@ t Critical two-tail    2.191          """
         """independent unequal variance ttest
         http://alamos.math.arizona.edu/~rychlik/math263/class_notes/Chapter7/R/"""
         R="""t-Test: Two-Sample Assuming Unequal Variances
-                         A         B    
-=======================================
-Mean                   51.476    41.522 
-Variance              121.162   294.079 
-Observations               21        23 
-df                     37.855           
-t Stat                  2.311           
-P(T<=t) one-tail        0.013           
-t Critical one-tail     1.686           
-P(T<=t) two-tail        0.026           
-t Critical two-tail     2.025           """
+                             A         B    
+===========================================
+Mean                       51.476    41.522 
+Variance                  121.162   294.079 
+Observations                   21        23 
+df                         37.855           
+t Stat                      2.311           
+alpha                       0.050           
+P(T<=t) one-tail            0.013           
+t Critical one-tail         2.025           
+P(T<=t) two-tail            0.026           
+t Critical two-tail         1.686           
+P(T<=t) two-tail            0.026           
+Effect size d               0.691           
+delta                       2.185           
+Observed power one-tail     0.692           
+Observed power two-tail     0.567           """
         
         A=[24,61,59,46,43,44,52,43,58,67,62,57,71,49,54,43,53,57,49,56,33]
         B=[42,33,46,37,43,41,10,42,55,19,17,55,26,54,60,28,62,20,53,48,37,85,42]
@@ -535,25 +823,31 @@ t Critical two-tail     2.025           """
 
     def test4(self):
         R="""t-Test: Paired Two Sample for means
-                        PRE        POST   
-=========================================
-Mean                    87.250     87.083 
-Variance              1207.659   1166.629 
-Observations                12         12 
-Pearson Correlation      0.995            
-df                          11            
-t Stat                   0.163            
-P(T<=t) one-tail         0.437            
-t Critical one-tail      1.796            
-P(T<=t) two-tail         0.873            
-t Critical two-tail      2.201            """
+                            PRE        POST   
+=============================================
+Mean                        87.250     87.083 
+Variance                  1207.659   1166.629 
+Observations                    12         12 
+Pearson Correlation          0.995            
+df                              11            
+t Stat                       0.163            
+alpha                        0.050            
+P(T<=t) one-tail             0.437            
+t Critical one-tail          2.201            
+P(T<=t) two-tail             0.873            
+t Critical two-tail          1.796            
+P(T<=t) two-tail             0.873            
+Effect size dz               0.047            
+delta                        0.163            
+Observed power one-tail      0.068            
+Observed power two-tail      0.035            """
         df = DataFrame()
         df.read_tbl('example2_prepost.csv')
-        ttest = df.ttest('PRE','POST',paired=True)
-        self.assertEqual(str(ttest),R)
+        D = df.ttest('PRE','POST',paired=True)
+        self.assertEqual(str(D),R)
         
     def test__repr__(self):
-        R="Ttest([('t', 2.310889197854228), ('p2tail', 0.026382412254338405), ('p1tail', 0.013191206127169203), ('n1', 21), ('n2', 23), ('df', 37.855400659439084), ('mu1', 51.476190476190474), ('mu2', 41.52173913043478), ('var1', 121.16190476190475), ('var2', 294.0790513833993), ('tc2tail', 2.0246487110853195), ('tc1tail', 1.6861152835190296)], equal_variance=False, aname='A', bname='B', type='t-Test: Two-Sample Assuming Unequal Variances')"
+        R="Ttest([('t', 2.310889197854228), ('p2tail', 0.026382412254338405), ('p1tail', 0.013191206127169203), ('n1', 21), ('n2', 23), ('df', 37.855400659439084), ('mu1', 51.476190476190474), ('mu2', 41.52173913043478), ('var1', 121.16190476190475), ('var2', 294.0790513833993), ('tc2tail', 1.6861153650443554), ('tc1tail', 2.0246481352107009), ('cohen_d', 0.6908475708680588), ('delta', 2.1846518399376538), ('power1tail', 0.6916337616595899), ('power2tail', 0.56712772561445368)], equal_variance=False, aname='A', bname='B', type='t-Test: Two-Sample Assuming Unequal Variances')"
         
         A=[24,61,59,46,43,44,52,43,58,67,62,57,71,49,54,43,53,57,49,56,33]
         B=[42,33,46,37,43,41,10,42,55,19,17,55,26,54,60,28,62,20,53,48,37,85,42]
@@ -570,7 +864,7 @@ def suite():
             unittest.makeSuite(Test_chisquare2way),
             unittest.makeSuite(Test_chisquare1way),
             unittest.makeSuite(Test_posthoc),
-##            unittest.makeSuite(Test_anova1way),
+            unittest.makeSuite(Test_anova1way),
             unittest.makeSuite(Test_ttest1sample),
             unittest.makeSuite(Test_ttest)
                               ))

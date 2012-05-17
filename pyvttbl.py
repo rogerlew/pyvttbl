@@ -24,34 +24,19 @@ from pprint import pprint as pp
 from copy import copy, deepcopy
 from collections import OrderedDict, Counter, namedtuple
 
+import pylab
+import scipy
+import numpy as np
+
 import pystaggrelite3
 from dictset import DictSet
 from texttable import Texttable as TextTable
-from stats import jsci, stats, pstat
+from stats import stats, pstat
 from qsturng import qsturng, psturng 
 
 from anova import Anova
 
-# check for third party packages
-try:
-    import pylab
-    HAS_PYLAB = True
-except:
-    HAS_PYLAB = False
-    
-try:
-    import numpy as np
-    HAS_NUMPY = True
-except:
-    HAS_NUMPY = False
-
-try:
-    import scipy
-    HAS_SCIPY = True
-except:
-    HAS_SCIPY = False
-
-__version__ = '0.3.6.7'
+__version__ = '0.4.0.0'
 
 def _isfloat(string):
     """
@@ -137,6 +122,40 @@ def _str(x, dtype='a', n=3):
             else:
                 return '%.*f'%(n, f)
             
+def nctcdf(x,df,nc):
+    """
+    Noncentral t cumulative distribution function (cdf)
+    
+    P = nctcdf(x,df,nc) computes the noncentral
+    F cdf at each of the values in {x} using the
+    corresponding degrees of freedom in {df} and positive
+    noncentrality parameters in {nc}. 
+    """
+    return scipy.stats.nct(df,nc).cdf(x)
+
+def ncfcdf(x,df1,df2,nc):
+    """
+    Noncentral F cumulative distribution function (cdf)
+    
+    P = ncfcdf(x,df1,df2,ncA) computes the noncentral
+    F cdf at each of the values in {x} using the
+    corresponding numerator degrees of freedom in {df1},
+    denominator degrees of freedom in {df2}, and positive
+    noncentrality parameters in {nc}. 
+    """
+    return scipy.stats.ncf(df1,df2,nc).cdf(x)
+
+def ncx2cdf(x,df,nc):
+    """
+    Noncentral t cumulative distribution function (cdf)
+    
+    P = nctcdf(x,df,nc) computes the noncentral
+    F cdf at each of the values in {x} using the
+    corresponding degrees of freedom in {df} and positive
+    noncentrality parameters in {nc}. 
+    """
+    return scipy.stats.ncx2(df,nc).cdf(x)
+
 # the dataframe class
 class DataFrame(OrderedDict):
     """holds the data in a dummy-coded group format"""
@@ -1205,616 +1224,606 @@ class DataFrame(OrderedDict):
               density=density, cumulative=cumulative)
         return h
 
-# conditionally load plot methods
-    if HAS_NUMPY and HAS_PYLAB and HAS_SCIPY:
-        def anova(self, dv, sub='SUBJECT', wfactors=None, bfactors=None,
-                  measure='', transform='', alpha=0.05):
-            aov=Anova()
-            aov.run(self, dv, sub=sub, wfactors=wfactors, bfactors=bfactors,
-                    measure=measure, transform=transform, alpha=alpha)
-            return aov
+    def anova(self, dv, sub='SUBJECT', wfactors=None, bfactors=None,
+              measure='', transform='', alpha=0.05):
+        aov=Anova()
+        aov.run(self, dv, sub=sub, wfactors=wfactors, bfactors=bfactors,
+                measure=measure, transform=transform, alpha=alpha)
+        return aov
         
-    # conditionally load plot methods
-    if HAS_NUMPY and HAS_PYLAB:
-        def histogram_plot(self, val, where=None, bins=10,
-                      range=None, density=False, cumulative=False,
-                      fname=None, quality='medium'):
-            """
-            Creates a histogram plot with the specified parameters
-            """
+    def histogram_plot(self, val, where=None, bins=10,
+                  range=None, density=False, cumulative=False,
+                  fname=None, quality='medium'):
+        """
+        Creates a histogram plot with the specified parameters
+        """
+        
+        if where == None:
+            where = []
+
+        # check fname
+        if not isinstance(fname, _strobj) and fname != None:
+            raise TypeError('fname must be None or string')
+
+        if isinstance(fname, _strobj):
+            if not (fname.lower().endswith('.png') or \
+                    fname.lower().endswith('.svg')):
+                raise Exception('fname must end with .png or .svg')                
+
+        # select_col does checking of val and where
+        v = self.select_col(val, where=where)
+        
+        fig=pylab.figure()
+        tup = pylab.hist(np.array(v), bins=bins, range=range,
+                         normed=density, cumulative=cumulative)
+        pylab.title(val)
+
+        if fname == None:
+            fname = 'hist(%s).png'%val.lower()
+        
+        # save figure
+        if quality == 'low' or fname.endswith('.svg'):
+            pylab.savefig(fname)
             
-            if where == None:
-                where = []
-
-            # check fname
-            if not isinstance(fname, _strobj) and fname != None:
-                raise TypeError('fname must be None or string')
-
-            if isinstance(fname, _strobj):
-                if not (fname.lower().endswith('.png') or \
-                        fname.lower().endswith('.svg')):
-                    raise Exception('fname must end with .png or .svg')                
-
-            # select_col does checking of val and where
-            v = self.select_col(val, where=where)
+        elif quality == 'medium':
+            pylab.savefig(fname, dpi=200)
             
-            fig=pylab.figure()
-            tup = pylab.hist(np.array(v), bins=bins, range=range,
-                             normed=density, cumulative=cumulative)
-            pylab.title(val)
-
-            if fname == None:
-                fname = 'hist(%s).png'%val.lower()
+        elif quality == 'high':
+            pylab.savefig(fname, dpi=300)
             
-            # save figure
-            if quality == 'low' or fname.endswith('.svg'):
-                pylab.savefig(fname)
-                
-            elif quality == 'medium':
-                pylab.savefig(fname, dpi=200)
-                
-            elif quality == 'high':
-                pylab.savefig(fname, dpi=300)
-                
+        else:
+            pylab.savefig(fname)
+
+        pylab.close()
+
+        if self.TESTMODE:
+            # build and return test dictionary
+            return {'bins':tup[0], 'counts':tup[1], 'fname':fname}
+
+    def scatter_plot(self, aname, bname, where=None,
+                     fname=None, quality='medium'):
+        """
+        Creates a scatter plot with the specified parameters
+        """
+        
+        if where == None:
+            where = []
+
+        # check fname
+        if not isinstance(fname, _strobj) and fname != None:
+            raise TypeError('fname must be None or string')
+
+        if isinstance(fname, _strobj):
+            if not (fname.lower().endswith('.png') or \
+                    fname.lower().endswith('.svg')):
+                raise Exception('fname must end with .png or .svg')                
+
+        # select_col does checking of aname, bnames, and where        
+        adata = self.select_col(aname, where)
+        bdata = self.select_col(bname, where)
+        
+        fig=pylab.figure()
+        pylab.scatter(adata, bdata)
+        pylab.xlabel(aname)
+        pylab.ylabel(bname)
+
+        if fname == None:
+            fname = 'scatter(%sX%s).png'%(aname.lower(),bname.lower())
+        
+        # save figure
+        if quality == 'low' or fname.endswith('.svg'):
+            pylab.savefig(fname)
+            
+        elif quality == 'medium':
+            pylab.savefig(fname, dpi=200)
+            
+        elif quality == 'high':
+            pylab.savefig(fname, dpi=300)
+            
+        else:
+            pylab.savefig(fname)
+
+        pylab.close()
+
+        if self.TESTMODE:
+            # build and return test dictionary
+            return {'bins':tup[0], 'counts':tup[1], 'fname':fname}
+
+    def box_plot(self, val, factors=None, where=None,
+            fname=None, quality='medium'):
+        """
+        Creates a box plot with the specified parameters
+        """
+
+        if factors == None:
+            factors = []
+
+        if where == None:
+            where = []
+
+        # check to see if there is any data in the table
+        if self == {}:
+            raise Exception('Table must have data to print data')
+        
+        # check to see if data columns have equal lengths
+        if not self._are_col_lengths_equal():
+            raise Exception('columns have unequal lengths')
+
+        # check the supplied arguments
+        if val not in self.names():
+            raise KeyError(val)
+
+        if not hasattr(factors, '__iter__'):
+            raise TypeError( "'%s' object is not iterable"
+                             % type(factors).__name__)
+        
+        for k in factors:
+            if k not in self.names():
+                raise KeyError(k)
+            
+        # check for duplicate names
+        dup = Counter([val]+factors)
+        del dup[None]
+        if not all([count==1 for count in dup.values()]):
+            raise Exception('duplicate labels specified as plot parameters')
+
+        # check fname
+        if not isinstance(fname, _strobj) and fname != None:
+            raise TypeError('fname must be None or string')
+
+        if isinstance(fname, _strobj):
+            if not (fname.lower().endswith('.png') or \
+                    fname.lower().endswith('.svg')):
+                raise Exception('fname must end with .png or .svg')
+
+        test = {}
+
+        if factors == []:
+            d = self.select_col(val, where=where)            
+            fig = pylab.figure()
+            pylab.boxplot(np.array(d))
+            xticks = pylab.xticks()[0]
+            xlabels = [val]
+            pylab.xticks(xticks, xlabels)
+
+            test['d'] = d
+            test['val'] = val
+
+        else:
+            D = self.pivot(val, rows=factors,
+                           where=where,
+                           aggregate='tolist')
+
+            fig = pylab.figure(figsize=(6*len(factors),6))
+            fig.subplots_adjust(left=.05, right=.97, bottom=0.24)
+            pylab.boxplot([np.array(_flatten(d)) for d in D])
+            xticks = pylab.xticks()[0]
+            xlabels = ['\n'.join('%s = %s'%fc for fc in c) for c in D.rnames]
+            pylab.xticks(xticks, xlabels,
+                         rotation='vertical',
+                         verticalalignment='top')
+
+            test['d'] = [np.array(_flatten(d)) for d in D]
+            test['xlabels'] = xlabels
+
+        maintitle = '%s'%val
+
+        if factors != []:
+            maintitle += ' by '
+            maintitle += ' * '.join(factors)
+            
+        fig.text(0.5, 0.95, maintitle,
+                 horizontalalignment='center',
+                 verticalalignment='top')
+        
+        test['maintitle'] = maintitle
+            
+        if fname == None:
+            fname = 'box(%s).png'%val.lower()
+
+        test['fname'] = fname
+        
+        # save figure
+        if quality == 'low' or fname.endswith('.svg'):
+            pylab.savefig(fname)
+            
+        elif quality == 'medium':
+            pylab.savefig(fname, dpi=200)
+            
+        elif quality == 'high':
+            pylab.savefig(fname, dpi=300)
+            
+        else:
+            pylab.savefig(fname)
+
+        pylab.close()
+
+        if self.TESTMODE:
+            return test
+
+    def interaction_plot(self, val, xaxis, 
+                    seplines=None, sepxplots=None, sepyplots=None,
+                    xmin='AUTO', xmax='AUTO', ymin='AUTO', ymax='AUTO',
+                    where=None, fname=None, quality='low', yerr=None):
+        """
+        Creates an interaction plot with the specified parameters
+        """
+
+        ##############################################################
+        # interaction_plot programmatic flow                         #
+        ##############################################################
+        #  1. Check to make sure a plot can be generated with the    # 
+        #     specified arguments and parameter                      #
+        #  2. Set yerr aggregate                                     #
+        #  3. Figure out ymin and ymax if 'AUTO' is specified        #
+        #  4. Figure out how many subplots we need to make and the   #
+        #     levels of those subplots                               #
+        #  5. Initialize pylab.figure and set plot parameters        #
+        #  6. Build and set main title                               #
+        #  7. loop through the the rlevels and clevels and make      #
+        #     subplots                                               #
+        #      7.1 Create new axes for the subplot                   #
+        #      7.2 Add subplot title                                 #
+        #      7.3 Format the subplot                                #
+        #      7.4 Iterate plotnum counter                           #
+        #  8. Place yerr text in bottom right corner                 #
+        #  9. Save the figure                                        #
+        # 10. return the test dictionary                             #
+        ##############################################################
+
+        #  1. Check to make sure a plot can be generated with the    
+        #     specified arguments and parameter
+        ##############################################################
+        # pylab doesn't like not being closed. To avoid starting
+        # a plot without finishing it, we do some extensive checking
+        # up front
+
+        if where == None:
+            where = []
+
+        # check for data
+        if self == {}:
+            raise Exception('Table must have data to plot marginals')
+
+        # check to see if data columns have equal lengths
+        if not self._are_col_lengths_equal():
+            raise Exception('columns have unequal lengths')
+
+        # check to make sure arguments are column labels
+        if val not in self.names():
+            raise KeyError(val)
+
+        if xaxis not in self.names():
+            raise KeyError(xaxis)
+        
+        if seplines not in self.names() and seplines != None:
+            raise KeyError(seplines)
+
+        if sepxplots not in self.names() and sepxplots != None:
+            raise KeyError(sepxplots)
+        
+        if sepyplots not in self.names() and sepyplots != None:
+            raise KeyError(sepyplots)
+
+        # check for duplicate names
+        dup = Counter([val, xaxis, seplines, sepxplots, sepyplots])
+        del dup[None]
+        if not all([count == 1 for count in dup.values()]):
+            raise Exception('duplicate labels specified as plot parameters')
+
+        # check fname
+        if not isinstance(fname, _strobj) and fname != None:
+            raise TypeError('fname must be None or string')
+
+        if isinstance(fname, _strobj):
+            if not (fname.lower().endswith('.png') or \
+                    fname.lower().endswith('.svg')):
+                raise Exception('fname must end with .png or .svg')                
+
+        # check cell counts
+        cols = [f for f in [seplines, sepxplots, sepyplots] if f in self.names()]
+        counts = self.pivot(val, rows=[xaxis], cols=cols,
+                            flatten=True, where=where, aggregate='count')
+
+        for count in counts:
+            if count < 1:
+                raise Exception('cell count too low to calculate mean')
+
+        #  2. Initialize test dictionary
+        ##############################################################
+        # To test the plotting a dict with various plot parameters
+        # is build and returned to the testing module. In this
+        # scenario our primary concern is that the values represent
+        # what we think they represent. Whether they match the plot
+        # should be fairly obvious to the user. 
+        test = {}
+        
+        #  3. Set yerr aggregate so sqlite knows how to calculate yerr
+        ##############################################################
+        
+        # check yerr
+        aggregate = None
+        if yerr == 'sem':
+            aggregate = 'sem'
+            
+        elif yerr == 'stdev':
+            aggregate = 'stdev'
+            
+        elif yerr == 'ci':
+            aggregate = 'ci'
+
+        for count in counts:
+            if aggregate != None and count < 2:
+                raise Exception('cell count too low to calculate %s'%yerr)
+
+        test['yerr'] = yerr
+        test['aggregate'] = aggregate
+
+        #  4. Figure out ymin and ymax if 'AUTO' is specified
+        ##############################################################            
+        desc = self.descriptives(val)
+        
+        if ymin == 'AUTO':
+            # when plotting postive data always have the y-axis go to 0
+            if desc['min'] >= 0.:
+                ymin = 0. 
             else:
-                pylab.savefig(fname)
+                ymin = desc['mean'] - 3.*desc['stdev']
+        if ymax == 'AUTO':
+            ymax = desc['mean'] + 3.*desc['stdev']
 
-            pylab.close()
+        if any([math.isnan(ymin), math.isinf(ymin), math.isnan(ymax), math.isinf(ymax)]):
+            raise Exception('calculated plot bounds nonsensical')
 
-            if self.TESTMODE:
-                # build and return test dictionary
-                return {'bins':tup[0], 'counts':tup[1], 'fname':fname}
+        test['ymin'] = ymin
+        test['ymax'] = ymax
 
-    # conditionally load plot methods
-    if HAS_NUMPY and HAS_PYLAB:
-        def scatter_plot(self, aname, bname, where=None,
-                         fname=None, quality='medium'):
-            """
-            Creates a scatter plot with the specified parameters
-            """
-            
-            if where == None:
-                where = []
-
-            # check fname
-            if not isinstance(fname, _strobj) and fname != None:
-                raise TypeError('fname must be None or string')
-
-            if isinstance(fname, _strobj):
-                if not (fname.lower().endswith('.png') or \
-                        fname.lower().endswith('.svg')):
-                    raise Exception('fname must end with .png or .svg')                
-
-            # select_col does checking of aname, bnames, and where        
-            adata = self.select_col(aname, where)
-            bdata = self.select_col(bname, where)
-            
-            fig=pylab.figure()
-            pylab.scatter(adata, bdata)
-            pylab.xlabel(aname)
-            pylab.ylabel(bname)
-
-            if fname == None:
-                fname = 'scatter(%sX%s).png'%(aname.lower(),bname.lower())
-            
-            # save figure
-            if quality == 'low' or fname.endswith('.svg'):
-                pylab.savefig(fname)
+        #  5. Figure out how many subplots we need to make and the
+        #     levels of those subplots
+        ##############################################################      
+        numrows = 1
+        rlevels = [1]
+        if sepyplots != None:
+            rlevels = copy(counts.conditions[sepyplots]) # a set
+            numrows = len(rlevels) # a int
+            rlevels = sorted(rlevels) # set -> sorted list
                 
-            elif quality == 'medium':
-                pylab.savefig(fname, dpi=200)
-                
-            elif quality == 'high':
-                pylab.savefig(fname, dpi=300)
-                
-            else:
-                pylab.savefig(fname)
+        numcols = 1
+        clevels = [1]            
+        if sepxplots != None:
+            clevels = copy(counts.conditions[sepxplots])
+            numcols = len(clevels)
+            clevels = sorted(clevels) # set -> sorted list
 
-            pylab.close()
-
-            if self.TESTMODE:
-                # build and return test dictionary
-                return {'bins':tup[0], 'counts':tup[1], 'fname':fname}
-
-    # conditionally load plot methods
-    if HAS_NUMPY and HAS_PYLAB:
-        def box_plot(self, val, factors=None, where=None,
-                fname=None, quality='medium'):
-            """
-            Creates a box plot with the specified parameters
-            """
-
-            if factors == None:
-                factors = []
-
-            if where == None:
-                where = []
-
-            # check to see if there is any data in the table
-            if self == {}:
-                raise Exception('Table must have data to print data')
+        test['numrows']  = numrows
+        test['rlevels']  = rlevels
+        test['numcols']  = numcols
+        test['clevels']  = clevels
+        
+        #  6. Initialize pylab.figure and set plot parameters
+        ##############################################################  
+        fig = pylab.figure(figsize=(6*numcols, 4*numrows+1))
+        fig.subplots_adjust(wspace=.05, hspace=0.2)
+        
+        #  7. Build and set main title
+        ##############################################################  
+        maintitle = '%s by %s'%(val,xaxis)
+        
+        if seplines:
+            maintitle += ' * %s'%seplines
+        if sepxplots:
+            maintitle += ' * %s'%sepxplots
+        if sepyplots:
+            maintitle += ' * %s'%sepyplots
             
-            # check to see if data columns have equal lengths
-            if not self._are_col_lengths_equal():
-                raise Exception('columns have unequal lengths')
+        fig.text(0.5, 0.95, maintitle,
+                 horizontalalignment='center',
+                 verticalalignment='top')
 
-            # check the supplied arguments
-            if val not in self.names():
-                raise KeyError(val)
+        test['maintitle']  = maintitle
+        
+        #  8. loop through the the rlevels and clevels and make
+        #     subplots
+        ##############################################################
+        test['y'] = []
+        test['yerr'] = []
+        test['subplot_titles'] = []
+        test['xmins'] = []
+        test['xmaxs'] = []
+        
+        plotnum = 1 # subplot counter
+        axs = []
 
-            if not hasattr(factors, '__iter__'):
-                raise TypeError( "'%s' object is not iterable"
-                                 % type(factors).__name__)
-            
-            for k in factors:
-                if k not in self.names():
-                    raise KeyError(k)
+        for r, rlevel in enumerate(rlevels):
+            for c, clevel in enumerate(clevels):
+                where_extension = []
+                if sepxplots!=None:
+                    where_extension.append((sepxplots, '=', [clevel]))
+                if sepyplots!=None:
+                    where_extension.append((sepyplots, '=', [rlevel]))
                 
-            # check for duplicate names
-            dup = Counter([val]+factors)
-            del dup[None]
-            if not all([count==1 for count in dup.values()]):
-                raise Exception('duplicate labels specified as plot parameters')
+                #  8.1 Create new axes for the subplot
+                ######################################################
+                axs.append(pylab.subplot(numrows, numcols, plotnum))
 
-            # check fname
-            if not isinstance(fname, _strobj) and fname != None:
-                raise TypeError('fname must be None or string')
+                ######## If separate lines are not specified #########
+                if seplines == None:
+                    y = self.pivot(val, cols=[xaxis],
+                                   where=where+where_extension,
+                                   aggregate='avg', flatten=True)
 
-            if isinstance(fname, _strobj):
-                if not (fname.lower().endswith('.png') or \
-                        fname.lower().endswith('.svg')):
-                    raise Exception('fname must end with .png or .svg')
-
-            test = {}
-
-            if factors == []:
-                d = self.select_col(val, where=where)            
-                fig = pylab.figure()
-                pylab.boxplot(np.array(d))
-                xticks = pylab.xticks()[0]
-                xlabels = [val]
-                pylab.xticks(xticks, xlabels)
-
-                test['d'] = d
-                test['val'] = val
-
-            else:
-                D = self.pivot(val, rows=factors,
-                               where=where,
-                               aggregate='tolist')
-
-                fig = pylab.figure(figsize=(6*len(factors),6))
-                fig.subplots_adjust(left=.05, right=.97, bottom=0.24)
-                pylab.boxplot([np.array(_flatten(d)) for d in D])
-                xticks = pylab.xticks()[0]
-                xlabels = ['\n'.join('%s = %s'%fc for fc in c) for c in D.rnames]
-                pylab.xticks(xticks, xlabels,
-                             rotation='vertical',
-                             verticalalignment='top')
-
-                test['d'] = [np.array(_flatten(d)) for d in D]
-                test['xlabels'] = xlabels
-
-            maintitle = '%s'%val
-
-            if factors != []:
-                maintitle += ' by '
-                maintitle += ' * '.join(factors)
-                
-            fig.text(0.5, 0.95, maintitle,
-                     horizontalalignment='center',
-                     verticalalignment='top')
-            
-            test['maintitle'] = maintitle
-                
-            if fname == None:
-                fname = 'box(%s).png'%val.lower()
-
-            test['fname'] = fname
-            
-            # save figure
-            if quality == 'low' or fname.endswith('.svg'):
-                pylab.savefig(fname)
-                
-            elif quality == 'medium':
-                pylab.savefig(fname, dpi=200)
-                
-            elif quality == 'high':
-                pylab.savefig(fname, dpi=300)
-                
-            else:
-                pylab.savefig(fname)
-
-            pylab.close()
-
-            if self.TESTMODE:
-                return test
-
-    # conditionally load plot methods
-    if HAS_NUMPY and HAS_PYLAB:
-        def interaction_plot(self, val, xaxis, 
-                        seplines=None, sepxplots=None, sepyplots=None,
-                        xmin='AUTO', xmax='AUTO', ymin='AUTO', ymax='AUTO',
-                        where=None, fname=None, quality='low', yerr=None):
-            """
-            Creates an interaction plot with the specified parameters
-            """
-
-            ##############################################################
-            # interaction_plot programmatic flow                         #
-            ##############################################################
-            #  1. Check to make sure a plot can be generated with the    # 
-            #     specified arguments and parameter                      #
-            #  2. Set yerr aggregate                                     #
-            #  3. Figure out ymin and ymax if 'AUTO' is specified        #
-            #  4. Figure out how many subplots we need to make and the   #
-            #     levels of those subplots                               #
-            #  5. Initialize pylab.figure and set plot parameters        #
-            #  6. Build and set main title                               #
-            #  7. loop through the the rlevels and clevels and make      #
-            #     subplots                                               #
-            #      7.1 Create new axes for the subplot                   #
-            #      7.2 Add subplot title                                 #
-            #      7.3 Format the subplot                                #
-            #      7.4 Iterate plotnum counter                           #
-            #  8. Place yerr text in bottom right corner                 #
-            #  9. Save the figure                                        #
-            # 10. return the test dictionary                             #
-            ##############################################################
-
-            #  1. Check to make sure a plot can be generated with the    
-            #     specified arguments and parameter
-            ##############################################################
-            # pylab doesn't like not being closed. To avoid starting
-            # a plot without finishing it, we do some extensive checking
-            # up front
-
-            if where == None:
-                where = []
-
-            # check for data
-            if self == {}:
-                raise Exception('Table must have data to plot marginals')
-
-            # check to see if data columns have equal lengths
-            if not self._are_col_lengths_equal():
-                raise Exception('columns have unequal lengths')
-
-            # check to make sure arguments are column labels
-            if val not in self.names():
-                raise KeyError(val)
-
-            if xaxis not in self.names():
-                raise KeyError(xaxis)
-            
-            if seplines not in self.names() and seplines != None:
-                raise KeyError(seplines)
-
-            if sepxplots not in self.names() and sepxplots != None:
-                raise KeyError(sepxplots)
-            
-            if sepyplots not in self.names() and sepyplots != None:
-                raise KeyError(sepyplots)
-
-            # check for duplicate names
-            dup = Counter([val, xaxis, seplines, sepxplots, sepyplots])
-            del dup[None]
-            if not all([count == 1 for count in dup.values()]):
-                raise Exception('duplicate labels specified as plot parameters')
-
-            # check fname
-            if not isinstance(fname, _strobj) and fname != None:
-                raise TypeError('fname must be None or string')
-
-            if isinstance(fname, _strobj):
-                if not (fname.lower().endswith('.png') or \
-                        fname.lower().endswith('.svg')):
-                    raise Exception('fname must end with .png or .svg')                
-
-            # check cell counts
-            cols = [f for f in [seplines, sepxplots, sepyplots] if f in self.names()]
-            counts = self.pivot(val, rows=[xaxis], cols=cols,
-                                flatten=True, where=where, aggregate='count')
-
-            for count in counts:
-                if count < 1:
-                    raise Exception('cell count too low to calculate mean')
-
-            #  2. Initialize test dictionary
-            ##############################################################
-            # To test the plotting a dict with various plot parameters
-            # is build and returned to the testing module. In this
-            # scenario our primary concern is that the values represent
-            # what we think they represent. Whether they match the plot
-            # should be fairly obvious to the user. 
-            test = {}
-            
-            #  3. Set yerr aggregate so sqlite knows how to calculate yerr
-            ##############################################################
-            
-            # check yerr
-            aggregate = None
-            if yerr == 'sem':
-                aggregate = 'sem'
-                
-            elif yerr == 'stdev':
-                aggregate = 'stdev'
-                
-            elif yerr == 'ci':
-                aggregate = 'ci'
-
-            for count in counts:
-                if aggregate != None and count < 2:
-                    raise Exception('cell count too low to calculate %s'%yerr)
-
-            test['yerr'] = yerr
-            test['aggregate'] = aggregate
-
-            #  4. Figure out ymin and ymax if 'AUTO' is specified
-            ##############################################################            
-            desc = self.descriptives(val)
-            
-            if ymin == 'AUTO':
-                # when plotting postive data always have the y-axis go to 0
-                if desc['min'] >= 0.:
-                    ymin = 0. 
-                else:
-                    ymin = desc['mean'] - 3.*desc['stdev']
-            if ymax == 'AUTO':
-                ymax = desc['mean'] + 3.*desc['stdev']
-
-            if any([math.isnan(ymin), math.isinf(ymin), math.isnan(ymax), math.isinf(ymax)]):
-                raise Exception('calculated plot bounds nonsensical')
-
-            test['ymin'] = ymin
-            test['ymax'] = ymax
-
-            #  5. Figure out how many subplots we need to make and the
-            #     levels of those subplots
-            ##############################################################      
-            numrows = 1
-            rlevels = [1]
-            if sepyplots != None:
-                rlevels = copy(counts.conditions[sepyplots]) # a set
-                numrows = len(rlevels) # a int
-                rlevels = sorted(rlevels) # set -> sorted list
+                    if aggregate != None:
+                        yerr = self.pivot(val, cols=[xaxis],
+                                          where=where+where_extension,
+                                          aggregate=aggregate,
+                                          flatten=True)
                     
-            numcols = 1
-            clevels = [1]            
-            if sepxplots != None:
-                clevels = copy(counts.conditions[sepxplots])
-                numcols = len(clevels)
-                clevels = sorted(clevels) # set -> sorted list
-
-            test['numrows']  = numrows
-            test['rlevels']  = rlevels
-            test['numcols']  = numcols
-            test['clevels']  = clevels
-            
-            #  6. Initialize pylab.figure and set plot parameters
-            ##############################################################  
-            fig = pylab.figure(figsize=(6*numcols, 4*numrows+1))
-            fig.subplots_adjust(wspace=.05, hspace=0.2)
-            
-            #  7. Build and set main title
-            ##############################################################  
-            maintitle = '%s by %s'%(val,xaxis)
-            
-            if seplines:
-                maintitle += ' * %s'%seplines
-            if sepxplots:
-                maintitle += ' * %s'%sepxplots
-            if sepyplots:
-                maintitle += ' * %s'%sepyplots
-                
-            fig.text(0.5, 0.95, maintitle,
-                     horizontalalignment='center',
-                     verticalalignment='top')
-
-            test['maintitle']  = maintitle
-            
-            #  8. loop through the the rlevels and clevels and make
-            #     subplots
-            ##############################################################
-            test['y'] = []
-            test['yerr'] = []
-            test['subplot_titles'] = []
-            test['xmins'] = []
-            test['xmaxs'] = []
-            
-            plotnum = 1 # subplot counter
-            axs = []
-
-            for r, rlevel in enumerate(rlevels):
-                for c, clevel in enumerate(clevels):
-                    where_extension = []
-                    if sepxplots!=None:
-                        where_extension.append((sepxplots, '=', [clevel]))
-                    if sepyplots!=None:
-                        where_extension.append((sepyplots, '=', [rlevel]))
+                    x = [name for [(label, name)] in y.cnames]
                     
-                    #  8.1 Create new axes for the subplot
-                    ######################################################
-                    axs.append(pylab.subplot(numrows, numcols, plotnum))
+                    if _isfloat(yerr):
+                        yerr = np.array([yerr for a in x])
 
-                    ######## If separate lines are not specified #########
-                    if seplines == None:
-                        y = self.pivot(val, cols=[xaxis],
-                                       where=where+where_extension,
-                                       aggregate='avg', flatten=True)
+                    if all([_isfloat(a) for a in x]):
+                        axs[-1].errorbar(x, y, yerr)
+                        if xmin == 'AUTO' and xmax == 'AUTO':
+                            xmin, xmax = axs[-1].get_xlim()
+                            xran = xmax - xmin
+                            xmin = xmin - 0.05*xran
+                            xmax = xmax + 0.05*xran
 
+                        axs[-1].plot([xmin, xmax], [0., 0.], 'k:')
+                        
+                    else : # categorical x axis
+                        axs[-1].errorbar(_xrange(len(x)), y, yerr)
+                        pylab.xticks(_xrange(len(x)), x)
+                        xmin = - 0.5
+                        xmax = len(x) - 0.5
+                        
+                        axs[-1].plot([xmin, xmax], [0., 0.], 'k:')
+
+                ########## If separate lines are specified ###########
+                else:                       
+                    y = self.pivot(val, rows=[seplines], cols=[xaxis],
+                                   where=where+where_extension,
+                                   aggregate='avg',
+                                   flatten=False)
+                    
+                    if aggregate != None:
+                        yerrs = self.pivot(val,
+                                           rows=[seplines],
+                                           cols=[xaxis],
+                                           where=where+where_extension,
+                                           aggregate=aggregate,
+                                           flatten=False)
+                        
+                    x = [name for [(label, name)] in y.cnames]
+
+                    if _isfloat(yerr):
+                        yerr = np.array([yerr for a in x])
+
+                    plots = []
+                    labels = []
+                    for i, name in enumerate(y.rnames):
                         if aggregate != None:
-                            yerr = self.pivot(val, cols=[xaxis],
-                                              where=where+where_extension,
-                                              aggregate=aggregate,
-                                              flatten=True)
+                            yerr = yerrs[i]
                         
-                        x = [name for [(label, name)] in y.cnames]
-                        
-                        if _isfloat(yerr):
-                            yerr = np.array([yerr for a in x])
+                        labels.append(name[0][1])
 
                         if all([_isfloat(a) for a in x]):
-                            axs[-1].errorbar(x, y, yerr)
+                            plots.append(
+                                axs[-1].errorbar(x, y[i], yerr)[0])
+                            
                             if xmin == 'AUTO' and xmax == 'AUTO':
-                                xmin, xmax = axs[-1].get_xlim()
+                                xmin , xmax = axs[-1].get_xlim()
                                 xran = xmax - xmin
-                                xmin = xmin - 0.05*xran
-                                xmax = xmax + 0.05*xran
-
-                            axs[-1].plot([xmin, xmax], [0., 0.], 'k:')
+                                xmin = xmin - .05*xran
+                                xmax = xmax + .05*xran
+                                
+                            axs[-1].plot([xmin, xmax], [0.,0.], 'k:')
                             
                         else : # categorical x axis
-                            axs[-1].errorbar(_xrange(len(x)), y, yerr)
+                            plots.append(
+                                axs[-1].errorbar(
+                                    _xrange(len(x)), y[i],yerr)[0])
+                            
                             pylab.xticks(_xrange(len(x)), x)
                             xmin = - 0.5
                             xmax = len(x) - 0.5
                             
                             axs[-1].plot([xmin, xmax], [0., 0.], 'k:')
 
-                    ########## If separate lines are specified ###########
-                    else:                       
-                        y = self.pivot(val, rows=[seplines], cols=[xaxis],
-                                       where=where+where_extension,
-                                       aggregate='avg',
-                                       flatten=False)
-                        
-                        if aggregate != None:
-                            yerrs = self.pivot(val,
-                                               rows=[seplines],
-                                               cols=[xaxis],
-                                               where=where+where_extension,
-                                               aggregate=aggregate,
-                                               flatten=False)
-                            
-                        x = [name for [(label, name)] in y.cnames]
+                    pylab.figlegend(plots, labels, loc=1,
+                                    labelsep=.005,
+                                    handlelen=.01,
+                                    handletextsep=.005)
 
-                        if _isfloat(yerr):
-                            yerr = np.array([yerr for a in x])
+                test['y'].append(y)
+                if yerr == None:
+                    test['yerr'].append([])
+                else:
+                    test['yerr'].append(yerr)
+                test['xmins'].append(xmin)
+                test['xmaxs'].append(xmax)
 
-                        plots = []
-                        labels = []
-                        for i, name in enumerate(y.rnames):
-                            if aggregate != None:
-                                yerr = yerrs[i]
-                            
-                            labels.append(name[0][1])
-
-                            if all([_isfloat(a) for a in x]):
-                                plots.append(
-                                    axs[-1].errorbar(x, y[i], yerr)[0])
-                                
-                                if xmin == 'AUTO' and xmax == 'AUTO':
-                                    xmin , xmax = axs[-1].get_xlim()
-                                    xran = xmax - xmin
-                                    xmin = xmin - .05*xran
-                                    xmax = xmax + .05*xran
-                                    
-                                axs[-1].plot([xmin, xmax], [0.,0.], 'k:')
-                                
-                            else : # categorical x axis
-                                plots.append(
-                                    axs[-1].errorbar(
-                                        _xrange(len(x)), y[i],yerr)[0])
-                                
-                                pylab.xticks(_xrange(len(x)), x)
-                                xmin = - 0.5
-                                xmax = len(x) - 0.5
-                                
-                                axs[-1].plot([xmin, xmax], [0., 0.], 'k:')
-
-                        pylab.figlegend(plots, labels, loc=1,
-                                        labelsep=.005,
-                                        handlelen=.01,
-                                        handletextsep=.005)
-
-                    test['y'].append(y)
-                    if yerr == None:
-                        test['yerr'].append([])
-                    else:
-                        test['yerr'].append(yerr)
-                    test['xmins'].append(xmin)
-                    test['xmaxs'].append(xmax)
-
-                    #  8.2 Add subplot title
-                    ######################################################
-                    if rlevels == [1] and clevels == [1]:
-                        title = ''
-                        
-                    elif rlevels == [1]:
-                        title = _str(clevel)
-                        
-                    elif clevels == [1]:
-                        title = _str(rlevel)
-                        
-                    else:
-                        title = '%s = %s, %s = %s' \
-                                % (sepyplots, _str(rlevel),
-                                   sepxplots, _str(rlevel))
-                        
-                    pylab.title(title, fontsize='medium')
-                    test['subplot_titles'].append(title)
-
-                    #  8.3 Format the subplot
-                    ######################################################
-                    pylab.xlim(xmin, xmax)
-                    pylab.ylim(ymin, ymax)
-
-                    # supress tick labels unless subplot is on the bottom
-                    # row or the far left column
-                    if r != (len(rlevels) - 1):
-                        pylab.setp(axs[-1].get_xticklabels(), visible=False)
-                        
-                    if c != 0:
-                        pylab.setp(axs[-1].get_yticklabels(), visible=False)
-
-                    # Set the aspect ratio for the subplot
-                    Dx = abs(axs[-1].get_xlim()[0] - axs[-1].get_xlim()[1])
-                    Dy = abs(axs[-1].get_ylim()[0] - axs[-1].get_ylim()[1])
-                    axs[-1].set_aspect(.75*Dx/Dy)
+                #  8.2 Add subplot title
+                ######################################################
+                if rlevels == [1] and clevels == [1]:
+                    title = ''
                     
-                    #  8.4 Iterate plotnum counter
-                    ######################################################
-                    plotnum += 1
-
-            #  9. Place yerr text in bottom right corner
-            ##############################################################
-            if aggregate != None:
-                if aggregate == 'ci':
-                    aggregate = '95% ci' 
+                elif rlevels == [1]:
+                    title = _str(clevel)
                     
-                pylab.xlabel('\n\n                '
-                             '*Error bars reflect %s'\
-                             %aggregate.upper())
+                elif clevels == [1]:
+                    title = _str(rlevel)
+                    
+                else:
+                    title = '%s = %s, %s = %s' \
+                            % (sepyplots, _str(rlevel),
+                               sepxplots, _str(rlevel))
+                    
+                pylab.title(title, fontsize='medium')
+                test['subplot_titles'].append(title)
 
-            # 10. Save the figure
-            ##############################################################
-            if fname == None:
-                fname = maintitle.lower() \
-                                 .replace('by', '~') \
-                                 .replace('*', 'X') \
-                                 .replace(' ', '')
-                
-            if quality == 'low' or fname.endswith('.svg'):
-                pylab.savefig(fname)
-                
-            elif quality == 'medium':
-                pylab.savefig(fname, dpi=200)
-                
-            elif quality == 'high':
-                pylab.savefig(fname, dpi=300)
-                
-            else:
-                pylab.savefig(fname)
+                #  8.3 Format the subplot
+                ######################################################
+                pylab.xlim(xmin, xmax)
+                pylab.ylim(ymin, ymax)
 
-            pylab.close()
+                # supress tick labels unless subplot is on the bottom
+                # row or the far left column
+                if r != (len(rlevels) - 1):
+                    pylab.setp(axs[-1].get_xticklabels(), visible=False)
+                    
+                if c != 0:
+                    pylab.setp(axs[-1].get_yticklabels(), visible=False)
 
-            test['fname'] = fname
+                # Set the aspect ratio for the subplot
+                Dx = abs(axs[-1].get_xlim()[0] - axs[-1].get_xlim()[1])
+                Dy = abs(axs[-1].get_ylim()[0] - axs[-1].get_ylim()[1])
+                axs[-1].set_aspect(.75*Dx/Dy)
+                
+                #  8.4 Iterate plotnum counter
+                ######################################################
+                plotnum += 1
 
-            # 11. return the test dictionary
-            ##############################################################
-            if self.TESTMODE:
-                return test
+        #  9. Place yerr text in bottom right corner
+        ##############################################################
+        if aggregate != None:
+            if aggregate == 'ci':
+                aggregate = '95% ci' 
+                
+            pylab.xlabel('\n\n                '
+                         '*Error bars reflect %s'\
+                         %aggregate.upper())
+
+        # 10. Save the figure
+        ##############################################################
+        if fname == None:
+            fname = maintitle.lower() \
+                             .replace('by', '~') \
+                             .replace('*', 'X') \
+                             .replace(' ', '')
+            
+        if quality == 'low' or fname.endswith('.svg'):
+            pylab.savefig(fname)
+            
+        elif quality == 'medium':
+            pylab.savefig(fname, dpi=200)
+            
+        elif quality == 'high':
+            pylab.savefig(fname, dpi=300)
+            
+        else:
+            pylab.savefig(fname)
+
+        pylab.close()
+
+        test['fname'] = fname
+
+        # 11. return the test dictionary
+        ##############################################################
+        if self.TESTMODE:
+            return test
 
 class PyvtTbl(list):
     """
@@ -2536,8 +2545,15 @@ class Ttest(OrderedDict):
             self['mu'] = mu
             self['pop_mean'] = pop_mean
             self['var'] = v
-            self['tc2tail'] = jsci.tinv(alpha,df)
-            self['tc1tail'] = jsci.tinv(2. * alpha,df)
+            self['tc2tail'] = scipy.stats.t.ppf((1.-alpha),df)
+            self['tc1tail'] = scipy.stats.t.ppf((1.-alpha/2.),df)
+
+            # post-hoc power analysis
+            self['cohen_d'] = abs( (pop_mean - mu) / math.sqrt(v) )
+            self['delta'] = math.sqrt(n) *self['cohen_d']
+            self['power1tail'] = 1. - nctcdf(self['tc2tail'], df, self['delta'])
+            self['power2tail'] = 1. - nctcdf(self['tc1tail'], df, self['delta'])
+            
                 
         elif paired == True:
             if len(A) - len(B) != 0:
@@ -2559,8 +2575,16 @@ class Ttest(OrderedDict):
             self['mu2'] = mu2
             self['var1'] = v1
             self['var2'] = v2
-            self['tc2tail'] = jsci.tinv(alpha,df)
-            self['tc1tail'] = jsci.tinv(2. * alpha,df)
+            self['tc2tail'] = scipy.stats.t.ppf((1.-alpha),df)
+            self['tc1tail'] = scipy.stats.t.ppf((1.-alpha/2.),df)
+
+            # post-hoc power analysis
+            # http://www.psycho.uni-duesseldorf.de/abteilungen/aap/gpower3/download-and-register/Dokumente/GPower3-BRM-Paper.pdf
+            sd1,sd2 = math.sqrt(v1), math.sqrt(v2)
+            self['cohen_d'] = abs(mu1 - mu2) / math.sqrt(v1 + v2 - 2*r*sd1*sd2)
+            self['delta'] = math.sqrt(n) *self['cohen_d']
+            self['power1tail'] = 1. - nctcdf(self['tc2tail'], df, self['delta'])
+            self['power2tail'] = 1. - nctcdf(self['tc1tail'], df, self['delta'])
             
         elif equal_variance:
             t, prob2, n1, n2, df, mu1, mu2, v1, v2, svar = stats.ttest_ind(A, B)
@@ -2577,8 +2601,25 @@ class Ttest(OrderedDict):
             self['var1'] = v1
             self['var2'] = v2
             self['vpooled'] = svar
-            self['tc2tail'] = jsci.tinv(alpha,df)
-            self['tc1tail'] = jsci.tinv(2. * alpha,df)            
+            self['tc2tail'] = scipy.stats.t.ppf((1.-alpha),df)
+            self['tc1tail'] = scipy.stats.t.ppf((1.-alpha/2.),df)
+
+
+            # post-hoc power analysis
+            # http://www.psycho.uni-duesseldorf.de/abteilungen/aap/gpower3/download-and-register/Dokumente/GPower3-BRM-Paper.pdf
+            # 
+            # the pooled standard deviation is calculated as:
+            #     sqrt((v1+v2)/2.)
+            # although wikipedia suggests a more sophisticated estimate might be preferred:
+            #     sqrt(((n1-1)*v1 + (n2-1)*v2)/(n1+n2))
+            #
+            # the biased estimate is used so that the results agree with G*power
+            
+            s = math.sqrt((v1+v2)/2.)
+            self['cohen_d'] = abs(mu1 - mu2) / s
+            self['delta'] = math.sqrt((n1*n2)/(n1+n2)) *self['cohen_d']
+            self['power1tail'] = 1. - nctcdf(self['tc2tail'], df, self['delta'])
+            self['power2tail'] = 1. - nctcdf(self['tc1tail'], df, self['delta'])
             
         else:            
             t, prob2, n1, n2, df, mu1, mu2, v1, v2 = stats.ttest_ind_uneq(A, B)
@@ -2594,9 +2635,25 @@ class Ttest(OrderedDict):
             self['mu2'] = mu2
             self['var1'] = v1
             self['var2'] = v2
-            self['tc2tail'] = jsci.tinv(alpha,df)
-            self['tc1tail'] = jsci.tinv(2. * alpha,df)            
-        
+            self['tc2tail'] = scipy.stats.t.ppf((1.-alpha),df)
+            self['tc1tail'] = scipy.stats.t.ppf((1.-alpha/2.),df)          
+
+            # post-hoc power analysis
+            # http://www.psycho.uni-duesseldorf.de/abteilungen/aap/gpower3/download-and-register/Dokumente/GPower3-BRM-Paper.pdf
+            # 
+            # the pooled standard deviation is calculated as:
+            #     sqrt((v1+v2)/2.)
+            # although wikipedia suggests a more sophisticated estimate might be preferred:
+            #     sqrt(((n1-1)*v1 + (n2-1)*v2)/(n1+n2))
+            #
+            # the biased estimate is used so that the results agree with G*power
+            
+            s = math.sqrt((v1+v2)/2.)
+            self['cohen_d'] = abs(mu1 - mu2) / s
+            self['delta'] = math.sqrt((n1*n2)/(n1+n2)) *self['cohen_d']
+            self['power1tail'] = 1. - nctcdf(self['tc2tail'], df, self['delta'])
+            self['power2tail'] = 1. - nctcdf(self['tc1tail'], df, self['delta'])
+            
     def __str__(self):
 
         if self == {}:
@@ -2610,17 +2667,23 @@ class Ttest(OrderedDict):
             tt.set_deco(TextTable.HEADER)
 
             first = 't-Test: One Sample for means\n'
-            tt.header( ['',                       self.aname])
-            tt.add_row(['Sample Mean',            self['mu']])
-            tt.add_row(['Hypothesized Pop. Mean', self['pop_mean']])
-            tt.add_row(['Variance',               self['var']])
-            tt.add_row(['Observations',           self['n']])
-            tt.add_row(['df',                     self['df']])
-            tt.add_row(['t Stat',                 self['t']])
-            tt.add_row(['P(T<=t) one-tail',       self['p1tail']])
-            tt.add_row(['t Critical one-tail',    self['tc1tail']])
-            tt.add_row(['P(T<=t) two-tail',       self['p2tail']])
-            tt.add_row(['t Critical two-tail',    self['tc2tail']])
+            tt.header( ['',                        self.aname])
+            tt.add_row(['Sample Mean',             self['mu']])
+            tt.add_row(['Hypothesized Pop. Mean',  self['pop_mean']])
+            tt.add_row(['Variance',                self['var']])
+            tt.add_row(['Observations',            self['n']])
+            tt.add_row(['df',                      self['df']])
+            tt.add_row(['t Stat',                  self['t']])
+            tt.add_row(['alpha',                   self.alpha])
+            tt.add_row(['P(T<=t) one-tail',        self['p1tail']])
+            tt.add_row(['t Critical one-tail',     self['tc1tail']])
+            tt.add_row(['P(T<=t) two-tail',        self['p2tail']])
+            tt.add_row(['t Critical two-tail',     self['tc2tail']])
+            tt.add_row(['P(T<=t) two-tail',        self['p2tail']])
+            tt.add_row(['Effect size d',           self['cohen_d']])
+            tt.add_row(['delta',                   self['delta']])
+            tt.add_row(['Observed power one-tail', self['power1tail']])
+            tt.add_row(['Observed power two-tail', self['power2tail']])
 
             return '%s\n%s'%(first, tt.draw())
 
@@ -2632,44 +2695,62 @@ class Ttest(OrderedDict):
         
         if self.paired == True:
             first = 't-Test: Paired Two Sample for means\n'
-            tt.header( ['',                    self.aname,      self.bname])
-            tt.add_row(['Mean',                self['mu1'],     self['mu2']])
-            tt.add_row(['Variance',            self['var1'],    self['var2']])
-            tt.add_row(['Observations',        self['n1'],      self['n2']])
-            tt.add_row(['Pearson Correlation', self['r'],      ''])
-            tt.add_row(['df',                  self['df'],      ''])
-            tt.add_row(['t Stat',              self['t'],       ''])
-            tt.add_row(['P(T<=t) one-tail',    self['p1tail'],  ''])
-            tt.add_row(['t Critical one-tail', self['tc1tail'], ''])
-            tt.add_row(['P(T<=t) two-tail',    self['p2tail'],  ''])
-            tt.add_row(['t Critical two-tail', self['tc2tail'], ''])
+            tt.header( ['',                        self.aname,         self.bname])
+            tt.add_row(['Mean',                    self['mu1'],        self['mu2']])
+            tt.add_row(['Variance',                self['var1'],       self['var2']])
+            tt.add_row(['Observations',            self['n1'],         self['n2']])
+            tt.add_row(['Pearson Correlation',     self['r'],          ''])
+            tt.add_row(['df',                      self['df'],         ''])
+            tt.add_row(['t Stat',                  self['t'],          ''])
+            tt.add_row(['alpha',                   self.alpha,         ''])
+            tt.add_row(['P(T<=t) one-tail',        self['p1tail'],     ''])
+            tt.add_row(['t Critical one-tail',     self['tc1tail'],    ''])
+            tt.add_row(['P(T<=t) two-tail',        self['p2tail'],     ''])
+            tt.add_row(['t Critical two-tail',     self['tc2tail'],    ''])
+            tt.add_row(['P(T<=t) two-tail',        self['p2tail'],     ''])
+            tt.add_row(['Effect size dz',          self['cohen_d'],    ''])
+            tt.add_row(['delta',                   self['delta'],      ''])
+            tt.add_row(['Observed power one-tail', self['power1tail'], ''])
+            tt.add_row(['Observed power two-tail', self['power2tail'], ''])
 
         elif self.equal_variance:
             first = 't-Test: Two-Sample Assuming Equal Variances\n'
-            tt.header( ['',                    self.aname,      self.bname])
-            tt.add_row(['Mean',                self['mu1'],     self['mu2']])
-            tt.add_row(['Variance',            self['var1'],    self['var2']])
-            tt.add_row(['Observations',        self['n1'],      self['n2']])
-            tt.add_row(['Pooled Variance',     self['vpooled'], ''])
-            tt.add_row(['df',                  self['df'],      ''])
-            tt.add_row(['t Stat',              self['t'],       ''])
-            tt.add_row(['P(T<=t) one-tail',    self['p1tail'],  ''])
-            tt.add_row(['t Critical one-tail', self['tc1tail'], ''])
-            tt.add_row(['P(T<=t) two-tail',    self['p2tail'],  ''])
-            tt.add_row(['t Critical two-tail', self['tc2tail'], ''])
+            tt.header( ['',                        self.aname,      self.bname])
+            tt.add_row(['Mean',                    self['mu1'],     self['mu2']])
+            tt.add_row(['Variance',                self['var1'],    self['var2']])
+            tt.add_row(['Observations',            self['n1'],      self['n2']])
+            tt.add_row(['Pooled Variance',         self['vpooled'], ''])
+            tt.add_row(['df',                      self['df'],      ''])
+            tt.add_row(['t Stat',                  self['t'],          ''])
+            tt.add_row(['alpha',                   self.alpha,         ''])
+            tt.add_row(['P(T<=t) one-tail',        self['p1tail'],     ''])
+            tt.add_row(['t Critical one-tail',     self['tc1tail'],    ''])
+            tt.add_row(['P(T<=t) two-tail',        self['p2tail'],     ''])
+            tt.add_row(['t Critical two-tail',     self['tc2tail'],    ''])
+            tt.add_row(['P(T<=t) two-tail',        self['p2tail'],     ''])
+            tt.add_row(['Effect size d',           self['cohen_d'],    ''])
+            tt.add_row(['delta',                   self['delta'],      ''])
+            tt.add_row(['Observed power one-tail', self['power1tail'], ''])
+            tt.add_row(['Observed power two-tail', self['power2tail'], ''])
         
         else:
             first = 't-Test: Two-Sample Assuming Unequal Variances\n'
-            tt.header( ['',                    self.aname,      self.bname])
-            tt.add_row(['Mean',                self['mu1'],     self['mu2']])
-            tt.add_row(['Variance',            self['var1'],    self['var2']])
-            tt.add_row(['Observations',        self['n1'],      self['n2']])
-            tt.add_row(['df',                  self['df'],      ''])
-            tt.add_row(['t Stat',              self['t'],       ''])
-            tt.add_row(['P(T<=t) one-tail',    self['p1tail'],  ''])
-            tt.add_row(['t Critical one-tail', self['tc1tail'], ''])
-            tt.add_row(['P(T<=t) two-tail',    self['p2tail'],  ''])
-            tt.add_row(['t Critical two-tail', self['tc2tail'], ''])
+            tt.header( ['',                        self.aname,      self.bname])
+            tt.add_row(['Mean',                    self['mu1'],     self['mu2']])
+            tt.add_row(['Variance',                self['var1'],    self['var2']])
+            tt.add_row(['Observations',            self['n1'],      self['n2']])
+            tt.add_row(['df',                      self['df'],      ''])
+            tt.add_row(['t Stat',                  self['t'],          ''])
+            tt.add_row(['alpha',                   self.alpha,         ''])
+            tt.add_row(['P(T<=t) one-tail',        self['p1tail'],     ''])
+            tt.add_row(['t Critical one-tail',     self['tc1tail'],    ''])
+            tt.add_row(['P(T<=t) two-tail',        self['p2tail'],     ''])
+            tt.add_row(['t Critical two-tail',     self['tc2tail'],    ''])
+            tt.add_row(['P(T<=t) two-tail',        self['p2tail'],     ''])
+            tt.add_row(['Effect size d',           self['cohen_d'],    ''])
+            tt.add_row(['delta',                   self['delta'],      ''])
+            tt.add_row(['Observed power one-tail', self['power1tail'], ''])
+            tt.add_row(['Observed power two-tail', self['power2tail'], ''])
             
         return ''.join([first,tt.draw()])
 
@@ -2759,6 +2840,7 @@ class Anova1way(OrderedDict):
         self.val = val
         self.factor = factor
         self.alpha = alpha
+        self.posthoc = posthoc
         
         if conditions_list == None:
             abc = lambda i : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'\
@@ -2771,6 +2853,9 @@ class Anova1way(OrderedDict):
         f, prob, ns, means, vars, ssbn, sswn, dfbn, dfwn = \
            stats.lF_oneway(list_of_lists)
 
+        mu = np.mean(_flatten(self.L))
+        var = np.var(_flatten(self.L))
+        
         self['f'] = f
         self['p'] = prob
         self['ns'] = ns
@@ -2782,10 +2867,18 @@ class Anova1way(OrderedDict):
         self['dfwn'] = dfwn
         self['msbn'] = ssbn/dfbn
         self['mswn'] = sswn/dfwn
-        
-        o_f, o_prob, o_ns, o_means, o_vars, o_ssbn, o_sswn, o_dfbn, o_dfwn = \
-           stats.lF_oneway(stats.obrientransform(list_of_lists))
+        self['eta2'] = ssbn/(sswn+ssbn)         
+        self['lambda'] = sum([n*(y-mu)**2./var for n,y in zip(ns,means)])
+        self['power'] = 1.-ncfcdf(scipy.stats.f(dfbn,dfwn).ppf(1.-alpha),
+                                  dfbn,dfwn,self['lambda'])
 
+        o_list_of_lists = stats.obrientransform(list_of_lists)        
+        o_f, o_prob, o_ns, o_means, o_vars, o_ssbn, o_sswn, o_dfbn, o_dfwn = \
+           stats.lF_oneway(o_list_of_lists)
+
+        mu = np.mean(_flatten(o_list_of_lists))
+        var = np.var(_flatten(o_list_of_lists))
+        
         self['o_f'] = o_f
         self['o_p'] = o_prob
         self['o_ns'] = o_ns
@@ -2797,6 +2890,10 @@ class Anova1way(OrderedDict):
         self['o_dfwn'] = o_dfwn
         self['o_msbn'] = o_ssbn/o_dfbn
         self['o_mswn'] = o_sswn/o_dfwn
+        self['o_eta2'] = o_ssbn/(o_sswn+o_ssbn)         
+        self['o_lambda'] = sum([n*(y-mu)**2./var for n,y in zip(o_ns,o_means)])
+        self['o_power'] = 1.-ncfcdf(scipy.stats.f(o_dfbn,o_dfwn).ppf(1.-alpha),
+                                    o_dfbn,o_dfwn,self['o_lambda'])
 
         if posthoc.lower() == 'tukey':
             self._tukey()
@@ -2850,48 +2947,46 @@ class Anova1way(OrderedDict):
         # put means into a dict
         d = dict([(k,v) for k,v in zip(self.conditions_list, self['mus'])])
 
-        # calculate the number of comparisons
-        s = sum(range(len(d)))
+        # calculate the number of observations per group
+        s = min(self['ns'])
 
         # figure out differences between pairs
         L = {}
         for x in sorted(self.conditions_list):
             for y in sorted(self.conditions_list):
-                if not L.has_key((y,x)):
+                if not L.has_key((y,x)) and x!=y:
                     L[(x,y)] = abs(d[x]-d[y])
 
+        L = sorted(list(L.items()), key=lambda t: t[1], reverse=True)
 
         # calculate critical studentized range q statistic
         k = len(d)
         df = sum(self['ns']) - k
         
-        multtest = {}
-        for i,(pair,abs_diff) in enumerate(sorted(list(L.items),
-                                           key=lambda t: t[1],
-                                           reverse=True)):
-            q = abs_diff / math.sqrt(self['mswn']*(1./s))
-            q_crit10 = qsturng(.9, k, df)
-            q_crit05 = qsturng(.95, k, df)
-            q_crit01 = qsturng(.99, k, df)
+        multtest = []
+        for i,(pair,abs_diff) in enumerate(L):
+##            print (i,pair,abs_diff,k)
             
-            sig = 'ns'
-            if  q > q_crit10:
-                sig = '+'
-            if q > q_crit05:
-                sig = '*'
-            if q > q_crit01:
-                sig += '*'
-            multtest[(x,y)] = dict(q=q,
-                                   sig=sig,
-                                   abs_diff=abs(d[x]-d[y]),
-                                   q_crit10=q_crit10,
-                                   q_crit05=q_crit05,
-                                   q_crit01=q_crit01,
-                                   q_k=k,
-                                   q_df=df)
+            if k>1:
+                q = abs_diff / math.sqrt(self['mswn']*(1./s))
+                p = psturng(q, k, df)
+                sig = 'ns'
+                if  p < .1  :  sig = '+'
+                if p < .05  :  sig = '*'
+                if p < .01  :  sig = '**'
+                if p < .001 :  sig = '***'
+                multtest.append([pair, i+1, abs_diff, q, k, df, p, sig])
+            else:
+                multtest.append([pair, i+1, abs_diff, np.NAN, np.NAN, np.NAN, np.NAN, sig])
 
-            k -= 1
-                    
+            try:
+                if L[i][1] != L[i+1][1]:
+                    k -= 1
+            except:
+                pass
+
+            last_diff = abs_diff
+
 
         self.multtest = multtest
         
@@ -2913,30 +3008,32 @@ class Anova1way(OrderedDict):
             tt_s.add_row([g, c, c * a, a, v])
 
         tt_o = TextTable(max_width=0)
-        tt_o.set_cols_dtype(['t', 'a', 'a', 'a', 'a', 'a'])
-        tt_o.set_cols_align(['l', 'r', 'r', 'r', 'r', 'r'])
+        tt_o.set_cols_dtype(['t', 'a', 'a', 'a', 'a', 'a', 'a', 'a'])
+        tt_o.set_cols_align(['l', 'r', 'r', 'r', 'r', 'r', 'r', 'r'])
         tt_o.set_deco(TextTable.HEADER | TextTable.FOOTER)
 
-        tt_o.header( ['Source of Variation','SS','df','MS','F','P-value'])
+        tt_o.header( ['Source of Variation','SS','df','MS','F','P-value','eta^2','Obs. power'])
         tt_o.add_row(['Treatments',self['o_ssbn'],self['o_dfbn'],
-                                   self['o_msbn'],self['o_f'],self['o_p']])
+                                   self['o_msbn'],self['o_f'],self['o_p'],
+                                   self['o_eta2'],self['o_power']])
         tt_o.add_row(['Error', self['o_sswn'],self['o_dfwn'],
-                               self['o_mswn'],' ', ''])
+                               self['o_mswn'],' ', ' ',' ', ' '])
         tt_o.footer( ['Total',self['o_ssbn']+self['o_sswn'],
-                              self['o_dfbn']+self['o_dfwn'],' ',' ',' '])
+                              self['o_dfbn']+self['o_dfwn'],' ',' ',' ',' ', ' '])
         
         tt_a = TextTable(max_width=0)
-        tt_a.set_cols_dtype(['t', 'a', 'a', 'a', 'a', 'a'])
-        tt_a.set_cols_align(['l', 'r', 'r', 'r', 'r', 'r'])
+        tt_a.set_cols_dtype(['t', 'a', 'a', 'a', 'a', 'a', 'a', 'a'])
+        tt_a.set_cols_align(['l', 'r', 'r', 'r', 'r', 'r', 'r', 'r'])
         tt_a.set_deco(TextTable.HEADER | TextTable.FOOTER)
 
-        tt_a.header( ['Source of Variation','SS','df','MS','F','P-value'])
+        tt_a.header( ['Source of Variation','SS','df','MS','F','P-value','eta^2','Obs. power'])
         tt_a.add_row(['Treatments',self['ssbn'],self['dfbn'],
-                                   self['msbn'],self['f'],self['p']])
+                                   self['msbn'],self['f'],self['p'],
+                                   self['eta2'],self['power']])
         tt_a.add_row(['Error', self['sswn'],self['dfwn'],
-                               self['mswn'],' ', ''])
+                               self['mswn'],' ', ' ',' ', ' '])
         tt_a.footer( ['Total',self['ssbn']+self['sswn'],
-                              self['dfbn']+self['dfwn'],' ',' ',' '])
+                              self['dfbn']+self['dfwn'],' ',' ',' ',' ', ' '])
 
         posthoc = ''
         if self.posthoc.lower() == 'tukey' and self.multtest != None:
@@ -2972,7 +3069,27 @@ class Anova1way(OrderedDict):
             posthoc += '\n  + p < .10 (q-critical[%i, %i] = %s)'%(k, df, q_crit10)
             posthoc += '\n  * p < .05 (q-critical[%i, %i] = %s)'%(k, df, q_crit05)
             posthoc += '\n ** p < .01 (q-critical[%i, %i] = %s)'%(k, df, q_crit01)
-     
+
+        if self.posthoc.lower() == 'snk' and self.multtest != None:
+
+            tt_m = TextTable(max_width=0)
+            tt_m.set_cols_dtype(['t', 'i', 'f', 'a', 'a', 'a', 'a', 't'])
+            tt_m.set_cols_align(['l', 'r', 'r', 'r', 'r', 'r', 'r', 'l'])
+            tt_m.set_deco(TextTable.HEADER)
+            tt_m.header(['Pair', 'i', '|diff|', 'q', 'range', 'df', 'p', 'Sig.'])
+            
+            for row in self.multtest:
+                x, y = row[0]
+                    
+                tt_m.add_row(['%s vs. %s'%(x, y)] +
+                             [(v,'-')[np.isnan(v)] for v in row[1:-1]] +
+                             [row[-1]])
+            
+            posthoc = 'POSTHOC MULTIPLE COMPARISONS\n\n'
+            posthoc += 'SNK: Step-down table of q-statistics\n'
+            posthoc += tt_m.draw()
+            posthoc += '\n  + p < .10,   * p < .05,   ** p < .01,   *** p < .001'
+            
         return 'Anova: Single Factor on %s\n\n'%self.val + \
                'SUMMARY\n%s\n\n'%tt_s.draw() + \
                "O'BRIEN TEST FOR HOMOGENEITY OF VARIANCE\n%s\n\n"%tt_o.draw() + \
@@ -3251,14 +3368,25 @@ class ChiSquare1way(OrderedDict):
         self['lnchisq'] = lnchisq
         self['lnp'] = lnprob
         self['lndf'] = lndf
+        self['N'] = sum(observed)
         self.observed = observed
         self.expected = expected
-        
+
+        p_observed = [v/float(self['N']) for v in observed]
+        p_expected = [v/float(self['N']) for v in expected]
+
+        p_chisq = sum([(po-pe)**2/pe for po,pe in zip(p_observed,p_expected)])
+        self['w'] = math.sqrt(p_chisq)
+        self['lambda'] = p_chisq*self['N']
+        self['crit_chi2'] = scipy.stats.chi2.ppf((1.-alpha),df)
+        self['power'] = 1. - ncx2cdf(self['crit_chi2'],df,self['lambda'])
+
     def __str__(self):
 
         if self == {}:
             return '(no data in object)'
 
+        # SUMMARY
         tt_s = TextTable(max_width=0)
         tt_s.set_cols_dtype(['t'] + ['a']*len(self.observed))
         tt_s.set_cols_align(['l'] + ['r']*len(self.observed))
@@ -3269,6 +3397,7 @@ class ChiSquare1way(OrderedDict):
         tt_s.add_row(['Observed'] + self.observed)
         tt_s.add_row(['Expected'] + self.expected)
 
+        # TESTS
         tt_a = TextTable(max_width=0)
         tt_a.set_cols_dtype(['t', 'a', 'a', 'a'])
         tt_a.set_cols_align(['l', 'r', 'r', 'r'])
@@ -3279,11 +3408,26 @@ class ChiSquare1way(OrderedDict):
                       self['chisq'], self['df'], self['p']])
         tt_a.add_row(['Likelihood Ratio',
                       self['lnchisq'], self['lndf'], self['lnp']])
-        tt_a.add_row(['Observations', sum(self.observed),'',''])
+        tt_a.add_row(['Observations', self['N'],'',''])
+
+        # POWER
+        tt_p = TextTable(max_width=0)
+        tt_p.set_cols_dtype(['t', 'a'])
+        tt_p.set_cols_align(['l', 'r'])
+        tt_p.set_deco(TextTable.HEADER)
+
+        tt_p.header( ['Measure',' '])
+
+        tt_p.add_row(['Effect size w', self['w']])
+        tt_p.add_row(['Non-centrality lambda', self['lambda']])
+        tt_p.add_row(['Critical Chi-Square', self['crit_chi2']])
+        tt_p.add_row(['Power', self['power']])
                      
         return 'Chi-Square: Single Factor\n\n' + \
                'SUMMARY\n%s\n\n'%tt_s.draw() + \
-               'CHI-SQUARE TESTS\n%s'%tt_a.draw()
+               'CHI-SQUARE TESTS\n%s\n\n'%tt_a.draw() + \
+               'POST-HOC POWER\n%s'%tt_p.draw()
+               
 
     def __repr__(self):
         if self == {}:
@@ -3430,6 +3574,15 @@ class ChiSquare2way(OrderedDict):
         self.col_counter = col_counter
         self.N_r = N_r
         self.N_c = N_c
+
+        p_observed = [v/float(self['N']) for v in _flatten(observed)]
+        p_expected = [v/float(self['N']) for v in _flatten(expected)]
+
+        p_chisq = sum([(po-pe)**2/pe for po,pe in zip(p_observed,p_expected)])
+        self['w'] = math.sqrt(p_chisq)
+        self['lambda'] = p_chisq*self['N']
+        self['crit_chi2'] = scipy.stats.chi2.ppf((1.-alpha),df)
+        self['power'] = 1. - ncx2cdf(self['crit_chi2'],df,self['lambda'])
         
     def __str__(self):
         """Returns human readable string representaition of Marginals"""
@@ -3437,6 +3590,7 @@ class ChiSquare2way(OrderedDict):
         if self == {}:
             return '(no data in object)'
 
+        # SUMMARY
         tt_s = TextTable(max_width=0)
         tt_s.set_cols_dtype(['t'] + ['a']*(self.N_c + 1))
         tt_s.set_cols_align(['l'] + ['r']*(self.N_c + 1))
@@ -3454,7 +3608,8 @@ class ChiSquare2way(OrderedDict):
         tt_s.footer(['Total'] +
                     [v for c,v in sorted(self.col_counter.items())] +
                     [self['N']])
-
+    
+        # SYMMETRIC TESTS
         tt_sym = TextTable(max_width=0)
         tt_sym.set_cols_dtype(['t', 'a', 'a'])
         tt_sym.set_cols_align(['l', 'r', 'r'])
@@ -3464,7 +3619,7 @@ class ChiSquare2way(OrderedDict):
         tt_sym.add_row(["Contingency Coefficient", self['C'], self['C_prob']])
         tt_sym.add_row(["N of Valid Cases", self['N'], ''])
                               
-
+        # CHI-SQUARE TESTS
         tt_a = TextTable(max_width=0)
         tt_a.set_cols_dtype(['t', 'a', 'a', 'a'])
         tt_a.set_cols_align(['l', 'r', 'r', 'r'])
@@ -3478,12 +3633,25 @@ class ChiSquare2way(OrderedDict):
         tt_a.add_row(['Likelihood Ratio',
                       self['lnchisq'], self['df'], self['lnp']])
         tt_a.add_row(["N of Valid Cases", self['N'], '', ''])
+
+        # POWER
+        tt_p = TextTable(max_width=0)
+        tt_p.set_cols_dtype(['t', 'a'])
+        tt_p.set_cols_align(['l', 'r'])
+        tt_p.set_deco(TextTable.HEADER)
+
+        tt_p.header( ['Measure',' '])
+
+        tt_p.add_row(['Effect size w', self['w']])
+        tt_p.add_row(['Non-centrality lambda', self['lambda']])
+        tt_p.add_row(['Critical Chi-Square', self['crit_chi2']])
+        tt_p.add_row(['Power', self['power']])
         
         return 'Chi-Square: two Factor\n\n' + \
                'SUMMARY\n%s\n\n'%tt_s.draw() + \
                'SYMMETRIC MEASURES\n%s\n\n'%tt_sym.draw() + \
-               'CHI-SQUARE TESTS\n%s'%tt_a.draw()
-
+               'CHI-SQUARE TESTS\n%s\n\n'%tt_a.draw() + \
+               'CHI-SQUARE POST-HOC POWER\n%s'%tt_p.draw()
 
     def __repr__(self):
         if self == {}:

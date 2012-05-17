@@ -15,6 +15,10 @@ from __future__ import print_function
 # 02/12/2012
 #   fixed bug affecting the observed_power estimates for epsilon values
 #   less than 1.0
+#
+# 05/17/2012
+#   all power estimates based on partial eta squares and
+#   validated against G*Power
 
 
 """
@@ -211,39 +215,18 @@ from numpy import remainder as rem
 from numpy import sum as nsum
 from numpy.random import uniform
 from pprint import pprint as pp
-from scipy.stats import fprob
+
 try:
     from scipy.stats.stats import stderr
 except:
     from scipy.stats import sem as stderr
-from scipy.stats.distributions import f,ncf,t
+
 from scipy.signal import detrend
 from sets import Set
 
-# Modules I wrote to support the anova class
-##from stixbox import qt
-##from pyvttbl import DataFrame
 from SimpleHTML import *
 from texttable import Texttable as TextTable
 from texttable import _str
-
-def qf(p,df1,df2):
-    return f(df1,df2).ppf(p)
-
-def qt(p,df):
-    return t(df).ppf(p)
-
-def ncfcdf(x,df1,df2,nc):
-    """
-    Noncentral F cumulative distribution function (cdf)
-    
-    P = ncfcdf(x,df1,df2,ncA) computes the noncentral
-    F cdf at each of the values in {x} using the
-    corresponding numerator degrees of freedom in {df1},
-    denominator degrees of freedom in {df2}, and positive
-    noncentrality parameters in {nc}. 
-    """
-    return ncf(df1,df2,nc).cdf(x)
 
 def observed_power(df,dfe,nc,alpha=0.05,eps=1.0):
     """
@@ -257,21 +240,11 @@ def observed_power(df,dfe,nc,alpha=0.05,eps=1.0):
     See Muller and Barton (1989).
     http://www.jstor.org/stable/2289941?seq=1
     """
-    return 1.-ncfcdf(qf(1.-alpha, df*eps, dfe*eps), df,dfe,nc)
-
-def noncentrality_par(nj,Y,mu,var):
-    """
-    Returns the noncentrality parameter. Assumes a
-    balanced design.
-
-    Y   - list of cell means
-    mu  - pop mean estimate
-    var - pop variance estimate 
-    nj  - is the number of observations per cell
-    
-    """
-    
-    return sum([nj*(y-mu)**2. for y in Y])/var
+    # 05.17.2012 validated against G*Power
+    # epsilon scales critical F, degrees of freedom,
+    # and non-centrality parameter
+    crit_f = scipy.stats.f(df*eps, dfe*eps).ppf(1.-alpha)
+    return scipy.stats.ncf(df*eps, dfe*eps, nc*eps).sf(crit_f)
 
 def f2s(L):
     """Turns a list of floats into a list of strings"""
@@ -836,7 +809,7 @@ class Anova(OrderedDict):
                 r['dfe'] = dfe
                 r['mse'] = ss_error / dfe
                 r['F'] = r['mss']/r['mse']
-                r['p'] = fprob(r['df'],r['dfe'],r['F'])
+                r['p'] = scipy.stats.f(r['df'],r['dfe']).sf(r['F'])
 
                 # calculate Generalized eta effect size
                 r['eta'] = r['ss']/(r['ss']+r['sse'])
@@ -846,7 +819,7 @@ class Anova(OrderedDict):
                 r['obs'] /= prod([len(conditions[f])*1. for f in efs])
                 
                 # calculate Loftus and Masson standard errors
-                r['critT'] = abs(qt(.05/2.,r['dfe']))
+                r['critT'] = abs(scipy.stats.t(r['dfe']).ppf(.05/2.))
                 r['se'] = sqrt(r['mse']/r['obs'])*r['critT']/1.96
                 r['ci'] = sqrt(r['mse']/r['obs'])*r['critT']
 
@@ -854,7 +827,9 @@ class Anova(OrderedDict):
                 dstd = std(self.df[self.dv])
                 dmu  = mean(self.df[self.dv])
                 
-                r['lambda'] = noncentrality_par(r['obs'],r['y2'],dmu,dstd**2.)
+                p_eta2 = r['ss']/(r['ss']+r['sse'])
+                r['lambda'] = (p_eta2/(1-p_eta2))*r['obs']
+                
                 r['power'] = observed_power( r['df'], r['dfe'], r['lambda'] )
                 
                 # record to dict
@@ -1031,8 +1006,8 @@ class Anova(OrderedDict):
                 r['dfe'] = self[(self.sub,)]['dfe']
                 r['mse'] = r['sse']/r['dfe']
                 r['F'] = r['mss']/r['mse']
-                r['p'] = fprob(r['df'],r['dfe'],r['F'])
-
+                r['p'] = scipy.stats.f(r['df'],r['dfe']).sf(r['F'])
+                
                 # calculate Generalized eta effect size 
                 r['eta'] = r['ss']/(r['ss']+ss_err_tot)
 
@@ -1041,7 +1016,7 @@ class Anova(OrderedDict):
                 r['obs']/= prod([len(conditions[f])*1. for f in efs])
 
                 # calculate Loftus and Masson standard errors
-                r['critT'] = abs(qt(.05/2.,r['dfe']))
+                r['critT'] = abs(scipy.stats.t(r['dfe']).ppf(.05/2.))
                 r['se'] = sqrt(r['mse']/r['obs'])*r['critT']/1.96
                 r['ci'] = sqrt(r['mse']/r['obs'])*r['critT']
 
@@ -1049,7 +1024,9 @@ class Anova(OrderedDict):
                 dstd=std(self.df[self.dv])
                 dmu  = mean(self.df[self.dv])
 
-                r['lambda'] = noncentrality_par(r['obs'],r['y2'],dmu,dstd**2.)
+                p_eta2 = r['ss']/(r['ss']+r['sse'])
+                r['lambda'] = (p_eta2/(1-p_eta2))*r['obs']
+                
                 r['power'] = observed_power( r['df'], r['dfe'], r['lambda'] )
                 
                 # record to dict
@@ -1069,8 +1046,8 @@ class Anova(OrderedDict):
                     r['sse'] = r2['ss']
                     r['mse'] = r2['mss']
                     r['F'] = r['mss']/r['mse']
-                    r['p'] = fprob(r['df'],r['dfe'],r['F'])
-
+                    r['p'] = scipy.stats.f(r['df'],r['dfe']).sf(r['F'])
+                    
                     # calculate Generalized eta effect size 
                     r['eta'] = r['ss']/(r['ss']+ss_err_tot)
 
@@ -1080,7 +1057,7 @@ class Anova(OrderedDict):
                     r['obs'] /= prod([len(conditions[f])*1. for f in efs])
 
                     # calculate Loftus and Masson standard errors
-                    r['critT'] = abs(qt(.05/2.,r['dfe']))
+                    r['critT'] = abs(scipy.stats.t(r['dfe']).ppf(.05/2.))
                     r['se'] = sqrt(r['mse']/r['obs'])*r['critT']/1.96
                     r['ci'] = sqrt(r['mse']/r['obs'])*r['critT']
 
@@ -1090,7 +1067,9 @@ class Anova(OrderedDict):
                     dstd=std(self.df[self.dv])
                     dmu  = mean(self.df[self.dv])
 
-                    r['lambda']=noncentrality_par(r['obs'],dave,dmu,dstd**2.)
+                    p_eta2 = r['ss']/(r['ss']+r['sse'])
+                    r['lambda'] = (p_eta2/(1-p_eta2))*r['obs']
+
                     r['power']=observed_power( r['df'], r['dfe'], r['lambda'] )
 
                     # Greenhouse-Geisser, Huynh-Feldt, Lower-Bound
@@ -1100,11 +1079,9 @@ class Anova(OrderedDict):
                         r['mss%s'%x] = r['ss']/r['df%s'%x]
                         r['mse%s'%x] = r['sse']/r['dfe%s'%x]
                         r['F%s'%x] = r['mss%s'%x]/r['mse%s'%x]
-                        r['p%s'%x] = fprob(r['df%s'%x],
-                                               r['dfe%s'%x],
-                                               r['F%s'%x])
+                        r['p%s'%x] = scipy.stats.f(r['df%s'%x],r['dfe%s'%x]).sf(r['F%s'%x])
                         r['obs%s'%x] = r['obs']
-                        r['critT%s'%x] = abs(qt(.05/2.,r['dfe%s'%x]))
+                        r['critT%s'%x] = abs(scipy.stats.t(r['dfe']).ppf(.05/2.))
                         r['se%s'%x] = sqrt(r['mse']/r['obs%s'%x])*\
                                          r['critT%s'%x]/1.96
                         r['ci%s'%x] = sqrt(r['mse']/r['obs%s'%x])*\
@@ -1205,13 +1182,13 @@ class Anova(OrderedDict):
             r['mse'] =  r['sse']/r['dfe']
             
             r['F'] =  r['mss']/r['mse']
-            r['p'] =  fprob(r['df'],r['dfe'],r['F'])
-
+            r['p'] =  scipy.stats.f(r['df'],r['dfe']).sf(r['F'])
+            
             # calculate observations per cell
             r['obs'] =  Nr*No
 
             # calculate Loftus and Masson standard errors
-            r['critT'] = abs(qt(.05/2.,r['dfe']))
+            r['critT'] = abs(scipy.stats.t(r['dfe']).ppf(.05/2.))
             r['se'] = sqrt(r['mse']/r['obs'])*r['critT']/1.96
             r['ci'] = sqrt(r['mse']/r['obs'])*r['critT']
 
@@ -1219,7 +1196,9 @@ class Anova(OrderedDict):
             dstd = std(self.df[self.dv])
             dmu  = mean(self.df[self.dv])
             
-            r['lambda'] = noncentrality_par(r['obs'],r['y2'],dmu,dstd**2.)
+            p_eta2 = r['ss']/(r['ss']+r['sse'])
+            r['lambda'] = (p_eta2/(1-p_eta2))*r['obs']
+                
             r['power'] = observed_power(r['df'], r['dfe'], r['lambda'])
 
             # Greenhouse-Geisser, Huynh-Feldt, Lower-Bound
@@ -1229,9 +1208,9 @@ class Anova(OrderedDict):
                 r['mss%s'%x] = r['ss']/r['df%s'%x]
                 r['mse%s'%x] = r['sse']/r['dfe%s'%x]
                 r['F%s'%x] = r['mss%s'%x]/r['mse%s'%x]
-                r['p%s'%x] = fprob(r['df%s'%x],r['dfe%s'%x],r['F%s'%x])
+                r['p%s'%x] = scipy.stats.f(r['df%s'%x],r['dfe%s'%x]).sf(r['F%s'%x])
                 r['obs%s'%x] = Nr*No
-                r['critT%s'%x] = abs(qt(.05/2.,r['dfe%s'%x]))
+                r['critT%s'%x] = abs(scipy.stats.t(r['dfe']).ppf(.05/2.))
                 r['se%s'%x] = sqrt(r['mse']/r['obs%s'%x])*r['critT%s'%x]/1.96
                 r['ci%s'%x] = sqrt(r['mse']/r['obs%s'%x])*r['critT%s'%x]
 

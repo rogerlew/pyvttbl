@@ -27,21 +27,22 @@ import math
 import scipy.stats
 import numpy as np
 
+from scipy.optimize import fminbound
 
-inf = float('inf')
+inf = np.inf
 
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 
 # changelog
 # 0.1   - initial release
 # 0.1.1 - vectorized
 # 0.2   - psturng added
 # 0.2.1 - T, R generation script relegated to make_tbls.py
-# 0.2.2 - qsturng0 first order approximation for initial part of scalar
-#         optimization
+# 0.2.2 
 #       - select_points refactored for performance to select_ps and
 #         select_vs
 #       - pysturng tester added.
+# 0.2.3 - uses np.inf and np.isinf
 
 # Gleason's table was derived using least square estimation on the tabled
 # r values for combinations of p and v. In total there are 206
@@ -457,24 +458,6 @@ def _ptransform(p):
     """function for p-value abcissa transformation"""
     return -1. / (1. + 1.5 * _phi((1. + p)/2.))
 
-##def _select_points(a, list_like):
-##    """
-##    returns one above a, one below a, and the third
-##    closest point to a sorted in ascending order
-##    for quadratic interpolation. Assumes that points
-##    above and below a exist.
-##    """
-##    foo = [x for x in list(list_like) if x-a <= 0]
-##    z = [min(foo, key=lambda x : abs(x-a))]
-##    
-##    foo = [x for x in list(list_like) if x-a > 0]
-##    z.append(min(foo, key=lambda x : abs(x-a)))
-##    
-##    foo = [x for x in list(list_like) if x not in z]
-##    z.append(min(foo, key=lambda x : abs(x-a)))
-##    
-##    return sorted(z)
-
 def _func(a, p, r, v):
     """
     calculates f-hat for the coefficients in a, probability p,
@@ -491,9 +474,9 @@ def _func(a, p, r, v):
         f += -0.002 / (1. + 12. * _phi(p)**2)
 
         if v <= 4.364:
-            f += 1./517. - 1./(312.*(v,1e38)[v==inf])
+            f += 1./517. - 1./(312.*(v,1e38)[np.isinf(v)])
         else:
-            f += 1./(191.*(v,1e38)[v==inf])
+            f += 1./(191.*(v,1e38)[np.isinf(v)])
 
     return -f
 
@@ -831,13 +814,21 @@ def _psturng(q, r, v):
     """scalar version of psturng"""
     if q < 0.:
         raise ValueError('q should be >= 0')
-    if q < _qsturng(.1, r, v):
-        return .9
-    if q > _qsturng(.999, r, v):
-        return .001
 
     opt_func = lambda p, r, v : abs(_qsturng(p, r, v) - q)
-    return 1. - fminbound(opt_func, .1, .999, args=(r,v))
+    
+    if v == 1:
+        if q < _qsturng(.9, r, 1):
+            return .1
+        elif q > _qsturng(.999, r, 1):
+            return .001
+        return 1. - fminbound(opt_func, .9, .999, args=(r,v))
+    else:
+        if q < _qsturng(.1, r, v):
+            return .9
+        elif q > _qsturng(.999, r, v):
+            return .001
+        return 1. - fminbound(opt_func, .1, .999, args=(r,v))
 
 _vpsturng = np.vectorize(_psturng)
 _vpsturng.__doc__ = """vector version of psturng"""
@@ -866,60 +857,14 @@ def psturng(q, r, v):
     -------
     p : (scalar, array_like)
         1. - area from zero to q under the Studentized Range
-        distribution. p is bound between .001 and .9, values
-        between .5 and .9 are 1st order appoximations.
+        distribution. When v == 1, p is bound between .001
+        and .1, when v > 1, p is bound between .001 and .9.
+        Values between .5 and .9 are 1st order appoximations.
         
     """
     if all(map(_isfloat, [q, r, v])):
         return _psturng(q, r, v)
     return _vpsturng(q, r, v)
-
-##import time
-##t0 = time.time()
-##p0_old=_select_points(2, p_keys)[0]
-##for i in range(1000000):
-##    p = i/1000000.*(.999-.1)+.1
-##    p0, p1, p2=_select_points(p, p_keys)
-##    if p0 != p0_old:
-##        print p, [p0, p1, p2]
-##
-##    p0_old = p0
-##print time.time()-t0
-##
-##t0 = time.time()
-##p0_old=_select_ps(.1)[0]
-##for i in range(1000000):
-##    p = i/1000000.*(.999-.1)+.1
-##    p0, p1, p2=_select_ps(p)
-##    if p0 != p0_old:
-##        print p, [p0, p1, p2]
-##
-##    p0_old = p0
-##print time.time()-t0
-##
-##import time
-##t0 = time.time()
-##p0_old=_select_points(2, v_keys)[0]
-##for i in range(1000000):
-##    p = i/1000000.*(1000-2)+2
-##    p0, p1, p2=_select_points(p, v_keys)
-##    if p0 != p0_old:
-##        print p, [p0, p1, p2]
-##
-##    p0_old = p0
-##print time.time()-t0
-##
-##import time
-##t0 = time.time()
-##p0_old=_select_vs(2,.)[0]
-##for i in range(1000000):
-##    p = i/1000000.*(1000-2)+2
-##    p0, p1, p2=_select_vs(p,.4)
-##    if p0 != p0_old:
-##        print p, [p0, p1, p2]
-##
-##    p0_old = p0
-##print time.time()-t0
 
 ##p, r, v = .9, 10, 20
 ##print
