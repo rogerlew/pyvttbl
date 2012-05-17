@@ -844,6 +844,7 @@ Observed power two-tail      0.035            """
         df = DataFrame()
         df.read_tbl('example2_prepost.csv')
         D = df.ttest('PRE','POST',paired=True)
+        print(repr(D))
         self.assertEqual(str(D),R)
         
     def test__repr__(self):

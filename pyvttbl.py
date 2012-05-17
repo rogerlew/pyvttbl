@@ -589,7 +589,7 @@ class DataFrame(OrderedDict):
             self._execute('alter table TBL2 rename to TBL')
             self.conn.commit()
         else:
-            # Initialize another temparary table
+            # Initialize another temporary table
             self._execute('drop table if exists TBL')
             self.conn.commit()
             
@@ -2007,20 +2007,24 @@ class PyvtTbl(list):
         if rows == []:
             rnames = [1]
         else:
-            g = Zconditions.unique_combinations(rows)
-            rnames = [zip(rows, v) for v in g]
-            
-        rsize = len(rnames)
+            rnames = []
+
+            conditions_set = set(zip(*[df[n] for n in rows]))
+            for vals in Zconditions.unique_combinations(rows):
+                if tuple(vals) in conditions_set:
+                    rnames.append(zip(rows,vals))
         
         # Build cnames
         if cols == []:
             cnames = [1]
         else:
-            g = Zconditions.unique_combinations(cols)
-            cnames = [zip(cols, v) for v in g]
-            
-        csize=len(cnames)
+            cnames = []
 
+            conditions_set = set(zip(*[df[n] for n in cols]))
+            for vals in Zconditions.unique_combinations(cols):
+                if tuple(vals) in conditions_set:
+                    cnames.append(zip(cols,vals))
+        
         #  4. Build query based on val, rows, and cols
         ##############################################################
         #  Here we are using string formatting to build the query.
@@ -2071,7 +2075,7 @@ class PyvtTbl(list):
         ##############################################################
         df._execute(''.join(query))
 
-        #  6. Read data to from cursor into a list of lists
+        #  6. Read data from cursor into a list of lists
         ##############################################################
 
         d = []
