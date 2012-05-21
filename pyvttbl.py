@@ -32,11 +32,11 @@ import pystaggrelite3
 from dictset import DictSet
 from texttable import Texttable as TextTable
 from stats import stats, pstat
-from qsturng import qsturng, psturng 
+from stats.qsturng import qsturng, psturng 
 
 from anova import Anova
 
-__version__ = '0.4.0.1'
+__version__ = '0.4.0.2'
 
 def _isfloat(string):
     """
