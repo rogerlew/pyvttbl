@@ -662,7 +662,7 @@ class Anova(OrderedDict):
             tstr='LOG_'
             
         elif transform in ['reciprocal','inverse']:
-            self.transform=lambda X:1./X
+            self.transform=lambda X:1./numpy.array(X)
             tstr='RECIPROCAL_'
             
         elif transform in ['square-root','sqrt']:
@@ -674,22 +674,22 @@ class Anova(OrderedDict):
             tstr='ARCSIN_'
             
         elif transform in ['windsor01']:
-            self.transform=lambda X: windsor(X,.01)
+            self.transform=lambda X: windsor(numpy.array(X),.01)
             tstr='WINDSOR01_'
             
         elif transform in ['windsor05']:
-            self.transform=lambda X: windsor(X,.05)
+            self.transform=lambda X: windsor(numpy.array(X),.05)
             tstr='WINDSOR05_'
             
         elif transform in ['windsor10']:
-            self.transform=lambda X: windsor(X,.10)
+            self.transform=lambda X: windsor(numpy.array(X),.10)
             tstr='WINDSOR10_'        
 
         if transform!='':
             if 'windsor' in transform:
                 self.df[tstr+self.dv], self.dftrim = \
                                        self.transform(self.df[self.dv])
-                print('%i degrees of freedom lost from trim'%int(self.dftrim))
+##                print('%i degrees of freedom lost from trim'%int(self.dftrim))
             else:
                 self.df[tstr+self.dv] = self.transform(self.df[self.dv])
                 
@@ -1248,32 +1248,38 @@ class Anova(OrderedDict):
 
         return list(array(list(zeros((p-len(b))))+b)+1.)
                           
-    def __html__(self):
-        if self.measure == '':
-            title  = '%s ~'%self.dv
-        else:
-            title  = '%s of %s ~'%(measure, self.dv)
-
-        factors = self.wfactors + self.bfactors
-        title += ''.join([' %s *'%f for f in factors])[:-2]
-        html=SimpleHTML(title)
-
-        if len(self.wfactors)!=0 and len(self.bfactors)==0:
-            self._within_html(html)
-            
-        if len(self.wfactors)==0 and len(self.bfactors)!=0:
-            self._between_html(html)
-            
-        if len(self.wfactors)!=0 and len(self.bfactors)!=0:
-            self._mixed_html(html)
-            
-        self._summary_html(html, factors)
-
-        return str(html)
-
-    def output2html(self, fname):
-        with open(fname, 'wb') as f:
-            f.write(self.__html__())
+##    def output2html(self, fname, script=''):
+##        if self.measure == '':
+##            title  = '%s ~'%self.dv
+##        else:
+##            title  = '%s of %s ~'%(measure, self.dv)
+##
+##        factors = self.wfactors + self.bfactors
+##        title += ''.join([' %s *'%f for f in factors])[:-2]
+##        html=SimpleHTML(title)
+##
+##        if len(self.wfactors)!=0 and len(self.bfactors)==0:
+##            self._within_html(html)
+##            
+##        if len(self.wfactors)==0 and len(self.bfactors)!=0:
+##            self._between_html(html)
+##            
+##        if len(self.wfactors)!=0 and len(self.bfactors)!=0:
+##            self._mixed_html(html)
+##            
+##        self._summary_html(html, factors)
+##        
+##        # Write Analysis Script
+##        if script != '':
+##            html.add(br(2))
+##            txt='Analysis Script'
+##            html.add(h(a(txt,name='1_'+md5sum(txt)),2,'center'))
+##            html.add(pre(script))
+##
+##        html.write( fname)
+##
+##    def output2html(self, fname):
+##        self.__html__()
         
     def _between_html(self, html):
         factors = self.bfactors
@@ -1926,7 +1932,7 @@ class Anova(OrderedDict):
                 yerr=self[tuple(efs)]['ci']
             else:
                 yerr=self[tuple(efs)]['ci_gg']
-        elif errorbars=='se':
+        elif errorbars=='sem':
             if len(self.wfactors)==0 and len(self.bfactors)!=0:
                 yerr=self[tuple(efs)]['se']
             else:

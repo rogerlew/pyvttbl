@@ -36,7 +36,7 @@ from stats.qsturng import qsturng, psturng
 
 from anova import Anova
 
-__version__ = '0.4.0.2'
+__version__ = '0.4.1.0'
 
 def _isfloat(string):
     """
@@ -1085,7 +1085,7 @@ class DataFrame(OrderedDict):
         conditions_list = [tup[1] for [tup] in pt.rnames]
 
         a = Anova1way()
-        a.run(list_of_lists, val, factor, conditions_list, posthoc='tukey')
+        a.run(list_of_lists, val, factor, conditions_list, posthoc=posthoc)
         return a
     
     def chisquare1way(self, observed, expected_dict=None,
@@ -2291,7 +2291,54 @@ class PyvtTbl(list):
             wtr.writerow(first)
             wtr.writerow(header)
             wtr.writerows(data)
+
+    def to_dataframe(self):
+        """
+        returns a DataFrame excluding row and column totals
+        """        
+        if self == []:
+            return DataFrame()
+
+        if self.flatten:
+            raise NotImplementedError(
+                'Pyvttbl.to_dataframe() cannot handle flatten tables.')
+
+        rows = self._get_rows()
+        cols = self._get_cols()
+
+        # initialize DataFrame
+        df = DataFrame()
+        
+        # no rows or cols were specified
+        if self.rnames == [1] and self.cnames == [1]:
+            # build the header
+            header = ['Value']
             
+        elif self.rnames == [1]: # no rows were specified
+            # build the header
+            header = ['__'.join('%s=%s'%(f, c) for (f, c) in L) \
+                      for L in self.cnames]
+            
+            df.insert(zip(header, self[0]))
+            
+        elif self.cnames == [1]: # no cols were specified
+            # build the header
+            header = rows + ['Value']
+            
+            for i, L in enumerate(self.rnames):
+                df.insert(zip(header, [c for (f, c) in L] + self[i]))
+            
+        else: # table has rows and cols
+            # build the header
+            header = copy(rows)
+            for L in self.cnames:
+                header.append('__'.join('%s=%s'%(f, c) for (f, c) in L))
+            
+            for i, L in enumerate(self.rnames):
+                df.insert(zip(header, [c for (f, c) in L] + self[i]))
+
+        return df
+    
     def __str__(self):
         """
         returns a human friendly string representation of the table
@@ -4043,3 +4090,43 @@ class Marginals(OrderedDict):
 
         return 'Marginals(%s%s)'%(args, kwds)
         
+####def linear_regression(x,y):
+####    x,y = np.array(x),np.array(y)
+####    ##########
+####    # Fitting the data -- Least Squares Method
+####    ##########
+####
+####    # define our (line) fitting function
+####    fitfunc = lambda p, x: p[0] + p[1] * x
+####    errfunc = lambda p, x, y: y - fitfunc(p, x)
+####
+####    pinit = [1.0, -.1]
+####    out = scipy.optimize.leastsq(errfunc, pinit,
+####                                 args=(x, y),
+####                                 full_output=1)
+####    
+####    pfinal = out[0]
+####    covar = out[1]
+####
+####    a = pfinal[1]
+####    k = 10.**pfinal[0]
+####
+####    # manual calculate r^2, F, p
+####    y_bar = np.mean(y)
+####    y_hat = fitfunc(pfinal, x)
+####
+####    ssm = np.sum([(_y-y_bar)**2 for _y in y_hat])
+####    sst = np.sum([(_y-y_bar)**2 for _y in y])
+####    sse = sst - ssm
+####
+####    r2 = 1. - sse/sst
+####    F = ssm / sse
+####
+####    n = len(x)
+####    dfm = 1
+####    dfe = n - 2
+####    dft = n - 1
+####
+####    p = fprob(dfm,dfe,F)
+####
+####    return a, k, r2, F, p, ssm, sse, sst, dfm, dfe, dft

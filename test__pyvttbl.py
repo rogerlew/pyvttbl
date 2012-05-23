@@ -919,175 +919,175 @@ class Test_pivot_1(unittest.TestCase):
         self.df=DataFrame()
         self.df.read_tbl('words~ageXcondition.csv')
         
-##    def test001(self):
-##        with self.assertRaises(KeyError) as cm:
-##            self.df.pivot('NOTAKEY',rows=['AGE'])
-##
-##        self.assertEqual(str(cm.exception),"'NOTAKEY'")
-##        
-##    def test002(self):
-##        with self.assertRaises(KeyError) as cm:
-##            self.df.pivot('CONDITION',cols=['NOTAKEY'])
-##
-##        self.assertEqual(str(cm.exception),"'NOTAKEY'")
-##
-##    def test003(self):
-##        with self.assertRaises(KeyError) as cm:
-##            self.df.pivot('SUBJECT',rows=['NOTAKEY','AGE'])
-##
-##        self.assertEqual(str(cm.exception),"'NOTAKEY'")
-##
+    def test001(self):
+        with self.assertRaises(KeyError) as cm:
+            self.df.pivot('NOTAKEY',rows=['AGE'])
+
+        self.assertEqual(str(cm.exception),"'NOTAKEY'")
+        
+    def test002(self):
+        with self.assertRaises(KeyError) as cm:
+            self.df.pivot('CONDITION',cols=['NOTAKEY'])
+
+        self.assertEqual(str(cm.exception),"'NOTAKEY'")
+
+    def test003(self):
+        with self.assertRaises(KeyError) as cm:
+            self.df.pivot('SUBJECT',rows=['NOTAKEY','AGE'])
+
+        self.assertEqual(str(cm.exception),"'NOTAKEY'")
+
+    def test004(self):
+        with self.assertRaises(KeyError) as cm:
+            self.df.pivot('CONDITION',cols=['NOTAKEY'])
+
+        self.assertEqual(str(cm.exception),"'NOTAKEY'")
+
+    def test005(self):
+        with self.assertRaises(TypeError) as cm:
+            self.df.pivot('SUBJECT',rows='AGE')
+
+        self.assertEqual(str(cm.exception),
+                         "'str' object is not iterable")
+
+    def test0051(self):
+        with self.assertRaises(TypeError) as cm:
+            self.df.pivot('SUBJECT',rows=42)
+
+        self.assertEqual(str(cm.exception),
+                         "'list' object is not iterable")
+        
+    def test006(self):
+        with self.assertRaises(TypeError) as cm:
+            self.df.pivot('SUBJECT',cols='AGE')
+
+        self.assertEqual(str(cm.exception),
+                         "'str' object is not iterable")
 ##    def test004(self):
-##        with self.assertRaises(KeyError) as cm:
-##            self.df.pivot('CONDITION',cols=['NOTAKEY'])
+##        # test the exclude parameter checking
 ##
-##        self.assertEqual(str(cm.exception),"'NOTAKEY'")
-##
-##    def test005(self):
-##        with self.assertRaises(TypeError) as cm:
-##            self.df.pivot('SUBJECT',rows='AGE')
-##
-##        self.assertEqual(str(cm.exception),
-##                         "'str' object is not iterable")
-##
-##    def test0051(self):
-##        with self.assertRaises(TypeError) as cm:
-##            self.df.pivot('SUBJECT',rows=42)
-##
-##        self.assertEqual(str(cm.exception),
-##                         "'list' object is not iterable")
+##        with warnings.catch_warnings(record=True) as w:
+##            # Cause all warnings to always be triggered.
+##            warnings.simplefilter("always")
+##            
+##            # Trigger a warning.    
+##            self.df.pivot('SUBJECT',
+##                          where=[('AGE','not in',['medium',])])
 ##        
-##    def test006(self):
-##        with self.assertRaises(TypeError) as cm:
-##            self.df.pivot('SUBJECT',cols='AGE')
-##
-##        self.assertEqual(str(cm.exception),
-##                         "'str' object is not iterable")
-####    def test004(self):
-####        # test the exclude parameter checking
-####
-####        with warnings.catch_warnings(record=True) as w:
-####            # Cause all warnings to always be triggered.
-####            warnings.simplefilter("always")
-####            
-####            # Trigger a warning.    
-####            self.df.pivot('SUBJECT',
-####                          where=[('AGE','not in',['medium',])])
-####        
-####            assert issubclass(w[-1].category, RuntimeWarning)
-##    
-##    def test005(self):
-##        # test the exclude parameter
-##        R=np.array([[14.8], [6.5], [17.6], [19.3], [7.6]])
-##        
-##        # this one shouldn't raise an Exception
-##        myPyvtTbl = self.df.pivot('WORDS',rows=['CONDITION'],
-##                      where=[('AGE','not in',['old',])])
-##        D=np.array(myPyvtTbl)
-##
-##        # verify the table is the correct shape
-##        self.assertEqual(R.shape,D.shape)
-##
-##        # verify the values in the table
-##        for d,r in zip(D.flat,R.flat):
-##            self.failUnlessAlmostEqual(d,r)
-##        
-##    def test011(self):
-##        R=np.array([[25.5], [75.5]])
-##        
-##        # aggregate is case-insensitive
-##        myPyvtTbl = self.df.pivot('SUBJECT',rows=['AGE'],aggregate='AVG')
-##        D=np.array(myPyvtTbl)
-##
-##        # verify the table is the correct shape
-##        self.assertEqual(R.shape,D.shape)
-##
-##        # verify the values in the table
-##        for d,r in zip(D.flat,R.flat):
-##            self.failUnlessAlmostEqual(d,r)
-##        
-##    def test0(self):
-##        R=np.array([[ 11. ,   7. ,  13.4,  12. ,   6.9],
-##                 [ 14.8,   6.5,  17.6,  19.3,   7.6]])
-##        
-##        myPyvtTbl = self.df.pivot('WORDS',rows=['AGE'],cols=['CONDITION'])
-##        D=np.array(myPyvtTbl)
-##
-##        # verify the table is the correct shape
-##        self.assertEqual(R.shape,D.shape)
-##
-##        # verify the values in the table
-##        for d,r in zip(D.flat,R.flat):
-##            self.failUnlessAlmostEqual(d,r)
-##
-##    def test1(self):
-##        R=np.array([[ 110.,  148.],
-##                    [  70.,   65.],
-##                    [ 134.,  176.],
-##                    [ 120.,  193.],
-##                    [  69.,   76.]])
-##        
-##        myPyvtTbl = self.df.pivot('WORDS',rows=['CONDITION'],cols=['AGE'],aggregate='sum')
-##        D=np.array(myPyvtTbl)
-##        
-##        # verify the table is the correct shape
-##        self.assertEqual(R.shape,D.shape)
-##
-##        # verify the values in the table
-##        for d,r in zip(D.flat,R.flat):
-##            self.failUnlessAlmostEqual(d,r)
-##
-##    def test3(self):
-##        R=np.array([[None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-##                  11.0, 13.0, 8.0,  6.0,  14.0, 11.0, 13.0, 13.0, 10.0, 11.0, None, None, None, None, None, None, None, None, None, None,
-##                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-##                  None, None, None, None, None, None, None, None, None, None, 14.0, 11.0, 18.0, 14.0, 13.0, 22.0, 17.0, 16.0, 12.0, 11.0,
-##                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-##                 [9.0,  8.0,  6.0,  8.0,  10.0, 4.0,  6.0,  5.0,  7.0,  7.0,  None, None, None, None, None, None, None, None, None, None,
-##                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-##                  None, None, None, None, None, None, None, None, None, None, 8.0,  6.0,  4.0,  6.0,  7.0,  6.0,  5.0,  7.0,  9.0,  7.0,
-##                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-##                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-##                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-##                  None, None, None, None, None, None, None, None, None, None, 12.0, 11.0, 16.0, 11.0, 9.0, 23.0, 12.0, 10.0, 19.0, 11.0,
-##                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-##                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-##                  20.0, 16.0, 16.0, 15.0, 18.0, 16.0, 20.0, 22.0, 14.0, 19.0, None, None, None, None, None, None, None, None, None, None],
-##                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-##                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-##                  10.0, 19.0, 14.0, 5.0,  10.0, 11.0, 14.0, 15.0, 11.0, 11.0, None, None, None, None, None, None, None, None, None, None,
-##                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-##                  None, None, None, None, None, None, None, None, None, None, 21.0, 19.0, 17.0, 15.0, 22.0, 16.0, 22.0, 22.0, 18.0, 21.0],
-##                 [None, None, None, None, None, None, None, None, None, None, 7.0,  9.0,  6.0,  6.0,  6.0,  11.0, 6.0,  3.0,  8.0,  7.0,
-##                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-##                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-##                  10.0, 7.0,  8.0,  10.0, 4.0,  7.0,  10.0, 6.0,  7.0,  7.0,  None, None, None, None, None, None, None, None, None, None,
-##                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]], dtype=object)
-##
-##        # One row and one col factor                     
-##        myPyvtTbl = self.df.pivot('WORDS',rows=['CONDITION'],cols=['SUBJECT'],aggregate='sum')
-##        D=np.array(myPyvtTbl)
-##    
-##        # verify the table is the correct shape
-##        self.assertEqual(R.shape,D.shape)
-##
-##        # verify the values in the table
-##        for d,r in zip(D.flat,R.flat):
-##            self.failUnlessAlmostEqual(d,r)
-##
-##    def test4(self):
-##        R=np.array([[5.191085988]])
-##
-##        # No rows or cols        
-##        myPyvtTbl = self.df.pivot('WORDS',aggregate='stdev')
-##        D=np.array(myPyvtTbl)
-##
-##        # verify the table is the correct shape
-##        self.assertEqual(R.shape,D.shape)
-##
-##        # verify the values in the table
-##        for d,r in zip(D.flat,R.flat):
-##            self.failUnlessAlmostEqual(d,r)
+##            assert issubclass(w[-1].category, RuntimeWarning)
+    
+    def test005(self):
+        # test the exclude parameter
+        R=np.array([[14.8], [6.5], [17.6], [19.3], [7.6]])
+        
+        # this one shouldn't raise an Exception
+        myPyvtTbl = self.df.pivot('WORDS',rows=['CONDITION'],
+                      where=[('AGE','not in',['old',])])
+        D=np.array(myPyvtTbl)
+
+        # verify the table is the correct shape
+        self.assertEqual(R.shape,D.shape)
+
+        # verify the values in the table
+        for d,r in zip(D.flat,R.flat):
+            self.failUnlessAlmostEqual(d,r)
+        
+    def test011(self):
+        R=np.array([[25.5], [75.5]])
+        
+        # aggregate is case-insensitive
+        myPyvtTbl = self.df.pivot('SUBJECT',rows=['AGE'],aggregate='AVG')
+        D=np.array(myPyvtTbl)
+
+        # verify the table is the correct shape
+        self.assertEqual(R.shape,D.shape)
+
+        # verify the values in the table
+        for d,r in zip(D.flat,R.flat):
+            self.failUnlessAlmostEqual(d,r)
+        
+    def test0(self):
+        R=np.array([[ 11. ,   7. ,  13.4,  12. ,   6.9],
+                 [ 14.8,   6.5,  17.6,  19.3,   7.6]])
+        
+        myPyvtTbl = self.df.pivot('WORDS',rows=['AGE'],cols=['CONDITION'])
+        D=np.array(myPyvtTbl)
+
+        # verify the table is the correct shape
+        self.assertEqual(R.shape,D.shape)
+
+        # verify the values in the table
+        for d,r in zip(D.flat,R.flat):
+            self.failUnlessAlmostEqual(d,r)
+
+    def test1(self):
+        R=np.array([[ 110.,  148.],
+                    [  70.,   65.],
+                    [ 134.,  176.],
+                    [ 120.,  193.],
+                    [  69.,   76.]])
+        
+        myPyvtTbl = self.df.pivot('WORDS',rows=['CONDITION'],cols=['AGE'],aggregate='sum')
+        D=np.array(myPyvtTbl)
+        
+        # verify the table is the correct shape
+        self.assertEqual(R.shape,D.shape)
+
+        # verify the values in the table
+        for d,r in zip(D.flat,R.flat):
+            self.failUnlessAlmostEqual(d,r)
+
+    def test3(self):
+        R=np.array([[None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                  11.0, 13.0, 8.0,  6.0,  14.0, 11.0, 13.0, 13.0, 10.0, 11.0, None, None, None, None, None, None, None, None, None, None,
+                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                  None, None, None, None, None, None, None, None, None, None, 14.0, 11.0, 18.0, 14.0, 13.0, 22.0, 17.0, 16.0, 12.0, 11.0,
+                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [9.0,  8.0,  6.0,  8.0,  10.0, 4.0,  6.0,  5.0,  7.0,  7.0,  None, None, None, None, None, None, None, None, None, None,
+                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                  None, None, None, None, None, None, None, None, None, None, 8.0,  6.0,  4.0,  6.0,  7.0,  6.0,  5.0,  7.0,  9.0,  7.0,
+                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                  None, None, None, None, None, None, None, None, None, None, 12.0, 11.0, 16.0, 11.0, 9.0, 23.0, 12.0, 10.0, 19.0, 11.0,
+                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                  20.0, 16.0, 16.0, 15.0, 18.0, 16.0, 20.0, 22.0, 14.0, 19.0, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                  10.0, 19.0, 14.0, 5.0,  10.0, 11.0, 14.0, 15.0, 11.0, 11.0, None, None, None, None, None, None, None, None, None, None,
+                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                  None, None, None, None, None, None, None, None, None, None, 21.0, 19.0, 17.0, 15.0, 22.0, 16.0, 22.0, 22.0, 18.0, 21.0],
+                 [None, None, None, None, None, None, None, None, None, None, 7.0,  9.0,  6.0,  6.0,  6.0,  11.0, 6.0,  3.0,  8.0,  7.0,
+                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                  10.0, 7.0,  8.0,  10.0, 4.0,  7.0,  10.0, 6.0,  7.0,  7.0,  None, None, None, None, None, None, None, None, None, None,
+                  None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]], dtype=object)
+
+        # One row and one col factor                     
+        myPyvtTbl = self.df.pivot('WORDS',rows=['CONDITION'],cols=['SUBJECT'],aggregate='sum')
+        D=np.array(myPyvtTbl)
+    
+        # verify the table is the correct shape
+        self.assertEqual(R.shape,D.shape)
+
+        # verify the values in the table
+        for d,r in zip(D.flat,R.flat):
+            self.failUnlessAlmostEqual(d,r)
+
+    def test4(self):
+        R=np.array([[5.191085988]])
+
+        # No rows or cols        
+        myPyvtTbl = self.df.pivot('WORDS',aggregate='stdev')
+        D=np.array(myPyvtTbl)
+
+        # verify the table is the correct shape
+        self.assertEqual(R.shape,D.shape)
+
+        # verify the values in the table
+        for d,r in zip(D.flat,R.flat):
+            self.failUnlessAlmostEqual(d,r)
 
     def test5(self):
         # when the tolist aggregate the pivot operation
@@ -1115,63 +1115,63 @@ class Test_pivot_1(unittest.TestCase):
         for d,r in zip(D.flat,R.flat):
             self.failUnlessAlmostEqual(d,r)
 
-##    def test6(self):
-##        # tolist handles text data differently then integer
-##        # or float data. We need to test this case as well
-##        R=np.array([[['L', 'N', 'I', 'G', 'O', 'L', 'N', 'N', 'K', 'L'],
-##                  ['J', 'I', 'G', 'I', 'K', 'E', 'G', 'F', 'H', 'H'],
-##                  ['M', 'L', 'Q', 'L', 'J', 'X', 'M', 'K', 'T', 'L'],
-##                  ['K', 'T', 'O', 'F', 'K', 'L', 'O', 'P', 'L', 'L'],
-##                  ['H', 'J', 'G', 'G', 'G', 'L', 'G', 'D', 'I', 'H']],
-##                 [['O', 'L', 'S', 'O', 'N', 'W', 'R', 'Q', 'M', 'L'],
-##                  ['I', 'G', 'E', 'G', 'H', 'G', 'F', 'H', 'J', 'H'],
-##                  ['U', 'Q', 'Q', 'P', 'S', 'Q', 'U', 'W', 'O', 'T'],
-##                  ['V', 'T', 'R', 'P', 'W', 'Q', 'W', 'W', 'S', 'V'],
-##                  ['K', 'H', 'I', 'K', 'E', 'H', 'K', 'G', 'H', 'H']]])
-##
-##        # caesar cipher
-##        num2abc=dict(zip(list(range(26)),'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))
-##        self.df['ABC']=[num2abc[v%26] for v in self.df['WORDS']]
-##
-##        myPyvtTbl = self.df.pivot('ABC',
-##                      rows=['AGE'], cols=['CONDITION'],
-##                      aggregate='tolist')
-##
-##        D=np.array(myPyvtTbl)
-##
-##        # verify the table is the correct shape
-##        self.assertEqual(R.shape,D.shape)
-##
-##        # verify the values in the table
-##        for d,r in zip(D.flat,R.flat):
-##            self.failUnlessAlmostEqual(d,r)
-##
-##    def test7(self):
-##        # test group_concat
-##        R=np.array( [[u'11,13,8,6,14,11,13,13,10,11',
-##                      u'9,8,6,8,10,4,6,5,7,7',
-##                      u'12,11,16,11,9,23,12,10,19,11',
-##                      u'10,19,14,5,10,11,14,15,11,11',
-##                      u'7,9,6,6,6,11,6,3,8,7'],
-##                     [u'14,11,18,14,13,22,17,16,12,11',
-##                      u'8,6,4,6,7,6,5,7,9,7',
-##                      u'20,16,16,15,18,16,20,22,14,19',
-##                      u'21,19,17,15,22,16,22,22,18,21',
-##                      u'10,7,8,10,4,7,10,6,7,7']])
-##
-##        myPyvtTbl = self.df.pivot('WORDS',
-##                      rows=['AGE'], cols=['CONDITION'],
-##                      aggregate='group_concat')
-##
-##        D=np.array(myPyvtTbl)
-##
-##        # verify the table is the correct shape
-##        self.assertEqual(R.shape,D.shape)
-##
-##        # verify the values in the table
-##        for d,r in zip(D.flat,R.flat):
-##            self.failUnlessEqual(d,r)
-##            
+    def test6(self):
+        # tolist handles text data differently then integer
+        # or float data. We need to test this case as well
+        R=np.array([[['L', 'N', 'I', 'G', 'O', 'L', 'N', 'N', 'K', 'L'],
+                  ['J', 'I', 'G', 'I', 'K', 'E', 'G', 'F', 'H', 'H'],
+                  ['M', 'L', 'Q', 'L', 'J', 'X', 'M', 'K', 'T', 'L'],
+                  ['K', 'T', 'O', 'F', 'K', 'L', 'O', 'P', 'L', 'L'],
+                  ['H', 'J', 'G', 'G', 'G', 'L', 'G', 'D', 'I', 'H']],
+                 [['O', 'L', 'S', 'O', 'N', 'W', 'R', 'Q', 'M', 'L'],
+                  ['I', 'G', 'E', 'G', 'H', 'G', 'F', 'H', 'J', 'H'],
+                  ['U', 'Q', 'Q', 'P', 'S', 'Q', 'U', 'W', 'O', 'T'],
+                  ['V', 'T', 'R', 'P', 'W', 'Q', 'W', 'W', 'S', 'V'],
+                  ['K', 'H', 'I', 'K', 'E', 'H', 'K', 'G', 'H', 'H']]])
+
+        # caesar cipher
+        num2abc=dict(zip(list(range(26)),'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))
+        self.df['ABC']=[num2abc[v%26] for v in self.df['WORDS']]
+
+        myPyvtTbl = self.df.pivot('ABC',
+                      rows=['AGE'], cols=['CONDITION'],
+                      aggregate='tolist')
+
+        D=np.array(myPyvtTbl)
+
+        # verify the table is the correct shape
+        self.assertEqual(R.shape,D.shape)
+
+        # verify the values in the table
+        for d,r in zip(D.flat,R.flat):
+            self.failUnlessAlmostEqual(d,r)
+
+    def test7(self):
+        # test group_concat
+        R=np.array( [[u'11,13,8,6,14,11,13,13,10,11',
+                      u'9,8,6,8,10,4,6,5,7,7',
+                      u'12,11,16,11,9,23,12,10,19,11',
+                      u'10,19,14,5,10,11,14,15,11,11',
+                      u'7,9,6,6,6,11,6,3,8,7'],
+                     [u'14,11,18,14,13,22,17,16,12,11',
+                      u'8,6,4,6,7,6,5,7,9,7',
+                      u'20,16,16,15,18,16,20,22,14,19',
+                      u'21,19,17,15,22,16,22,22,18,21',
+                      u'10,7,8,10,4,7,10,6,7,7']])
+
+        myPyvtTbl = self.df.pivot('WORDS',
+                      rows=['AGE'], cols=['CONDITION'],
+                      aggregate='group_concat')
+
+        D=np.array(myPyvtTbl)
+
+        # verify the table is the correct shape
+        self.assertEqual(R.shape,D.shape)
+
+        # verify the values in the table
+        for d,r in zip(D.flat,R.flat):
+            self.failUnlessEqual(d,r)
+            
 class Test_pivot_2(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
@@ -1439,7 +1439,71 @@ class Test_writePivot(unittest.TestCase):
 
         self.assertEqual(str(cm.exception),
                          'fname must be a string')
+
+class Test_pyvttbl_to_dataframe(unittest.TestCase):
+    def test0(self):
+        R = """TIME    CONDITION=A   CONDITION=B 
+=================================
+day           1.864         1.933 
+night         1.622         1.731 """
         
+        df = DataFrame()
+        df.read_tbl('example.csv')
+        df['LOG10_X']=[math.log10(x) for x in df['X']]
+        pt = df.pivot('LOG10_X', ['TIME'], ['CONDITION'])
+        df2 = pt.to_dataframe()
+        
+        self.assertEqual(str(df2),R)
+
+    def test1(self):
+        R = """CYCLE   PHASE   GROUP=AA__AGE=old   GROUP=AA__AGE=young   GROUP=AB__AGE=old   GROUP=AB__AGE=young   GROUP=LAB__AGE=old   GROUP=LAB__AGE=young 
+=============================================================================================================================================
+    1   I                  17.750                 8.675              12.625                 5.525               21.625                  7.825 
+    1   II                 20.875                 8.300              22.750                 8.675               36.250                 13.750 
+    2   I                  22.375                10.225              23.500                 8.825               21.375                  9.900 
+    2   II                 28.125                10.250              41.125                13.100               46.875                 14.375 
+    3   I                  23.125                10.500              20.000                 9.125               23.750                  9.500 
+    3   II                 20.750                 9.525              46.125                14.475               50.375                 15.575 
+    4   I                  20.250                 9.925              15.625                 7.750               26.375                  9.650 
+    4   II                 24.250                11.100              51.750                12.850               46.500                 14.425 """
+        df = DataFrame()
+        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        pt = df.pivot('SUPPRESSION',
+                  rows=['CYCLE', 'PHASE'],
+                  cols=['GROUP', 'AGE'])
+        df2 = pt.to_dataframe()
+        
+        self.assertEqual(str(df2),R)
+
+    def test2(self):
+        R = """GROUP=AA__AGE=old   GROUP=AA__AGE=young   GROUP=AB__AGE=old   GROUP=AB__AGE=young   GROUP=LAB__AGE=old   GROUP=LAB__AGE=young 
+=============================================================================================================================
+           22.188                 9.813              29.188                10.041               34.141                 11.875 """
+        df = DataFrame()
+        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        pt = df.pivot('SUPPRESSION',
+                  cols=['GROUP', 'AGE'])
+        df2 = pt.to_dataframe()
+       
+        self.assertEqual(str(df2),R)
+
+    def test3(self):
+        R = """GROUP    AGE    Value  
+======================
+AA      old     22.188 
+AA      young    9.813 
+AB      old     29.188 
+AB      young   10.041 
+LAB     old     34.141 
+LAB     young   11.875 """
+        df = DataFrame()
+        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        pt = df.pivot('SUPPRESSION',
+                  rows=['GROUP', 'AGE'])
+        df2 = pt.to_dataframe()
+
+        self.assertEqual(str(df2),R)
+
 class Test_marginals(unittest.TestCase):
     def test0(self):
         df=DataFrame()
@@ -2255,6 +2319,7 @@ def suite():
             unittest.makeSuite(Test_pivot_0),
             unittest.makeSuite(Test_pivot_1),
             unittest.makeSuite(Test_pivot_2),
+            unittest.makeSuite(Test_pyvttbl_to_dataframe),
             unittest.makeSuite(Test_marginals),
             unittest.makeSuite(Test_select_col),
             unittest.makeSuite(Test_histogram),
