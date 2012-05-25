@@ -1,0 +1,1 @@
+cmd /k C:\Python27\Scripts\nosetests.exe
