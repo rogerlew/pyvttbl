@@ -224,9 +224,9 @@ except:
 from scipy.signal import detrend
 from sets import Set
 
-from SimpleHTML import *
-from texttable import Texttable as TextTable
-from texttable import _str
+from pyvttbl.misc.SimpleHTML import *
+from pyvttbl.misc.texttable import Texttable as TextTable
+from pyvttbl.misc.support import *
 
 def observed_power(df,dfe,nc,alpha=0.05,eps=1.0):
     """

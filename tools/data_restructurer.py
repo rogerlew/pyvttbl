@@ -11,7 +11,19 @@ elif sys.version_info[0] == 3:
     _xrange = range
     
 import csv
-from pyvttbl import DataFrame, _xunique_combinations
+from pyvttbl import DataFrame
+
+def _xunique_combinations(items, n):
+    """
+    returns the unique combinations of items. the n parameter controls
+    the number of elements in items to combine in each combination
+    """
+    if n == 0:
+        yield []
+    else:
+        for i in _xrange(len(items)):
+            for cc in _xunique_combinations(items[i+1:], n-1):
+                yield [items[i]]+cc
 
 def long2wide(in_fname, id, dvs, between=[], within=[],
          covariates=[], out_fname=None, nested=True):
@@ -66,34 +78,35 @@ def long2wide(in_fname, id, dvs, between=[], within=[],
 ##          out_fname='formatted.csv',
 ##          nested=False)
 
-import time
+if __name__ == "__main__":
+    import time
 
-t0=time.time()
-print('need to format data for spss... (this may take a few minutes)')
+    t0=time.time()
+    print('need to format data for spss... (this may take a few minutes)')
 
-fname='collaborated.csv'
+    fname='collaborated.csv'
 
-covariates='age,gender,dicho_correct,dicho_misses,dicho_FA,SAAT_noncomp_correct,'\
-           'SAAT_noncomp_incorrect,SAAT_comp_correct,SAAT_comp_incorrect'.split(',')
+    covariates='age,gender,dicho_correct,dicho_misses,dicho_FA,SAAT_noncomp_correct,'\
+               'SAAT_noncomp_incorrect,SAAT_comp_correct,SAAT_comp_incorrect'.split(',')
 
-within='speed,target_dir,agreement'.split(',')
+    within='speed,target_dir,agreement'.split(',')
 
-dvs='correct_decision_raw,decision_at_safe_distance_raw,decision_distance_raw,'\
-    'decision_latency_raw,decision_proportion_raw,decision_ttc_proportion_raw,'\
-    'decision_ttc_raw,detection_distance_raw,detection_latency_raw,'\
-    'detection_proportion_raw,detection_ttc_proportion_raw,detection_ttc_raw,'\
-    'position_distance_raw,position_latency_raw,risk_level_raw,trial_raw'.split(',')
- 
-##long2wide(fname, 'participant',dvs=dvs,within=within,covariates=covariates,nested=False)
+    dvs='correct_decision_raw,decision_at_safe_distance_raw,decision_distance_raw,'\
+        'decision_latency_raw,decision_proportion_raw,decision_ttc_proportion_raw,'\
+        'decision_ttc_raw,detection_distance_raw,detection_latency_raw,'\
+        'detection_proportion_raw,detection_ttc_proportion_raw,detection_ttc_raw,'\
+        'position_distance_raw,position_latency_raw,risk_level_raw,trial_raw'.split(',')
+     
+    ##long2wide(fname, 'participant',dvs=dvs,within=within,covariates=covariates,nested=False)
 
-long2wide(in_fname=fname,
-          id='participant',
-          dvs=dvs,
-          between=[],
-          within=within,
-          covariates=covariates,
-          out_fname='formatted.csv',
-          nested=True)
+    long2wide(in_fname=fname,
+              id='participant',
+              dvs=dvs,
+              between=[],
+              within=within,
+              covariates=covariates,
+              out_fname='formatted.csv',
+              nested=True)
 
-print('\ndone.')
-print(time.time()-t0)
+    print('\ndone.')
+    print(time.time()-t0)

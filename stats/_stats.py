@@ -24,7 +24,7 @@
 """
 stats.py module
 
-(Requires pstat.py module.)
+(Requires _pstat.py module.)
 
 #################################################
 #######  Written by:  Gary Strangman  ###########
@@ -203,7 +203,7 @@ SUPPORT FUNCTIONS:  writecc
 ## 01/13/99 ... CHANGED TO VERSION 0.3
 ##              fixed bug in a/lmannwhitneyu p-value calculation
 ## 12/31/98 ... fixed variable-name bug in ldescribe
-## 12/19/98 ... fixed bug in findwithin (fcns needed pstat. prefix)
+## 12/19/98 ... fixed bug in findwithin (fcns needed _pstat. prefix)
 ## 12/16/98 ... changed amedianscore to return float (not array) for 1 score
 ## 12/14/98 ... added atmin and atmax functions
 ##              removed umath from import line (not needed)
@@ -222,7 +222,7 @@ SUPPORT FUNCTIONS:  writecc
 ##              changed name of skewness and askewness to skew and askew
 ##              fixed (a)histogram (which sometimes counted points <lowerlimit)
 
-import pstat               # required 3rd party module
+import _pstat              # required 3rd party module
 import math, string, copy  # required python modules
 from types import *
 
@@ -357,7 +357,7 @@ Usage:   lmode(inlist)
 Returns: bin-count for mode(s), a list of modal value(s)
 """
 
-    scores = pstat.unique(inlist)
+    scores = _pstat.unique(inlist)
     scores.sort()
     freq = []
     for item in scores:
@@ -457,12 +457,12 @@ and it's frequency count.  Assumes a 1D list is passed.
 Usage:   litemfreq(inlist)
 Returns: a 2D frequency table (col [0:n-1]=scores, col n=frequencies)
 """
-    scores = pstat.unique(inlist)
+    scores = _pstat.unique(inlist)
     scores.sort()
     freq = []
     for item in scores:
         freq.append(inlist.count(item))
-    return pstat.abut(scores, freq)
+    return _pstat.abut(scores, freq)
 
 
 def lscoreatpercentile (inlist, percent):
@@ -784,7 +784,7 @@ Returns: appropriate statistic name, value, and probability
         print '\nComparing variances ...',
 # USE O'BRIEN'S TEST FOR HOMOGENEITY OF VARIANCE, Maxwell & delaney, p.112
         r = obrientransform(x,y)
-        f,p = F_oneway(pstat.colex(r,0),pstat.colex(r,1))
+        f,p = F_oneway(_pstat.colex(r,0),_pstat.colex(r,1))
         if p<0.05:
             vartype='unequal, p='+str(round(p,4))
         else:
@@ -818,7 +818,7 @@ Returns: appropriate statistic name, value, and probability
             m,b,r,p,see = linregress(x,y)
             print '\nLinear regression for continuous variables ...'
             lol = [['Slope','Intercept','r','Prob','SEestimate'],[round(m,4),round(b,4),round(r,4),round(p,4),round(see,4)]]
-            pstat.printcc(lol)
+            _pstat.printcc(lol)
         elif corrtype in ['r','R']:
             r,p = spearmanr(x,y)
             print '\nCorrelation for ranked variables ...'
@@ -907,20 +907,20 @@ Returns: Point-biserial r, two-tailed p-value
     TINY = 1e-30
     if len(x) <> len(y):
         raise ValueError, 'INPUT VALUES NOT PAIRED IN pointbiserialr.  ABORTING.'
-    data = pstat.abut(x,y)
-    categories = pstat.unique(x)
+    data = _pstat.abut(x,y)
+    categories = _pstat.unique(x)
     if len(categories) <> 2:
         raise ValueError, "Exactly 2 categories required for pointbiserialr()."
     else:   # there are 2 categories, continue
-        codemap = pstat.abut(categories,range(2))
-        recoded = pstat.recode(data,codemap,0)
-        x = pstat.linexand(data,0,categories[0])
-        y = pstat.linexand(data,0,categories[1])
-        xmean = mean(pstat.colex(x,1))
-        ymean = mean(pstat.colex(y,1))
+        codemap = _pstat.abut(categories,range(2))
+        recoded = _pstat.recode(data,codemap,0)
+        x = _pstat.linexand(data,0,categories[0])
+        y = _pstat.linexand(data,0,categories[1])
+        xmean = mean(_pstat.colex(x,1))
+        ymean = mean(_pstat.colex(y,1))
         n = len(data)
         adjust = math.sqrt((len(x)/float(n))*(len(y)/float(n)))
-        rpb = (ymean - xmean)/samplestdev(pstat.colex(data,1))*adjust
+        rpb = (ymean - xmean)/samplestdev(_pstat.colex(data,1))*adjust
         df = n-2
         t = rpb*math.sqrt(df/((1.0-rpb+TINY)*(1.0+rpb+TINY)))
         prob = betai(0.5*df,0.5,df/(df+t*t))  # t already a float
@@ -1363,7 +1363,7 @@ Returns: chi-square statistic, associated p-value
     if k < 3:
         raise ValueError, 'Less than 3 levels.  Friedman test not appropriate.'
     n = len(args[0])
-    data = apply(pstat.abut,tuple(args))
+    data = apply(_pstat.abut,tuple(args))
     for i in range(len(data)):
         data[i] = rankdata(data[i])
     ssbn = 0
@@ -1690,8 +1690,8 @@ Returns: None
         del list2print[row]
     maxsize = [0]*len(list2print[0])
     for col in range(len(list2print[0])):
-        items = pstat.colex(list2print,col)
-        items = map(pstat.makestr,items)
+        items = _pstat.colex(list2print,col)
+        items = map(_pstat.makestr,items)
         maxsize[col] = max(map(len,items)) + extra
     for row in listoflists:
         if row == ['\n'] or row == '\n':
@@ -1700,9 +1700,9 @@ Returns: None
             dashes = [0]*len(maxsize)
             for j in range(len(maxsize)):
                 dashes[j] = '-'*(maxsize[j]-2)
-            outfile.write(pstat.lineincustcols(dashes,maxsize))
+            outfile.write(_pstat.lineincustcols(dashes,maxsize))
         else:
-            outfile.write(pstat.lineincustcols(row,maxsize))
+            outfile.write(_pstat.lineincustcols(row,maxsize))
         outfile.write('\n')
     outfile.close()
     return None
@@ -1774,7 +1774,7 @@ Usage:   lsummult(list1,list2)
     if len(list1) <> len(list2):
         raise ValueError, "Lists not equal length in summult."
     s = 0
-    for item1,item2 in pstat.abut(list1,list2):
+    for item1,item2 in _pstat.abut(list1,list2):
         s = s + item1*item2
     return s
 
@@ -1884,7 +1884,7 @@ Returns: None
         print
         print statname
         print
-        pstat.printcc(lofl)
+        _pstat.printcc(lofl)
         print
         try:
             if stat.shape == ():
@@ -1908,7 +1908,7 @@ Returns: None
                 prob = prob[0]
         except:
             pass
-        file.write(pstat.list2string(['\nTest statistic = ',round(stat,4),'   p = ',round(prob,4),suffix,'\n\n']))
+        file.write(_pstat.list2string(['\nTest statistic = ',round(stat,4),'   p = ',round(prob,4),suffix,'\n\n']))
         file.close()
     return None
 
@@ -1929,10 +1929,10 @@ Usage:   lfindwithin(data)     data in |Stat format
     numfact = len(data[0])-1
     withinvec = 0
     for col in range(1,numfact):
-        examplelevel = pstat.unique(pstat.colex(data,col))[0]
-        rows = pstat.linexand(data,col,examplelevel)  # get 1 level of this factor
-        factsubjs = pstat.unique(pstat.colex(rows,0))
-        allsubjs = pstat.unique(pstat.colex(data,0))
+        examplelevel = _pstat.unique(_pstat.colex(data,col))[0]
+        rows = _pstat.linexand(data,col,examplelevel)  # get 1 level of this factor
+        factsubjs = _pstat.unique(_pstat.colex(rows,0))
+        allsubjs = _pstat.unique(_pstat.colex(data,0))
         if len(factsubjs) == len(allsubjs):  # fewer Ss than scores on this factor?
             withinvec = withinvec + (1 << col)
     return withinvec
@@ -2261,7 +2261,7 @@ Returns: array of bin-counts for mode(s), array of corresponding modal values
     if dimension == None:
         a = N.ravel(a)
         dimension = 0
-    scores = pstat.aunique(N.ravel(a))       # get ALL unique values
+    scores = _pstat.aunique(N.ravel(a))       # get ALL unique values
     testshape = list(a.shape)
     testshape[dimension] = 1
     oldmostfreq = N.zeros(testshape)
@@ -2615,12 +2615,12 @@ column 2 contains their respective counts.  Assumes a 1D array is passed.
 Usage:   aitemfreq(a)
 Returns: a 2D frequency table (col [0:n-1]=scores, col n=frequencies)
 """
-    scores = pstat.aunique(a)
+    scores = _pstat.aunique(a)
     scores = N.sort(scores)
     freq = N.zeros(len(scores))
     for i in range(len(scores)):
         freq[i] = N.add.reduce(N.equal(a,scores[i]))
-    return N.array(pstat.aabut(scores, freq))
+    return N.array(_pstat.aabut(scores, freq))
 
 
  def ascoreatpercentile (inarray, percent):
@@ -3068,7 +3068,7 @@ Returns: appropriate statistic name, value, and probability
         print '\nComparing variances ...',
 # USE O'BRIEN'S TEST FOR HOMOGENEITY OF VARIANCE, Maxwell & delaney, p.112
         r = obrientransform(x,y)
-        f,p = F_oneway(pstat.colex(r,0),pstat.colex(r,1))
+        f,p = F_oneway(_pstat.colex(r,0),_pstat.colex(r,1))
         if p<0.05:
             vartype='unequal, p='+str(round(p,4))
         else:
@@ -3102,7 +3102,7 @@ Returns: appropriate statistic name, value, and probability
             m,b,r,p,see = linregress(x,y)
             print '\nLinear regression for continuous variables ...'
             lol = [['Slope','Intercept','r','Prob','SEestimate'],[round(m,4),round(b,4),round(r,4),round(p,4),round(see,4)]]
-            pstat.printcc(lol)
+            _pstat.printcc(lol)
         elif corrtype in ['r','R']:
             r,p = spearmanr(x,y)
             print '\nCorrelation for ranked variables ...'
@@ -3227,20 +3227,20 @@ Usage:   apointbiserialr(x,y)      where x,y are equal length arrays
 Returns: Point-biserial r, two-tailed p-value
 """
     TINY = 1e-30
-    categories = pstat.aunique(x)
-    data = pstat.aabut(x,y)
+    categories = _pstat.aunique(x)
+    data = _pstat.aabut(x,y)
     if len(categories) <> 2:
         raise ValueError, "Exactly 2 categories required (in x) for pointbiserialr()."
     else:   # there are 2 categories, continue
-        codemap = pstat.aabut(categories,N.arange(2))
-        recoded = pstat.arecode(data,codemap,0)
-        x = pstat.alinexand(data,0,categories[0])
-        y = pstat.alinexand(data,0,categories[1])
-        xmean = amean(pstat.acolex(x,1))
-        ymean = amean(pstat.acolex(y,1))
+        codemap = _pstat.aabut(categories,N.arange(2))
+        recoded = _pstat.arecode(data,codemap,0)
+        x = _pstat.alinexand(data,0,categories[0])
+        y = _pstat.alinexand(data,0,categories[1])
+        xmean = amean(_pstat.acolex(x,1))
+        ymean = amean(_pstat.acolex(y,1))
         n = len(data)
         adjust = math.sqrt((len(x)/float(n))*(len(y)/float(n)))
-        rpb = (ymean - xmean)/asamplestdev(pstat.acolex(data,1))*adjust
+        rpb = (ymean - xmean)/asamplestdev(_pstat.acolex(data,1))*adjust
         df = n-2
         t = rpb*math.sqrt(df/((1.0-rpb+TINY)*(1.0+rpb+TINY)))
         prob = abetai(0.5*df,0.5,df/(df+t*t))
@@ -3746,7 +3746,7 @@ Returns: chi-square statistic, associated p-value
     if k < 3:
         raise ValueError, '\nLess than 3 levels.  Friedman test not appropriate.\n'
     n = len(args[0])
-    data = apply(pstat.aabut,args)
+    data = apply(_pstat.aabut,args)
     data = data.astype(N.float_)
     for i in range(len(data)):
         data[i] = arankdata(data[i])
@@ -4083,7 +4083,7 @@ Returns: statistic, p-value ???
         print "data and para must be same length in aglm"
         return
     n = len(para)
-    p = pstat.aunique(para)
+    p = _pstat.aunique(para)
     x = N.zeros((n,len(p)))  # design matrix
     for l in range(len(p)):
         x[:,l] = N.equal(para,p[l])
@@ -4162,7 +4162,7 @@ Returns an F-statistic given the following:
      title = [['EF/ER','DF','Mean Square','F-value','prob','']]
      lofl = title+[[Enum, dfnum, round(Enum/float(dfnum),3), f, prob, suffix],
                    [Eden, dfden, round(Eden/float(dfden),3),'','','']]
-     pstat.printcc(lofl)
+     _pstat.printcc(lofl)
      return
 
 
@@ -4396,8 +4396,8 @@ Usage:   afindwithin(data)     data in |Stat format
     numfact = len(data[0])-2
     withinvec = [0]*numfact
     for col in range(1,numfact+1):
-        rows = pstat.linexand(data,col,pstat.unique(pstat.colex(data,1))[0])  # get 1 level of this factor
-        if len(pstat.unique(pstat.colex(rows,0))) < len(rows):   # if fewer subjects than scores on this factor
+        rows = _pstat.linexand(data,col,_pstat.unique(_pstat.colex(data,1))[0])  # get 1 level of this factor
+        if len(_pstat.unique(_pstat.colex(rows,0))) < len(rows):   # if fewer subjects than scores on this factor
             withinvec[col-1] = 1
     return withinvec
 

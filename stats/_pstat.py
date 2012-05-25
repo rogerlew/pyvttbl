@@ -105,7 +105,7 @@ functions/methods.  Their inclusion here is for function name consistency.
 ##
 ## 11/08/98 ... fixed aput to output large arrays correctly
 
-import stats  # required 3rd party module
+import _stats  # required 3rd party module
 import string, copy
 from types import *
 
