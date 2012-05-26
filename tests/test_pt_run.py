@@ -66,7 +66,7 @@ class Test_pivot_1(unittest.TestCase):
            }
         
         self.df=DataFrame()
-        self.df.read_tbl('words~ageXcondition.csv')
+        self.df.read_tbl('data/words~ageXcondition.csv')
         
     def test001(self):
         with self.assertRaises(KeyError) as cm:
@@ -324,7 +324,7 @@ class Test_pivot_1(unittest.TestCase):
 class Test_pivot_2(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
-        self.df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        self.df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         
     def test0(self):
               # M 1  2  3

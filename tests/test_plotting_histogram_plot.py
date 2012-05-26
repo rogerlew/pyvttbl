@@ -25,11 +25,11 @@ class Test_plotHist(unittest.TestCase):
     def test0(self):
         R = {'bins': np.array([ 4, 14, 17, 12, 15, 10,  9,  5,  6,  8]),
              'counts': np.array([  3.,   5.,   7.,   9.,  11.,  13.,  15.,  17.,  19.,  21.,  23.]),
-             'fname': 'hist(words).png'}
+             'fname': 'output\\hist(words).png'}
         df=DataFrame()
         df.TESTMODE=True
-        df.read_tbl('words~ageXcondition.csv')
-        D=df.histogram_plot('WORDS')
+        df.read_tbl('data/words~ageXcondition.csv')
+        D=df.histogram_plot('WORDS', output_dir='output')
 
         self.assertEqual(D['fname'],R['fname'])
         

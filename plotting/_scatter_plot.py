@@ -11,6 +11,8 @@ elif sys.version_info[0] == 3:
     _strobj = str
     _xrange = range
 
+import os
+
 import pylab
 import numpy as np
 
@@ -18,7 +20,8 @@ from pyvttbl.plotting.support import \
      _bivariate_trend_fit, _tick_formatter, _subplots
 
 def scatter_plot(df, aname, bname, where=None, trend='linear',
-                 fname=None, quality='medium', alpha=0.6):
+                 fname=None, output_dir='',
+                 quality='medium', alpha=0.6):
     """
     Creates a scatter plot with the specified parameters
     
@@ -81,7 +84,8 @@ def scatter_plot(df, aname, bname, where=None, trend='linear',
     pylab.ylabel(bname)
 
     # perform trend fit if requested
-    if trend in ['exponential','linear','logarithmic','log','polynomial','power']:
+    if trend in ['exponential','linear','logarithmic',
+                 'log','polynomial','power']:
 
         trend_dict = _bivariate_trend_fit(adata,bdata,trend)
         model = trend_dict['model']
@@ -99,7 +103,9 @@ def scatter_plot(df, aname, bname, where=None, trend='linear',
     
     if fname == None:
         fname = 'scatter(%sX%s).png'%(aname.lower(),bname.lower())
-    
+
+    fname = os.path.join(output_dir, fname)
+
     # save figure
     if quality == 'low' or fname.endswith('.svg'):
         pylab.savefig(fname)

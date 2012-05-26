@@ -171,7 +171,7 @@ LAB                   0
  ** p < .01 (q-critical[3, 381] = 4.14515568451)"""
         
         df = DataFrame()
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data/suppression~subjectXgroupXageXcycleXphase.csv')
         D=df.anova1way('SUPPRESSION','GROUP')
         
         self.assertEqual(str(D),R)

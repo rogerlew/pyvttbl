@@ -11,12 +11,14 @@ elif sys.version_info[0] == 3:
     _strobj = str
     _xrange = range
 
+import os
+
 import pylab
 import numpy as np
 
 def histogram_plot(self, val, where=None, bins=10,
               range=None, density=False, cumulative=False,
-              fname=None, quality='medium'):
+              fname=None, output_dir='', quality='medium'):
     """
     Creates a histogram plot with the specified parameters
     """
@@ -43,6 +45,8 @@ def histogram_plot(self, val, where=None, bins=10,
 
     if fname == None:
         fname = 'hist(%s).png'%val.lower()
+    
+    fname = os.path.join(output_dir, fname)
     
     # save figure
     if quality == 'low' or fname.endswith('.svg'):

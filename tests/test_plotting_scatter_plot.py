@@ -24,13 +24,16 @@ from pyvttbl.misc.support import *
 class Test_scatter_plot(unittest.TestCase):
     def test01(self):
         df=DataFrame()
-        df.read_tbl('iqbrainsize.txt', delimiter='\t')
-        df.scatter_plot('TOTVOL','FIQ')
+        df.read_tbl('data/iqbrainsize.txt', delimiter='\t')
+        df.scatter_plot('TOTVOL','FIQ',
+                        output_dir='output')
         
     def test02(self):
         df=DataFrame()
-        df.read_tbl('iqbrainsize.txt', delimiter='\t')
-        df.scatter_plot('TOTVOL','FIQ', trend='power')
+        df.read_tbl('data/iqbrainsize.txt', delimiter='\t')
+        df.scatter_plot('TOTVOL','FIQ',
+                        trend='power',
+                        output_dir='output')
             
 def suite():
     return unittest.TestSuite((

@@ -25,10 +25,10 @@ from pyvttbl.tests.support import *
 class Test_writeTable(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
-        self.df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        self.df.read_tbl('data\suppression~subjectXgroupXageXcycleXphase.csv')
 
     def test0(self):
-        d='suppression~subjectXgroupXageXcycleXphase.csv'
+        d='data\suppression~subjectXgroupXageXcycleXphase.csv'
         r='subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv'
         self.df.write()
         self.assertTrue(fcmp(d,r))
@@ -38,7 +38,7 @@ class Test_writeTable(unittest.TestCase):
 
     def test1(self):
         # with exclusion
-        d='suppression~subjectXgroupXageXcycleXphase.csv'
+        d='data\suppression~subjectXgroupXageXcycleXphase.csv'
         r='subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv'
         self.df.write(where=[('AGE','not in',['young'])])
         self.assertTrue(fcmp(d,r))

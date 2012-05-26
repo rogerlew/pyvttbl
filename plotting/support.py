@@ -11,6 +11,8 @@ elif sys.version_info[0] == 3:
     _strobj = str
     _xrange = range
 
+import os
+
 import numpy as np
 import scipy
 import matplotlib.pyplot as plt

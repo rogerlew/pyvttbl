@@ -24,7 +24,7 @@ from pyvttbl.misc.support import *
 class Test_del_item(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
-        self.df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        self.df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         del self.df['COURSE']
 
     def test0(self):

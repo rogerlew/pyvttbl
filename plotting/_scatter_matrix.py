@@ -11,6 +11,8 @@ elif sys.version_info[0] == 3:
     _strobj = str
     _xrange = range
 
+import os
+
 import pylab
 import scipy
 import numpy as np
@@ -20,8 +22,8 @@ from pyvttbl.plotting.support import \
      _bivariate_trend_fit, _tick_formatter, _subplots
 
 def scatter_matrix(df, variables, alpha=0.5, grid=False,
-                   diagonal=None, fname=None, quality='medium',
-                   trend='power', alternate_labels=True, **kwds):
+                   diagonal=None, trend='power', alternate_labels=True,
+                   fname=None, output_dir='', quality='medium', **kwds):
     """
     Plots a matrix of scatterplots
 
@@ -237,6 +239,8 @@ def scatter_matrix(df, variables, alpha=0.5, grid=False,
                    
     if fname == None:
         fname = 'scatter_matrix(%s).png'%','.join(variables)
+
+    fname = os.path.join(output_dir, fname)
         
     if quality == 'low' or fname.endswith('.svg'):
         fig.savefig(fname)

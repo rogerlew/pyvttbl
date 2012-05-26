@@ -72,7 +72,7 @@ young   rhyming      7.600        0.618             6.388             8.812
 
 """
         df=DataFrame()
-        fname='words~ageXcondition.csv'
+        fname='data/words~ageXcondition.csv'
         df.read_tbl(fname)
         aov=Anova()
         aov.run(df,'WORDS',bfactors=['AGE','CONDITION'])

@@ -24,51 +24,59 @@ from pyvttbl.misc.support import *
 class Test_scatter_matrix(unittest.TestCase):
     def setUp(self):
         self.df = DataFrame()
-        self.df.read_tbl('iqbrainsize.txt', delimiter='\t')
+        self.df.read_tbl('data/iqbrainsize.txt', delimiter='\t')
         self.df['TOTSA'] = [v*1000 for v in self.df['TOTSA']]
         self.df['HC'] = [v*.0001 for v in self.df['HC']]
         
     def test0(self):
         self.df.scatter_matrix('CCSA FIQ TOTSA TOTVOL'.split(),
                           diagonal=None,
-                          fname = 'scatter,4var,diag=None')
+                          fname = 'scatter,4var,diag=None',
+                          output_dir='output')
 
     def test1(self):
         self.df.scatter_matrix('CCSA HC FIQ TOTSA TOTVOL'.split(),
                           diagonal=None,
-                          fname = 'scatter,5var,diag=None')
+                          fname = 'scatter,5var,diag=None',
+                          output_dir='output')
 
     def test2(self):
 
         self.df.scatter_matrix('CCSA FIQ TOTSA TOTVOL'.split(),
                           diagonal='kde',
-                          fname = 'scatter,4var,diag=kde')
+                          fname = 'scatter,4var,diag=kde',
+                          output_dir='output')
 
     def test3(self):
 
         self.df.scatter_matrix('CCSA HC FIQ TOTSA TOTVOL'.split(),
                           diagonal='kde',
-                          fname = 'scatter,5var,diag=kde')
+                          fname = 'scatter,5var,diag=kde',
+                          output_dir='output')
 
     def test4(self):
         self.df.scatter_matrix('CCSA FIQ TOTSA TOTVOL'.split(),
                           diagonal='hist',
-                          fname = 'scatter,4var,diag=hist')
+                          fname = 'scatter,4var,diag=hist',
+                          output_dir='output')
 
     def test5(self):
         self.df.scatter_matrix('CCSA HC FIQ TOTSA TOTVOL'.split(),
                           diagonal='hist',
-                          fname = 'scatter,5var,diag=hist')
+                          fname = 'scatter,5var,diag=hist',
+                          output_dir='output')
 
     def test5(self):
         self.df.scatter_matrix('CCSA FIQ TOTSA TOTVOL'.split(),
                           diagonal='kde', alternate_labels=False,
-                          fname = 'scatter,4var,diag=kde,alternate_labels=False')
+                          fname = 'scatter,4var,diag=kde,alternate_labels=False',
+                          output_dir='output')
 
     def test6(self):
         self.df.scatter_matrix('CCSA HC FIQ TOTSA TOTVOL'.split(),
                           diagonal='kde', alternate_labels=False,
-                          fname = 'scatter,5var,diag=kde,alternate_labels=False')
+                          fname = 'scatter,5var,diag=kde,alternate_labels=False',
+                          output_dir='output')
 
 
 def suite():

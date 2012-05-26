@@ -25,7 +25,7 @@ from pyvttbl.misc.support import *
 class Test_marginals(unittest.TestCase):
     def test0(self):
         df=DataFrame()
-        df.read_tbl('words~ageXcondition.csv')
+        df.read_tbl('data/words~ageXcondition.csv')
 
         x=df.marginals('WORDS',factors=['AGE','CONDITION'])
 
@@ -49,7 +49,7 @@ class Test_marginals(unittest.TestCase):
 
     def test02(self):
         df=DataFrame()
-        df.read_tbl('words~ageXcondition.csv')
+        df.read_tbl('data/words~ageXcondition.csv')
         D = str(df.marginals('WORDS',factors=['AGE','CONDITION']))
         R = """ AGE    CONDITION    Mean    Count   Std.    95% CI   95% CI 
                                      Error   lower    upper  
@@ -68,14 +68,14 @@ young   rhyming      7.600   10      0.618    6.388    8.812 """
 
     def test03(self):
         df=DataFrame()
-        df.read_tbl('words~ageXcondition.csv')
+        df.read_tbl('data/words~ageXcondition.csv')
         D = repr(df.marginals('WORDS',factors=['AGE','CONDITION']))
         R = "Marginals([('factorials', OrderedDict([('AGE', [u'old', u'old', u'old', u'old', u'old', u'young', u'young', u'young', u'young', u'young']), ('CONDITION', [u'adjective', u'counting', u'imagery', u'intention', u'rhyming', u'adjective', u'counting', u'imagery', u'intention', u'rhyming'])])), ('dmu', PyvtTbl([11.0, 7.0, 13.4, 12.0, 6.9, 14.8, 6.5, 17.6, 19.3, 7.6], val='WORDS', grand_tot=11.61, rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')], [('AGE', u'young'), ('CONDITION', u'adjective')], [('AGE', u'young'), ('CONDITION', u'counting')], [('AGE', u'young'), ('CONDITION', u'imagery')], [('AGE', u'young'), ('CONDITION', u'intention')], [('AGE', u'young'), ('CONDITION', u'rhyming')]], cnames=[1], flatten=True)), ('dN', PyvtTbl([10, 10, 10, 10, 10, 10, 10, 10, 10, 10], val='WORDS', grand_tot=100, rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')], [('AGE', u'young'), ('CONDITION', u'adjective')], [('AGE', u'young'), ('CONDITION', u'counting')], [('AGE', u'young'), ('CONDITION', u'imagery')], [('AGE', u'young'), ('CONDITION', u'intention')], [('AGE', u'young'), ('CONDITION', u'rhyming')]], cnames=[1], aggregate='count', flatten=True)), ('dsem', PyvtTbl([0.7888106377466154, 0.5773502691896257, 1.4236104336041748, 1.1832159566199232, 0.6741249472052228, 1.103529690483123, 0.4533823502911814, 0.8192137151629671, 0.8439325934114773, 0.6182412330330468], val='WORDS', grand_tot=0.5191085988246943, rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')], [('AGE', u'young'), ('CONDITION', u'adjective')], [('AGE', u'young'), ('CONDITION', u'counting')], [('AGE', u'young'), ('CONDITION', u'imagery')], [('AGE', u'young'), ('CONDITION', u'intention')], [('AGE', u'young'), ('CONDITION', u'rhyming')]], cnames=[1], aggregate='sem', flatten=True)), ('dlower', PyvtTbl([9.453931150016635, 5.868393472388334, 10.609723550135818, 9.680896725024951, 5.578715103477764, 12.637081806653079, 5.611370593429284, 15.994341118280586, 17.645892116913505, 6.388247183255228], val='WORDS', grand_tot=100, rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')], [('AGE', u'young'), ('CONDITION', u'adjective')], [('AGE', u'young'), ('CONDITION', u'counting')], [('AGE', u'young'), ('CONDITION', u'imagery')], [('AGE', u'young'), ('CONDITION', u'intention')], [('AGE', u'young'), ('CONDITION', u'rhyming')]], cnames=[1], aggregate='count', flatten=True)), ('dupper', PyvtTbl([12.546068849983365, 8.131606527611666, 16.190276449864182, 14.319103274975049, 8.221284896522237, 16.962918193346923, 7.388629406570716, 19.205658881719415, 20.954107883086497, 8.811752816744772], val='WORDS', grand_tot=100, rnames=[[('AGE', u'old'), ('CONDITION', u'adjective')], [('AGE', u'old'), ('CONDITION', u'counting')], [('AGE', u'old'), ('CONDITION', u'imagery')], [('AGE', u'old'), ('CONDITION', u'intention')], [('AGE', u'old'), ('CONDITION', u'rhyming')], [('AGE', u'young'), ('CONDITION', u'adjective')], [('AGE', u'young'), ('CONDITION', u'counting')], [('AGE', u'young'), ('CONDITION', u'imagery')], [('AGE', u'young'), ('CONDITION', u'intention')], [('AGE', u'young'), ('CONDITION', u'rhyming')]], cnames=[1], aggregate='count', flatten=True))], val='WORDS', factors=['AGE', 'CONDITION'])"
         self.assertEqual(D, R)
 
     def test04(self):
         df=DataFrame()
-        df.read_tbl('words~ageXcondition.csv')
+        df.read_tbl('data/words~ageXcondition.csv')
         D = str(df.marginals('WORDS',
                               factors=['AGE','CONDITION'],
                               where='AGE == "old"'))
@@ -91,7 +91,7 @@ old   rhyming      6.900   10      0.674    5.579    8.221 """
 
     def test05(self):
         df=DataFrame()
-        df.read_tbl('words~ageXcondition.csv')
+        df.read_tbl('data/words~ageXcondition.csv')
         D = df.marginals('WORDS',
                               factors=['AGE','CONDITION'],
                               where='AGE == "old"')

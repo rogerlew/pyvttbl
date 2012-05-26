@@ -57,7 +57,7 @@ Observed power one-tail         0.950
 Observed power two-tail         0.908 """
         
         df = DataFrame()
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data/suppression~subjectXgroupXageXcycleXphase.csv')
         D=df.ttest('SUPPRESSION', pop_mean=17.)
         self.assertEqual(str(D),R)
 

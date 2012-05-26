@@ -24,7 +24,7 @@ from pyvttbl.misc.support import *
 class Test_attach(unittest.TestCase):
     def test0(self):
         self.df1=DataFrame()
-        self.df1.read_tbl('words~ageXcondition.csv')
+        self.df1.read_tbl('data/words~ageXcondition.csv')
 
         with self.assertRaises(Exception) as cm:
             self.df1.attach('s')
@@ -35,8 +35,8 @@ class Test_attach(unittest.TestCase):
     def test1(self):
         self.df1=DataFrame()
         self.df2=DataFrame()
-        self.df1.read_tbl('words~ageXcondition.csv')
-        self.df2.read_tbl('words~ageXcondition.csv')
+        self.df1.read_tbl('data/words~ageXcondition.csv')
+        self.df2.read_tbl('data/words~ageXcondition.csv')
 
         # add an extra key to df1
         self.df1['EXTRA'] = [5 for a in self.df1['AGE']]
@@ -50,8 +50,8 @@ class Test_attach(unittest.TestCase):
     def test2(self):
         df1=DataFrame()
         df2=DataFrame()
-        df1.read_tbl('words~ageXcondition.csv')
-        df2.read_tbl('words~ageXcondition.csv')
+        df1.read_tbl('data/words~ageXcondition.csv')
+        df2.read_tbl('data/words~ageXcondition.csv')
 
         M=df1.shape()[1]
 

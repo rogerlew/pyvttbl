@@ -24,7 +24,7 @@ from pyvttbl.misc.support import *
 class Test_writepivot(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
-        self.df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        self.df.read_tbl('data/suppression~subjectXgroupXageXcycleXphase.csv')
 
     def test0(self):
         # self.assertEqual doesn't like really long comparisons

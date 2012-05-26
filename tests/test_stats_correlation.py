@@ -66,7 +66,7 @@ B vs. C   3         0.890   6.850e-08           0.050   **   """
 
     def test2(self):
         df = DataFrame()
-        df.read_tbl('iqbrainsize.txt', delimiter='\t')
+        df.read_tbl('data/iqbrainsize.txt', delimiter='\t')
         cor = df.correlation(df.names())
             
 def suite():

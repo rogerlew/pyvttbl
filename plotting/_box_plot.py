@@ -10,6 +10,8 @@ if sys.version_info[0] == 2:
 elif sys.version_info[0] == 3:
     _strobj = str
     _xrange = range
+    
+import os
 
 import pylab
 import numpy as np
@@ -18,7 +20,7 @@ from collections import Counter
 from pyvttbl.misc.support import _flatten
 
 def box_plot(df, val, factors=None, where=None,
-        fname=None, quality='medium'):
+        fname=None, output_dir='', quality='medium'):
     """    Plots an interaction plot
 
     Parameters
@@ -120,6 +122,8 @@ def box_plot(df, val, factors=None, where=None,
     if fname == None:
         fname = 'box(%s).png'%val.lower()
 
+    fname = os.path.join(output_dir, fname)
+    
     test['fname'] = fname
     
     # save figure

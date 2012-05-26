@@ -26,7 +26,7 @@ class Test_interaction_plot(unittest.TestCase):
     def test0(self):
         R = {'aggregate': None,
              'clevels': [1],
-             'fname': 'words~ageXcondition',
+             'fname': 'output\\words~ageXcondition',
              'maintitle': 'WORDS by AGE * CONDITION',
              'numcols': 1,
              'numrows': 1,
@@ -34,7 +34,11 @@ class Test_interaction_plot(unittest.TestCase):
              'subplot_titles': [''],
              'xmaxs': [1.5],
              'xmins': [-0.5],
-             'y': [[[11.0, 14.8], [7.0, 6.5], [13.4, 17.6], [12.0, 19.3], [6.9, 7.6]]],
+             'y': [[[11.0, 14.8],
+                    [7.0, 6.5],
+                    [13.4, 17.6],
+                    [12.0, 19.3],
+                    [6.9, 7.6]]],
              'yerr': [[]],
              'ymin': 0.0,
              'ymax': 27.183257964740832}
@@ -42,30 +46,34 @@ class Test_interaction_plot(unittest.TestCase):
         # a simple plot
         df=DataFrame()
         df.TESTMODE=True
-        df.read_tbl('words~ageXcondition.csv')
-        D=df.interaction_plot('WORDS','AGE',seplines='CONDITION')
+        df.read_tbl('data/words~ageXcondition.csv')
+        D=df.interaction_plot('WORDS','AGE',
+                              seplines='CONDITION',
+                              output_dir='output')
 
-        self.assertEqual(D['aggregate'],R['aggregate'])
-        self.assertEqual(D['clevels'],R['clevels'])
-        self.assertEqual(D['rlevels'],R['rlevels'])
-        self.assertEqual(D['numcols'],R['numcols'])
-        self.assertEqual(D['numrows'],R['numrows'])
-        self.assertEqual(D['fname'],R['fname'])
-        self.assertEqual(D['maintitle'],R['maintitle'])
-        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
-        self.assertAlmostEqual(D['ymin'],R['ymin'])
-        self.assertAlmostEqual(D['ymax'],R['ymax'])
+        self.assertEqual(D['aggregate'],      R['aggregate'])
+        self.assertEqual(D['clevels'],        R['clevels'])
+        self.assertEqual(D['rlevels'],        R['rlevels'])
+        self.assertEqual(D['numcols'],        R['numcols'])
+        self.assertEqual(D['numrows'],        R['numrows'])
+        self.assertEqual(D['fname'],          R['fname'])
+        self.assertEqual(D['maintitle'],      R['maintitle'])
+        self.assertEqual(D['subplot_titles'], R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],     R['ymin'])
+        self.assertAlmostEqual(D['ymax'],     R['ymax'])
 
-        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,
+                       np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,
+                       np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
         
     def test1(self):
         R = {'aggregate': None,
              'clevels': ['M1', 'M2', 'M3'],
-             'fname': 'error~timeofdayXcourseXmodel',
+             'fname': 'output\\error~timeofdayXcourseXmodel',
              'maintitle': 'ERROR by TIMEOFDAY * COURSE * MODEL',
              'numcols': 3,
              'numrows': 1,
@@ -91,32 +99,36 @@ class Test_interaction_plot(unittest.TestCase):
         # specify yerr
         df=DataFrame()
         df.TESTMODE = True
-        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         D=df.interaction_plot('ERROR','TIMEOFDAY',
-                                seplines='COURSE',
-                                sepxplots='MODEL',yerr=1.)        
+                              seplines='COURSE',
+                              sepxplots='MODEL',
+                              yerr=1.,
+                              output_dir='output')   
 
-        self.assertEqual(D['aggregate'],R['aggregate'])
-        self.assertEqual(D['clevels'],R['clevels'])
-        self.assertEqual(D['rlevels'],R['rlevels'])
-        self.assertEqual(D['numcols'],R['numcols'])
-        self.assertEqual(D['numrows'],R['numrows'])
-        self.assertEqual(D['fname'],R['fname'])
-        self.assertEqual(D['maintitle'],R['maintitle'])
-        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
-        self.assertAlmostEqual(D['ymin'],R['ymin'])
-        self.assertAlmostEqual(D['ymax'],R['ymax'])
+        self.assertEqual(D['aggregate'],      R['aggregate'])
+        self.assertEqual(D['clevels'],        R['clevels'])
+        self.assertEqual(D['rlevels'],        R['rlevels'])
+        self.assertEqual(D['numcols'],        R['numcols'])
+        self.assertEqual(D['numrows'],        R['numrows'])
+        self.assertEqual(D['fname'],          R['fname'])
+        self.assertEqual(D['maintitle'],      R['maintitle'])
+        self.assertEqual(D['subplot_titles'], R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],     R['ymin'])
+        self.assertAlmostEqual(D['ymax'],     R['ymax'])
 
-        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,
+                       np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,
+                       np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
 
     def test2(self):
         R = {'aggregate': 'ci',
              'clevels': [1],
-             'fname': 'suppression~cycleXageXphase',
+             'fname': 'output\\suppression~cycleXageXphase',
              'maintitle': 'SUPPRESSION by CYCLE * AGE * PHASE',
              'numcols': 1,
              'numrows': 2,
@@ -136,22 +148,24 @@ class Test_interaction_plot(unittest.TestCase):
         # generate yerr
         df=DataFrame()
         df.TESTMODE = True
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data\suppression~subjectXgroupXageXcycleXphase.csv')
 
         D = df.interaction_plot('SUPPRESSION','CYCLE',
-                            seplines='AGE',
-                            sepyplots='PHASE',yerr='ci')
+                                seplines='AGE',
+                                sepyplots='PHASE',
+                                yerr='ci',
+                                output_dir='output')
         
-        self.assertEqual(D['aggregate'],R['aggregate'])
-        self.assertEqual(D['clevels'],R['clevels'])
-        self.assertEqual(D['rlevels'],R['rlevels'])
-        self.assertEqual(D['numcols'],R['numcols'])
-        self.assertEqual(D['numrows'],R['numrows'])
-        self.assertEqual(D['fname'],R['fname'])
-        self.assertEqual(D['maintitle'],R['maintitle'])
-        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
-        self.assertAlmostEqual(D['ymin'],R['ymin'])
-        self.assertAlmostEqual(D['ymax'],R['ymax'])
+        self.assertEqual(D['aggregate'],      R['aggregate'])
+        self.assertEqual(D['clevels'],        R['clevels'])
+        self.assertEqual(D['rlevels'],        R['rlevels'])
+        self.assertEqual(D['numcols'],        R['numcols'])
+        self.assertEqual(D['numrows'],        R['numrows'])
+        self.assertEqual(D['fname'],          R['fname'])
+        self.assertEqual(D['maintitle'],      R['maintitle'])
+        self.assertEqual(D['subplot_titles'], R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],     R['ymin'])
+        self.assertAlmostEqual(D['ymax'],     R['ymax'])
         
         for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
@@ -162,14 +176,23 @@ class Test_interaction_plot(unittest.TestCase):
     def test3(self):
         R = {'aggregate': 'ci',
              'clevels': ['I', 'II'],
-             'fname': 'whereGROUPnotLAB.png',
+             'fname': 'output\\whereGROUPnotLAB.png',
              'maintitle': 'SUPPRESSION by CYCLE * AGE * PHASE * GROUP',
              'numcols': 2,
              'numrows': 2,
              'rlevels': ['AA', 'AB'],
-             'subplot_titles': ['GROUP = AA, PHASE = AA', 'GROUP = AA, PHASE = AA', 'GROUP = AB, PHASE = AB', 'GROUP = AB, PHASE = AB'],
-             'xmaxs': [4.1500000000000004, 4.1500000000000004, 4.1500000000000004, 4.1500000000000004],
-             'xmins': [0.84999999999999998, 0.84999999999999998, 0.84999999999999998, 0.84999999999999998],
+             'subplot_titles': ['GROUP = AA, PHASE = AA',
+                                'GROUP = AA, PHASE = AA',
+                                'GROUP = AB, PHASE = AB',
+                                'GROUP = AB, PHASE = AB'],
+             'xmaxs': [4.1500000000000004,
+                       4.1500000000000004,
+                       4.1500000000000004,
+                       4.1500000000000004],
+             'xmins': [0.84999999999999998,
+                       0.84999999999999998,
+                       0.84999999999999998,
+                       0.84999999999999998],
              'y': [[[ 17.75 ,  22.375,  23.125,  20.25 ],
                     [  8.675,  10.225,  10.5  ,   9.925]],
                    [[ 20.875,  28.125,  20.75 ,  24.25 ],
@@ -184,26 +207,27 @@ class Test_interaction_plot(unittest.TestCase):
         # separate y plots and separate x plots
         df=DataFrame()
         df.TESTMODE = True
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data\suppression~subjectXgroupXageXcycleXphase.csv')
 
         D = df.interaction_plot('SUPPRESSION','CYCLE',
-                              seplines='AGE',
-                              sepxplots='PHASE',
-                              sepyplots='GROUP',yerr='ci',
-                              where=[('GROUP','not in',['LAB'])],
-                              fname='whereGROUPnotLAB.png')
+                                seplines='AGE',
+                                sepxplots='PHASE',
+                                sepyplots='GROUP',yerr='ci',
+                                where=[('GROUP','not in',['LAB'])],
+                                fname='whereGROUPnotLAB.png',
+                                output_dir='output')
 
         
-        self.assertEqual(D['aggregate'],R['aggregate'])
-        self.assertEqual(D['clevels'],R['clevels'])
-        self.assertEqual(D['rlevels'],R['rlevels'])
-        self.assertEqual(D['numcols'],R['numcols'])
-        self.assertEqual(D['numrows'],R['numrows'])
-        self.assertEqual(D['fname'],R['fname'])
-        self.assertEqual(D['maintitle'],R['maintitle'])
-        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
-        self.assertAlmostEqual(D['ymin'],R['ymin'])
-        self.assertAlmostEqual(D['ymax'],R['ymax'])
+        self.assertEqual(D['aggregate'],      R['aggregate'])
+        self.assertEqual(D['clevels'],        R['clevels'])
+        self.assertEqual(D['rlevels'],        R['rlevels'])
+        self.assertEqual(D['numcols'],        R['numcols'])
+        self.assertEqual(D['numrows'],        R['numrows'])
+        self.assertEqual(D['fname'],          R['fname'])
+        self.assertEqual(D['maintitle'],      R['maintitle'])
+        self.assertEqual(D['subplot_titles'], R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],     R['ymin'])
+        self.assertAlmostEqual(D['ymax'],     R['ymax'])
 
         for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
@@ -213,26 +237,34 @@ class Test_interaction_plot(unittest.TestCase):
         # separate y plots and separate x plots
         df=DataFrame()
         df.TESTMODE = True
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data\suppression~subjectXgroupXageXcycleXphase.csv')
 
         D = df.interaction_plot('SUPPRESSION','CYCLE',
-                              seplines='AGE',
-                              sepxplots='GROUP',
-                              sepyplots='PHASE',yerr='sem')
-        
-
+                                seplines='AGE',
+                                sepxplots='GROUP',
+                                sepyplots='PHASE',
+                                yerr='sem',
+                                output_dir='output')
 
     # the code for when seplines=None is in a different branch
     # these test that code
     def test4(self):
         R = {'aggregate': None,
-             'clevels': ['adjective', 'counting', 'imagery', 'intention', 'rhyming'],
-             'fname': 'words~ageXcondition',
+             'clevels': ['adjective',
+                         'counting',
+                         'imagery',
+                         'intention',
+                         'rhyming'],
+             'fname': 'output\\words~ageXcondition',
              'maintitle': 'WORDS by AGE * CONDITION',
              'numcols': 5,
              'numrows': 1,
              'rlevels': [1],
-             'subplot_titles': ['adjective', 'counting', 'imagery', 'intention', 'rhyming'],
+             'subplot_titles': ['adjective',
+                                'counting',
+                                'imagery',
+                                'intention',
+                                'rhyming'],
              'xmaxs': [1.5, 1.5, 1.5, 1.5, 1.5],
              'xmins': [-0.5, -0.5, -0.5, -0.5, -0.5],
              'y': [[ 11. ,  14.8],
@@ -247,30 +279,34 @@ class Test_interaction_plot(unittest.TestCase):
         # a simple plot
         df=DataFrame()
         df.TESTMODE = True
-        df.read_tbl('words~ageXcondition.csv')
-        D = df.interaction_plot('WORDS','AGE',sepxplots='CONDITION')
+        df.read_tbl('data/words~ageXcondition.csv')
+        D = df.interaction_plot('WORDS','AGE',
+                                sepxplots='CONDITION',
+                                output_dir='output')
         
-        self.assertEqual(D['aggregate'],R['aggregate'])
-        self.assertEqual(D['clevels'],R['clevels'])
-        self.assertEqual(D['rlevels'],R['rlevels'])
-        self.assertEqual(D['numcols'],R['numcols'])
-        self.assertEqual(D['numrows'],R['numrows'])
-        self.assertEqual(D['fname'],R['fname'])
-        self.assertEqual(D['maintitle'],R['maintitle'])
-        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
-        self.assertAlmostEqual(D['ymin'],R['ymin'])
-        self.assertAlmostEqual(D['ymax'],R['ymax'])
+        self.assertEqual(D['aggregate'],      R['aggregate'])
+        self.assertEqual(D['clevels'],        R['clevels'])
+        self.assertEqual(D['rlevels'],        R['rlevels'])
+        self.assertEqual(D['numcols'],        R['numcols'])
+        self.assertEqual(D['numrows'],        R['numrows'])
+        self.assertEqual(D['fname'],          R['fname'])
+        self.assertEqual(D['maintitle'],      R['maintitle'])
+        self.assertEqual(D['subplot_titles'], R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],     R['ymin'])
+        self.assertAlmostEqual(D['ymax'],     R['ymax'])
         
-        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,
+                       np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,
+                       np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
         
     def test5(self):
         R = {'aggregate': None,
              'clevels': ['M1', 'M2', 'M3'],
-             'fname': 'error~timeofdayXmodel',
+             'fname': 'output\\error~timeofdayXmodel',
              'maintitle': 'ERROR by TIMEOFDAY * MODEL',
              'numcols': 3,
              'numrows': 1,
@@ -288,31 +324,35 @@ class Test_interaction_plot(unittest.TestCase):
         # specify yerr
         df=DataFrame()
         df.TESTMODE = True
-        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         D = df.interaction_plot('ERROR','TIMEOFDAY',
-                                sepxplots='MODEL',yerr=1.)
+                                sepxplots='MODEL',
+                                yerr=1.,
+                                output_dir='output')
         
-        self.assertEqual(D['aggregate'],R['aggregate'])
-        self.assertEqual(D['clevels'],R['clevels'])
-        self.assertEqual(D['rlevels'],R['rlevels'])
-        self.assertEqual(D['numcols'],R['numcols'])
-        self.assertEqual(D['numrows'],R['numrows'])
-        self.assertEqual(D['fname'],R['fname'])
-        self.assertEqual(D['maintitle'],R['maintitle'])
-        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
-        self.assertAlmostEqual(D['ymin'],R['ymin'])
-        self.assertAlmostEqual(D['ymax'],R['ymax'])
+        self.assertEqual(D['aggregate'],      R['aggregate'])
+        self.assertEqual(D['clevels'],        R['clevels'])
+        self.assertEqual(D['rlevels'],        R['rlevels'])
+        self.assertEqual(D['numcols'],        R['numcols'])
+        self.assertEqual(D['numrows'],        R['numrows'])
+        self.assertEqual(D['fname'],          R['fname'])
+        self.assertEqual(D['maintitle'],      R['maintitle'])
+        self.assertEqual(D['subplot_titles'], R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],     R['ymin'])
+        self.assertAlmostEqual(D['ymax'],     R['ymax'])
         
-        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,
+                       np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,
+                       np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
             
     def test6(self):
         R = {'aggregate': 'ci',
              'clevels': [1],
-             'fname': 'suppression~cycleXphase',
+             'fname': 'output\\suppression~cycleXphase',
              'maintitle': 'SUPPRESSION by CYCLE * PHASE',
              'numcols': 1,
              'numrows': 2,
@@ -330,38 +370,51 @@ class Test_interaction_plot(unittest.TestCase):
         # generate yerr
         df=DataFrame()
         df.TESTMODE = True
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data\suppression~subjectXgroupXageXcycleXphase.csv')
         D = df.interaction_plot('SUPPRESSION','CYCLE',
-                              sepyplots='PHASE',yerr='ci')
+                                sepyplots='PHASE',
+                                yerr='ci',
+                                output_dir='output')
 
-        self.assertEqual(D['aggregate'],R['aggregate'])
-        self.assertEqual(D['clevels'],R['clevels'])
-        self.assertEqual(D['rlevels'],R['rlevels'])
-        self.assertEqual(D['numcols'],R['numcols'])
-        self.assertEqual(D['numrows'],R['numrows'])
-        self.assertEqual(D['fname'],R['fname'])
-        self.assertEqual(D['maintitle'],R['maintitle'])
-        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
-        self.assertAlmostEqual(D['ymin'],R['ymin'])
-        self.assertAlmostEqual(D['ymax'],R['ymax'])
+        self.assertEqual(D['aggregate'],      R['aggregate'])
+        self.assertEqual(D['clevels'],        R['clevels'])
+        self.assertEqual(D['rlevels'],        R['rlevels'])
+        self.assertEqual(D['numcols'],        R['numcols'])
+        self.assertEqual(D['numrows'],        R['numrows'])
+        self.assertEqual(D['fname'],          R['fname'])
+        self.assertEqual(D['maintitle'],      R['maintitle'])
+        self.assertEqual(D['subplot_titles'], R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],     R['ymin'])
+        self.assertAlmostEqual(D['ymax'],     R['ymax'])
         
-        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,
+                       np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,
+                       np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
 
     def test7(self):
         R = {'aggregate': 'ci',
              'clevels': ['I', 'II'],
-             'fname': 'suppression~cycleXphaseXgroup',
+             'fname': 'output\\suppression~cycleXphaseXgroup',
              'maintitle': 'SUPPRESSION by CYCLE * PHASE * GROUP',
              'numcols': 2,
              'numrows': 2,
              'rlevels': ['AA', 'AB'],
-             'subplot_titles': ['GROUP = AA, PHASE = AA', 'GROUP = AA, PHASE = AA', 'GROUP = AB, PHASE = AB', 'GROUP = AB, PHASE = AB'],
-             'xmaxs': [4.1500000000000004, 4.1500000000000004, 4.1500000000000004, 4.1500000000000004],
-             'xmins': [0.84999999999999998, 0.84999999999999998, 0.84999999999999998, 0.84999999999999998],
+             'subplot_titles': ['GROUP = AA, PHASE = AA',
+                                'GROUP = AA, PHASE = AA',
+                                'GROUP = AB, PHASE = AB',
+                                'GROUP = AB, PHASE = AB'],
+             'xmaxs': [4.1500000000000004,
+                       4.1500000000000004,
+                       4.1500000000000004,
+                       4.1500000000000004],
+             'xmins': [0.84999999999999998,
+                       0.84999999999999998,
+                       0.84999999999999998,
+                       0.84999999999999998],
              'y': [[ 13.2125,  16.3   ,  16.8125,  15.0875],
                    [ 14.5875,  19.1875,  15.1375,  17.675 ],
                    [  9.075 ,  16.1625,  14.5625,  11.6875],
@@ -376,28 +429,32 @@ class Test_interaction_plot(unittest.TestCase):
         # separate y plots and separate x plots
         df=DataFrame()
         df.TESTMODE = True
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data\suppression~subjectXgroupXageXcycleXphase.csv')
 
         D = df.interaction_plot('SUPPRESSION','CYCLE',
-                              sepxplots='PHASE',
-                              sepyplots='GROUP',yerr='ci',
-                              where=[('GROUP','not in',['LAB'])])
+                                sepxplots='PHASE',
+                                sepyplots='GROUP',
+                                yerr='ci',
+                                where=[('GROUP','not in',['LAB'])],
+                                output_dir='output')
         
-        self.assertEqual(D['aggregate'],R['aggregate'])
-        self.assertEqual(D['clevels'],R['clevels'])
-        self.assertEqual(D['rlevels'],R['rlevels'])
-        self.assertEqual(D['numcols'],R['numcols'])
-        self.assertEqual(D['numrows'],R['numrows'])
-        self.assertEqual(D['fname'],R['fname'])
-        self.assertEqual(D['maintitle'],R['maintitle'])
-        self.assertEqual(D['subplot_titles'],R['subplot_titles'])
-        self.assertAlmostEqual(D['ymin'],R['ymin'])
-        self.assertAlmostEqual(D['ymax'],R['ymax'])
+        self.assertEqual(D['aggregate'],      R['aggregate'])
+        self.assertEqual(D['clevels'],        R['clevels'])
+        self.assertEqual(D['rlevels'],        R['rlevels'])
+        self.assertEqual(D['numcols'],        R['numcols'])
+        self.assertEqual(D['numrows'],        R['numrows'])
+        self.assertEqual(D['fname'],          R['fname'])
+        self.assertEqual(D['maintitle'],      R['maintitle'])
+        self.assertEqual(D['subplot_titles'], R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],     R['ymin'])
+        self.assertAlmostEqual(D['ymax'],     R['ymax'])
         
-        for d,r in zip(np.array(D['y']).flat,np.array(R['y']).flat):
+        for d,r in zip(np.array(D['y']).flat,
+                       np.array(R['y']).flat):
             self.assertAlmostEqual(d,r)
 
-        for d,r in zip(np.array(D['yerr']).flat,np.array(R['yerr']).flat):
+        for d,r in zip(np.array(D['yerr']).flat,
+                       np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
 
 

@@ -38,7 +38,7 @@ x,y,z
 4,8,12""")
             
         self.df=DataFrame()
-        self.df.read_tbl('skiptest.csv',skip=4)
+        self.df.read_tbl('data/skiptest.csv',skip=4)
         D=self.df['x']+self.df['y']+self.df['z']
         R=range(1,13)
         
@@ -186,7 +186,7 @@ y 1,   y 2   ,   y 3
 class Test__setitem__(unittest.TestCase):
     def test1(self):
         df=DataFrame()
-        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         df['DUM']=range(48) # Shouldn't complain
                 
     def test11(self):
@@ -221,7 +221,7 @@ class Test__setitem__(unittest.TestCase):
 
     def test_kn(self):
         df = DataFrame()
-        df.read_tbl('example.csv')
+        df.read_tbl('data/example.csv')
         y = [23]*len(df['X'])
         df['X'] = y
         

@@ -85,7 +85,7 @@ delta                        0.163
 Observed power one-tail      0.068            
 Observed power two-tail      0.035            """
         df = DataFrame()
-        df.read_tbl('example2_prepost.csv')
+        df.read_tbl('data/example2_prepost.csv')
         D = df.ttest('PRE','POST',paired=True)
         self.assertEqual(str(D),R)
         

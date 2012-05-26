@@ -81,7 +81,7 @@ Critical Chi-Square      7.815
 Power                    0.865 """
 
         df = DataFrame()
-        df.read_tbl('chi_test.csv')
+        df.read_tbl('data/chi_test.csv')
         X=df.chisquare1way('RESULT')
         self.assertEqual(str(X),R)
 
@@ -110,7 +110,7 @@ Critical Chi-Square      9.488
 Power                    0.998 """
 
         df = DataFrame()
-        df.read_tbl('chi_test.csv')
+        df.read_tbl('data/chi_test.csv')
         X=df.chisquare1way('RESULT',{1:11.8 ,2:11.8 ,3:11.8 ,4:11.8 ,5:11.8})
         self.assertEqual(str(X),R)
 

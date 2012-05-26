@@ -181,7 +181,7 @@ T2          C3       M3      1.333        0.333             0.680             1.
 
 """
         df=DataFrame()
-        fname='error~subjectXtimeofdayXcourseXmodel.csv'
+        fname='data/error~subjectXtimeofdayXcourseXmodel.csv'
         df.read_tbl(fname)
         aov=df.anova('ERROR',wfactors=['TIMEOFDAY','COURSE','MODEL'])
 

@@ -74,7 +74,7 @@ class Test_df__str__(unittest.TestCase):
       3   T2          C3       M2          0 
       3   T2          C3       M3          1 """
         df=DataFrame()
-        df.read_tbl('error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
 
         self.assertEqual(str(df),R)
         

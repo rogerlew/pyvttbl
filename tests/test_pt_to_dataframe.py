@@ -30,7 +30,7 @@ day           1.864         1.933
 night         1.622         1.731 """
         
         df = DataFrame()
-        df.read_tbl('example.csv')
+        df.read_tbl('data/example.csv')
         df['LOG10_X']=[math.log10(x) for x in df['X']]
         pt = df.pivot('LOG10_X', ['TIME'], ['CONDITION'])
         df2 = pt.to_dataframe()
@@ -49,7 +49,7 @@ night         1.622         1.731 """
     4   I                  20.250                 9.925              15.625                 7.750               26.375                  9.650 
     4   II                 24.250                11.100              51.750                12.850               46.500                 14.425 """
         df = DataFrame()
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data/suppression~subjectXgroupXageXcycleXphase.csv')
         pt = df.pivot('SUPPRESSION',
                   rows=['CYCLE', 'PHASE'],
                   cols=['GROUP', 'AGE'])
@@ -62,7 +62,7 @@ night         1.622         1.731 """
 =============================================================================================================================
            22.188                 9.813              29.188                10.041               34.141                 11.875 """
         df = DataFrame()
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data/suppression~subjectXgroupXageXcycleXphase.csv')
         pt = df.pivot('SUPPRESSION',
                   cols=['GROUP', 'AGE'])
         df2 = pt.to_dataframe()
@@ -79,7 +79,7 @@ AB      young   10.041
 LAB     old     34.141 
 LAB     young   11.875 """
         df = DataFrame()
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data/suppression~subjectXgroupXageXcycleXphase.csv')
         pt = df.pivot('SUPPRESSION',
                   rows=['GROUP', 'AGE'])
         df2 = pt.to_dataframe()

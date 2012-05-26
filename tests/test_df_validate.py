@@ -23,7 +23,7 @@ class Test_validate_for_success(unittest.TestCase):
     def test0(self):
 
         df=DataFrame()
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data\suppression~subjectXgroupXageXcycleXphase.csv')
         df['RANDDATA'][42]='nan'
 
         R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
@@ -37,7 +37,7 @@ class Test_validate_for_success(unittest.TestCase):
     def test1(self):
 
         df=DataFrame()
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data\suppression~subjectXgroupXageXcycleXphase.csv')
         ##df['RANDDATA'][42]='nan'
 
         R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
@@ -50,7 +50,7 @@ class Test_validate_for_success(unittest.TestCase):
     def test2(self):
 
         df=DataFrame()
-        df.read_tbl('suppression~subjectXgroupXageXcycleXphase.csv')
+        df.read_tbl('data\suppression~subjectXgroupXageXcycleXphase.csv')
         ##df['RANDDATA'][42]='nan'
 
         R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],

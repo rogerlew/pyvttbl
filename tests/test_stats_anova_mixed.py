@@ -179,7 +179,7 @@ CYCLE   PHASE   GROUP   Mean    Std. Error   95% Lower Bound   95% Upper Bound
 
 """
         df=DataFrame()
-        fname='suppression~subjectXgroupXcycleXphase.csv'
+        fname='data/suppression~subjectXgroupXcycleXphase.csv'
         df.read_tbl(fname)
         df['SUPPRESSION']=[.01*x for x in df['SUPPRESSION']]
         aov=df.anova('SUPPRESSION',wfactors=['CYCLE','PHASE'],bfactors=['GROUP'])

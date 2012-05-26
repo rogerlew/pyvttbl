@@ -11,6 +11,7 @@ elif sys.version_info[0] == 3:
     _strobj = str
     _xrange = range
 
+import os
 import math
 
 from collections import Counter
@@ -23,9 +24,10 @@ import numpy as np
 from pyvttbl.misc.support import _isfloat,_str
 
 def interaction_plot(df, val, xaxis, 
-                    seplines=None, sepxplots=None, sepyplots=None,
-                    xmin='AUTO', xmax='AUTO', ymin='AUTO', ymax='AUTO',
-                    where=None, fname=None, quality='low', yerr=None):
+                     seplines=None, sepxplots=None, sepyplots=None,
+                     xmin='AUTO', xmax='AUTO', ymin='AUTO', ymax='AUTO',
+                     where=None, fname=None, output_dir='',
+                     quality='low', yerr=None):
     """
     Plots an interaction plot
 
@@ -407,7 +409,9 @@ def interaction_plot(df, val, xaxis,
                          .replace('by', '~') \
                          .replace('*', 'X') \
                          .replace(' ', '')
-        
+
+    fname = os.path.join(output_dir, fname)
+    
     if quality == 'low' or fname.endswith('.svg'):
         pylab.savefig(fname)
         
