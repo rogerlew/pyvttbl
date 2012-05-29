@@ -17,6 +17,8 @@ import math
 from collections import Counter,OrderedDict
 from copy import copy
 
+import numpy as np
+
 from pyvttbl.misc.texttable import Texttable as TextTable
 from pyvttbl.misc.support import *
 
@@ -41,7 +43,7 @@ class Descriptives(OrderedDict):
         numerical data in V
         """        
         try:
-            V = sorted(_flatten(list(copy(V))))
+            V = np.array(sorted(_flatten(list(copy(V)))))
         except:
             raise TypeError('V must be a list-like object')
             
@@ -55,23 +57,15 @@ class Descriptives(OrderedDict):
         self['count'] = N
         self['mean'] = sum(V) / N
         self['mode'] = Counter(V).most_common()[0][0]
-        self['var'] = sum([(self['mean']-v)**2 for v in V]) / (N - 1)
+##        self['var'] = sum([(self['mean']-v)**2 for v in V]) / (N - 1)
+        self['var'] = np.var(V, ddof=1)
         self['stdev']= math.sqrt(self['var'])
         self['sem'] = self['stdev'] / math.sqrt(N)
-        self['rms'] = math.sqrt(sum([v**2 for v in V]) / N)
+        self['rms'] = math.sqrt(np.mean(V**2))
         self['min'] = min(V)
-        self['Q1'] = V[int(N/4.)]
-        if int(N) % 2 == 0:
-            self['Q1'] += V[int(N/4.)-1]
-            self['Q1'] /= 2
-        self['median'] = V[int(N/2.)]
-        if int(N/2.) % 2 == 0:
-            self['median'] += V[int(N/2.)-1]
-            self['median'] /= 2.
-        self['Q3'] = V[int(3*N/4.)]
-        if int(N/2.) % 2 == 0:
-            self['Q3'] += V[int(N/4.)*3-1]
-            self['Q3'] /= 2
+        self['Q1'] = np.median(V[:int(N/2.)])
+        self['median'] = np.median(V)
+        self['Q3'] = np.median(V[int(N/2.):])
         self['max'] = max(V)
         self['range'] = self['max'] - self['min']
         self['95ci_lower'] = self['mean'] - 1.96*self['sem']

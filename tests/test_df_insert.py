@@ -73,7 +73,7 @@ class Test_insert(unittest.TestCase):
     def test4(self):
         df=DataFrame()
         df.insert([('A',1.23), ('B',2), ('C','A')])
-        self.assertEqual(df.types(), ('real', 'integer', 'text'))
+        self.assertEqual(df.types(), ['real', 'integer', 'text'])
         
 def suite():
     return unittest.TestSuite((

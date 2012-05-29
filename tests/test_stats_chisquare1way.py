@@ -95,11 +95,11 @@ Observed        7       20       23        9        0
 Expected   11.800   11.800   11.800   11.800   11.800 
 
 CHI-SQUARE TESTS
-                     Value    df        P     
-=============================================
-Pearson Chi-Square   30.746     4   3.450e-06 
-Likelihood Ratio        nan   nan         nan 
-Observations             59                   
+                     Value    df       P     
+============================================
+Pearson Chi-Square   30.746    4   3.450e-06 
+Likelihood Ratio         --   --          -- 
+Observations             59                  
 
 POST-HOC POWER
        Measure                 
@@ -112,6 +112,7 @@ Power                    0.998 """
         df = DataFrame()
         df.read_tbl('data/chi_test.csv')
         X=df.chisquare1way('RESULT',{1:11.8 ,2:11.8 ,3:11.8 ,4:11.8 ,5:11.8})
+        print(X)
         self.assertEqual(str(X),R)
 
     def test3(self):

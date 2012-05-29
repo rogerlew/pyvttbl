@@ -51,7 +51,7 @@ def box_plot(df, val, factors=None, where=None,
         raise Exception('columns have unequal lengths')
 
     # check the supplied arguments
-    if val not in df.names():
+    if val not in df.keys():
         raise KeyError(val)
 
     if not hasattr(factors, '__iter__'):
@@ -59,7 +59,7 @@ def box_plot(df, val, factors=None, where=None,
                          % type(factors).__name__)
     
     for k in factors:
-        if k not in df.names():
+        if k not in df.keys():
             raise KeyError(k)
         
     # check for duplicate names

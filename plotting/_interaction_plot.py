@@ -96,19 +96,19 @@ def interaction_plot(df, val, xaxis,
         raise Exception('columns have unequal lengths')
 
     # check to make sure arguments are column labels
-    if val not in df.names():
+    if val not in df.keys():
         raise KeyError(val)
 
-    if xaxis not in df.names():
+    if xaxis not in df.keys():
         raise KeyError(xaxis)
     
-    if seplines not in df.names() and seplines != None:
+    if seplines not in df.keys() and seplines != None:
         raise KeyError(seplines)
 
-    if sepxplots not in df.names() and sepxplots != None:
+    if sepxplots not in df.keys() and sepxplots != None:
         raise KeyError(sepxplots)
     
-    if sepyplots not in df.names() and sepyplots != None:
+    if sepyplots not in df.keys() and sepyplots != None:
         raise KeyError(sepyplots)
 
     # check for duplicate names
@@ -127,7 +127,7 @@ def interaction_plot(df, val, xaxis,
             raise Exception('fname must end with .png or .svg')                
 
     # check cell counts
-    cols = [f for f in [seplines, sepxplots, sepyplots] if f in df.names()]
+    cols = [f for f in [seplines, sepxplots, sepyplots] if f in df.keys()]
     counts = df.pivot(val, rows=[xaxis], cols=cols,
                         flatten=True, where=where, aggregate='count')
 

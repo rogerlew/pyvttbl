@@ -25,7 +25,7 @@ class Test_scatter_matrix(unittest.TestCase):
     def setUp(self):
         self.df = DataFrame()
         self.df.read_tbl('data/iqbrainsize.txt', delimiter='\t')
-        self.df['TOTSA'] = [v*1000 for v in self.df['TOTSA']]
+        self.df['TOTSA'] = [v*10 for v in self.df['TOTSA']]
         self.df['HC'] = [v*.0001 for v in self.df['HC']]
         
     def test0(self):

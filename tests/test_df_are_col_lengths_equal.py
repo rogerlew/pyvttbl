@@ -49,8 +49,7 @@ class Test__are_col_lengths_equal(unittest.TestCase):
         df[1]=range(10)
         df[2]=range(10)
         df[3]=range(10)
-        df[4]=range(10)
-        df[4].pop()
+        df[4]=range(9)
         self.assertFalse(df._are_col_lengths_equal())
         
 def suite():

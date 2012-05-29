@@ -59,9 +59,10 @@ Critical Chi-Square      3.841
 Power                    1.000 """
         df=DataFrame()
         df['FAULTS']=list(Counter(Low=177,High=181).elements())
-        df['FAULTS'].reverse()
+        df['FAULTS']=df['FAULTS'][::-1]
         df['VERDICT']=list(Counter(Guilty=153, NotGuilty=24).elements())
-        df['VERDICT'].extend(list(Counter(Guilty=105, NotGuilty=76).elements()))
+        df['VERDICT']=np.concatenate((df['VERDICT'],
+                                     list(Counter(Guilty=105, NotGuilty=76).elements())))
 
         x2= df.chisquare2way('FAULTS','VERDICT')
         self.assertEqual(str(x2), R)

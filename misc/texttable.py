@@ -119,7 +119,7 @@ def _str(x, dtype='a', n=3):
     try    : f=float(x)
     except : return str(x)
 
-    if math.isnan(f) : return 'nan'
+    if math.isnan(f) : return '--'
     if math.isinf(f) : return 'inf'
     
     if   dtype == 'i' : return str(int(round(f)))

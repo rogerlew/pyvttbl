@@ -41,7 +41,6 @@ import plotting
 # this file is a bit long but they can't be split without
 # running into circular import complications
 
-# the dataframe class
 class DataFrame(OrderedDict):
     """holds the data in a dummy-coded group format"""
     def __init__(self, *args, **kwds):
@@ -64,17 +63,20 @@ class DataFrame(OrderedDict):
         for n, a, f in pystaggrelite3.getaggregators():
             self.bind_aggregate(n, a, f)
 
-        # holds the factors conditions (and all the data values)
-        # maybe this should be built on the fly for necessary
-        # columns only?
-        self.conditions = DictSet([(n, self[n]) for n in self.names()]) 
-
         # prints the sqlite3 queries to stdout before
         # executing them for debugging purposes
         self.PRINTQUERIES = False
 
         # controls whether plot functions return the test dictionaries
         self.TESTMODE = False
+
+        # holds the factors conditions (and all the data values)
+        # maybe this should be built on the fly for necessary
+        # columns only?
+        self.conditions = DictSet()
+
+        # dict to look up sqlite3 type by key
+        self._sqltypesdict = {}
 
         super(DataFrame, self).update(*args, **kwds)
 
@@ -84,6 +86,21 @@ class DataFrame(OrderedDict):
         self.aggregates = list(self.aggregates)
         self.aggregates.append(name)
         self.aggregates = tuple(self.aggregates)
+
+    def get_sqltype(self, key):
+        return self._sqltypesdict[key]
+                       
+    def get_nptype(self, key):
+        return {'null' : np.dtype(object),
+                'integer' : np.dtype(int),
+                'real' : np.dtype(float),
+                'text' : np.dtype(str)}[self._sqltypesdict[key]]
+    
+    def get_mafillvalue(self, key):
+        return {'null' : '',
+                'integer' : 999999,
+                'real' : 999999,
+                'text' : ''}[self._sqltypesdict[key]]
 
     def read_tbl(self, fname, skip=0, delimiter=',',labels=True):
         """
@@ -96,7 +113,8 @@ class DataFrame(OrderedDict):
         # open and read dummy coded data results file to data dictionary
         fid = open(fname, 'r')
         csv_reader = csv.reader(fid, delimiter=delimiter)
-        d = OrderedDict()
+        data = OrderedDict()
+        mask = {}
         colnames = []
         
         for i, row in enumerate(csv_reader):
@@ -108,7 +126,7 @@ class DataFrame(OrderedDict):
             elif i == skip and labels:
                 colnameCounter = Counter()
                 for k, colname in enumerate(row):
-                    colname = colname.strip().replace(' ','_')
+                    colname = colname.strip()#.replace(' ','_')
                     colnameCounter[colname] += 1
                     if colnameCounter[colname] > 1:
                         warnings.warn("Duplicate label '%s' found"
@@ -116,16 +134,22 @@ class DataFrame(OrderedDict):
                                       RuntimeWarning)
                         colname = '%s_%i'%(colname, colnameCounter[colname])                    
                     colnames.append(colname)
-                    d[colname] = []
+                    data[colname] = []
+                    mask[colname] = []
 
             # if labels is false we need to make labels
             elif i == skip and not labels:
                 colnames = ['COL_%s'%(k+1) for k in range(len(row))]
                 for j,colname in enumerate(colnames):
                     if _isfloat(row[j]):
-                        d[colname] = [float(row[j])]
+                        data[colname] = [float(row[j])]
+                        mask[colname] = [0]
                     else:
-                        d[colname] = [row[i]]
+                        data[colname] = [row[i]]
+                        if row[i] == '':
+                            mask[colname] = [1]
+                        else:
+                            mask[colname] = [0]
 
             # for remaining lines where i>skip...
             else:
@@ -136,26 +160,27 @@ class DataFrame(OrderedDict):
                                   RuntimeWarning)
                 else:                    
                     for j, colname in enumerate(colnames):                        
-                        colname = colname.strip().replace(' ','_')
+                        colname = colname.strip()#.replace(' ','_')
                         if _isfloat(row[j]):
-                            d[colname].append(float(row[j]))
+                            data[colname].append(float(row[j]))
+                            mask[colname].append(0)
                         else:
-                            d[colname].append(row[j])
+                            data[colname].append(row[j])
+                            if row[j] == '':
+                                mask[colname].append(1)
+                            else:
+                                mask[colname].append(0)
             
         # close data file
         fid.close()
         self.clear()
-        for k, v in d.items():
-            name_type = (k, self._check_sqlite3_type(v))
-            super(DataFrame, self).__setitem__(name_type, v)
+        for k, v in data.items():
+            ## In __setitem__ the conditions DictSet and datatype are set 
+            self.__setitem__(k, v, mask[k])
             
-        del d
-        self.conditions = DictSet([(n,self[n]) for n in self.names()])
+        del data
 
-    def __contains__(self, key):
-        return key in self.names()
-        
-    def __setitem__(self, key, item):
+    def __setitem__(self, key, item, mask=None):
         """
         assign a column in the table
 
@@ -169,82 +194,57 @@ class DataFrame(OrderedDict):
           the insert method. To  another table to this one use
           the attach method.
         """
+        
         # check item
         if not hasattr(item, '__iter__'):
             raise TypeError("'%s' object is not iterable"%type(item).__name__)
-
-        # tuple, no where conditions to handle
-        if isinstance(key, tuple):
-            name, dtype = key
-            if name.lower() in map(str.lower, self.names()) and \
-               name not in self.names():
-                raise Exception("a case variant of '%s' already exists"%name)
-            if name in self.names() and dtype != self.typesdict()[name]:
-                del self[name]
-            super(DataFrame, self).__setitem__((name, dtype), item)
-            self.conditions[name] = self[key]
-            return
-
-        # string, no where conditions to handle
-        split_key = str(key).split()
-        name = split_key[0]
-        if len(split_key) == 1:
-            dtype = self._check_sqlite3_type(item)
-            if name.lower() in map(str.lower, self.names()) and \
-               name not in self.names():
-                raise Exception("a case variant of '%s' already exists"%name)
-            if name in self.names():
-                del self[name]
-            super(DataFrame, self).__setitem__((name, dtype), item)
-            self.conditions[name] = self[key]
-            return
-
-        # string, with where conditions to handle    
-        if name not in self.names():
-            raise KeyError(name)
-        self._get_indices_where(split_key[1:])
-
-        indices = [tup[0] for tup in list(self.cur)]
-
-        if len(indices) != len(item):
-            raise Exception('Length of items must length '
-                            'of conditions in selection')
-        for i,v in zip(indices, item):
-            self[name][i] = v
-        self.conditions[name] = self[key]
-
-    def __getitem__(self, key):
-        """
-        returns an item
-        """
-        if isinstance(key, tuple):
-            name_type = key
-            return super(DataFrame, self).__getitem__(name_type)
         
-        split_key = str(key).split()
-        if len(split_key) == 1:
-            name_type = (split_key[0], self.typesdict()[split_key[0]])
-            return super(DataFrame, self).__getitem__(name_type)
+        if key in self.keys():
+            del self[key]
 
-        if split_key[0] not in self.names():
-            raise KeyError(split_key[0])
+        # a mask was provided
+        if mask != None:
+            # data contains invalid entries and a masked array should be created
+            # this needs to be nested incase mask != None
+            if not all([m==0 for m in mask]):
 
-        self._get_indices_where(split_key[1:])
+                # figure out the datatype of the valid entries
+                self._sqltypesdict[key] = \
+                    self._check_sqlite3_type([d for d,m in zip(item,mask) if not m])
 
-        return [self[split_key[0]][tup[0]] for tup in self.cur]
+                # replace invalid values
+                x = np.array([(d,self.get_mafillvalue(key))[m] for d,m in zip(item,mask)])
+                print(x)
 
+                # call super.__setitem__
+                super(DataFrame, self).\
+                    __setitem__(key, np.ma.array(x, mask=mask,
+                                                 dtype=self.get_nptype(key)))
+
+                # set or update self.conditions DictSet
+                self.conditions[key] = self[key]
+
+                # return if successful
+                return
+
+        # no mask provided or mask is all true
+        self._sqltypesdict[key] = self._check_sqlite3_type(item)
+        super(DataFrame, self).\
+            __setitem__(key, np.array(item, dtype=self.get_nptype(key)))
+            
+        self.conditions[key] = self[key]
+
+##    def __iter__(self):
+##        raise NotImplementedError('use .keys() to iterate')
+        
     def __delitem__(self, key):
         """
         delete a column from the table
         """
-        if isinstance(key, tuple):
-            name_type = key
-        else:
-            key = str(key)
-            name_type = (key, self.typesdict()[key])
-            
+
+        del self._sqltypesdict[key]
         del self.conditions[key]
-        super(DataFrame, self).__delitem__(name_type)
+        super(DataFrame, self).__delitem__(key)
         
     def __str__(self):
         """
@@ -261,7 +261,7 @@ class DataFrame(OrderedDict):
         aligns = [('l','r')[dt in 'fi'] for dt in dtypes]
         tt.set_cols_align(aligns)
         
-        tt.header(self.names())
+        tt.header(self.keys())
         if self.shape()[1] > 0:
             tt.add_rows(zip(*list(self.values())), header=False)
         tt.set_deco(TextTable.HEADER)
@@ -269,29 +269,14 @@ class DataFrame(OrderedDict):
         # output the table
         return tt.draw()
         
-    def names(self):
-        """
-        returns a list of the column labels
-        """
-        if len(self) == 0:
-            return tuple()
-        
-        return list(zip(*list(self.keys())))[0]
-
     def types(self):
         """
         returns a list of the sqlite3 datatypes of the columns 
         """
         if len(self) == 0:
-            return tuple()
+            return []
         
-        return list(zip(*list(self.keys())))[1]
-
-    def typesdict(self):
-        """
-        returns a lookup dictionary of names and datatypes
-        """
-        return OrderedDict(self.keys())
+        return [self._sqltypesdict[k] for k in self]
 
     def shape(self):
         """
@@ -365,15 +350,16 @@ class DataFrame(OrderedDict):
         self.cur.executemany(query, tlist)
 
     def _get_indices_where(self, where):
-        # where should be a split string. No sense splitting it twice
-        
+        """ where should be string criterion without the 'where'"""
+
         # preprocess where
         tokens = []
         nsubset2 = set()
-        names = self.names()
-        for w in where:
+        names = self.keys()
+        for w in where.split():
+            print(w)
             if w in names:
-                tokens.append('_%s_'%w)
+                tokens.append(_sha1(w))
                 nsubset2.add(w)
             else:
                 tokens.append(w)
@@ -390,7 +376,7 @@ class DataFrame(OrderedDict):
 
         self.conn.commit()
         query =  'create temp table GTBL\n  ('
-        query += ', '.join('_%s_ %s'%(n, self.typesdict()[n]) for n in nsubset2)
+        query += ', '.join('%s %s'%(_sha1(n), self.get_sqltype(n)) for n in nsubset2)
         query += ')'
         self._execute(query)
 
@@ -403,7 +389,7 @@ class DataFrame(OrderedDict):
         super(DataFrame, self).__delitem__(('INDICES','integer'))
 
         # get the indices
-        query = 'select _INDICES_ from GTBL %s'%where
+        query = 'select %s from GTBL where %s'%(_sha1('INDICES'), where)
         self._execute(query)
         
 
@@ -425,13 +411,11 @@ class DataFrame(OrderedDict):
         if isinstance(where, _strobj):
             where = [where]
             
-        #  1. Perform some checkings
+        #  1. Perform some checking
         ##############################################################
         if not hasattr(where, '__iter__'):
             raise TypeError( "'%s' object is not iterable"
                              % type(where).__name__)
-
-        nsubset = map(str, nsubset)
 
         #  2. Figure out which columns need to go into the table
         #     to be able to filter the data
@@ -439,13 +423,16 @@ class DataFrame(OrderedDict):
         nsubset2 = set(nsubset)
         for item in where:
             if isinstance(item, _strobj):
-                nsubset2.update(w for w in item.split() if w in self.names())
-            else:
-                if str(item[0]) in self.names():
-                    nsubset2.add(str(item[0]))
+                tokens = item.split()
+                if tokens[0] not in self.keys():
+                    raise KeyError(tokens[0])
+                nsubset2.update(w for w in tokens if w in self.keys())
+            else: # tuple
+                if item[0] in self.keys():
+                    nsubset2.add(item[0])
 
-        # orders nsubset2 to match the order in self.names()
-        nsubset2 = [n for n in self.names() if n in nsubset2]
+        # orders nsubset2 to match the order in self.keys()
+        nsubset2 = [n for n in self if n in nsubset2]
 
         #  3. Build a table
         ##############################################################
@@ -454,14 +441,17 @@ class DataFrame(OrderedDict):
 
         self.conn.commit()
         query =  'create temp table TBL2\n  ('
-        query += ', '.join('_%s_ %s'%(n, self.typesdict()[n]) for n in nsubset2)
+        query += ', '.join('%s %s'%(_sha1(n), self.get_sqltype(n)) for n in nsubset2)
         query += ')'
         self._execute(query)
 
         # build insert query
         query = 'insert into TBL2 values ('
         query += ','.join('?' for n in nsubset2) + ')'
-        self._executemany(query, zip(*[self[n] for n in nsubset2]))
+
+        # because sqlite3 does not understand numpy datatypes we need to recast them
+        # using astype to numpy.object
+        self._executemany(query, zip(*[self[n].astype(np.object) for n in nsubset2]))
         self.conn.commit()
 
         #  4. If where == None then we are done. Otherwise we need
@@ -480,7 +470,7 @@ class DataFrame(OrderedDict):
             
             query = []
             for n in nsubset:
-                query.append('_%s_ %s'%(n, self.typesdict()[n]))
+                query.append('%s %s'%(_sha1(n), self.get_sqltype(n)))
             query = ', '.join(query)
             query =  'create temp table TBL\n  (' + query + ')'
             self._execute(query)
@@ -492,8 +482,8 @@ class DataFrame(OrderedDict):
                 if isinstance(item, _strobj):
                     tokens = []
                     for word in item.split():
-                        if word in self.names():
-                            tokens.append('_%s_'%word)
+                        if word in self.keys():
+                            tokens.append(_sha1(word))
                         else:
                             tokens.append(word)
                     query.append(' '.join(tokens))
@@ -506,18 +496,18 @@ class DataFrame(OrderedDict):
                         raise Exception('could not upack tuple from where')
                     
                     if _isfloat(value):
-                        query.append(' _%s_ %s %s'%(k, op, value))
+                        query.append(' %s %s %s'%(_sha1(k), op, value))
                     elif isinstance(value,list):
                         if _isfloat(value[0]):
                             args = ', '.join(str(v) for v in value)
                         else:
                             args = ', '.join('"%s"'%v for v in value)
-                        query.append(' _%s_ %s (%s)'%(k, op, args))
+                        query.append(' %s %s (%s)'%(_sha1(k), op, args))
                     else:
-                        query.append(' _%s_ %s "%s"'%(k, op, value))
+                        query.append(' %s %s "%s"'%(_sha1(str(k)), op, value))
                     
             query = ' and '.join(query)
-            nstr = ', '.join('_%s_'%n for n in nsubset)
+            nstr = ', '.join(_sha1(n) for n in nsubset)
             query = 'insert into TBL select %s from TBL2\n where '%nstr + query
             
             # run query
@@ -560,8 +550,7 @@ class DataFrame(OrderedDict):
         p.run(self, val, rows, cols, aggregate,
                        where, flatten, attach_rlabels)
         return p
-        
-    
+            
     def select_col(self, val, where=None):
         """
         returns the a copy of the selected values based on the
@@ -577,14 +566,14 @@ class DataFrame(OrderedDict):
 
         # 2.
         # check the supplied arguments
-        if val not in self.names():
+        if val not in self.keys():
             raise KeyError(val)
 
         # check to make sure exclude is mappable
         # todo
 
         # warn if exclude is not a subset of self.conditions
-        if not set(self.names()) >= set(tup[0] for tup in where):
+        if not set(self.keys()) >= set(tup[0] for tup in where):
             warnings.warn("where is not a subset of table conditions",
                           RuntimeWarning)
             
@@ -619,29 +608,29 @@ class DataFrame(OrderedDict):
 
         # check or build order
         if order == []:
-            order = self.names()
+            order = self.keys()
 
         # there are probably faster ways to do this, we definitely need
         # to treat the words as tokens to avoid problems were column
         # names are substrings of other column names
         for i, k in enumerate(order):
             ks = k.split()
-            if ks[0] not in self.names():
+            if ks[0] not in self.keys():
                 raise KeyError(k)
             
             if len(ks) == 1:
-                order[i] = '_%s_'%ks[0]
+                order[i] = _sha1(ks[0])
 
             elif len(ks) == 2:
                 if ks[1].lower() not in ['desc', 'asc']:
                     raise Exception("'order arg must be 'DESC' or 'ASC'")
-                order[i] = '_%s_ %s'%(ks[0], ks[1])
+                order[i] = '%s %s'%(_sha1(ks[0]), ks[1])
 
             elif len(ks) > 2:
                 raise Exception('too many parameters specified')
 
         # build table
-        self._build_sqlite3_tbl(self.names())
+        self._build_sqlite3_tbl(self.keys())
 
         # build and excute query
         query = 'select * from TBL order by ' + ', '.join(order)
@@ -653,7 +642,7 @@ class DataFrame(OrderedDict):
             d.append(list(row))
 
         d = zip(*d) # transpose
-        for i, n in enumerate(self.names()):
+        for i, n in enumerate(self.keys()):
             self[n] = list(d[i])
 
     def where(self, where):
@@ -663,9 +652,9 @@ class DataFrame(OrderedDict):
         """
         new = DataFrame()
         
-        self._build_sqlite3_tbl(self.names(), where)
+        self._build_sqlite3_tbl(self.keys(), where)
         self._execute('select * from TBL')
-        for n, values in zip(self.names(), zip(*list(self.cur))):
+        for n, values in zip(self.keys(), zip(*list(self.cur))):
             new[n] = list(values)        
 
         return new
@@ -674,9 +663,9 @@ class DataFrame(OrderedDict):
         """
         Applies the where filter in-place.
         """
-        self._build_sqlite3_tbl(self.names(), where)
+        self._build_sqlite3_tbl(self.keys(), where)
         self._execute('select * from TBL')
-        for n, values in zip(self.names(), zip(*list(self.cur))):
+        for n, values in zip(self.keys(), zip(*list(self.cur))):
             del self[n]
             self[n] = list(values)
     
@@ -697,7 +686,7 @@ class DataFrame(OrderedDict):
         
         try:        
             c = set(criteria.keys())
-            s = set(self.names())
+            s = set(self.keys())
         except:
             raise TypeError('criteria must be mappable type')
 
@@ -796,19 +785,18 @@ class DataFrame(OrderedDict):
         if not other._are_col_lengths_equal():
             raise Exception('columns in other have unequal lengths')
 
-        if not set(self.names()) == set(other.names()):
+        if not set(self.keys()) == set(other.keys()):
             raise Exception('self and other must have the same columns')
 
-        if not all(self.typesdict()[n] == other.typesdict()[n]
-                                                   for n in self.names()):
+        if not all(self.get_sqltype(n) == other.get_sqltype(n) for n in self):
             raise Exception('types of self and other must match')
 
         # perform attachment
-        for n in self.names():
-            self[n].extend(copy(other[n]))
+        for n in self.keys():
+            self[n] = np.concatenate((self[n], other[n]))
 
         # update state variables
-        self.conditions = DictSet([(n, self[n]) for n in self.names()])
+        self.conditions = DictSet([(n, list(self[n])) for n in self])
 
     def insert(self, row):
         """
@@ -819,7 +807,7 @@ class DataFrame(OrderedDict):
         """
         try:
             c = set(dict(row).keys())
-            s = set(self.names())
+            s = set(self.keys())
         except:
             raise TypeError('row must be mappable type')
         
@@ -832,12 +820,12 @@ class DataFrame(OrderedDict):
                     self[k] = [v]
                     self.conditions[k] = [v]
             else:
-                for (k, v) in dict(row).items():
+                for (k, v) in row.items():
                     self[k] = [v]
                     self.conditions[k] = [v]
         elif c - s == set():
-            for (k, v) in dict(row).items():
-                self[k].append(v)
+            for (k, v) in OrderedDict(row).items():
+                self[k]=np.concatenate((self[k], np.array([v], dtype=self.get_nptype(k))))
                 self.conditions[k].add(v)
         else:
             raise Exception('row must have the same keys as the table')
@@ -864,7 +852,7 @@ class DataFrame(OrderedDict):
             if not isinstance(fname, _strobj):
                 raise TypeError('fname must be a string')
         else:
-            lnames = [str(n).lower().replace('1','') for n in self.names()]
+            lnames = [str(n).lower().replace('1','') for n in self.keys()]
             fname = 'X'.join(lnames)
 
             if delimiter == ',':
@@ -876,12 +864,12 @@ class DataFrame(OrderedDict):
 
         with open(fname,'wb') as fid:
             wtr = csv.writer(fid, delimiter=delimiter)
-            wtr.writerow(self.names())
+            wtr.writerow(self.keys())
 
             if where == []: 
-                wtr.writerows(zip(*list(self[n] for n in self.names())))
+                wtr.writerows(zip(*list(self[n] for n in self)))
             else:
-                self._build_sqlite3_tbl(self.names(), where)
+                self._build_sqlite3_tbl(self.keys(), where)
                 self._execute('select * from TBL')
                 wtr.writerows(list(self.cur))
 
@@ -900,7 +888,7 @@ class DataFrame(OrderedDict):
         if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
 
-        if cname not in self.names():
+        if cname not in self.keys():
             raise KeyError(cname)
         
         V = self.select_col(cname, where=where)
@@ -1041,7 +1029,7 @@ class DataFrame(OrderedDict):
         """
         list_of_lists = []
         for var in sorted(variables):
-            list_of_lists.append(self.select_col(var, where))
+            list_of_lists.append(list(self.select_col(var, where)))
 
         cor= stats.Correlation()
         cor.run(list_of_lists, sorted(variables),
@@ -1100,7 +1088,7 @@ class DataFrame(OrderedDict):
         if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
 
-        if cname not in self.names():
+        if cname not in self.keys():
             raise KeyError(cname)
         
         V = sorted(self.select_col(cname, where=where))
@@ -1271,7 +1259,7 @@ class PyvtTbl(list):
             raise Exception('columns have unequal lengths')
 
         # check the supplied arguments
-        if val not in df.names():
+        if val not in df.keys():
             raise KeyError(val)
 
         if not hasattr(rows, '__iter__'):
@@ -1283,11 +1271,11 @@ class PyvtTbl(list):
                              % type(cols).__name__)
         
         for k in rows:
-            if k not in df.names():
+            if k not in df.keys():
                 raise KeyError(k)
             
         for k in cols:
-            if k not in df.names():
+            if k not in df.keys():
                 raise KeyError(k)
 
         # check for duplicate names
@@ -1316,7 +1304,7 @@ class PyvtTbl(list):
         
         # Refresh conditions list so we can build row and col list
         df._execute('select %s from TBL'
-                      %', '.join('_%s_'%n for n in [val] + rows + cols))
+                      %', '.join(_sha1(n) for n in [val] + rows + cols))
         Zconditions = DictSet(zip([val]+rows+cols, zip(*list(df.cur))))
                 
         # Build rnames
@@ -1357,25 +1345,25 @@ class PyvtTbl(list):
             
         query = ['select ']            
         if rnames == [1] and cnames == [1]:
-            query.append('%s( _%s_ ) from TBL'%(agg, val))
+            query.append('%s( %s ) from TBL'%(agg, _sha1(val)))
         else:
             if rnames == [1]:
-                query.append('_%s_'%val)
+                query.append(_sha1(val))
             else:
-                query.append(', '.join('_%s_'%r for r in rows))
+                query.append(', '.join(_sha1(r) for r in rows))
 
             if cnames == [1]:
-                query.append('\n  , %s( _%s_ )'%(agg, val))
+                query.append('\n  , %s( %s )'%(agg, _sha1(val)))
             else:
                 for cs in cnames:
                     query.append('\n  , %s( case when '%agg)
                     if all(map(_isfloat, zip(*cols)[1])):
                         query.append(
-                        ' and '.join(('_%s_=%s'%(k, v) for k, v in cs)))
+                        ' and '.join(('%s=%s'%(_sha1(k), v) for k, v in cs)))
                     else:
                         query.append(
-                        ' and '.join(('_%s_="%s"'%(k ,v) for k, v in cs)))
-                    query.append(' then _%s_ end )'%val)
+                        ' and '.join(('%s="%s"'%(_sha1(k) ,v) for k, v in cs)))
+                    query.append(' then %s end )'%_sha1(val))
 
             if rnames == [1]:
                 query.append('\nfrom TBL')
@@ -1385,7 +1373,7 @@ class PyvtTbl(list):
                 for i, r in enumerate(rows):
                     if i != 0:
                         query.append(', ')
-                    query.append('_%s_'%r)
+                    query.append(_sha1(r))
 
         #  5. Run Query
         ##############################################################
@@ -1395,7 +1383,7 @@ class PyvtTbl(list):
         ##############################################################
 
         d = []
-        val_type = df.typesdict()[val]
+        val_type = df.get_sqltype(val)
 
         # keep the columns with the row labels
         if attach_rlabels:
@@ -1433,18 +1421,18 @@ class PyvtTbl(list):
             if aggregate in ['tolist', 'group_concat', 'arbitrary']:
                 self.calc_tots = False
             else:
-                query = 'select %s( _%s_ ) from TBL'%(agg, val)
+                query = 'select %s( %s ) from TBL'%(agg, _sha1(val))
                 df._execute(query)
                 self.grand_tot = list(df.cur)[0][0]
 
                 if cnames != [1] and rnames != [1]:
-                    query = ['select %s( _%s_ ) from TBL group by'%(agg, val)]
-                    query.append(', '.join('_%s_'%r for r in rows))
+                    query = ['select %s( %s ) from TBL group by'%(agg, _sha1(val))]
+                    query.append(', '.join(_sha1(r) for r in rows))
                     df._execute(' '.join(query))
                     self.row_tots = [tup[0] for tup in df.cur]
                     
-                    query = ['select %s( _%s_ ) from TBL group by'%(agg, val)]
-                    query.append(', '.join('_%s_'%r for r in cols))
+                    query = ['select %s( %s ) from TBL group by'%(agg, _sha1(val))]
+                    query.append(', '.join(_sha1(r) for r in cols))
                     df._execute(' '.join(query))
                     self.col_tots = [tup[0] for tup in df.cur]                
         
@@ -1612,7 +1600,6 @@ class PyvtTbl(list):
         """
         returns a DataFrame excluding row and column totals
         """
-        # import goes here to avoid circular imports
         if self == []:
             return DataFrame()
 
@@ -1633,7 +1620,7 @@ class PyvtTbl(list):
             
         elif self.rnames == [1]: # no rows were specified
             # build the header
-            header = ['__'.join('%s=%s'%(f, c) for (f, c) in L) \
+            header = [',\n'.join('%s=%s'%(f, c) for (f, c) in L) \
                       for L in self.cnames]
             
             df.insert(zip(header, self[0]))
@@ -1649,7 +1636,7 @@ class PyvtTbl(list):
             # build the header
             header = copy(rows)
             for L in self.cnames:
-                header.append('__'.join('%s=%s'%(f, c) for (f, c) in L))
+                header.append(',\n'.join('%s=%s'%(f, c) for (f, c) in L))
             
             for i, L in enumerate(self.rnames):
                 df.insert(zip(header, [c for (f, c) in L] + self[i]))

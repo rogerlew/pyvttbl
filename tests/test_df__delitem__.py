@@ -25,19 +25,16 @@ class Test_del_item(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
         self.df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        print(self.df)
         del self.df['COURSE']
 
     def test0(self):
-        self.assertEqual(list(self.df.names()),
+        self.assertEqual(self.df.keys(),
                          ['SUBJECT', 'TIMEOFDAY', 'MODEL', 'ERROR'])
 
     def test1(self):
         self.assertEqual(list(self.df.types()),
                          ['integer', 'text', 'text', 'integer'])
-
-    def test2(self):
-        self.assertEqual(list(self.df.names()),
-                         ['SUBJECT', 'TIMEOFDAY', 'MODEL', 'ERROR'])
 
     def test3(self):
         self.assertEqual(len(self.df), 4)

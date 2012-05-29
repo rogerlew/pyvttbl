@@ -24,12 +24,12 @@ class Test_validate_for_success(unittest.TestCase):
 
         df=DataFrame()
         df.read_tbl('data\suppression~subjectXgroupXageXcycleXphase.csv')
-        df['RANDDATA'][42]='nan'
+        df['RANDDATA'][42]=0.
 
         R=df.validate({'GROUP' : lambda x: x in ['AA', 'AB', 'LAB'],
                          'SEX' : lambda x: x in [0],
                  'SUPPRESSION' : lambda x: x < 62.,
-                    'RANDDATA' : lambda x: _isfloat(x),
+                    'RANDDATA' : lambda x: x!=0,
                      'SUBJECT' : _isint}, verbose=False, report=False)
         self.assertFalse(R)
 

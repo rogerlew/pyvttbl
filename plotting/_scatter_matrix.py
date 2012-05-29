@@ -54,7 +54,9 @@ def scatter_matrix(df, variables, alpha=0.5, grid=False,
    # code forked from pandas.tools.plotting
     
     n = len(variables)
-    fig, axes = _subplots(nrows=n, ncols=n, figsize=(n*2.5, n*2.5), squeeze=False)
+    fig, axes = _subplots(nrows=n, ncols=n,
+                          figsize=(n*2.5, n*2.5),
+                          squeeze=False)
 
     # remove gaps between subplots
     pylab.subplots_adjust(wspace=0, hspace=0)
@@ -62,9 +64,10 @@ def scatter_matrix(df, variables, alpha=0.5, grid=False,
     ticks = {}
     lims = {}
     for a in variables:
-        d = df.descriptives(a)
-        ticks[a] = np.linspace(d['min'], d['max'], 5)
-        lims[a] = [d['min'] - .1*d['range'], d['max'] + .1*d['range']]
+        dmin,dmax = np.min(df[a]),np.max(df[a])
+        drange = dmax-dmin
+        ticks[a] = np.linspace(dmin, dmax, 5)
+        lims[a] = [dmin - .1*drange, dmax + .1*drange]
 
     for i, a in enumerate(variables):
         for j, b in enumerate(variables):

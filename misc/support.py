@@ -13,6 +13,10 @@ elif sys.version_info[0] == 3:
     _xrange = range
 
 import math
+import hashlib
+
+def _sha1(item):
+    return '_%s'%hashlib.sha1(str(item)).hexdigest()
 
 def _isfloat(string):
     """
@@ -99,4 +103,4 @@ def _str(x, dtype='a', n=3):
             else:
                 return '%.*f'%(n, f)
             
-__all__ = ['_isfloat','_isint','_flatten','_xunique_combinations','_str']
+__all__ = ['_sha1','_isfloat','_isint','_flatten','_xunique_combinations','_str']
