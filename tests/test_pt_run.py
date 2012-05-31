@@ -18,12 +18,16 @@ import os
 
 import numpy as np
 
-from pyvttbl import DataFrame
+from pyvttbl import DataFrame, PyvtTbl
 from pyvttbl.misc.support import *
 
 class Test_pivot_0(unittest.TestCase):
+                    
     def test1(self):
-        R = """count(id)
+        """method='valid', aggregate=count, invalid row"""
+        
+        R = """\
+count(id)
 Name    Year   member=N   member=Y   Total 
 ==========================================
 name1   2010          0          1       1 
@@ -31,16 +35,21 @@ name1   2011          1          0       1
 name2   2011          0          1       1 
 ==========================================
 Total                 1          2       3 """
+        
         df = DataFrame()
         df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y'})
         df.insert({'id':1,'Name':'name1','Year':2011,'member':'N'})
         df.insert({'id':2,'Name':'name2','Year':2011,'member':'Y'})
         
         my_pivot = df.pivot('id',rows = ['Name','Year'], cols = ['member'], aggregate='count')
+
         self.assertEqual(R,str(my_pivot))
         
     def test2(self):
-        R = """count(id)
+        """method='valid', aggregate=count, invalid col"""
+        
+        R = """\
+count(id)
 member   Name=name1,   Name=name1,   Name=name2,   Total 
           Year=2010     Year=2011     Year=2011          
 ========================================================
@@ -48,15 +57,170 @@ N                  0             1             0       1
 Y                  1             0             1       2 
 ========================================================
 Total              1             1             1       3 """
+        
         df = DataFrame()
         df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y'})
         df.insert({'id':1,'Name':'name1','Year':2011,'member':'N'})
         df.insert({'id':2,'Name':'name2','Year':2011,'member':'Y'})
         
         my_pivot = df.pivot('id',rows = ['member'], cols = ['Name','Year'], aggregate='count')
+        
+        self.assertEqual(R,str(my_pivot))
+
+    def test3(self):
+        """method='full', aggregate=count, invalid row"""
+        
+        R = """\
+count(id)
+Name    Year   member=N   member=Y   Total 
+==========================================
+name1   2010          0          1       1 
+name1   2011          1          0       1 
+name2   2010         --         --      -- 
+name2   2011          0          1       1 
+==========================================
+Total                 1          2       3 """
+        
+        df = DataFrame()
+        df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y'})
+        df.insert({'id':1,'Name':'name1','Year':2011,'member':'N'})
+        df.insert({'id':2,'Name':'name2','Year':2011,'member':'Y'})
+        
+        my_pivot = df.pivot('id',rows = ['Name','Year'], cols = ['member'],
+                            aggregate='count', method='full')
+        
+        self.assertEqual(R,str(my_pivot))
+        
+    def test4(self):
+        """method='full', aggregate=count, invalid row"""
+
+        R = """\
+count(id)
+member   Name=name1,   Name=name1,   Name=name2,   Name=name2,   Total 
+          Year=2010     Year=2011     Year=2010     Year=2011          
+======================================================================
+N                  0             1            --             0       1 
+Y                  1             0            --             1       2 
+======================================================================
+Total              1             1            --             1       3 """
+        
+        df = DataFrame()
+        df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y'})
+        df.insert({'id':1,'Name':'name1','Year':2011,'member':'N'})
+        df.insert({'id':2,'Name':'name2','Year':2011,'member':'Y'})
+        
+        my_pivot = df.pivot('id',rows = ['member'], cols = ['Name','Year'],
+                            aggregate='count', method='full')
+
+        self.assertEqual(R,str(my_pivot))
+
+class Test_pivot_1(unittest.TestCase):
+    def test1(self):        
+        """method='valid', aggregate=tolist, invalid row"""
+        R = """\
+tolist(id)
+Name    Year    member=N     member=Y  
+======================================
+name1   2010   [nan, nan]   [0.0, 0.0] 
+name1   2011   [1.0, 1.0]   [nan, nan] 
+name2   2011   [nan, nan]   [2.0, 2.0] """
+        
+        df = DataFrame()
+        df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y','rep':1})
+        df.insert({'id':1,'Name':'name1','Year':2011,'member':'N','rep':1})
+        df.insert({'id':2,'Name':'name2','Year':2011,'member':'Y','rep':1})
+        df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y','rep':2})
+        df.insert({'id':1,'Name':'name1','Year':2011,'member':'N','rep':2})
+        df.insert({'id':2,'Name':'name2','Year':2011,'member':'Y','rep':2})
+        
+        my_pivot = df.pivot('id',rows = ['Name','Year'], cols = ['member'],
+                            aggregate='tolist')
+
+##        print(my_pivot)
+        
+        self.assertEqual(R,str(my_pivot))
+        
+    def test2(self):
+        """method='valid', aggregate=tolist, invalid col"""
+    
+        R = """\
+tolist(id)
+member   Name=name1,   Name=name1,   Name=name2, 
+          Year=2010     Year=2011     Year=2011  
+================================================
+N         [nan, nan]    [1.0, 1.0]    [nan, nan] 
+Y         [0.0, 0.0]    [nan, nan]    [2.0, 2.0] """
+        
+        df = DataFrame()
+        df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y','rep':1})
+        df.insert({'id':1,'Name':'name1','Year':2011,'member':'N','rep':1})
+        df.insert({'id':2,'Name':'name2','Year':2011,'member':'Y','rep':1})
+        df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y','rep':2})
+        df.insert({'id':1,'Name':'name1','Year':2011,'member':'N','rep':2})
+        df.insert({'id':2,'Name':'name2','Year':2011,'member':'Y','rep':2})
+        
+        my_pivot = df.pivot('id',rows = ['member'], cols = ['Name','Year'],
+                            aggregate='tolist')
+        
+##        print(my_pivot)
+        
+        self.assertEqual(R,str(my_pivot))
+
+    def test3(self):
+        """method='full', aggregate=tolist, invalid row"""
+        
+        R = """\
+tolist(id)
+Name    Year    member=N     member=Y  
+======================================
+name1   2010   [nan, nan]   [0.0, 0.0] 
+name1   2011   [1.0, 1.0]   [nan, nan] 
+name2   2010   [nan, nan]   [nan, nan] 
+name2   2011   [nan, nan]   [2.0, 2.0] """
+        
+        df = DataFrame()
+        df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y','rep':1})
+        df.insert({'id':1,'Name':'name1','Year':2011,'member':'N','rep':1})
+        df.insert({'id':2,'Name':'name2','Year':2011,'member':'Y','rep':1})
+        df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y','rep':2})
+        df.insert({'id':1,'Name':'name1','Year':2011,'member':'N','rep':2})
+        df.insert({'id':2,'Name':'name2','Year':2011,'member':'Y','rep':2})
+        
+        my_pivot = df.pivot('id',rows = ['Name','Year'], cols = ['member'],
+                            aggregate='tolist', method='full')
+        
+
+##        print(my_pivot)
+
+        self.assertEqual(R,str(my_pivot))
+        
+    def test4(self):
+        """method='full', aggregate=tolist, invalid col"""
+        
+        R = """\
+tolist(id)
+member   Name=name1,   Name=name1,   Name=name2,   Name=name2, 
+          Year=2010     Year=2011     Year=2010     Year=2011  
+==============================================================
+N         [nan, nan]    [1.0, 1.0]    [nan, nan]    [nan, nan] 
+Y         [0.0, 0.0]    [nan, nan]    [nan, nan]    [2.0, 2.0] """
+        
+        df = DataFrame()
+        df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y','rep':1})
+        df.insert({'id':1,'Name':'name1','Year':2011,'member':'N','rep':1})
+        df.insert({'id':2,'Name':'name2','Year':2011,'member':'Y','rep':1})
+        df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y','rep':2})
+        df.insert({'id':1,'Name':'name1','Year':2011,'member':'N','rep':2})
+        df.insert({'id':2,'Name':'name2','Year':2011,'member':'Y','rep':2})
+        
+        my_pivot = df.pivot('id',rows = ['member'], cols = ['Name','Year'],
+                            aggregate='tolist', method='full')
+
+##        print(my_pivot)
+
         self.assertEqual(R,str(my_pivot))
     
-class Test_pivot_1(unittest.TestCase):
+class Test_pivot_2(unittest.TestCase):
     def setUp(self):
         D={
             'SUBJECT':[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100],
@@ -92,12 +256,12 @@ class Test_pivot_1(unittest.TestCase):
 
         self.assertEqual(str(cm.exception),"'NOTAKEY'")
 
-    def test005(self):
-        with self.assertRaises(TypeError) as cm:
-            self.df.pivot('SUBJECT',rows='AGE')
-
-        self.assertEqual(str(cm.exception),
-                         "'str' object is not iterable")
+##    def test005(self):
+##        with self.assertRaises(TypeError) as cm:
+##            self.df.pivot('SUBJECT',rows='AGE')
+##
+##        self.assertEqual(str(cm.exception),
+##                         "'str' object is not iterable")
 
     def test0051(self):
         with self.assertRaises(TypeError) as cm:
@@ -112,6 +276,7 @@ class Test_pivot_1(unittest.TestCase):
 
         self.assertEqual(str(cm.exception),
                          "'str' object is not iterable")
+        
 ##    def test004(self):
 ##        # test the exclude parameter checking
 ##
@@ -130,9 +295,9 @@ class Test_pivot_1(unittest.TestCase):
         R=np.array([[14.8], [6.5], [17.6], [19.3], [7.6]])
         
         # this one shouldn't raise an Exception
-        myPyvtTbl = self.df.pivot('WORDS',rows=['CONDITION'],
+        D = self.df.pivot('WORDS',rows=['CONDITION'],
                       where=[('AGE','not in',['old',])])
-        D=np.array(myPyvtTbl)
+        
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -145,9 +310,8 @@ class Test_pivot_1(unittest.TestCase):
         R=np.array([[25.5], [75.5]])
         
         # aggregate is case-insensitive
-        myPyvtTbl = self.df.pivot('SUBJECT',rows=['AGE'],aggregate='AVG')
-        D=np.array(myPyvtTbl)
-
+        D=self.df.pivot('SUBJECT',rows=['AGE'],aggregate='AVG')
+        
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
 
@@ -159,9 +323,8 @@ class Test_pivot_1(unittest.TestCase):
         R=np.array([[ 11. ,   7. ,  13.4,  12. ,   6.9],
                  [ 14.8,   6.5,  17.6,  19.3,   7.6]])
         
-        myPyvtTbl = self.df.pivot('WORDS',rows=['AGE'],cols=['CONDITION'])
-        D=np.array(myPyvtTbl)
-
+        D = self.df.pivot('WORDS',rows=['AGE'],cols=['CONDITION'])
+        
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
 
@@ -214,9 +377,8 @@ class Test_pivot_1(unittest.TestCase):
                   None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]], dtype=object)
 
         # One row and one col factor                     
-        myPyvtTbl = self.df.pivot('WORDS',rows=['CONDITION'],cols=['SUBJECT'],aggregate='sum')
-        D=np.array(myPyvtTbl)
-    
+        D=self.df.pivot('WORDS',rows=['CONDITION'],cols=['SUBJECT'],aggregate='sum')
+        
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
 
@@ -228,9 +390,8 @@ class Test_pivot_1(unittest.TestCase):
         R=np.array([[5.191085988]])
 
         # No rows or cols        
-        myPyvtTbl = self.df.pivot('WORDS',aggregate='stdev')
-        D=np.array(myPyvtTbl)
-
+        D = self.df.pivot('WORDS',aggregate='stdev')
+        
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
 
@@ -252,10 +413,11 @@ class Test_pivot_1(unittest.TestCase):
                   [21.0, 19.0, 17.0, 15.0, 22.0, 16.0, 22.0, 22.0, 18.0, 21.0],
                   [10.0, 7.0, 8.0, 10.0, 4.0, 7.0, 10.0, 6.0, 7.0, 7.0]]])
 
-        myPyvtTbl = self.df.pivot('WORDS',
+        D = self.df.pivot('WORDS',
                       rows=['AGE'], cols=['CONDITION'],
                       aggregate='tolist')
-        D=np.array(myPyvtTbl)
+
+##        print(D)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -282,12 +444,10 @@ class Test_pivot_1(unittest.TestCase):
         num2abc=dict(zip(list(range(26)),'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))
         self.df['ABC']=[num2abc[v%26] for v in self.df['WORDS']]
 
-        myPyvtTbl = self.df.pivot('ABC',
+        D = self.df.pivot('ABC',
                       rows=['AGE'], cols=['CONDITION'],
                       aggregate='tolist')
-
-        D=np.array(myPyvtTbl)
-
+    
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
 
@@ -308,11 +468,9 @@ class Test_pivot_1(unittest.TestCase):
                       u'21,19,17,15,22,16,22,22,18,21',
                       u'10,7,8,10,4,7,10,6,7,7']])
 
-        myPyvtTbl = self.df.pivot('WORDS',
+        D=self.df.pivot('WORDS',
                       rows=['AGE'], cols=['CONDITION'],
                       aggregate='group_concat')
-
-        D=np.array(myPyvtTbl)
 
         # verify the table is the correct shape
         self.assertEqual(R.shape,D.shape)
@@ -321,7 +479,7 @@ class Test_pivot_1(unittest.TestCase):
         for d,r in zip(D.flat,R.flat):
             self.failUnlessEqual(d,r)
             
-class Test_pivot_2(unittest.TestCase):
+class Test_pivot_3(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
         self.df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
@@ -406,7 +564,8 @@ def suite():
     return unittest.TestSuite((
             unittest.makeSuite(Test_pivot_0),
             unittest.makeSuite(Test_pivot_1),
-            unittest.makeSuite(Test_pivot_2)
+            unittest.makeSuite(Test_pivot_2),
+            unittest.makeSuite(Test_pivot_3)
                               ))
 
 if __name__ == "__main__":

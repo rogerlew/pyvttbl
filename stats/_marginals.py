@@ -75,15 +75,15 @@ class Marginals(OrderedDict):
                          % type(cols).__name__)
         
         dmu = df.pivot(val, rows=factors, where=where,
-                         aggregate='avg', flatten=True)
+                         aggregate='avg')
 
 
         dN = df.pivot(val, rows=factors, where=where,
-                        aggregate='count', flatten=True)
+                        aggregate='count')
 
         dsem = df.pivot(val, rows=factors, where=where,
-                              aggregate='sem', flatten=True)
-         
+                              aggregate='sem')
+        
         # build factors from r_list
         factorials = OrderedDict()
         for i, r in enumerate(dN.rnames):
@@ -94,20 +94,18 @@ class Marginals(OrderedDict):
             for j, c in enumerate(r):
                 factorials[c[0]].append(c[1])
 
-        dlower = copy(dN)
-        dupper = copy(dN)
-        for i,(mu, sem) in enumerate(zip(dmu, dsem)):
-            dlower[i] = mu - 1.96 * sem
-            dupper[i] = mu + 1.96 * sem
+        dlower = dmu - 1.96 * dsem
+        dupper = dmu + 1.96 * dsem
 
-        super(Marginals, self).__init__()
         
+        super(Marginals, self).__init__()
+
         self['factorials'] = factorials
-        self['dmu'] = dmu
-        self['dN'] = dN
-        self['dsem'] = dsem
-        self['dlower'] = dlower
-        self['dupper'] = dupper
+        self['dmu'] = list(dmu)
+        self['dN'] = list(dN)
+        self['dsem'] = list(dsem)
+        self['dlower'] = list(dlower)
+        self['dupper'] = list(dupper)
 
         self.val = val
         self.factors = factors

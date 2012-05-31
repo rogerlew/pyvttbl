@@ -101,15 +101,15 @@ class Test_writepivot(unittest.TestCase):
         # clean up
         os.remove('./pivot_test2.csv')        
 
-    def test3(self):
-        from pyvttbl import PyvtTbl
-        myPyvtTbl = PyvtTbl()
-        # try to write pivot table when table doesn't exist
-        with self.assertRaises(Exception) as cm:
-            myPyvtTbl.write('pivot_test3.csv')
-
-        self.assertEqual(str(cm.exception),
-                         'must call pivot before writing pivot table')        
+##    def test3(self):
+##        from pyvttbl import PyvtTbl
+##        myPyvtTbl = PyvtTbl()
+##        # try to write pivot table when table doesn't exist
+##        with self.assertRaises(Exception) as cm:
+##            myPyvtTbl.write('pivot_test3.csv')
+##
+##        self.assertEqual(str(cm.exception),
+##                         'must call pivot before writing pivot table')        
         
     def test4(self):
         R = 'avg(SUPPRESSION)\r\nCYCLE=1_AGE=old,CYCLE=1_AGE=young,CYCLE=2_AGE=old,CYCLE=2_AGE=young,CYCLE=3_AGE=old,CYCLE=3_AGE=young,CYCLE=4_AGE=old,CYCLE=4_AGE=young\r\n21.9791666667,8.79166666667,30.5625,11.1125,30.6875,11.45,30.7916666667,10.95\r\n'

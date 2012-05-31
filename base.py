@@ -81,6 +81,9 @@ class DataFrame(OrderedDict):
         super(DataFrame, self).update(*args, **kwds)
 
     def bind_aggregate(self, name, arity, func):
+        """
+        bind a sqlite3 aggregator to DataFrame
+        """
         self.conn.create_aggregate(name, arity, func)
         
         self.aggregates = list(self.aggregates)
@@ -97,10 +100,10 @@ class DataFrame(OrderedDict):
                 'text' : np.dtype(str)}[self._sqltypesdict[key]]
     
     def get_mafillvalue(self, key):
-        return {'null' : '',
+        return {'null' : '?',
                 'integer' : 999999,
-                'real' : 999999,
-                'text' : ''}[self._sqltypesdict[key]]
+                'real' : 1e20,
+                'text' : 'N/A'}[self._sqltypesdict[key]]
 
     def read_tbl(self, fname, skip=0, delimiter=',',labels=True):
         """
@@ -132,7 +135,7 @@ class DataFrame(OrderedDict):
                         warnings.warn("Duplicate label '%s' found"
                                       %colname,
                                       RuntimeWarning)
-                        colname = '%s_%i'%(colname, colnameCounter[colname])                    
+                        colname += '_%i'%colnameCounter[colname]                   
                     colnames.append(colname)
                     data[colname] = []
                     mask[colname] = []
@@ -160,7 +163,7 @@ class DataFrame(OrderedDict):
                                   RuntimeWarning)
                 else:                    
                     for j, colname in enumerate(colnames):                        
-                        colname = colname.strip()#.replace(' ','_')
+                        colname = colname.strip()
                         if _isfloat(row[j]):
                             data[colname].append(float(row[j]))
                             mask[colname].append(0)
@@ -213,13 +216,13 @@ class DataFrame(OrderedDict):
                     self._check_sqlite3_type([d for d,m in zip(item,mask) if not m])
 
                 # replace invalid values
-                x = np.array([(d,self.get_mafillvalue(key))[m] for d,m in zip(item,mask)])
-                print(x)
-
+                fill_val = self.get_mafillvalue(key)
+                x = np.array([(d, fill_val)[m] for d,m in zip(item,mask)])
+                
                 # call super.__setitem__
                 super(DataFrame, self).\
-                    __setitem__(key, np.ma.array(x, mask=mask,
-                                                 dtype=self.get_nptype(key)))
+                    __setitem__(key, \
+                        np.ma.array(x, mask=mask, dtype=self.get_nptype(key)))
 
                 # set or update self.conditions DictSet
                 self.conditions[key] = self[key]
@@ -532,11 +535,24 @@ class DataFrame(OrderedDict):
         return list(self.cur)
     
     def pivot(self, val, rows=None, cols=None, aggregate='avg',
-              where=None, flatten=False, attach_rlabels=False):
+              where=None, attach_rlabels=False, method='valid'):
         """
-        returns a PyvtTbl object
+        val = the colname to place as the data in the table
+        rows = list of colnames whos combinations will become rows
+               in the table if left blank their will be one row
+        cols = list of colnames whos combinations will become cols
+               in the table if left blank their will be one col
+        aggregate = function applied across data going into each cell
+                  of the table
+                  http://www.sqlite.org/lang_aggfunc.html
+        where = list of tuples or list of strings for filtering data
+        method = when 'valid' only returns rows or columns with valid
+                 entries.
+                 when 'full' return full factorial combinations of the
+                 conditions specified by rows and cols
         """
-
+        calc_tots = True
+            
         if rows == None:
             rows = []
             
@@ -545,11 +561,307 @@ class DataFrame(OrderedDict):
             
         if where == None:
             where = []
+            
+        ##############################################################
+        # pivot programmatic flow                                    #
+        ##############################################################
+        #  1.  Check to make sure the table can be pivoted with the  #
+        #      specified parameters                                  #
+        #  2.  Create a sqlite table with only the data in columns   #
+        #      specified by val, rows, and cols. Also eliminate      #
+        #      rows that meet the exclude conditions                 #
+        #  3.  Build rnames and cnames lists                         #
+        #  4.  Build query based on val, rows, and cols              #
+        #  5.  Run query                                             #
+        #  6.  Read data to from cursor into a list of lists         #
+        #  7.  Query grand, row, and column totals                   #
+        #  8.  Clean up                                              #
+        #  9.  flatten if specified                                  #
+        #  10. Initialize and return PyvtTbl Object                  #
+        ##############################################################
 
-        p = PyvtTbl()
-        p.run(self, val, rows, cols, aggregate,
-                       where, flatten, attach_rlabels)
-        return p
+        #  1. Check to make sure the table can be pivoted with the
+        #     specified parameters
+        ##############################################################
+        #  This may seem excessive but it provides better feedback
+        #  to the user if the errors can be parsed out before had
+        #  instead of crashing on confusing looking code segments
+            
+                
+        # check to see if data columns have equal lengths
+        if not self._are_col_lengths_equal():
+            raise Exception('columns have unequal lengths')
+
+        # check the supplied arguments
+        if val not in self.keys():
+            raise KeyError(val)
+
+        if not hasattr(rows, '__iter__'):
+            raise TypeError( "'%s' object is not iterable"
+                             % type(cols).__name__)
+
+        if not hasattr(cols, '__iter__'):
+            raise TypeError( "'%s' object is not iterable"
+                             % type(cols).__name__)
+        
+        for k in rows:
+            if k not in self.keys():
+                raise KeyError(k)
+            
+        for k in cols:
+            if k not in self.keys():
+                raise KeyError(k)
+
+        # check for duplicate names
+        dup = Counter([val] + rows + cols)
+        del dup[None]
+        if not all(count == 1 for count in dup.values()):
+            raise Exception('duplicate labels specified')
+
+        # check aggregate function
+        aggregate = aggregate.lower()
+
+        if aggregate not in self.aggregates:
+            raise ValueError("supplied aggregate '%s' is not valid"%aggregate)
+        
+        # check to make sure where is properly formatted
+        # todo
+        
+        #  2. Create a sqlite table with only the data in columns
+        #     specified by val, rows, and cols. Also eliminate
+        #     rows that meet the exclude conditions      
+        ##############################################################
+        self._build_sqlite3_tbl([val] + rows + cols, where)
+        
+        #  3. Build rnames and cnames lists
+        ##############################################################
+        
+        # Refresh conditions list so we can build row and col list
+        self._execute('select %s from TBL'
+                      %', '.join(_sha1(n) for n in [val] + rows + cols))
+        Zconditions = DictSet(zip([val]+rows+cols, zip(*list(self.cur))))
+
+        # rnames_mask and cnanes_mask specify which unique combinations of
+        # factor conditions have valid entries in the table.
+        #   1 = valid
+        #   0 = not_valid
+        
+        # Build rnames
+        if rows == []:
+            rnames = [1]
+            rnames_mask = [1]
+        else:
+            rnames = []
+            rnames_mask = []
+
+            conditions_set = set(zip(*[self[n] for n in rows]))
+            for vals in Zconditions.unique_combinations(rows):
+                rnames_mask.append(tuple(vals) in conditions_set)                    
+                rnames.append(zip(rows,vals))
+        
+        # Build cnames
+        if cols == []:
+            cnames = [1]
+            cnames_mask = [1]
+        else:
+            cnames = []
+            cnames_mask = []
+
+            conditions_set = set(zip(*[self[n] for n in cols]))
+            for vals in Zconditions.unique_combinations(cols):
+                cnames_mask.append(tuple(vals) in conditions_set)
+                cnames.append(zip(cols,vals))
+        
+        
+        #  4. Build query based on val, rows, and cols
+        ##############################################################
+        #  Here we are using string formatting to build the query.
+        #  This method is generally discouraged for security, but
+        #  in this circumstance I think it should be okay. The column
+        #  labels are protected with leading and trailing underscores.
+        #  The rest of the query is set by the logic.
+        #
+        #  When we pass the data in we use the (?) tuple format
+        if aggregate == 'tolist':
+            agg = 'group_concat'
+        else:
+            agg = aggregate
+            
+        query = ['select ']            
+        if rnames == [1] and cnames == [1]:
+            query.append('%s( %s ) from TBL'%(agg, _sha1(val)))
+        else:
+            if rnames == [1]:
+                query.append(_sha1(val))
+            else:
+                query.append(', '.join(_sha1(r) for r in rows))
+
+            if cnames == [1]:
+                query.append('\n  , %s( %s )'%(agg, _sha1(val)))
+            else:
+                for cs in cnames:
+                    query.append('\n  , %s( case when '%agg)
+                    if all(map(_isfloat, zip(*cols)[1])):
+                        query.append(
+                        ' and '.join(('%s=%s'%(_sha1(k), v) for k, v in cs)))
+                    else:
+                        query.append(
+                        ' and '.join(('%s="%s"'%(_sha1(k) ,v) for k, v in cs)))
+                    query.append(' then %s end )'%_sha1(val))
+
+            if rnames == [1]:
+                query.append('\nfrom TBL')
+            else:                
+                query.append('\nfrom TBL group by ')
+                
+                for i, r in enumerate(rows):
+                    if i != 0:
+                        query.append(', ')
+                    query.append(_sha1(r))
+
+        #  5. Run Query
+        ##############################################################
+        self._execute(''.join(query))
+
+        #  6. Read data from cursor into a list of lists
+        ##############################################################
+
+        d = []
+        val_type = self.get_sqltype(val)
+##        fill_val = self.get_mafillvalue(val_type)
+
+        # keep the columns with the row labels
+        if attach_rlabels:
+            cnames = [(r, '') for r in rows].extend(cnames)
+            cnames_mask = [1 for i in _xrange(len(rows))].extend(cnames_mask)
+
+        if aggregate == 'tolist':
+            if method=='full':
+                i=0
+                for row in self.cur:
+                    while not rnames_mask[i]:
+                        d.append([[np.ma.masked] for j in _xrange(len(cnames))])
+                        i+=1
+                        
+                    d.append([])
+                    for cell, mask in zip(list(row)[-len(cnames):], cnames_mask):
+                        if cell == None or not mask:
+                            d[-1].append([np.ma.masked])
+                        else:
+                            if val_type == 'real' or val_type == 'integer':
+                                d[-1].append(eval('[%s]'%cell))
+                            else:
+                                d[-1].append(cell.split(','))
+
+                    i+=1
+            else:
+                for row in self.cur:
+                    d.append([])
+                    for cell, mask in zip(list(row)[-len(cnames):], cnames_mask):
+                        if mask:
+                            if cell == None:
+                                d[-1].append([np.ma.masked])
+                            elif val_type == 'real' or val_type == 'integer':
+                                d[-1].append(eval('[%s]'%cell))
+                            else:
+                                d[-1].append(cell.split(','))
+
+            # numpy arrays must have the same number of dimensions so we need to pad
+            # cells to the maximum dimension of the data
+            max_len = max(_flatten([[len(c) for c in L] for L in d]))
+
+            for i,L in enumerate(d):
+                for j,c in enumerate(L):
+                    for k in _xrange(max_len - len(d[i][j])):
+                        d[i][j].append(np.ma.masked)
+                        
+        else:
+            if method=='full':
+                i=0
+                for row in self.cur:
+                    while not rnames_mask[i]:
+                        d.append([np.ma.masked for j in _xrange(len(cnames))])
+                        i+=1
+
+                    row_data = list(row)[-len(cnames):]
+                    d.append([(np.ma.masked,v)[m] for v,m in zip(row_data, cnames_mask)])
+                    i+=1
+            else:
+                for row in self.cur:
+                    row_data = list(row)[-len(cnames):]
+                    d.append([v for v,m in zip(row_data, cnames_mask) if m])
+
+        #  7. Get totals
+        ##############################################################
+        row_tots, col_tots, grand_tot = [], [], []
+        if calc_tots:
+            if aggregate in ['tolist', 'group_concat', 'arbitrary']:
+                calc_tots = False
+            else:
+                query = 'select %s( %s ) from TBL'%(agg, _sha1(val))
+                self._execute(query)
+                grand_tot = list(self.cur)[0][0]
+
+                if cnames != [1] and rnames != [1]:
+                    query = ['select %s( %s ) from TBL group by'%(agg, _sha1(val))]
+                    query.append(', '.join(_sha1(r) for r in rows))
+                    self._execute(' '.join(query))
+                    
+                    if method=='full':
+                        i=0
+                        row_tots=[]
+                        for tup in self.cur:
+                            while not rnames_mask[i]:
+                                row_tots.append(np.ma.masked)
+                                i+=1
+                                
+                            row_tots.append(tup[0])
+                            i+=1
+                    else:
+                        row_tots = [tup[0] for tup in self.cur]
+                    
+                    query = ['select %s( %s ) from TBL group by'%(agg, _sha1(val))]
+                    query.append(', '.join(_sha1(r) for r in cols))
+                    self._execute(' '.join(query))
+
+                    if method=='full':
+                        i=0
+                        col_tots=[]
+                        for tup in self.cur:
+                            while not cnames_mask[i]:
+                                col_tots.append(np.ma.masked)
+                                i+=1
+                                
+                            col_tots.append(tup[0])
+                            i+=1
+                    else:
+                        col_tots = [tup[0] for tup in self.cur]                
+        
+        #  8. Clean up
+        ##############################################################
+        self.conn.commit()
+
+        #  9. Build rnames and cnames if method=='valid'
+        ##############################################################
+        if method=='valid':
+            rnames = [n for n,m in zip(rnames,rnames_mask) if m]
+            cnames = [n for n,m in zip(cnames,cnames_mask) if m]
+        
+        #  10. Initialize and return PyvtTbl Object
+        ##############################################################
+##
+##        print(d)
+##        print(rnames)
+##        print(cnames)
+##        print(col_tots)
+##        print(row_tots)
+##        print(grand_tot)
+##        print()
+##        
+        return PyvtTbl(d, val, Zconditions, rnames, cnames, aggregate,
+                       calc_tots=calc_tots,
+                       row_tots=row_tots, col_tots=col_tots, grand_tot=grand_tot,
+                       attach_rlabels=attach_rlabels)
             
     def select_col(self, val, where=None):
         """
@@ -825,7 +1137,8 @@ class DataFrame(OrderedDict):
                     self.conditions[k] = [v]
         elif c - s == set():
             for (k, v) in OrderedDict(row).items():
-                self[k]=np.concatenate((self[k], np.array([v], dtype=self.get_nptype(k))))
+                self[k]=np.concatenate((self[k],
+                                        np.array([v], dtype=self.get_nptype(k))))
                 self.conditions[k].add(v)
         else:
             raise Exception('row must have the same keys as the table')
@@ -952,7 +1265,7 @@ class DataFrame(OrderedDict):
                         aggregate='tolist',
                         where=where)
         for L in pt:
-            list_of_lists.append(L[0])
+            list_of_lists.append(list(L[0]))
 
         # build list of condiitons
         conditions_list = [tup[1] for [tup] in pt.rnames]
@@ -1127,349 +1440,189 @@ class DataFrame(OrderedDict):
     def scatter_matrix(self, variables, **kwargs):
         return plotting.scatter_matrix(self, variables, **kwargs)
 
-    scatter_matrix.__doc__ = plotting.scatter_matrix.__doc__
+    scatter_matrix.__doc__ = plotting.scatter_matrix.__doc__        
+
+class _ptmathmethod(object):
+    """
+    Defines a wrapper for arithmetic array methods (add, mul...).
+    """
+    def __init__ (self, methodname):
+        self.__name__ = methodname
+        self.__doc__ = getattr(np.ma.MaskedArray, methodname).__doc__
+        self.obj = None
+
+    def __get__(self, obj, objtype=None):
+        "Gets the calling object."
+        self.obj = obj
+        return self
+
+    def __call__ (self, other, *args):
+        "Execute the call behavior."
         
-class PyvtTbl(list):
+        instance = self.obj
+
+        func = getattr(super(PyvtTbl, instance), self.__name__)
+        data = np.ma.MaskedArray(func(other, *args), subok=False)
+
+        if isinstance(other, PyvtTbl):
+            func = getattr(np.array(instance.row_tots), self.__name__)
+            row_tots = list(func(other.row_tots, *args))
+
+            func = getattr(np.array(instance.col_tots), self.__name__)
+            col_tots = list(func(other.col_tots, *args))
+
+            func = getattr(np.array([instance.grand_tot]), self.__name__)
+            grand_tot = float(func(other.grand_tot, *args)[0])
+            
+        elif _isfloat(other):        
+            func = getattr(np.array(instance.row_tots), self.__name__)
+            row_tots = list(func(other, *args))
+
+            func = getattr(np.array(instance.col_tots), self.__name__)
+            col_tots = list(func(other, *args))
+
+            func = getattr(np.array([instance.grand_tot]), self.__name__)
+            grand_tot = float(func(other, *args)[0])
+
+        else:
+            row_tots = np.ma.masked_equal(np.zeros(len(instance.row_tots)), 0.)
+            col_tots = np.ma.masked_equal(np.zeros(len(instance.col_tots)), 0.)
+            grand_tot = np.ma.masked
+            
+        return PyvtTbl(data,
+                       val=instance.val,
+                       conditions=instance.conditions,
+                       rnames=instance.rnames,
+                       cnames=instance.cnames,
+                       aggregate=instance.aggregate,
+                       calc_tots=instance.calc_tots,
+                       row_tots=row_tots,
+                       col_tots=col_tots,
+                       grand_tot=grand_tot,
+                       attach_rlabels=instance.attach_rlabels)
+            
+    
+class PyvtTbl(np.ma.MaskedArray, object):
     """
     list of lists container holding the pivoted data
     """
-    def __init__(self, *args, **kwds):
-        if len(args) > 1:
-            raise Exception('expecting only 1 argument')
+    
+##    PyvtTbl(d, val, conditions, rnames, cnames, aggregate,
+##           calc_tots=calc_tots,
+##           row_tots=row_tots, col_tots=col_tots, grand_tot=grand_tot,
+##           attach_rlabels=attach_rlabels)
+    
+    def __new__(cls, data, val, conditions, rnames, cnames, aggregate, **kwds):
+        # http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
+        if data == None:
+            data = []
 
-        if kwds.has_key('val'):
-            self.val = kwds['val']
-        else:
-            self.val = None
+        maparms = dict(copy=kwds.get('copy',False),
+                       dtype=kwds.get('dtype',None),
+                       fill_value=kwds.get('fill_value',None),
+                       subok=kwds.get('subok',True),
+                       keep_mask=kwds.get('keep_mask',True),
+                       hard_mask=kwds.get('hard_mask',False))
 
-        if kwds.has_key('show_tots'):
-            self.show_tots = kwds['show_tots']
-        else:
-            self.show_tots = True
+        mask = kwds.get('mask', np.ma.nomask)
+        obj = np.ma.MaskedArray.__new__(cls, data, mask=mask, **maparms)
 
-        if kwds.has_key('calc_tots'):
-            self.calc_tots = kwds['calc_tots']
+        # Get data
+        if not kwds.get('subok',True) or not isinstance(obj, PyvtTbl):
+            obj = obj.view(cls)
+
+        # add attributes to instance
+        obj.val = val
+        obj.conditions = conditions
+        obj.rnames = rnames
+        obj.cnames = cnames
+        obj.aggregate = aggregate
+        obj.calc_tots = kwds.get('calc_tots', True)
+
+        if 'row_tots' in kwds:
+            obj.row_tots = np.ma.array(kwds['row_tots'])
         else:
-            self.calc_tots = True
+            obj.row_tots = np.ma.masked_equal(np.zeros(len(cnames)), 0.)
+
+        if 'col_tots' in kwds:
+            obj.col_tots = np.ma.array(kwds['col_tots'])
+        else:
+            obj.col_tots = np.ma.masked_equal(np.zeros(len(rnames)), 0.)
             
-        if kwds.has_key('row_tots'):
-            self.row_tots = kwds['row_tots']
-        else:
-            self.row_tots = None
-                
-        if kwds.has_key('col_tots'):
-            self.col_tots = kwds['col_tots']
-        else:
-            self.col_tots = None
-            
-        if kwds.has_key('grand_tot'):
-            self.grand_tot = kwds['grand_tot']
-        else:
-            self.grand_tot = None
-            
-        if kwds.has_key('rnames'):
-            self.rnames = kwds['rnames']
-        else:
-            self.rnames = None
+        obj.grand_tot = kwds.get('grand_tot', np.ma.masked)
+        obj.where = kwds.get('where', [])
+        obj.attach_rlabels = kwds.get('attach_rlabels', False)
 
-        if kwds.has_key('cnames'):
-            self.cnames = kwds['cnames']
-        else:
-            self.cnames = None
-
-        if kwds.has_key('aggregate'):
-            self.aggregate = kwds['aggregate']
-        else:
-            self.aggregate = 'avg'
+        obj.subok = maparms['subok']
+        obj.keep_mask = maparms['keep_mask']
+        obj.hard_mask = maparms['hard_mask']
             
-        if kwds.has_key('flatten'):
-            self.flatten = kwds['flatten']
-        else:
-            self.flatten = False
-            
-        if kwds.has_key('where'):
-            self.where = kwds['where']
-        else:
-            self.where = []
+        return obj
 
-        if kwds.has_key('attach_rlabels'):
-            self.attach_rlabels = kwds['attach_rlabels']
-        else:
-            self.attach_rlabels = False
-
-        if len(args) == 1:
-            super(PyvtTbl, self).__init__(args[0])
-        else:
-            super(PyvtTbl, self).__init__()
-            
-    def run(self, df, val, rows=None, cols=None,
-                 aggregate='avg', where=None, flatten=False,
-                 attach_rlabels=False, calc_tots=True):
+    def __array_finalize__(self, obj):
         
-        # public method, saves table to df variables after pivoting
-        """
-        val = the colname to place as the data in the table
-        rows = list of colnames whos combinations will become rows
-               in the table if left blank their will be one row
-        cols = list of colnames whos combinations will become cols
-               in the table if left blank their will be one col
-        aggregate = function applied across data going into each cell
-                  of the table
-                  http://www.sqlite.org/lang_aggfunc.html
-        where = list of tuples or list of strings for filtering data
-        """
-            
-        if rows == None:
-            rows = []
-            
-        if cols == None:
-            cols = []
-            
-        if where == None:
-            where = []
-            
-        ##############################################################
-        # pivot programmatic flow                                    #
-        ##############################################################
-        #  1.  Check to make sure the table can be pivoted with the  #
-        #      specified parameters                                  #
-        #  2.  Create a sqlite table with only the data in columns   #
-        #      specified by val, rows, and cols. Also eliminate      #
-        #      rows that meet the exclude conditions                 #
-        #  3.  Build rnames and cnames lists                         #
-        #  4.  Build query based on val, rows, and cols              #
-        #  5.  Run query                                             #
-        #  6.  Read data to from cursor into a list of lists         #
-        #  7.  Query grand, row, and column totals                   #
-        #  8.  Clean up                                              #
-        #  9.  flatten if specified                                  #
-        #  10. return data, rnames, and cnames                       #
-        ##############################################################
+        self.val = getattr(obj, 'val', None)
+        self.conditions = getattr(obj, 'conditions', DictSet())
+        self.rnames = getattr(obj, 'rnames', [1])
+        self.cnames = getattr(obj, 'cnames', [1])
+        self.aggregate = getattr(obj, 'aggregate', 'avg')
 
-        #  1. Check to make sure the table can be pivoted with the
-        #     specified parameters
-        ##############################################################
-        #  This may seem excessive but it provides better feedback
-        #  to the user if the errors can be parsed out before had
-        #  instead of crashing on confusing looking code segments
-            
-                
-        # check to see if data columns have equal lengths
-        if not df._are_col_lengths_equal():
-            raise Exception('columns have unequal lengths')
+        self.calc_tots = getattr(obj, 'calc_tots', True)
 
-        # check the supplied arguments
-        if val not in df.keys():
-            raise KeyError(val)
-
-        if not hasattr(rows, '__iter__'):
-            raise TypeError( "'%s' object is not iterable"
-                             % type(cols).__name__)
-
-        if not hasattr(cols, '__iter__'):
-            raise TypeError( "'%s' object is not iterable"
-                             % type(cols).__name__)
-        
-        for k in rows:
-            if k not in df.keys():
-                raise KeyError(k)
-            
-        for k in cols:
-            if k not in df.keys():
-                raise KeyError(k)
-
-        # check for duplicate names
-        dup = Counter([val] + rows + cols)
-        del dup[None]
-        if not all(count == 1 for count in dup.values()):
-            raise Exception('duplicate labels specified')
-
-        # check aggregate function
-        aggregate = aggregate.lower()
-
-        if aggregate not in df.aggregates:
-            raise ValueError("supplied aggregate '%s' is not valid"%aggregate)
-        
-        # check to make sure where is properly formatted
-        # todo
-        
-        #  2. Create a sqlite table with only the data in columns
-        #     specified by val, rows, and cols. Also eliminate
-        #     rows that meet the exclude conditions      
-        ##############################################################
-        df._build_sqlite3_tbl([val] + rows + cols, where)
-        
-        #  3. Build rnames and cnames lists
-        ##############################################################
-        
-        # Refresh conditions list so we can build row and col list
-        df._execute('select %s from TBL'
-                      %', '.join(_sha1(n) for n in [val] + rows + cols))
-        Zconditions = DictSet(zip([val]+rows+cols, zip(*list(df.cur))))
-                
-        # Build rnames
-        if rows == []:
-            rnames = [1]
+        if hasattr(obj, 'row_tots'):
+            self.row_tots = np.ma.array(obj.row_tots)
         else:
-            rnames = []
-
-            conditions_set = set(zip(*[df[n] for n in rows]))
-            for vals in Zconditions.unique_combinations(rows):
-                if tuple(vals) in conditions_set:
-                    rnames.append(zip(rows,vals))
+            self.row_tots = np.ma.masked_equal(np.zeros(len(self.cnames)), 0.)
         
-        # Build cnames
-        if cols == []:
-            cnames = [1]
+        if hasattr(obj, 'col_tots'):
+            self.col_tots = np.ma.array(obj.col_tots)
         else:
-            cnames = []
-
-            conditions_set = set(zip(*[df[n] for n in cols]))
-            for vals in Zconditions.unique_combinations(cols):
-                if tuple(vals) in conditions_set:
-                    cnames.append(zip(cols,vals))
-        
-        #  4. Build query based on val, rows, and cols
-        ##############################################################
-        #  Here we are using string formatting to build the query.
-        #  This method is generally discouraged for security, but
-        #  in this circumstance I think it should be okay. The column
-        #  labels are protected with leading and trailing underscores.
-        #  The rest of the query is set by the logic.
-        #
-        #  When we pass the data in we use the (?) tuple format
-        if aggregate == 'tolist':
-            agg = 'group_concat'
-        else:
-            agg = aggregate
+            self.col_tots = np.ma.masked_equal(np.zeros(len(self.rnames)), 0.)
             
-        query = ['select ']            
-        if rnames == [1] and cnames == [1]:
-            query.append('%s( %s ) from TBL'%(agg, _sha1(val)))
-        else:
-            if rnames == [1]:
-                query.append(_sha1(val))
-            else:
-                query.append(', '.join(_sha1(r) for r in rows))
+        self.grand_tot = getattr(obj, 'grand_tot', np.ma.masked)
+        self.where = getattr(obj, 'where', [])
+        self.attach_rlabels = getattr(obj, 'attach_rlabels', False)
 
-            if cnames == [1]:
-                query.append('\n  , %s( %s )'%(agg, _sha1(val)))
-            else:
-                for cs in cnames:
-                    query.append('\n  , %s( case when '%agg)
-                    if all(map(_isfloat, zip(*cols)[1])):
-                        query.append(
-                        ' and '.join(('%s=%s'%(_sha1(k), v) for k, v in cs)))
-                    else:
-                        query.append(
-                        ' and '.join(('%s="%s"'%(_sha1(k) ,v) for k, v in cs)))
-                    query.append(' then %s end )'%_sha1(val))
+        self.subok = getattr(obj, 'subok', True)
+        self.keep_mask = getattr(obj, 'keep_mask', True)
+        self.hard_mask = getattr(obj, 'hard_mask', False)
 
-            if rnames == [1]:
-                query.append('\nfrom TBL')
-            else:                
-                query.append('\nfrom TBL group by ')
-                
-                for i, r in enumerate(rows):
-                    if i != 0:
-                        query.append(', ')
-                    query.append(_sha1(r))
-
-        #  5. Run Query
-        ##############################################################
-        df._execute(''.join(query))
-
-        #  6. Read data from cursor into a list of lists
-        ##############################################################
-
-        d = []
-        val_type = df.get_sqltype(val)
-
-        # keep the columns with the row labels
-        if attach_rlabels:
-            if aggregate == 'tolist':
-                for row in df.cur:
-                    d.append([])
-                    for cell in list(row):
-                        if val_type == 'real' or val_type == 'integer':
-                            d[-1].append(eval('[%s]'%cell))
-                        else:
-                            d[-1].append(cell.split(','))
-            else:
-                for row in df.cur:
-                    d.append(list(row))
-
-            cnames = [(r, '') for r in rows].extend(cnames)
-                    
-        # eliminate the columns with row labels
-        else:
-            if aggregate == 'tolist':
-                for row in df.cur:
-                    d.append([])
-                    for cell in list(row)[-len(cnames):]:
-                        if val_type == 'real' or val_type == 'integer':
-                            d[-1].append(eval('[%s]'%cell))
-                        else:
-                            d[-1].append(cell.split(','))
-            else:
-                for row in df.cur:
-                    d.append(list(row)[-len(cnames):])
-
-        #  7. Get totals
-        ##############################################################
-        if calc_tots:
-            if aggregate in ['tolist', 'group_concat', 'arbitrary']:
-                self.calc_tots = False
-            else:
-                query = 'select %s( %s ) from TBL'%(agg, _sha1(val))
-                df._execute(query)
-                self.grand_tot = list(df.cur)[0][0]
-
-                if cnames != [1] and rnames != [1]:
-                    query = ['select %s( %s ) from TBL group by'%(agg, _sha1(val))]
-                    query.append(', '.join(_sha1(r) for r in rows))
-                    df._execute(' '.join(query))
-                    self.row_tots = [tup[0] for tup in df.cur]
-                    
-                    query = ['select %s( %s ) from TBL group by'%(agg, _sha1(val))]
-                    query.append(', '.join(_sha1(r) for r in cols))
-                    df._execute(' '.join(query))
-                    self.col_tots = [tup[0] for tup in df.cur]                
-        
-        #  8. Clean up
-        ##############################################################
-        df.conn.commit()
-
-        #  9. flatten if specified
-        ##############################################################
-        if flatten:
-            d = _flatten(d)
-
-        #  10. set data, rnames, and cnames
-        ##############################################################
-        self.df = df
-        self.val = val
-        self.rows = rows
-        self.cols = cols
-        self.aggregate = aggregate
-        self.where = where
-        self.flatten = flatten
-        self.attach_rlabels = attach_rlabels
-
-        self.rnames = rnames 
-        self.cnames = cnames
-        self.aggregate = aggregate
-        self.conditions = Zconditions
-
-        super(PyvtTbl, self).__init__(d)
+        np.ma.MaskedArray.__array_finalize__(self, obj)
 
     def transpose(self):
         """
-        tranpose the pivot table in place
+        returns a transposed PyvtTbl object
         """
-        super(PyvtTbl,self).__init__([list(r) for r in zip(*self)])
-        self.rnames,self.cnames = self.cnames,self.rnames
-        self.row_tots,self.col_tots = self.col_tots,self.row_tots
+        return PyvtTbl(super(PyvtTbl,self).transpose(),
+                             self.val,
+                             self.conditions,
+                             self.cnames,
+                             self.rnames,
+                             self.aggregate,
+                             calc_tots=self.calc_tots,
+                             row_tots=self.col_tots,
+                             col_tots=self.row_tots,
+                             grand_tot=self.grand_tot,
+                             attach_rlabels=self.attach_rlabels,
+                             subok=self.subok,
+                             keep_mask=self.keep_mask,
+                             hard_mask=self.hard_mask)
+
+    def flatten(self):
+        """
+        returns a the PyvtTbl flattened as a MaskedArray
+        """
+
+        # probably a better way to do this if you really know what your doing.
+        # subclassing numpy objects is not for the faint of heart
+        
+        obj = super(PyvtTbl,self).flatten()
+        if hasattr(obj.mask, '__iter__'):
+            return eval('np.ma.array(%s, mask=%s)'%\
+                        (repr(obj.tolist()), repr(list(obj.mask))))
+        else:
+            return eval('np.ma.array(%s, mask=%s)'%\
+                        (repr(obj.tolist()), repr(obj.mask)))
 
     def _are_row_lengths_equal(self):
         """
@@ -1503,24 +1656,11 @@ class PyvtTbl(list):
         else:
             return [str(k) for (k, v) in self.cnames[0]]
 
-    def shape(self):
-        """
-        returns the size of the pivot table as a tuple. Does not
-        include row label columns.
-
-          The first element is the number of columns.
-          The second element is the number of rows
-        """
-        if len(self) == 0:
-            return (0, 0)
-        
-        return (len(self.rnames), len(self[0]))
-
     def write(self, fname=None, delimiter=','):
         """
         writes the pivot table to a plaintext file
 
-          as currently implemented does not write grandtotals
+          as currently implemented does not write grand_totals
         """
         
         if self == []:
@@ -1561,7 +1701,7 @@ class PyvtTbl(list):
             header = ['Value']
 
             # initialize the texttable and add stuff
-            data.append(self[0])
+            data.append(list(self[0]))
             
         elif self.rnames == [1]: # no rows were specified
             # build the header
@@ -1569,7 +1709,7 @@ class PyvtTbl(list):
                       for L in self.cnames]
 
             # initialize the texttable and add stuff
-            data.append(self[0])
+            data.append(list(self[0]))
             
         elif self.cnames == [1]: # no cols were specified
             # build the header
@@ -1577,7 +1717,7 @@ class PyvtTbl(list):
             
             # initialize the texttable and add stuff
             for i, L in enumerate(self.rnames):
-                data.append([c for (f, c) in L] + self[i])
+                data.append([c for (f, c) in L] + list(self[i]))
             
         else: # table has rows and cols
             # build the header
@@ -1587,7 +1727,7 @@ class PyvtTbl(list):
 
             # initialize the texttable and add stuff
             for i, L in enumerate(self.rnames):
-                data.append([c for (f, c) in L] + self[i])
+                data.append([c for (f, c) in L] + list(self[i]))
 
         # write file
         with open(fname, 'wb') as fid:
@@ -1603,10 +1743,7 @@ class PyvtTbl(list):
         if self == []:
             return DataFrame()
 
-        if self.flatten:
-            raise NotImplementedError(
-                'Pyvttbl.to_dataframe() cannot handle flatten tables.')
-
+        
         rows = self._get_rows()
         cols = self._get_cols()
 
@@ -1623,14 +1760,14 @@ class PyvtTbl(list):
             header = [',\n'.join('%s=%s'%(f, c) for (f, c) in L) \
                       for L in self.cnames]
             
-            df.insert(zip(header, self[0]))
+            df.insert(zip(header, list(self[0])))
             
         elif self.cnames == [1]: # no cols were specified
             # build the header
             header = rows + ['Value']
             
             for i, L in enumerate(self.rnames):
-                df.insert(zip(header, [c for (f, c) in L] + self[i]))
+                df.insert(zip(header, [c for (f, c) in L] + list(self[i])))
             
         else: # table has rows and cols
             # build the header
@@ -1639,22 +1776,21 @@ class PyvtTbl(list):
                 header.append(',\n'.join('%s=%s'%(f, c) for (f, c) in L))
             
             for i, L in enumerate(self.rnames):
-                df.insert(zip(header, [c for (f, c) in L] + self[i]))
+                df.insert(zip(header, [c for (f, c) in L] + list(self[i])))
 
         return df
-    
+
     def __str__(self):
         """
         returns a human friendly string representation of the table
-        """        
+        """
+##        return super(PyvtTbl, self).__str__()
+    
         if self == []:
             return '(table is empty)'
-
-        if self.flatten:
-            return super(PyvtTbl, self).__str__()
-
-        showtots = self.show_tots and self.calc_tots
-
+        
+        show_tots = self.calc_tots
+        
         rows = self._get_rows()
         cols = self._get_cols()
 
@@ -1675,15 +1811,15 @@ class PyvtTbl(list):
             # build the header
             header = [',\n'.join('%s=%s'%(f, c) for (f, c) in L) \
                       for L in self.cnames]
-            if showtots:
+            if show_tots:
                 header.append('Total')
             
             # initialize the texttable and add stuff
             # False and True evaluate as 0 and 1 for integer addition
             # and list indexing
-            tt.set_cols_dtype(['a'] * (len(self.cnames)+showtots))
-            tt.set_cols_align(['r'] * (len(self.cnames)+showtots))
-            tt.add_row(self[0]+([],[self.grand_tot])[showtots])
+            tt.set_cols_dtype(['a'] * (len(self.cnames)+show_tots))
+            tt.set_cols_align(['r'] * (len(self.cnames)+show_tots))
+            tt.add_row(list(self[0])+([],[self.grand_tot])[show_tots])
             
         elif self.cnames == [1]: # no cols were specified
             # build the header
@@ -1693,9 +1829,9 @@ class PyvtTbl(list):
             tt.set_cols_dtype(['t'] * len(rows) + ['a'])
             tt.set_cols_align(['l'] * len(rows) + ['r'])
             for i, L in enumerate(self.rnames):
-                tt.add_row([c for (f, c) in L] + self[i])
+                tt.add_row([c for (f, c) in L] + [self[i,0]])
 
-            if showtots:
+            if show_tots:
                 tt.footer(['Total'] + 
                           ['']*(len(rows)-1) +
                           [self.grand_tot])
@@ -1705,25 +1841,30 @@ class PyvtTbl(list):
             header = copy(rows)
             for L in self.cnames:
                 header.append(',\n'.join('%s=%s'%(f, c) for (f, c) in L))
-            if showtots:
+            if show_tots:
                 header.append('Total')
 
-            dtypes = ['t'] * len(rows) + ['a'] * (len(self.cnames)+showtots)
-            aligns = ['l'] * len(rows) + ['r'] * (len(self.cnames)+showtots)
+            dtypes = ['t'] * len(rows) + ['a'] * (len(self.cnames)+show_tots)
+            aligns = ['l'] * len(rows) + ['r'] * (len(self.cnames)+show_tots)
 
             # initialize the texttable and add stuff
             tt.set_cols_dtype(dtypes)
             tt.set_cols_align(aligns)
-            for i, L in enumerate(self.rnames):
-                tt.add_row([c for (f, c) in L] +
-                           self[i] +
-                           ([],[self.row_tots[i]])[showtots])
+            if show_tots:
+                for i, L in enumerate(self.rnames):
+                    tt.add_row([c for (f, c) in L] +
+                               list(self[i]) +
+                               [self.row_tots[i]])
 
-            if showtots:
                 tt.footer(['Total'] + 
                           ['']*(len(rows)-1) +
-                          self.col_tots +
+                          list(self.col_tots) +
                           [self.grand_tot])
+                
+            else:
+                for i, L in enumerate(self.rnames):
+                    tt.add_row([c for (f, c) in L] +
+                               self[i].tolist())
 
         # add header and decoration
         tt.header(header)
@@ -1739,37 +1880,35 @@ class PyvtTbl(list):
         if self == []:
             return 'PyvtTbl()'
 
-        args = super(PyvtTbl, self).__repr__()
+        args = repr(self.tolist())
+        args += ", '%s'"%self.val
+        args += ", %s"%repr(self.conditions)
+        args += ", %s"%repr(self.rnames)
+        args += ", %s"%repr(self.cnames)
+        args += ", '%s'"%self.aggregate
+        
         kwds = []
-        if self.val != None:
-            kwds.append(", val='%s'"%self.val)
-
-        if self.show_tots != True:
-            kwds.append(", show_tots=False")
 
         if self.calc_tots != True:
             kwds.append(", calc_tots=False")
 
         if self.row_tots != None:
-            kwds.append(', row_tots=%s'%repr(self.row_tots))
+            # sometimes np.ma.array.mask is a bool, somtimes it is a list.
+            # if we just copy the mask over it will first create a list and then
+            # keep appending to the list everytime the object is reprized. Not sure if
+            # if this is a bug or intentional. Anyways handling the masked string this
+            # way makes it so repr(eval(repr(myPyvttbl))) = repr(myPyvttbl)
+            mask_str =('',', mask=%s')[any(_flatten([self.row_tots.mask]))]
+            kwds.append(', row_tots=np.ma.array(%s%s)'%\
+                        (self.row_tots.tolist(), mask_str))
                 
         if self.col_tots != None:
-            kwds.append(', col_tots=%s'%repr(self.col_tots))
+            mask_str =('',', mask=%s')[any(_flatten([self.col_tots.mask]))]
+            kwds.append(', col_tots=np.ma.array(%s%s)'%\
+                        (self.col_tots.tolist(), mask_str))
             
         if self.grand_tot != None:
-            kwds.append(', grand_tot=%s'%repr(self.grand_tot))
-            
-        if self.rnames != None:
-            kwds.append(', rnames=%s'%repr(self.rnames))
-
-        if self.cnames != None:
-            kwds.append(', cnames=%s'%repr(self.cnames))
-
-        if self.aggregate != 'avg':
-            kwds.append(", aggregate='%s'"%self.aggregate)
-            
-        if self.flatten != False:
-            kwds.append(', flatten=%s'%self.flatten)
+            kwds.append(', grand_tot=%s'%repr(self.grand_tot))            
             
         if self.where != []:
             if isinstance(self.where, _strobj):
@@ -1780,7 +1919,61 @@ class PyvtTbl(list):
         if self.attach_rlabels != False:
             kwds.append(', attach_rlabels=%s'%self.attach_rlabels)
 
+        # masked array related parameters
+        if self.mask != False:
+            kwds.append(', mask=%s'%repr(list(self.mask)))
+            
+        if self.dtype != None:
+            kwds.append(', dtype=%s'%repr(self.dtype))
+                
+        if self.fill_value != None:
+            kwds.append(', fill_value=%s'%repr(self.fill_value))
+            
+        if self.subok != True:
+            kwds.append(', subok=%s'%repr(self.subok))
+            
+        if self.keep_mask != True:
+            kwds.append(', keep_mask=%s'%repr(self.keep_mask))
+            
+        if self.hard_mask != False:
+            kwds.append(', hard_mask=%s'%repr(self.hard_mask))
+            
         if len(kwds)>1:
             kwds = ''.join(kwds)
             
-        return 'PyvtTbl(%s%s)'%(args,kwds)
+        return ('PyvtTbl(%s%s)'%(args,kwds)).replace('\n','')
+    
+    __add__ = _ptmathmethod('__add__')
+    __radd__ = _ptmathmethod('__add__')
+    __sub__ = _ptmathmethod('__sub__')
+    __rsub__ = _ptmathmethod('__rsub__')
+    __pow__ = _ptmathmethod('__pow__')
+    __mul__ = _ptmathmethod('__mul__')
+    __rmul__ = _ptmathmethod('__mul__')
+    __div__ = _ptmathmethod('__div__')
+    __rdiv__ = _ptmathmethod('__rdiv__')
+    __truediv__ = _ptmathmethod('__truediv__')
+    __rtruediv__ = _ptmathmethod('__rtruediv__')
+    __floordiv__ = _ptmathmethod('__floordiv__')
+    __rfloordiv__ = _ptmathmethod('__rfloordiv__')
+##    __eq__ = _ptmathmethod('__eq__')
+##    __ne__ = _ptmathmethod('__ne__')
+##    __lt__ = _ptmathmethod('__lt__')
+##    __le__ = _ptmathmethod('__le__')
+##    __gt__ = _ptmathmethod('__gt__')
+##    __ge__ = _ptmathmethod('__ge__')
+##
+##    copy = _tsarraymethod('copy', ondates=True)
+##    compress = _tsarraymethod('compress', ondates=True)
+##    cumsum = _tsarraymethod('cumsum', ondates=False)
+##    cumprod = _tsarraymethod('cumprod', ondates=False)
+##    anom = _tsarraymethod('anom', ondates=False)
+##
+##    sum = _tsaxismethod('sum')
+##    prod = _tsaxismethod('prod')
+##    mean = _tsaxismethod('mean')
+##    var = _tsaxismethod('var')
+##    std = _tsaxismethod('std')
+##    all = _tsaxismethod('all')
+##    any = _tsaxismethod('any')
+##

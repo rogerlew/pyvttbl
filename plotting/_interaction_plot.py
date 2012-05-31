@@ -129,7 +129,15 @@ def interaction_plot(df, val, xaxis,
     # check cell counts
     cols = [f for f in [seplines, sepxplots, sepyplots] if f in df.keys()]
     counts = df.pivot(val, rows=[xaxis], cols=cols,
-                        flatten=True, where=where, aggregate='count')
+                      where=where, aggregate='count')
+
+    # unpack conditions DictSet from counts PyvtTbl
+    # we need to do it this way instead of using df.conditions
+    # because the counts PyvtTbl reflects the where exclusions
+    conditions = counts.conditions
+
+    # flatten counts to MaskedArray
+    counts = counts.flatten()
 
     for count in counts:
         if count < 1:
@@ -190,14 +198,14 @@ def interaction_plot(df, val, xaxis,
     numrows = 1
     rlevels = [1]
     if sepyplots != None:
-        rlevels = copy(counts.conditions[sepyplots]) # a set
+        rlevels = copy(conditions[sepyplots]) # a set
         numrows = len(rlevels) # a int
         rlevels = sorted(rlevels) # set -> sorted list
             
     numcols = 1
     clevels = [1]            
     if sepxplots != None:
-        clevels = copy(counts.conditions[sepxplots])
+        clevels = copy(conditions[sepxplots])
         numcols = len(clevels)
         clevels = sorted(clevels) # set -> sorted list
 
@@ -256,15 +264,17 @@ def interaction_plot(df, val, xaxis,
             if seplines == None:
                 y = df.pivot(val, cols=[xaxis],
                                where=where+where_extension,
-                               aggregate='avg', flatten=True)
+                               aggregate='avg')
+                
+                cnames = y.cnames
+                y = y.flatten()
 
                 if aggregate != None:
                     yerr = df.pivot(val, cols=[xaxis],
                                       where=where+where_extension,
-                                      aggregate=aggregate,
-                                      flatten=True)
+                                      aggregate=aggregate).flatten()
                 
-                x = [name for [(label, name)] in y.cnames]
+                x = [name for [(label, name)] in cnames]
                 
                 if _isfloat(yerr):
                     yerr = np.array([yerr for a in x])
@@ -291,16 +301,14 @@ def interaction_plot(df, val, xaxis,
             else:                       
                 y = df.pivot(val, rows=[seplines], cols=[xaxis],
                                where=where+where_extension,
-                               aggregate='avg',
-                               flatten=False)
+                               aggregate='avg')
                 
                 if aggregate != None:
                     yerrs = df.pivot(val,
                                        rows=[seplines],
                                        cols=[xaxis],
                                        where=where+where_extension,
-                                       aggregate=aggregate,
-                                       flatten=False)
+                                       aggregate=aggregate)
                     
                 x = [name for [(label, name)] in y.cnames]
 
