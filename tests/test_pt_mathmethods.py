@@ -97,7 +97,7 @@ Total              24      21.667      13.889   19.479 """
         pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
         pt2=pt*5
 
-        print(pt2)
+##        print(pt2)
         
         self.assertEqual(str(pt2),R)
 
@@ -118,7 +118,7 @@ Total          23.040      18.778       7.716   15.178 """
         pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
         pt2=pt*pt
 
-        print(pt2)
+##        print(pt2)
         
         self.assertEqual(str(pt2),R)
         
@@ -138,14 +138,35 @@ Total              --          --          --      -- """
         pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
         pt2=pt*np.array([[5,5,5], [5,5,5]])
 
-        print(pt2)
+##        print(pt2)
         
         self.assertEqual(str(pt2),R)
+
+     
+class Test_pt_mathmethods_sum(unittest.TestCase):
+    def test0(self):
+        # __add__ constant
+        R ="""\
+avg(ERROR)
+TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total  
+======================================================
+T1             12.167      11.500           9   10.619 
+T2              8.222       7.889       6.556    7.556 
+======================================================
+Total           9.800       9.333       7.778    8.896 """
+        
+        
+        df=DataFrame()
+        df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
+        self.assertAlmostEqual(np.sum(pt),25.3333333333, 5)
+
         
 def suite():
     return unittest.TestSuite((
             unittest.makeSuite(Test_pt_mathmethods__add__),
-            unittest.makeSuite(Test_pt_mathmethods__mul__)
+            unittest.makeSuite(Test_pt_mathmethods__mul__),
+            unittest.makeSuite(Test_pt_mathmethods_sum)
                               ))
 
 if __name__ == "__main__":

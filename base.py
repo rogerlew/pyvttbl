@@ -551,6 +551,7 @@ class DataFrame(OrderedDict):
                  when 'full' return full factorial combinations of the
                  conditions specified by rows and cols
         """
+        
         calc_tots = True
             
         if rows == None:
@@ -726,9 +727,9 @@ class DataFrame(OrderedDict):
         #  6. Read data from cursor into a list of lists
         ##############################################################
 
-        d = []
+        data, mask = [],[]
         val_type = self.get_sqltype(val)
-##        fill_val = self.get_mafillvalue(val_type)
+        fill_val = self.get_mafillvalue(val)
 
         # keep the columns with the row labels
         if attach_rlabels:
@@ -740,60 +741,78 @@ class DataFrame(OrderedDict):
                 i=0
                 for row in self.cur:
                     while not rnames_mask[i]:
-                        d.append([[np.ma.masked] for j in _xrange(len(cnames))])
+                        data.append([[fill_val] for j in _xrange(len(cnames))])
+                        mask.append([[True] for j in _xrange(len(cnames))])
                         i+=1
                         
-                    d.append([])
-                    for cell, mask in zip(list(row)[-len(cnames):], cnames_mask):
-                        if cell == None or not mask:
-                            d[-1].append([np.ma.masked])
+                    data.append([])
+                    mask.append([])
+                    for cell, _mask in zip(list(row)[-len(cnames):], cnames_mask):
+                        if cell == None or not _mask:
+                            data[-1].append([fill_val])
+                            mask[-1].append([True])
                         else:
                             if val_type == 'real' or val_type == 'integer':
-                                d[-1].append(eval('[%s]'%cell))
+                                split =cell.split(',')
+                                data[-1].append(map(float, split))
+                                mask[-1].append([False for j in _xrange(len(split))])
                             else:
-                                d[-1].append(cell.split(','))
-
+                                split =cell.split(',')
+                                data[-1].append(split)
+                                mask[-1].append([False for j in _xrange(len(split))])
                     i+=1
             else:
                 for row in self.cur:
-                    d.append([])
-                    for cell, mask in zip(list(row)[-len(cnames):], cnames_mask):
-                        if mask:
+                    data.append([])
+                    mask.append([])
+                    for cell, _mask in zip(list(row)[-len(cnames):], cnames_mask):
+                        if _mask:
                             if cell == None:
-                                d[-1].append([np.ma.masked])
+                                data[-1].append([fill_val])
+                                mask[-1].append([True])
                             elif val_type == 'real' or val_type == 'integer':
-                                d[-1].append(eval('[%s]'%cell))
+                                split =cell.split(',')
+                                data[-1].append(map(float, split))
+                                mask[-1].append([False for j in _xrange(len(split))])
                             else:
-                                d[-1].append(cell.split(','))
+                                split =cell.split(',')
+                                data[-1].append(split)
+                                mask[-1].append([False for j in _xrange(len(split))])
 
             # numpy arrays must have the same number of dimensions so we need to pad
             # cells to the maximum dimension of the data
-            max_len = max(_flatten([[len(c) for c in L] for L in d]))
+            max_len = max(_flatten([[len(c) for c in L] for L in data]))
 
-            for i,L in enumerate(d):
+            for i,L in enumerate(data):
                 for j,c in enumerate(L):
-                    for k in _xrange(max_len - len(d[i][j])):
-                        d[i][j].append(np.ma.masked)
+                    for k in _xrange(max_len - len(data[i][j])):
+                        data[i][j].append(fill_val)
+                        mask[i][j].append(True)
                         
         else:
             if method=='full':
                 i=0
                 for row in self.cur:
                     while not rnames_mask[i]:
-                        d.append([np.ma.masked for j in _xrange(len(cnames))])
+                        data.append([fill_val for j in _xrange(len(cnames))])
+                        mask.append([True for j in _xrange(len(cnames))])
                         i+=1
 
                     row_data = list(row)[-len(cnames):]
-                    d.append([(np.ma.masked,v)[m] for v,m in zip(row_data, cnames_mask)])
+                    data.append([(fill_val,v)[m] for v,m in zip(row_data, cnames_mask)])
+                    mask.append([not m for v,m in zip(row_data, cnames_mask)])
                     i+=1
             else:
                 for row in self.cur:
                     row_data = list(row)[-len(cnames):]
-                    d.append([v for v,m in zip(row_data, cnames_mask) if m])
+                    data.append([v for v,m in zip(row_data, cnames_mask) if m])
+                    mask.append([False for m in cnames_mask if m])
 
         #  7. Get totals
         ##############################################################
-        row_tots, col_tots, grand_tot = [], [], []
+        row_tots, col_tots, grand_tot = [], [], np.nan
+        row_mask, col_mask = [], []
+        
         if calc_tots:
             if aggregate in ['tolist', 'group_concat', 'arbitrary']:
                 calc_tots = False
@@ -810,15 +829,19 @@ class DataFrame(OrderedDict):
                     if method=='full':
                         i=0
                         row_tots=[]
+                        row_mask=[]
                         for tup in self.cur:
                             while not rnames_mask[i]:
-                                row_tots.append(np.ma.masked)
+                                row_tots.append(fill_val)
+                                row_mask.append(True)
                                 i+=1
                                 
                             row_tots.append(tup[0])
+                            row_mask.append(False)
                             i+=1
                     else:
-                        row_tots = [tup[0] for tup in self.cur]
+                        row_tots = [tup[0] for tup in self.cur]    
+                        row_mask = [False for z in row_tots]   
                     
                     query = ['select %s( %s ) from TBL group by'%(agg, _sha1(val))]
                     query.append(', '.join(_sha1(r) for r in cols))
@@ -827,15 +850,23 @@ class DataFrame(OrderedDict):
                     if method=='full':
                         i=0
                         col_tots=[]
+                        col_mask=[]
                         for tup in self.cur:
                             while not cnames_mask[i]:
-                                col_tots.append(np.ma.masked)
+                                col_tots.append(fill_val)
+                                col_mask.append(True)
                                 i+=1
                                 
                             col_tots.append(tup[0])
+                            col_mask.append(False)
                             i+=1
                     else:
-                        col_tots = [tup[0] for tup in self.cur]                
+                        
+                        col_tots = [tup[0] for tup in self.cur]    
+                        col_mask = [False for z in col_tots]
+                    
+        row_tots = np.ma.array(row_tots, mask=row_mask)
+        col_tots = np.ma.array(col_tots, mask=col_mask)
         
         #  8. Clean up
         ##############################################################
@@ -850,7 +881,8 @@ class DataFrame(OrderedDict):
         #  10. Initialize and return PyvtTbl Object
         ##############################################################
 ##
-##        print(d)
+##        print(data)
+##        print(mask)
 ##        print(rnames)
 ##        print(cnames)
 ##        print(col_tots)
@@ -858,8 +890,8 @@ class DataFrame(OrderedDict):
 ##        print(grand_tot)
 ##        print()
 ##        
-        return PyvtTbl(d, val, Zconditions, rnames, cnames, aggregate,
-                       calc_tots=calc_tots,
+        return PyvtTbl(data, val, Zconditions, rnames, cnames, aggregate,
+                       mask=mask, calc_tots=calc_tots,
                        row_tots=row_tots, col_tots=col_tots, grand_tot=grand_tot,
                        attach_rlabels=attach_rlabels)
             
@@ -1624,6 +1656,22 @@ class PyvtTbl(np.ma.MaskedArray, object):
             return eval('np.ma.array(%s, mask=%s)'%\
                         (repr(obj.tolist()), repr(obj.mask)))
 
+    def __iter__(self):
+        for i in _xrange(self.shape[0]):
+            obj = self[i]
+            
+            if _isfloat(obj):
+                yield obj
+
+            else:
+                yield eval('np.ma.array(%s, mask=%s)'%\
+                            (repr(obj.tolist()), repr(obj.mask.tolist())))
+
+    def ndenumerate(self):
+        for i in _xrange(self.shape[0]):
+            for j in _xrange(self.shape[1]):
+                yield (i,j), self[i,j]
+
     def _are_row_lengths_equal(self):
         """
         private method to check if the lists in self have equal lengths
@@ -1898,12 +1946,17 @@ class PyvtTbl(np.ma.MaskedArray, object):
             # keep appending to the list everytime the object is reprized. Not sure if
             # if this is a bug or intentional. Anyways handling the masked string this
             # way makes it so repr(eval(repr(myPyvttbl))) = repr(myPyvttbl)
-            mask_str =('',', mask=%s')[any(_flatten([self.row_tots.mask]))]
+            
+            mask_str =''
+            if any(_flatten([self.row_tots.mask])):
+                mask_str = ', mask=%s'%repr(self.row_tots.mask)
             kwds.append(', row_tots=np.ma.array(%s%s)'%\
                         (self.row_tots.tolist(), mask_str))
                 
         if self.col_tots != None:
-            mask_str =('',', mask=%s')[any(_flatten([self.col_tots.mask]))]
+            mask_str =''
+            if any(_flatten([self.col_tots.mask])):
+                mask_str = ', mask=%s'%repr(self.col_tots.mask)
             kwds.append(', col_tots=np.ma.array(%s%s)'%\
                         (self.col_tots.tolist(), mask_str))
             
@@ -1920,7 +1973,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
             kwds.append(', attach_rlabels=%s'%self.attach_rlabels)
 
         # masked array related parameters
-        if self.mask != False:
+        if any(_flatten([self.mask])):
             kwds.append(', mask=%s'%repr(list(self.mask)))
             
         if self.dtype != None:

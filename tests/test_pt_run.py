@@ -119,11 +119,11 @@ class Test_pivot_1(unittest.TestCase):
         """method='valid', aggregate=tolist, invalid row"""
         R = """\
 tolist(id)
-Name    Year    member=N     member=Y  
-======================================
-name1   2010   [nan, nan]   [0.0, 0.0] 
-name1   2011   [1.0, 1.0]   [nan, nan] 
-name2   2011   [nan, nan]   [2.0, 2.0] """
+Name    Year     member=N       member=Y   
+==========================================
+name1   2010   [None, None]     [0.0, 0.0] 
+name1   2011     [1.0, 1.0]   [None, None] 
+name2   2011   [None, None]     [2.0, 2.0] """
         
         df = DataFrame()
         df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y','rep':1})
@@ -145,11 +145,11 @@ name2   2011   [nan, nan]   [2.0, 2.0] """
     
         R = """\
 tolist(id)
-member   Name=name1,   Name=name1,   Name=name2, 
-          Year=2010     Year=2011     Year=2011  
-================================================
-N         [nan, nan]    [1.0, 1.0]    [nan, nan] 
-Y         [0.0, 0.0]    [nan, nan]    [2.0, 2.0] """
+member   Name=name1,    Name=name1,    Name=name2,  
+          Year=2010      Year=2011      Year=2011   
+===================================================
+N        [None, None]     [1.0, 1.0]   [None, None] 
+Y          [0.0, 0.0]   [None, None]     [2.0, 2.0] """
         
         df = DataFrame()
         df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y','rep':1})
@@ -171,12 +171,12 @@ Y         [0.0, 0.0]    [nan, nan]    [2.0, 2.0] """
         
         R = """\
 tolist(id)
-Name    Year    member=N     member=Y  
-======================================
-name1   2010   [nan, nan]   [0.0, 0.0] 
-name1   2011   [1.0, 1.0]   [nan, nan] 
-name2   2010   [nan, nan]   [nan, nan] 
-name2   2011   [nan, nan]   [2.0, 2.0] """
+Name    Year     member=N       member=Y   
+==========================================
+name1   2010   [None, None]     [0.0, 0.0] 
+name1   2011     [1.0, 1.0]   [None, None] 
+name2   2010   [None, None]   [None, None] 
+name2   2011   [None, None]     [2.0, 2.0] """
         
         df = DataFrame()
         df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y','rep':1})
@@ -199,11 +199,11 @@ name2   2011   [nan, nan]   [2.0, 2.0] """
         
         R = """\
 tolist(id)
-member   Name=name1,   Name=name1,   Name=name2,   Name=name2, 
-          Year=2010     Year=2011     Year=2010     Year=2011  
-==============================================================
-N         [nan, nan]    [1.0, 1.0]    [nan, nan]    [nan, nan] 
-Y         [0.0, 0.0]    [nan, nan]    [nan, nan]    [2.0, 2.0] """
+member   Name=name1,    Name=name1,    Name=name2,    Name=name2,  
+          Year=2010      Year=2011      Year=2010      Year=2011   
+==================================================================
+N        [None, None]     [1.0, 1.0]   [None, None]   [None, None] 
+Y          [0.0, 0.0]   [None, None]   [None, None]     [2.0, 2.0] """
         
         df = DataFrame()
         df.insert({'id':0,'Name':'name1','Year':2010,'member':'Y','rep':1})
