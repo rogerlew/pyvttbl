@@ -21,19 +21,29 @@ from pyvttbl.misc.support import _flatten
 
 def box_plot(df, val, factors=None, where=None,
         fname=None, output_dir='', quality='medium'):
-    """    Plots an interaction plot
+    """
+    Makes a box plot
 
-    Parameters
-    ----------
-    df : a pyvttbl.DataFrame object
-    val : the label of the dependent variable
-    factors : a list of factors to include in boxplot
-    where : (optional) a string, list of strings, or list of tuples
-            applied to the DataFrame before plotting
-    fname : (optional) output file name
-    quality: {'low' | 'medium' | 'high'} specifies image file dpi
-    yerr: {float, 'ci', 'se', 'sem'} designates errorbars across
-          datapoints in all subplots
+    args:
+       df:
+          a pyvttbl.DataFrame object
+          
+       val:
+          the label of the dependent variable
+
+    kwds:
+       factors:
+          a list of factors to include in boxplot
+          
+       where:
+          a string, list of strings, or list of tuples
+          applied to the DataFrame before plotting
+          
+       fname:
+          output file name
+          
+       quality:
+          {'low' | 'medium' | 'high'} specifies image file dpi
     """
 
     if factors == None:

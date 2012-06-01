@@ -29,7 +29,6 @@ from pyvttbl.misc.texttable import Texttable as TextTable
 from pyvttbl.misc.support import *
 	    
 class Anova1way(OrderedDict):
-    """1-way ANOVA"""
     def __init__(self, *args, **kwds):
         if len(args) > 1:
             raise Exception('expecting only 1 argument')

@@ -48,6 +48,10 @@ class Test_pt_mathmethods__iter__(unittest.TestCase):
         df=DataFrame()
         df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         pt = df.pivot('ERROR', rows=['TIMEOFDAY','COURSE'])
+##        print(pt)
+##
+##        for row in pt:
+##            print(type(row),row)
 
         for r,L in zip(R,pt):
             self.assertEqual(','.join(['%.5f'%f for f in r]),

@@ -1,0 +1,499 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>2. Quick-Start Guide &mdash; pyvttbl v 0.5.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.0.0 documentation" href="index.html" />
+    <link rel="next" title="3. pyvttbl.DataFrame" href="DataFrame.html" />
+    <link rel="prev" title="1. Installing pyvttbl" href="install.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="DataFrame.html" title="3. pyvttbl.DataFrame"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="1. Installing pyvttbl"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2. Quick-Start Guide</a><ul>
+<li><a class="reference internal" href="#loading-data-into-a-dataframe">2.1. Loading Data into a <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
+<li><a class="reference internal" href="#manipulating-data-in-a-dataframe">2.2. Manipulating Data in a <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
+<li><a class="reference internal" href="#sorting-a-dataframe">2.3. Sorting a <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
+<li><a class="reference internal" href="#writing-data-from-a-dataframe">2.4. Writing Data from a <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
+<li><a class="reference internal" href="#pivoting-data">2.5. Pivoting Data</a></li>
+<li><a class="reference internal" href="#multidimensional-pivoting">2.6. Multidimensional Pivoting</a></li>
+<li><a class="reference internal" href="#pivot-aggregate-functions">2.7. Pivot Aggregate Functions</a></li>
+<li><a class="reference internal" href="#manipulating-pyvttbl-objects">2.8. Manipulating <tt class="docutils literal"><span class="pre">PyvtTbl</span></tt> objects</a></li>
+<li><a class="reference internal" href="#converting-a-pyvttbl-to-a-dataframe">2.9. Converting a <tt class="docutils literal"><span class="pre">PyvtTbl</span></tt> to a <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="previous chapter">1. Installing pyvttbl</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="DataFrame.html"
+                        title="next chapter">3. <tt class="docutils literal docutils literal docutils literal"><span class="pre">pyvttbl.DataFrame</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/quick-start.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="quick-start-guide">
+<h1>2. Quick-Start Guide<a class="headerlink" href="#quick-start-guide" title="Permalink to this headline">¶</a></h1>
+<p>pyvttbl has two primary containers for storing data. <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> objects
+hold tabulated data in a manner similiar to what you would have in a
+spreadsheet. DataFrames are basically dictionary objects. The <em>keys</em>
+are the names of the columns and the <em>values</em> are NumPy arrays or
+NumPy MaskedArrays if missing data is specified or encountered when
+reading datafiles.</p>
+<p>DataFrames can be pivoted to created <tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> objects. These are
+subclasses of <tt class="xref py py-class docutils literal"><span class="pre">NumPy.MaskedArray</span></tt>. The use of <tt class="xref py py-class docutils literal"><span class="pre">MaskedArray'</span> <span class="pre">helps</span> <span class="pre">to</span> <span class="pre">make</span>
+<span class="pre">:class:`PyvtTbl</span></tt>&#8216;s robust to invalid or missing data.</p>
+<div class="section" id="loading-data-into-a-dataframe">
+<h2>2.1. Loading Data into a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt><a class="headerlink" href="#loading-data-into-a-dataframe" title="Permalink to this headline">¶</a></h2>
+<p>Before we can start building contingency tables we need to first load the
+data into a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> object. Data can be read from plaintext datafiles
+using the <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>.:meth:<cite>read_tbl</cite> method or inserted one row at a time using
+<tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>.:meth:<cite>insert</cite>. DataFrames can be attached to one another using
+<tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>.:meth:<cite>attach</cite>. The read_tbl method is looking for comma separated values
+(CSV) files. Other delimited file types should also work; just specify the
+delimiter. You can also specify whether your file has labels (default is
+True) and the number of lines at the beginning to skip (Default is 0).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;example.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">CASE   TIME    CONDITION    X</span>
+<span class="go">==============================</span>
+<span class="go">   1   day     A           102</span>
+<span class="go">   2   day     B            70</span>
+<span class="go">   3   night   A            27</span>
+<span class="go">   4   night   B            38</span>
+<span class="go">   5   day     A            67</span>
+<span class="go">   6   day     B           127</span>
+<span class="go">   7   night   A            68</span>
+<span class="go">   8   night   B            49</span>
+<span class="go">   9   day     A            57</span>
+<span class="go">  10   day     B            71</span>
+<span class="go">  11   night   A            40</span>
+<span class="go">  12   night   B            84</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="manipulating-data-in-a-dataframe">
+<h2>2.2. Manipulating Data in a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt><a class="headerlink" href="#manipulating-data-in-a-dataframe" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> class inherits collections.OrderedDict. The <tt class="xref py py-meth docutils literal"><span class="pre">__str__()</span></tt> method
+is defined to output pretty looking text tables. Because the <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> holds</p>
+<blockquote>
+<div>NumPy arrays manipulating data is fairly straight forward.</div></blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="p">[</span><span class="s">&#39;LOG10_X&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">&#39;X&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">CASE   TIME    CONDITION    X    LOG10_X</span>
+<span class="go">========================================</span>
+<span class="go">   1   day     A           102     2.009</span>
+<span class="go">   2   day     B            70     1.845</span>
+<span class="go">   3   night   A            27     1.431</span>
+<span class="go">   4   night   B            38     1.580</span>
+<span class="go">   5   day     A            67     1.826</span>
+<span class="go">   6   day     B           127     2.104</span>
+<span class="go">   7   night   A            68     1.833</span>
+<span class="go">   8   night   B            49     1.690</span>
+<span class="go">   9   day     A            57     1.756</span>
+<span class="go">  10   day     B            71     1.851</span>
+<span class="go">  11   night   A            40     1.602</span>
+<span class="go">  12   night   B            84     1.924</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sorting-a-dataframe">
+<h2>2.3. Sorting a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt><a class="headerlink" href="#sorting-a-dataframe" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> has an inplace <tt class="xref py py-meth docutils literal"><span class="pre">sort()</span></tt> method. You just have to specify the
+variables you want to sort by.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s">&#39;TIME&#39;</span><span class="p">,</span><span class="s">&#39;CONDITION&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">CASE   TIME    CONDITION    X    LOG10_X</span>
+<span class="go">========================================</span>
+<span class="go">   1   day     A           102     2.009</span>
+<span class="go">   5   day     A            67     1.826</span>
+<span class="go">   9   day     A            57     1.756</span>
+<span class="go">   2   day     B            70     1.845</span>
+<span class="go">   6   day     B           127     2.104</span>
+<span class="go">  10   day     B            71     1.851</span>
+<span class="go">   3   night   A            27     1.431</span>
+<span class="go">   7   night   A            68     1.833</span>
+<span class="go">  11   night   A            40     1.602</span>
+<span class="go">   4   night   B            38     1.580</span>
+<span class="go">   8   night   B            49     1.690</span>
+<span class="go">  12   night   B            84     1.924</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>You can also reverse the order by using &#8216;DESC&#8217; or &#8216;desc&#8217; after the name of
+the variable.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s">&#39;TIME DESC&#39;</span><span class="p">,</span><span class="s">&#39;CONDITION DESC&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">CASE   TIME    CONDITION    X    LOG10_X</span>
+<span class="go">========================================</span>
+<span class="go">   4   night   B            38     1.580</span>
+<span class="go">   8   night   B            49     1.690</span>
+<span class="go">  12   night   B            84     1.924</span>
+<span class="go">   3   night   A            27     1.431</span>
+<span class="go">   7   night   A            68     1.833</span>
+<span class="go">  11   night   A            40     1.602</span>
+<span class="go">   2   day     B            70     1.845</span>
+<span class="go">   6   day     B           127     2.104</span>
+<span class="go">  10   day     B            71     1.851</span>
+<span class="go">   1   day     A           102     2.009</span>
+<span class="go">   5   day     A            67     1.826</span>
+<span class="go">   9   day     A            57     1.756</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="writing-data-from-a-dataframe">
+<h2>2.4. Writing Data from a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt><a class="headerlink" href="#writing-data-from-a-dataframe" title="Permalink to this headline">¶</a></h2>
+<p>Tables can be exported using the write method. If filename is not supplied
+(as a fname keyword argument) a filename will be generated from the column
+labels.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;caseXtimeXconditionXxXlog0_x.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">CASE   TIME    CONDITION    X    LOG10_X</span>
+<span class="go">========================================</span>
+<span class="go">   1   day     A           102     2.009</span>
+<span class="go">   2   day     B            70     1.845</span>
+<span class="go">   3   night   A            27     1.431</span>
+<span class="go">   4   night   B            38     1.580</span>
+<span class="go">   5   day     A            67     1.826</span>
+<span class="go">   6   day     B           127     2.104</span>
+<span class="go">   7   night   A            68     1.833</span>
+<span class="go">   8   night   B            49     1.690</span>
+<span class="go">   9   day     A            57     1.756</span>
+<span class="go">  10   day     B            71     1.851</span>
+<span class="go">  11   night   A            40     1.602</span>
+<span class="go">  12   night   B            84     1.924</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pivoting-data">
+<h2>2.5. Pivoting Data<a class="headerlink" href="#pivoting-data" title="Permalink to this headline">¶</a></h2>
+<p>Once data is in a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> pivoting is as simple as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pt</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="s">&#39;LOG10_X&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;TIME&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;CONDITION&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+<span class="go">avg(LOG10_X)</span>
+<span class="go">TIME    CONDITION=A   CONDITION=B</span>
+<span class="go">=================================</span>
+<span class="go">day           1.864         1.933</span>
+<span class="go">night         1.622         1.731</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>Calling pivot returns a <tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> object.</p>
+</div>
+<div class="section" id="multidimensional-pivoting">
+<h2>2.6. Multidimensional Pivoting<a class="headerlink" href="#multidimensional-pivoting" title="Permalink to this headline">¶</a></h2>
+<p>The example above isn&#8217;t all that impressive. The <tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> class can also pivot higher dimensional data.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;suppression~subjectXgroupXageXcycleXphase.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pt</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="s">&#39;SUPPRESSION&#39;</span><span class="p">,</span>
+<span class="go">                  rows=[&#39;CYCLE&#39;, &#39;PHASE&#39;],</span>
+<span class="go">                  cols=[&#39;GROUP&#39;, &#39;AGE&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+<span class="go">avg(SUPPRESSION)</span>
+<span class="go">CYCLE   PHASE   GROUP=AA,   GROUP=AA,   GROUP=AB,   GROUP=AB,   GROUP=LAB,   GROUP=LAB,</span>
+<span class="go">                 AGE=old    AGE=young    AGE=old    AGE=young    AGE=old     AGE=young</span>
+<span class="go">=======================================================================================</span>
+<span class="go">1       I          17.750       8.675      12.625       5.525       21.625        7.825</span>
+<span class="go">1       II         20.875       8.300      22.750       8.675       36.250       13.750</span>
+<span class="go">2       I          22.375      10.225      23.500       8.825       21.375        9.900</span>
+<span class="go">2       II         28.125      10.250      41.125      13.100       46.875       14.375</span>
+<span class="go">3       I          23.125      10.500          20       9.125       23.750        9.500</span>
+<span class="go">3       II         20.750       9.525      46.125      14.475       50.375       15.575</span>
+<span class="go">4       I          20.250       9.925      15.625       7.750       26.375        9.650</span>
+<span class="go">4       II         24.250      11.100      51.750      12.850       46.500       14.425</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pivot-aggregate-functions">
+<h2>2.7. Pivot Aggregate Functions<a class="headerlink" href="#pivot-aggregate-functions" title="Permalink to this headline">¶</a></h2>
+<p>If no aggregate keyword is supplied the pivoting will result in averages of the underlying
+data. A variety of other aggregators can also be applied:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="77%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Aggregate</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>abs_mean(X)</td>
+<td>mean of the absolute values of X</td>
+</tr>
+<tr class="row-odd"><td>avg(X)</td>
+<td>average value of all non-NULL X within a group</td>
+</tr>
+<tr class="row-even"><td>arbitrary(X)</td>
+<td>an arbitrary element of X</td>
+</tr>
+<tr class="row-odd"><td>count(X)</td>
+<td>count of the number of times that X is not NULL in a group</td>
+</tr>
+<tr class="row-even"><td>ci(X)</td>
+<td>95% confidence interval of X</td>
+</tr>
+<tr class="row-odd"><td>datarange(X)</td>
+<td>range of X</td>
+</tr>
+<tr class="row-even"><td>geometric_mean(X)</td>
+<td>geometric mean of X</td>
+</tr>
+<tr class="row-odd"><td>group_concat(X)</td>
+<td>concatenates the values of X as elements in a list</td>
+</tr>
+<tr class="row-even"><td>hasinf(X)</td>
+<td>True if X contains any inf values</td>
+</tr>
+<tr class="row-odd"><td>hasnan(X)</td>
+<td>True if X contains any nan values</td>
+</tr>
+<tr class="row-even"><td>kurt(X)</td>
+<td>sample kurtosis estimate of X</td>
+</tr>
+<tr class="row-odd"><td>kurtp(X)</td>
+<td>population kurtosis estimate of X</td>
+</tr>
+<tr class="row-even"><td>median(X)</td>
+<td>median of X</td>
+</tr>
+<tr class="row-odd"><td>mode(X)</td>
+<td>mode of X</td>
+</tr>
+<tr class="row-even"><td>prod(X)</td>
+<td>product of the elements of X</td>
+</tr>
+<tr class="row-odd"><td>rms(X)</td>
+<td>root mean square of X</td>
+</tr>
+<tr class="row-even"><td>sem(X)</td>
+<td>standard error of the mean of X</td>
+</tr>
+<tr class="row-odd"><td>skew(X)</td>
+<td>sample skewness estimate of X     (N-1)</td>
+</tr>
+<tr class="row-even"><td>skewp(X)</td>
+<td>population skewness estimate of X     (N)</td>
+</tr>
+<tr class="row-odd"><td>stdev(X)</td>
+<td>standard deviation estimate of the samples in X (N-1)</td>
+</tr>
+<tr class="row-even"><td>stdevp(X)</td>
+<td>standard deviation of the population X        (N)</td>
+</tr>
+<tr class="row-odd"><td>var(X)</td>
+<td>variance estimate of the samples in X (N-1)</td>
+</tr>
+<tr class="row-even"><td>varp(X)</td>
+<td>variance of the population X (N)</td>
+</tr>
+</tbody>
+</table>
+<p>The pyvttbl module takes advantage of aggregate functions in from pystaggrelite3.
+You can also bind your own using <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>.:meth:<cite>bind_aggregate</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pt</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="s">&#39;SUPPRESSION&#39;</span><span class="p">,</span>
+<span class="go">                  rows=[&#39;CYCLE&#39;, &#39;PHASE&#39;],</span>
+<span class="go">                  cols=[&#39;GROUP&#39;, &#39;AGE&#39;],</span>
+<span class="go">                  aggregate=&#39;count&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+<span class="go">count(SUPPRESSION)</span>
+<span class="go">CYCLE   PHASE   GROUP=AA,   GROUP=AA,   GROUP=AB,   GROUP=AB,   GROUP=LAB,   GROUP=LAB,</span>
+<span class="go">                 AGE=old    AGE=young    AGE=old    AGE=young    AGE=old     AGE=young</span>
+<span class="go">=======================================================================================</span>
+<span class="go">1       I               8           8           8           8            8            8</span>
+<span class="go">1       II              8           8           8           8            8            8</span>
+<span class="go">2       I               8           8           8           8            8            8</span>
+<span class="go">2       II              8           8           8           8            8            8</span>
+<span class="go">3       I               8           8           8           8            8            8</span>
+<span class="go">3       II              8           8           8           8            8            8</span>
+<span class="go">4       I               8           8           8           8            8            8</span>
+<span class="go">4       II              8           8           8           8            8            8</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="manipulating-pyvttbl-objects">
+<h2>2.8. Manipulating <tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> objects<a class="headerlink" href="#manipulating-pyvttbl-objects" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> can be added, subtracted, multiplied by constants or other <tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> objects
+of equivalent shape.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pt</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="s">&#39;ERROR&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;TIMEOFDAY&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;COURSE&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+<span class="go">avg(ERROR)</span>
+<span class="go">TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total</span>
+<span class="go">=====================================================</span>
+<span class="go">T1              7.167       6.500           4   5.619</span>
+<span class="go">T2              3.222       2.889       1.556   2.556</span>
+<span class="go">=====================================================</span>
+<span class="go">Total           4.800       4.333       2.778   3.896</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pt2</span><span class="o">=</span><span class="n">pt</span><span class="o">+</span><span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">pt2</span><span class="p">)</span>
+<span class="go">avg(ERROR)</span>
+<span class="go">TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total</span>
+<span class="go">======================================================</span>
+<span class="go">T1             12.167      11.500           9   10.619</span>
+<span class="go">T2              8.222       7.889       6.556    7.556</span>
+<span class="go">======================================================</span>
+<span class="go">Total           9.800       9.333       7.778    8.896</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sums</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="s">&#39;ERROR&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;TIMEOFDAY&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;COURSE&#39;</span><span class="p">],</span>
+<span class="go">                    aggregate=&#39;sum&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">counts</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="s">&#39;ERROR&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;TIMEOFDAY&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;COURSE&#39;</span><span class="p">],</span>
+<span class="go">                      aggregate=&#39;count&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">sums</span><span class="o">/</span><span class="n">counts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+<span class="go">N/A(ERROR)</span>
+<span class="go">TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total</span>
+<span class="go">=====================================================</span>
+<span class="go">T1              7.167       6.500           4   5.619</span>
+<span class="go">T2              3.222       2.889       1.556   2.556</span>
+<span class="go">=====================================================</span>
+<span class="go">Total           4.800       4.333       2.778   3.896</span>
+</pre></div>
+</div>
+<p>The operrations are applied to the row and column totals when
+possible. However, operations like np.sum behave as expected</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">counts</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="s">&#39;ERROR&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;TIMEOFDAY&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;COURSE&#39;</span><span class="p">],</span>
+<span class="go">                      aggregate&#39;count&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="go">count(ERROR)</span>
+<span class="go">TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total</span>
+<span class="go">=====================================================</span>
+<span class="go">T1                  6           6           9      21</span>
+<span class="go">T2                  9           9           9      27</span>
+<span class="go">=====================================================</span>
+<span class="go">Total              15          15          18      48</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span>
+<span class="go">48</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="converting-a-pyvttbl-to-a-dataframe">
+<h2>2.9. Converting a <tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> to a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt><a class="headerlink" href="#converting-a-pyvttbl-to-a-dataframe" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt>.:meth:<cite>to_dataframe</cite> will return the pivoted data as a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> object</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;example.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="p">[</span><span class="s">&#39;LOG10_X&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">&#39;X&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pt</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="s">&#39;LOG10_X&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;TIME&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;CONDITION&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df2</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df2</span><span class="p">)</span>
+<span class="go">TIME    CONDITION=A   CONDITION=B</span>
+<span class="go">=================================</span>
+<span class="go">day           1.864         1.933</span>
+<span class="go">night         1.622         1.731</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="DataFrame.html" title="3. pyvttbl.DataFrame"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="1. Installing pyvttbl"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

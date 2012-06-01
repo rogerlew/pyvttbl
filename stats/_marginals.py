@@ -19,6 +19,23 @@ from copy import copy
 from pyvttbl.misc.texttable import Texttable as TextTable
 
 class Marginals(OrderedDict):
+    """
+       Calculates means, counts, standard errors, and confidence intervals
+       for the marginal conditions of the factorial combinations specified in
+       the factors list.
+
+       args:
+          key: column label (of the dependent variable)
+
+       kwds:
+          factors: list of column labels to segregate data
+
+          where: criterion to apply to table before running analysis
+
+       returns:
+          a :mod:`pyvttbl.stats`. :class:`Marginals` object
+    """
+
     def __init__(self, *args, **kwds):
         if len(args) > 1:
             raise Exception('expecting only 1 argument')

@@ -1,0 +1,203 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to pyvttbl’s documentation! &mdash; pyvttbl v 0.5.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.0.0 documentation" href="#" />
+    <link rel="next" title="1. Installing pyvttbl" href="install.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="1. Installing pyvttbl"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to pyvttbl&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#contents">Contents:</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="next chapter">1. Installing pyvttbl</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-pyvttbl-s-documentation">
+<h1>Welcome to pyvttbl&#8217;s documentation!<a class="headerlink" href="#welcome-to-pyvttbl-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Pivot tables (also called contingency tables and cross tabulation tables)
+are a powerful means of data visualization and data summarization. When
+dealing with large data sets with multiple variables, or multiple
+datasets manually manipulating the pivot tables in WYSIWYG (what you see
+is what you get) spreadsheets can quickly become troublesome and error
+prone. In these instances it becomes preferred or even necessary to use
+a YAFIYGI (you ask for it you got it) model to automate all or part of
+the data summarization process.</p>
+<p>There are already existing Python pivot table modules available. The ones
+I have found don&#8217;t support multidimensional data, require Windows and
+Excel, or are incomplete and abandoned. They also are usually tailored
+towards an information technology audience as opposed to a scientific/
+research audience. On the other extreme are projects like PyTables.
+PyTables is an impressive undertaking but many datasets just aren&#8217;t
+complex enough to justify the effort required to get data into PyTables.
+The <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl</span></tt> module presented here offers a solution for datasets of
+&#8220;Goldilocks&#8221; complexity; too much for spreadsheets, but too little for
+coding custom solutions or configuring PyTables.</p>
+<p>Behind the scenes <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl</span></tt> uses sqlite3 to handle much of the data
+manipulation. sqlite3 is fast and part of the Python standard library.</p>
+<p>The project described was supported by NIH Grant Number P20 RR016454 from
+the INBRE Program of the National Center for Research Resources.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Version 0.5.0.0 introduced changes that are not backwards compatible with
+previous versions.</p>
+<p><tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> items are now numpy.arrays or numpy.ma.masked_arrays.
+<tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> objects are now subclasses of numpy.ma.masked_arrays. These changes make
+handling missing data easier and better incorporate the power and succinctness of
+NumPy.</p>
+<p class="last"><tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> indexing (__getitem__) no longer accepts &#8220;where&#8221; queries. This allows for
+any hashable object to be used as a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> key (string, tuple, etc.).  keys can
+have spaces and special characters or just be distinguished by capitalization.
+Sqlite3 is keeped happy by hashing all the keys.</p>
+</div>
+</div>
+<div class="section" id="contents">
+<h1>Contents:<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">1. Installing pyvttbl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick-start.html">2. Quick-Start Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html#loading-data-into-a-dataframe">2.1. Loading Data into a <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html#manipulating-data-in-a-dataframe">2.2. Manipulating Data in a <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html#sorting-a-dataframe">2.3. Sorting a <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html#writing-data-from-a-dataframe">2.4. Writing Data from a <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html#pivoting-data">2.5. Pivoting Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html#multidimensional-pivoting">2.6. Multidimensional Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html#pivot-aggregate-functions">2.7. Pivot Aggregate Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html#manipulating-pyvttbl-objects">2.8. Manipulating <tt class="docutils literal"><span class="pre">PyvtTbl</span></tt> objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html#converting-a-pyvttbl-to-a-dataframe">2.9. Converting a <tt class="docutils literal"><span class="pre">PyvtTbl</span></tt> to a <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="DataFrame.html">3. <tt class="docutils literal"><span class="pre">pyvttbl.DataFrame</span></tt></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="DataFrame.html#description">3.1. Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DataFrame.html#general-public-methods">3.2. General Public Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DataFrame.html#pyvttbl-plotting-wrappers">3.3. <tt class="docutils literal"><span class="pre">pyvttbl.plotting</span></tt> Wrappers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DataFrame.html#pyvttbl-stats-wrappers">3.4. <tt class="docutils literal"><span class="pre">pyvttbl.stats</span></tt> Wrappers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DataFrame.html#private-methods">3.5. Private Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="PyvtTbl.html">4. <tt class="docutils literal"><span class="pre">pyvttbl.PyvtTbl</span></tt></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="PyvtTbl.html#description">4.1. Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PyvtTbl.html#general-public-methods">4.2. General Public Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PyvtTbl.html#private-methods">4.3. Private Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">5. <tt class="docutils literal"><span class="pre">pyvttbl.plotting</span></tt></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html#description">5.1. Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html#static-plotting-methods">5.2. Static Plotting Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="stats.html">6. <tt class="docutils literal"><span class="pre">pyvttbl.stats</span></tt></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="stats.html#description">6.1. Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.html#statistics-classes">6.2. Statistics Classes</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="1. Installing pyvttbl"
+             >next</a> |</li>
+        <li><a href="#">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -24,22 +24,29 @@ def scatter_plot(df, aname, bname, where=None, trend='linear',
                  quality='medium', alpha=0.6):
     """
     Creates a scatter plot with the specified parameters
+
+       args:
+          aname: variable on x-axis
+          
+          bname: variable on y-axis
+             
+       kwds:
+          alpha:
+             amount of transparency applied
     
-    Parameters
-    ----------
-    aname : variable on x-axis
-    bname : variable on y-axis
-    alpha : amount of transparency applied
-    grid  : setting this to True will show the grid
-    trend :
-        None          no model fitting
-        'linear'      f(x) = a + b*x
-        'exponential' f(x) = a * x**b
-        'logarithmic' f(x) = a * log(x) + b
-        'polynomial'  f(x) = a * x**2 + b*x + c
-        'power'       f(x) = a * x**b
-    """
-    
+          trend :
+             None:          no model fitting
+        
+             'linear':      f(x) = a + b*x
+        
+             'exponential': f(x) = a * x**b
+        
+             'logarithmic': f(x) = a * log(x) + b
+        
+             'polynomial':  f(x) = a * x**2 + b*x + c
+        
+             'power':       f(x) = a * x**b
+    """ 
     if where == None:
         where = []
 

@@ -27,28 +27,41 @@ def scatter_matrix(df, variables, alpha=0.5, grid=False,
     """
     Plots a matrix of scatterplots
 
-    Parameters
-    ----------
-    alpha : amount of transparency applied
-    grid : setting this to True will show the grid
-    diagonal :
-        'kde'  Kernel Density Estimation
-        'hist' 20 bin Histogram
-         None  just labels
-    trend :
-        None          no model fitting
-        'linear'      f(x) = a + b*x
-        'exponential' f(x) = a * x**b
-        'logarithmic' f(x) = a * log(x) + b
-        'polynomial'  f(x) = a * x**2 + b*x + c
-        'power'       f(x) = a * x**b
-    alternate_labels : Specifies whether the labels and ticks
-       should alternate. Default is True. When False tick labels
-       will be on the left and botttom, and variable labels will
-       be on the top and right.
-    kwds : other plotting keyword arguments
-        To be passed to scatter function
-
+       args:
+          variables:
+             column labels to include in scatter matrix
+             
+       kwds:
+          alpha:
+             amount of transparency applied
+    
+          grid:
+             setting this to True will show the grid
+    
+          diagonal:
+             'kde':  Kernel Density Estimation
+        
+             'hist': 20 bin Histogram
+        
+             None:  just labels
+         
+          trend :
+             None:          no model fitting
+        
+             'linear':      f(x) = a + b*x
+        
+             'exponential': f(x) = a * x**b
+        
+             'logarithmic': f(x) = a * log(x) + b
+        
+             'polynomial':  f(x) = a * x**2 + b*x + c
+        
+             'power':       f(x) = a * x**b
+        
+          alternate_labels: Specifies whether the labels and ticks should
+                            alternate. Default is True. When False tick labels
+                            will be on the left and botttom, and variable
+                            labels will be on the top and right.
     """
 
    # code forked from pandas.tools.plotting

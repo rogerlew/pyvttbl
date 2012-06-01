@@ -39,8 +39,16 @@ class Descriptives(OrderedDict):
             
     def run(self, V, cname=None):
         """
-        generates and stores descriptive statistics for the
-        numerical data in V
+        Conducts a descriptive statistical analysis of the data in V
+
+           args:
+              V: an iterable containing numerical data
+
+           kwds:
+              cname: a string to label the data
+
+           returns:
+              None
         """        
         try:
             V = np.array(sorted(_flatten(list(copy(V)))))
@@ -72,6 +80,7 @@ class Descriptives(OrderedDict):
         self['95ci_upper'] = self['mean'] + 1.96*self['sem']
     
     def __str__(self):
+        """A human friendly representation of the analysis"""
 
         if self == {}:
             return '(no data in object)'
@@ -89,6 +98,8 @@ class Descriptives(OrderedDict):
                          tt.draw()])
 
     def __repr__(self):
+        """A Python friendly representation of the analysis"""
+        
         if self == {}:
             return 'Descriptives()'
         

@@ -1,0 +1,173 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. Installing pyvttbl &mdash; pyvttbl v 0.5.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.0.0 documentation" href="index.html" />
+    <link rel="next" title="2. Quick-Start Guide" href="quick-start.html" />
+    <link rel="prev" title="Welcome to pyvttbl’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="quick-start.html" title="2. Quick-Start Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyvttbl’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to pyvttbl&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="quick-start.html"
+                        title="next chapter">2. Quick-Start Guide</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/install.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installing-pyvttbl">
+<h1>1. Installing pyvttbl<a class="headerlink" href="#installing-pyvttbl" title="Permalink to this headline">¶</a></h1>
+<p>The requirements for using pyvttbl are:</p>
+<ol class="arabic simple">
+<li><strong>Python 2.7.x</strong> (This package uses the <em>OrderedDict</em> and <em>Counter</em> objects
+introduced in the collections module of 2.7. )</li>
+<li><strong>SciPy</strong> : (tested with 0.9.0)</li>
+<li><strong>NumPy</strong> : (tested with 1.5.1)</li>
+<li><strong>Matplotlib</strong> : (tested with 1.0.1)</li>
+</ol>
+<p>Options to install pyvttbl</p>
+<ol class="arabic">
+<li><p class="first">Acquire pyvttbl from PyPi</p>
+<ol class="arabic simple">
+<li>get <a class="reference external" href="http://pypi.python.org/pypi/setuptools/">setuptools</a></li>
+<li>run easy_install -Z pyvttbl</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The &#8220;-Z&#8221; flag is optional and tells easy_install to install the
+packaged unzipped</p>
+</div>
+</li>
+<li><p class="first">Install from source</p>
+<ol class="arabic simple">
+<li>You will also need to acquire <a class="reference external" href="http://code.google.com/p/dictset/">dictset</a> and <a class="reference external" href="http://code.google.com/p/py-st-a-ggre-lite3/">pystaggrelite3</a></li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you use easy_install it should automatically acquire dictset
+and pystaggrelite3.</p>
+</div>
+<ol class="arabic" start="2">
+<li><dl class="first docutils">
+<dt><a class="reference external" href="http://pypi.python.org/pypi/pyvttbl/">Obtain source from PyPi</a></dt>
+<dd><ol class="first arabic simple" start="3">
+<li>Unzip</li>
+<li>Run &#8220;setup.py install&#8221; or &#8220;setup.py develop&#8221;</li>
+</ol>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The develop command will install the package unzipped by
+essentially telling Python about your packages location. In your
+site-packages directory it creates a egg-info file that points to
+where you unzipped the source.</p>
+</div>
+</dd>
+</dl>
+</li>
+</ol>
+</li>
+</ol>
+<p>To develop pyvttbl you should also have:</p>
+<ol class="arabic simple">
+<li><strong>nose</strong> (using 0.11.3)</li>
+<li><strong>Sphinx</strong> : (tested with 1.1.3)</li>
+</ol>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="quick-start.html" title="2. Quick-Start Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyvttbl’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

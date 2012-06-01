@@ -25,7 +25,7 @@ class Test_pt_mathmethods__add__(unittest.TestCase):
     def test0(self):
         # __add__ constant
         R ="""\
-avg(ERROR)
+N/A(ERROR)
 TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total  
 ======================================================
 T1             12.167      11.500           9   10.619 
@@ -37,14 +37,16 @@ Total           9.800       9.333       7.778    8.896 """
         df=DataFrame()
         df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
+##        print(pt)
         pt2=pt+5
+##        print(pt2)
         
         self.assertEqual(str(pt2),R)
 
     def test1(self):
         # __add__ PyvtTbl
         R ="""\
-avg(ERROR)
+N/A(ERROR)
 TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total  
 ======================================================
 T1             14.333          13           8   11.238 
@@ -63,7 +65,7 @@ Total           9.600       8.667       5.556    7.792 """
     def test2(self):
         # __add__ ndarray
         R ="""\
-avg(ERROR)
+N/A(ERROR)
 TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total 
 =====================================================
 T1             12.167      11.500           9      -- 
@@ -83,7 +85,7 @@ class Test_pt_mathmethods__mul__(unittest.TestCase):
     def test0(self):
         # __mul__ constant
         R ="""\
-avg(ERROR)
+N/A(ERROR)
 TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total  
 ======================================================
 T1             35.833      32.500          20   28.095 
@@ -102,9 +104,8 @@ Total              24      21.667      13.889   19.479 """
         self.assertEqual(str(pt2),R)
 
     def test1(self):
-        # __mul__ PyvtTbl
         R ="""\
-avg(ERROR)
+N/A(ERROR)
 TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total  
 ======================================================
 T1             51.361      42.250          16   31.574 
@@ -115,17 +116,21 @@ Total          23.040      18.778       7.716   15.178 """
         
         df=DataFrame()
         df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-        pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
-        pt2=pt*pt
-
-##        print(pt2)
+        sums = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'],aggregate='sum')
+        counts = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'],aggregate='count')
+        aves = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'],aggregate='avg')
+        calc_aves = sums/counts.astype(np.float64)
         
-        self.assertEqual(str(pt2),R)
+##        print('\n'.join(str(aves).split('\n')[1:]))
+##        print('\n'.join(str(calc_aves).split('\n')[1:]))
+        
+        self.assertEqual('\n'.join(str(aves).split('\n')[1:]),
+                         '\n'.join(str(calc_aves).split('\n')[1:]))
         
     def test2(self):
         # __mul__ ndarray
         R ="""\
-avg(ERROR)
+N/A(ERROR)
 TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total 
 =====================================================
 T1             35.833      32.500          20      -- 
@@ -147,7 +152,7 @@ class Test_pt_mathmethods_sum(unittest.TestCase):
     def test0(self):
         # __add__ constant
         R ="""\
-avg(ERROR)
+N/A(ERROR)
 TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total  
 ======================================================
 T1             12.167      11.500           9   10.619 

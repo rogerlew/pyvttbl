@@ -1,0 +1,375 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4. pyvttbl.PyvtTbl &mdash; pyvttbl v 0.5.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.0.0 documentation" href="index.html" />
+    <link rel="next" title="5. pyvttbl.plotting" href="plotting.html" />
+    <link rel="prev" title="3. pyvttbl.DataFrame" href="DataFrame.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="5. pyvttbl.plotting"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DataFrame.html" title="3. pyvttbl.DataFrame"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">4. <tt class="docutils literal"><span class="pre">pyvttbl.PyvtTbl</span></tt></a><ul>
+<li><a class="reference internal" href="#description">4.1. Description</a></li>
+<li><a class="reference internal" href="#general-public-methods">4.2. General Public Methods</a></li>
+<li><a class="reference internal" href="#private-methods">4.3. Private Methods</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="DataFrame.html"
+                        title="previous chapter">3. <tt class="docutils literal docutils literal"><span class="pre">pyvttbl.DataFrame</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="plotting.html"
+                        title="next chapter">5. <tt class="docutils literal"><span class="pre">pyvttbl.plotting</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/PyvtTbl.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyvttbl-pyvttbl">
+<h1>4. <tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.PyvtTbl</span></tt><a class="headerlink" href="#pyvttbl-pyvttbl" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="description">
+<h2>4.1. Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> objects are containers for holding pivoted data.
+They are instantiated through DataFrame.pivot.</p>
+</div>
+<div class="section" id="general-public-methods">
+<h2>4.2. General Public Methods<a class="headerlink" href="#general-public-methods" title="Permalink to this headline">¶</a></h2>
+<p>Additional methods inherented from np.ma.MaskedArray that are not
+explicitely listed here may also be available. Keep in mind methods not
+listed here may not been have extensively tested.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/maskedarray.baseclass.html">numpy.ma.MaskedArray</a></p>
+</div>
+<hr class="docutils" />
+<dl class="staticmethod">
+<dt id="pyvttbl.PyvtTbl.__new__">
+<em class="property">static </em><tt class="descclassname">PyvtTbl.</tt><tt class="descname">__new__</tt><big>(</big><em>data</em>, <em>val</em>, <em>conditions</em>, <em>rnames</em>, <em>cnames</em>, <em>aggregate</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__new__" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates a new PyvtTbl from scratch</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd><p class="first">data: np.ma.array object holding pivoted data</p>
+<p>val: string label for the data in the table</p>
+<p>conditions: Dictset representing the factors and levels in the table</p>
+<p>rnames: list of row labels</p>
+<p>cnames: list of column labels</p>
+<p class="last">aggregate: string describing the aggregate function applied to the data</p>
+</dd>
+<dt>kwds:</dt>
+<dd><p class="first">calc tots: bool specifying whether totals were calculated</p>
+<p>row_tots: row totals in a MaskedArray</p>
+<p>col_tots: column totals in a MaskedArray</p>
+<p>grand_tot: float holding grand total</p>
+<p class="last">attach_rlabels: bool specifying whether row labels are part of the table</p>
+</dd>
+</dl>
+</div></blockquote>
+<div class="line-block">
+<div class="line">subclassing Numpy objects are a little different from subclassing other objects.</div>
+<div class="line">see: <a class="reference external" href="http://docs.scipy.org/doc/numpy/user/basics.subclassing.html">http://docs.scipy.org/doc/numpy/user/basics.subclassing.html</a></div>
+</div>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.transpose">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">transpose</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.transpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a transposed PyvtTbl object</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.astype">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">astype</tt><big>(</big><em>dtype</em><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.astype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the input to an array.</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd><dl class="first last docutils">
+<dt>a: array_like Input data, in any form that can be converted to an array.  This</dt>
+<dd>includes lists, lists of tuples, tuples, tuples of tuples, tuples
+of lists and ndarrays.</dd>
+</dl>
+</dd>
+<dt>kwds:</dt>
+<dd><p class="first">dtype: data-type. By default, the data-type is inferred from the input data.</p>
+<dl class="last docutils">
+<dt>order: {&#8216;C&#8217;, &#8216;F&#8217;}  Whether to use row-major (&#8216;C&#8217;) or column-major (&#8216;F&#8217; for FORTRAN)</dt>
+<dd>memory representation.  Defaults to &#8216;C&#8217;.</dd>
+</dl>
+</dd>
+<dt>returns:</dt>
+<dd><dl class="first last docutils">
+<dt>out: ndarray</dt>
+<dd>Array interpretation of <cite>a</cite>.  No copy is performed if the input
+is already an ndarray.  If <cite>a</cite> is a subclass of ndarray, a base
+class ndarray is returned.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.flatten">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">flatten</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.flatten" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a the PyvtTbl flattened as a MaskedArray</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__iter__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__iter__</tt><big>(</big><em>) &lt;==&gt; iter(x</em><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.ndenumerate">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">ndenumerate</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.ndenumerate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multidimensional index iterator.</p>
+<dl class="docutils">
+<dt>returns:</dt>
+<dd>returns an iterator yielding pairs of array coordinates and values.</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__repr__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a machine friendly string representation of the object</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__str__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a human friendly string representation of the table</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.write">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">write</tt><big>(</big><em>fname=None</em>, <em>delimiter='</em>, <em>'</em><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>writes the pivot table to a plaintext file</p>
+<div class="line-block">
+<div class="line">as currently implemented does not write grand_totals</div>
+</div>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.to_dataframe">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">to_dataframe</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.to_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a DataFrame excluding row and column totals</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__add__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__add__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__add__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add other to self, and return a new PyvtTbl.</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__radd__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__radd__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__radd__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add other to self, and return a new PyvtTbl.</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__sub__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__sub__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__sub__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subtract other to self, and return a new PyvtTbl.</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__rsub__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__rsub__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__rsub__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subtract other to self, and return a new PyvtTbl.</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__pow__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__pow__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__pow__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise self to the power other, masking the potential NaNs/Infs</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__mul__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__mul__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__mul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiply other by self, and return a new PyvtTbl.</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__rmul__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__rmul__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__rmul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiply other by self, and return a new PyvtTbl.</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__div__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__div__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__div__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divide other into self, and return a new PyvtTbl.</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__rdiv__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__rdiv__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__rdiv__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__rdiv__(y) &lt;==&gt; y/x</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__truediv__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__truediv__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__truediv__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divide other into self, and return a new PyvtTbl.</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__rtruediv__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__rtruediv__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__rtruediv__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divide other into self, and return a new PyvtTbl.</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__floordiv__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__floordiv__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__floordiv__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divide other into self, and return a new PyvtTbl.</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__rfloordiv__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__rfloordiv__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__rfloordiv__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divide other into self, and return a new PyvtTbl.</p>
+</dd></dl>
+
+</div>
+<hr class="docutils" />
+<div class="section" id="private-methods">
+<h2>4.3. Private Methods<a class="headerlink" href="#private-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl._get_rows">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">_get_rows</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl._get_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list of tuples containing row labels and conditions</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl._get_cols">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">_get_cols</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl._get_cols" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list of tuples containing column labels and conditions</p>
+</dd></dl>
+
+<hr class="docutils" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="5. pyvttbl.plotting"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DataFrame.html" title="3. pyvttbl.DataFrame"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

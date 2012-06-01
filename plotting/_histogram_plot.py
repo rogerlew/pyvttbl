@@ -16,13 +16,23 @@ import os
 import pylab
 import numpy as np
 
-def histogram_plot(self, val, where=None, bins=10,
+def histogram_plot(df, val, where=None, bins=10,
               range=None, density=False, cumulative=False,
               fname=None, output_dir='', quality='medium'):
     """
-    Creates a histogram plot with the specified parameters
+    Makes a histogram plot
+
+       args:
+          key: column label of dependent variable
+
+       kwds:
+          where: criterion to apply to table before running analysis
+
+          bins: number of bins (default = 10)
+
+          range: list of length 2 defining min and max bin edges
     """
-    
+
     if where == None:
         where = []
 
@@ -36,7 +46,7 @@ def histogram_plot(self, val, where=None, bins=10,
             raise Exception('fname must end with .png or .svg')                
 
     # select_col does checking of val and where
-    v = self.select_col(val, where=where)
+    v = df.select_col(val, where=where)
     
     fig=pylab.figure()
     tup = pylab.hist(np.array(v), bins=bins, range=range,
@@ -63,6 +73,6 @@ def histogram_plot(self, val, where=None, bins=10,
 
     pylab.close()
 
-    if self.TESTMODE:
+    if df.TESTMODE:
         # build and return test dictionary
         return {'bins':tup[0], 'counts':tup[1], 'fname':fname}

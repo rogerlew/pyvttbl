@@ -1,0 +1,1297 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3. pyvttbl.DataFrame &mdash; pyvttbl v 0.5.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.0.0 documentation" href="index.html" />
+    <link rel="next" title="4. pyvttbl.PyvtTbl" href="PyvtTbl.html" />
+    <link rel="prev" title="2. Quick-Start Guide" href="quick-start.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="PyvtTbl.html" title="4. pyvttbl.PyvtTbl"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quick-start.html" title="2. Quick-Start Guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3. <tt class="docutils literal"><span class="pre">pyvttbl.DataFrame</span></tt></a><ul>
+<li><a class="reference internal" href="#description">3.1. Description</a></li>
+<li><a class="reference internal" href="#general-public-methods">3.2. General Public Methods</a></li>
+<li><a class="reference internal" href="#pyvttbl-plotting-wrappers">3.3. <tt class="docutils literal"><span class="pre">pyvttbl.plotting</span></tt> Wrappers</a></li>
+<li><a class="reference internal" href="#pyvttbl-stats-wrappers">3.4. <tt class="docutils literal"><span class="pre">pyvttbl.stats</span></tt> Wrappers</a></li>
+<li><a class="reference internal" href="#private-methods">3.5. Private Methods</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="quick-start.html"
+                        title="previous chapter">2. Quick-Start Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="PyvtTbl.html"
+                        title="next chapter">4. <tt class="docutils literal"><span class="pre">pyvttbl.PyvtTbl</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/DataFrame.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyvttbl-dataframe">
+<h1>3. <tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.DataFrame</span></tt><a class="headerlink" href="#pyvttbl-dataframe" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="description">
+<h2>3.1. Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> objects are containers for holding tabulated data. They
+inherent <tt class="xref py py-class docutils literal"><span class="pre">collections.OrderedDict</span></tt> and hold data in
+<tt class="xref py py-class docutils literal"><span class="pre">numpy.array</span></tt> objects.</p>
+</div>
+<div class="section" id="general-public-methods">
+<h2>3.2. General Public Methods<a class="headerlink" href="#general-public-methods" title="Permalink to this headline">¶</a></h2>
+<p>Methods to get data into a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>, manipulate and manage data,
+and write data.</p>
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.__init__">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>initialize a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> object.</p>
+<div class="line-block">
+<div class="line">Subclass of <tt class="xref py py-mod docutils literal"><span class="pre">collections</span></tt>. <tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt>.           </div>
+<div class="line">Understands the typical initialization <tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt> signatures.</div>
+<div class="line">Keys must be hashable.</div>
+<div class="line">Values become numpy.arrays or numpy.ma.MaskedArrays.</div>
+</div>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.__setitem__">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>item</em>, <em>mask=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>assign a column in the table</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd><p class="first">key: hashable object to associate with item</p>
+<p class="last">item: an iterable that is put in an np.array or np.ma.array</p>
+</dd>
+<dt>kwds:</dt>
+<dd>mask: mask value passed to np.ma.MaskedArray.__init__()</dd>
+<dt>returns:</dt>
+<dd>None</dd>
+</dl>
+</div></blockquote>
+<div class="line-block">
+<div class="line">df.__setitem__(key, item) &lt;==&gt; df[key] = item</div>
+</div>
+<div class="line-block">
+<div class="line">The assigned item must be iterable. To add a single row use
+the insert method. To  another table to this one use
+the attach method.</div>
+</div>
+<blockquote>
+<div><dl class="docutils">
+<dt>example:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">first      last       age   gender </span>
+<span class="go">==================================</span>
+<span class="go">Roger   Lew            28   male   </span>
+<span class="go">Bosco   Robinson        5   male   </span>
+<span class="go">Megan   Whittington    26   female </span>
+<span class="go">John    Smith          51   male   </span>
+<span class="go">Jane    Doe            49   female </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="p">[</span><span class="s">&#39;log10(age)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">&#39;age&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">first      last       age   gender   log10(age) </span>
+<span class="go">===============================================</span>
+<span class="go">Roger   Lew            28   male          1.447 </span>
+<span class="go">Bosco   Robinson        5   male          0.699 </span>
+<span class="go">Megan   Whittington    26   female        1.415 </span>
+<span class="go">John    Smith          51   male          1.708 </span>
+<span class="go">Jane    Doe            49   female        1.690 </span>
+<span class="gp">&gt;&gt;&gt; </span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.__delitem__">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">__delitem__</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>delete a column from the table</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd>key: associated with the item to delete</dd>
+<dt>returns:</dt>
+<dd>None</dd>
+</dl>
+</div></blockquote>
+<div class="line-block">
+<div class="line">df.__delitem__(key) &lt;==&gt; del df[key]</div>
+</div>
+<blockquote>
+<div><dl class="docutils">
+<dt>example:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">first      last       age   gender   log10(age) </span>
+<span class="go">===============================================</span>
+<span class="go">Roger   Lew            28   male          1.447 </span>
+<span class="go">Bosco   Robinson        5   male          0.699 </span>
+<span class="go">Megan   Whittington    26   female        1.415 </span>
+<span class="go">John    Smith          51   male          1.708 </span>
+<span class="go">Jane    Doe            49   female        1.690 </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;log10(age)&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">first      last       age   gender </span>
+<span class="go">==================================</span>
+<span class="go">Roger   Lew            28   male   </span>
+<span class="go">Bosco   Robinson        5   male   </span>
+<span class="go">Megan   Whittington    26   female </span>
+<span class="go">John    Smith          51   male   </span>
+<span class="go">Jane    Doe            49   female </span>
+<span class="gp">&gt;&gt;&gt; </span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.__str__">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns human friendly string representation of object</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd>None</dd>
+<dt>returns:</dt>
+<dd>string with easy to read representation of table</dd>
+</dl>
+</div></blockquote>
+<div class="line-block">
+<div class="line">df.__str__() &lt;==&gt; str(df)</div>
+</div>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.read_tbl">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">read_tbl</tt><big>(</big><em>fname</em>, <em>skip=0</em>, <em>delimiter='</em>, <em>'</em>, <em>labels=True</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.read_tbl" title="Permalink to this definition">¶</a></dt>
+<dd><p>loads tabulated data from a plain text file</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd>fname: path and name of datafile</dd>
+<dt>kwds:</dt>
+<dd><p class="first">skip: number of lines to skip before looking for column labels. (default = 0)</p>
+<p>delimiter: string to seperate values (default = &#8220;&#8217;&#8221;)</p>
+<p class="last">labels: bool specifiying whether first row (after skip) contains labels.
+(default = True)</p>
+</dd>
+<dt>returns:</dt>
+<dd>None</dd>
+</dl>
+</div></blockquote>
+<div class="line-block">
+<div class="line">Checks and renames duplicate column labels as well as checking</div>
+<div class="line">for missing cells. readTbl will warn and skip over missing lines.</div>
+</div>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.attach">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">attach</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.attach" title="Permalink to this definition">¶</a></dt>
+<dd><p>attaches a second <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> to self</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>other: a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> object whose key set matches self</dd>
+<dt>return:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.insert">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">insert</tt><big>(</big><em>row</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>insert a row into the table</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>row: should be mappable. e.g. a dict or a list with key/value pairs.</dd>
+<dt>returns:</dt>
+<dd>None</dd>
+<dt>example:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Person</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Person&#39;</span><span class="p">,[</span><span class="s">&#39;first&#39;</span><span class="p">,</span><span class="s">&#39;last&#39;</span><span class="p">,</span><span class="s">&#39;age&#39;</span><span class="p">,</span><span class="s">&#39;gender&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Roger&#39;</span><span class="p">,</span> <span class="s">&#39;Lew&#39;</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="s">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Bosco&#39;</span><span class="p">,</span> <span class="s">&#39;Robinson&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Megan&#39;</span><span class="p">,</span> <span class="s">&#39;Whittington&#39;</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="s">&#39;female&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">first      last       age   gender </span>
+<span class="go">==================================</span>
+<span class="go">Roger   Lew            28   male   </span>
+<span class="go">Bosco   Robinson        5   male   </span>
+<span class="go">Megan   Whittington    26   female </span>
+<span class="gp">&gt;&gt;&gt; </span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.sort">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">sort</tt><big>(</big><em>order=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>sort the table in-place</p>
+<dl class="docutils">
+<dt>kwds:</dt>
+<dd>order: is a list of factors to sort by
+to reverse order append &#8221; desc&#8221; to the factor</dd>
+<dt>returns:</dt>
+<dd>None</dd>
+<dt>example:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Person</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Person&#39;</span><span class="p">,[</span><span class="s">&#39;first&#39;</span><span class="p">,</span><span class="s">&#39;last&#39;</span><span class="p">,</span><span class="s">&#39;age&#39;</span><span class="p">,</span><span class="s">&#39;gender&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Roger&#39;</span><span class="p">,</span> <span class="s">&#39;Lew&#39;</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="s">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Bosco&#39;</span><span class="p">,</span> <span class="s">&#39;Robinson&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Megan&#39;</span><span class="p">,</span> <span class="s">&#39;Whittington&#39;</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="s">&#39;female&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="s">&#39;Smith&#39;</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="s">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="s">&#39;female&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s">&#39;gender&#39;</span><span class="p">,</span> <span class="s">&#39;age&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">first      last       age   gender </span>
+<span class="go">==================================</span>
+<span class="go">Megan   Whittington    26   female </span>
+<span class="go">Jane    Doe            49   female </span>
+<span class="go">Bosco   Robinson        5   male   </span>
+<span class="go">Roger   Lew            28   male   </span>
+<span class="go">John    Smith          51   male   </span>
+<span class="gp">&gt;&gt;&gt; </span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.select_col">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">select_col</tt><big>(</big><em>key</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.select_col" title="Permalink to this definition">¶</a></dt>
+<dd><p>determines rows in table that satisfy the conditions given by where and returns
+the values of key in the remaining rows</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd>key: column label of data to return</dd>
+<dt>kwds:</dt>
+<dd>where: constraints to apply to table before returning data</dd>
+<dt>returns:</dt>
+<dd>a list</dd>
+<dt>example:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">first      last       age   gender </span>
+<span class="go">==================================</span>
+<span class="go">Roger   Lew            28   male   </span>
+<span class="go">Bosco   Robinson        5   male   </span>
+<span class="go">Megan   Whittington    26   female </span>
+<span class="go">John    Smith          51   male   </span>
+<span class="go">Jane    Doe            49   female </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">select_col</span><span class="p">(</span><span class="s">&#39;age&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s">&#39;gender == &quot;male&quot;&#39;</span><span class="p">)</span>
+<span class="go">[28, 5, 51]</span>
+<span class="gp">&gt;&gt;&gt; </span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.row_iter">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">row_iter</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.row_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>iterate over the rows in table</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>None</dd>
+<dt>returns:</dt>
+<dd>iterator that yields OrderedDict objects with (key,value) pairs
+cooresponding to the data in each row</dd>
+<dt>example:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">first      last       age   gender </span>
+<span class="go">==================================</span>
+<span class="go">Roger   Lew            28   male   </span>
+<span class="go">Bosco   Robinson        5   male   </span>
+<span class="go">Megan   Whittington    26   male   </span>
+<span class="go">John    Smith          51   female </span>
+<span class="go">Jane    Doe            49   female </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">row_iter</span><span class="p">():</span>
+<span class="go">        print(case)</span>
+<span class="go">OrderedDict([(&#39;first&#39;, &#39;Roger&#39;), (&#39;last&#39;, &#39;Lew&#39;), (&#39;age&#39;, 28), (&#39;gender&#39;, &#39;male&#39;)])</span>
+<span class="go">OrderedDict([(&#39;first&#39;, &#39;Bosco&#39;), (&#39;last&#39;, &#39;Robinson&#39;), (&#39;age&#39;, 5), (&#39;gender&#39;, &#39;male&#39;)])</span>
+<span class="go">OrderedDict([(&#39;first&#39;, &#39;Megan&#39;), (&#39;last&#39;, &#39;Whittington&#39;), (&#39;age&#39;, 26), (&#39;gender&#39;, &#39;male&#39;)])</span>
+<span class="go">OrderedDict([(&#39;first&#39;, &#39;John&#39;), (&#39;last&#39;, &#39;Smith&#39;), (&#39;age&#39;, 51), (&#39;gender&#39;, &#39;female&#39;)])</span>
+<span class="go">OrderedDict([(&#39;first&#39;, &#39;Jane&#39;), (&#39;last&#39;, &#39;Doe&#39;), (&#39;age&#39;, 49), (&#39;gender&#39;, &#39;female&#39;)])</span>
+<span class="gp">&gt;&gt;&gt; </span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.pivot">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">pivot</tt><big>(</big><em>val</em>, <em>rows=None</em>, <em>cols=None</em>, <em>aggregate='avg'</em>, <em>where=None</em>, <em>attach_rlabels=False</em>, <em>method='valid'</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.pivot" title="Permalink to this definition">¶</a></dt>
+<dd><p>produces a contingency table according to the arguments and keywords
+provided.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd>val: the colname to place as the data in the table</dd>
+<dt>kwds:</dt>
+<dd><dl class="first docutils">
+<dt>rows: list of colnames whos combinations will become rows</dt>
+<dd>in the table if left blank their will be one row</dd>
+<dt>cols: list of colnames whos combinations will become cols</dt>
+<dd>in the table if left blank their will be one col</dd>
+<dt>aggregate: function applied across data going into each cell</dt>
+<dd>of the table &lt;<a class="reference external" href="http://www.sqlite.org/lang_aggfunc.html">http://www.sqlite.org/lang_aggfunc.html</a>&gt;_</dd>
+</dl>
+<p>where: list of tuples or list of strings for filtering data</p>
+<dl class="last docutils">
+<dt>method:</dt>
+<dd><p class="first">&#8216;valid&#8217;: only returns rows or columns with valid entries.</p>
+<dl class="last docutils">
+<dt>&#8216;full&#8217;: return full factorial combinations of the</dt>
+<dd>conditions specified by rows and cols</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>returns:</dt>
+<dd><tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> object</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.where">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">where</tt><big>(</big><em>where</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.where" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies the where filter to a copy of the DataFrame, and
+returns the new DataFrame. The associated DataFrame is not copied.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd>where: criterion to apply to new table</dd>
+<dt>returns:</dt>
+<dd>a new <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt></dd>
+<dt>example:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">first      last       age   gender </span>
+<span class="go">==================================</span>
+<span class="go">Roger   Lew            28   male   </span>
+<span class="go">Bosco   Robinson        5   male   </span>
+<span class="go">Megan   Whittington    26   female </span>
+<span class="go">John    Smith          51   male   </span>
+<span class="go">Jane    Doe            49   female</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="s">&#39;age &gt; 20 and age &lt; 45&#39;</span><span class="p">))</span>
+<span class="go">first      last       age   gender </span>
+<span class="go">==================================</span>
+<span class="go">Roger   Lew            28   male   </span>
+<span class="go">Megan   Whittington    26   female </span>
+<span class="gp">&gt;&gt;&gt; </span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.where_update">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">where_update</tt><big>(</big><em>where</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.where_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies the where filter in-place.</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>where: criterion to apply to table</dd>
+<dt>returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.summary">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">summary</tt><big>(</big><em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>prints the descriptive information for each column in DataFrame</p>
+<dl class="docutils">
+<dt>kwds:</dt>
+<dd>where: criterion to apply to table before running analysis</dd>
+<dt>returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.validate">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">validate</tt><big>(</big><em>criteria</em>, <em>verbose=False</em>, <em>report=False</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>validate the data in the table.</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>criteria: a dict whose keys should coorespond to columns in the table.
+The values should be functions which take a single parameter and return
+a boolean.</dd>
+<dt>kwds:</dt>
+<dd><dl class="first last docutils">
+<dt>verbose:</dt>
+<dd><p class="first">True: provide real-time feedback</p>
+<p class="last">False: don&#8217;t provide feedback (default)</p>
+</dd>
+<dt>report:</dt>
+<dd><p class="first">True: print a report upon completion</p>
+<p class="last">False: don&#8217;t print report (default)</p>
+</dd>
+</dl>
+</dd>
+<dt>returns:</dt>
+<dd><blockquote class="first">
+<div><p>True: the criteria was satisfied</p>
+<p>False: the critera was not satisfied</p>
+</div></blockquote>
+<dl class="last docutils">
+<dt>example:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">first      last       age   gender </span>
+<span class="go">==================================</span>
+<span class="go">Roger   Lew            28   male   </span>
+<span class="go">Bosco   Robinson        5   male   </span>
+<span class="go">Megan   Whittington    26   female </span>
+<span class="go">John    Smith          51   male   </span>
+<span class="go">Jane    Doe            49   female</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">isint</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="go">        try : return int(x)-float(x)==0</span>
+<span class="go">        except:  return False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">validate</span><span class="p">({</span><span class="s">&#39;age&#39;</span> <span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">isint</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+<span class="go">                 &#39;gender&#39; : lambda x: x in [&#39;male&#39;, &#39;female&#39;]},</span>
+<span class="go">                 verbose=True, report=True)                    </span>
+<span class="go">Validating gender:</span>
+<span class="go">.....</span>
+<span class="go">Validating age:</span>
+<span class="go">.....</span>
+<span class="go">Report:</span>
+<span class="go">  Values tested: 10 </span>
+<span class="go">  Values passed: 10 </span>
+<span class="go">  Values failed: 0</span>
+<span class="go">***Validation PASSED***</span>
+<span class="go">True</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.types">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">types</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.types" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>returns a list of the sqlite3 datatypes of the columns </dt>
+<dd><dl class="first last docutils">
+<dt>args:</dt>
+<dd>None</dd>
+<dt>returns:</dt>
+<dd>an ordered list of sqlite3 types.</dd>
+</dl>
+</dd>
+</dl>
+<div class="line-block">
+<div class="line">order matches self.keys() </div>
+</div>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.shape">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">shape</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the size of the data in the table as a tuple</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>None</dd>
+<dt>returns:</dt>
+<dd>tuple (number of columns, number of rows)</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.bind_aggregate">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">bind_aggregate</tt><big>(</big><em>name</em>, <em>arity</em>, <em>func</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.bind_aggregate" title="Permalink to this definition">¶</a></dt>
+<dd><p>binds a sqlite3 aggregator to <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt></p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd><p class="first">name: string to be associated with the aggregator</p>
+<p>arity: the number of inputs required by the aggregator</p>
+<p class="last">func: the aggregator class</p>
+</dd>
+<dt>returns:</dt>
+<dd>None</dd>
+</dl>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>.aggregates is a list of the available aggregators.</div>
+<div class="line">For information on rolling your own aggregators see:
+<a class="reference external" href="http://docs.python.org/library/sqlite3.html">http://docs.python.org/library/sqlite3.html</a></div>
+</div>
+</dd></dl>
+
+</div>
+<hr class="docutils" />
+<div class="section" id="pyvttbl-plotting-wrappers">
+<h2>3.3. <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.plotting</span></tt> Wrappers<a class="headerlink" href="#pyvttbl-plotting-wrappers" title="Permalink to this headline">¶</a></h2>
+<p>Methods to visualize data.</p>
+<dl class="method">
+<dt id="pyvttbl.DataFrame.histogram_plot">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">histogram_plot</tt><big>(</big><em>val</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.histogram_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a histogram plot</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>key: column label of dependent variable</dd>
+<dt>kwds:</dt>
+<dd><p class="first">where: criterion to apply to table before running analysis</p>
+<p>bins: number of bins (default = 10)</p>
+<p class="last">range: list of length 2 defining min and max bin edges</p>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.scatter_plot">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">scatter_plot</tt><big>(</big><em>aname</em>, <em>bname</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.scatter_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a scatter plot with the specified parameters</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd><p class="first">aname: variable on x-axis</p>
+<p class="last">bname: variable on y-axis</p>
+</dd>
+<dt>kwds:</dt>
+<dd><dl class="first last docutils">
+<dt>alpha:</dt>
+<dd>amount of transparency applied</dd>
+<dt>trend :</dt>
+<dd><p class="first">None:          no model fitting</p>
+<p>&#8216;linear&#8217;:      f(x) = a + b*x</p>
+<p>&#8216;exponential&#8217;: f(x) = a * x**b</p>
+<p>&#8216;logarithmic&#8217;: f(x) = a * log(x) + b</p>
+<p>&#8216;polynomial&#8217;:  f(x) = a * x**2 + b*x + c</p>
+<p class="last">&#8216;power&#8217;:       f(x) = a * x**b</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.box_plot">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">box_plot</tt><big>(</big><em>val</em>, <em>factors=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.box_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a box plot</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd><dl class="first last docutils">
+<dt>df:</dt>
+<dd>a pyvttbl.DataFrame object</dd>
+<dt>val:</dt>
+<dd>the label of the dependent variable</dd>
+</dl>
+</dd>
+<dt>kwds:</dt>
+<dd><dl class="first last docutils">
+<dt>factors:</dt>
+<dd>a list of factors to include in boxplot</dd>
+<dt>where:</dt>
+<dd>a string, list of strings, or list of tuples
+applied to the DataFrame before plotting</dd>
+<dt>fname:</dt>
+<dd>output file name</dd>
+<dt>quality:</dt>
+<dd>{&#8216;low&#8217; | &#8216;medium&#8217; | &#8216;high&#8217;} specifies image file dpi</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.interaction_plot">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">interaction_plot</tt><big>(</big><em>val</em>, <em>xaxis</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.interaction_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>makes an interaction plot</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd><dl class="first last docutils">
+<dt>df:</dt>
+<dd>a pyvttbl.DataFrame object</dd>
+<dt>val:</dt>
+<dd>the label of the dependent variable</dd>
+<dt>xaxis:</dt>
+<dd>the label of the variable to place on the xaxis of each subplot</dd>
+</dl>
+</dd>
+<dt>kwds:</dt>
+<dd><dl class="first last docutils">
+<dt>seplines:</dt>
+<dd>label specifying seperate lines in each subplot</dd>
+<dt>sepxplots:</dt>
+<dd>label specifying seperate horizontal subplots</dd>
+<dt>sepyplots:</dt>
+<dd>label specifying separate vertical subplots</dd>
+<dt>xmin:</dt>
+<dd>(&#8216;AUTO&#8217; by default) minimum xaxis value across subplots</dd>
+<dt>xmax:</dt>
+<dd>(&#8216;AUTO&#8217; by default) maximum xaxis value across subplots</dd>
+<dt>ymin:</dt>
+<dd>(&#8216;AUTO&#8217; by default) minimum yaxis value across subplots</dd>
+<dt>ymax:</dt>
+<dd>(&#8216;AUTO&#8217; by default) maximum yaxis value across subplots</dd>
+<dt>where:</dt>
+<dd>a string, list of strings, or list of tuples
+applied to the DataFrame before plotting</dd>
+<dt>fname:</dt>
+<dd>output file name</dd>
+<dt>quality:</dt>
+<dd>{&#8216;low&#8217; | &#8216;medium&#8217; | &#8216;high&#8217;} specifies image file dpi</dd>
+<dt>yerr:</dt>
+<dd>{float, &#8216;ci&#8217;, &#8216;se&#8217;, &#8216;sem&#8217;} designates errorbars across
+datapoints in all subplots</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.scatter_matrix">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">scatter_matrix</tt><big>(</big><em>variables</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.scatter_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a matrix of scatterplots</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd><dl class="first last docutils">
+<dt>variables:</dt>
+<dd>column labels to include in scatter matrix</dd>
+</dl>
+</dd>
+<dt>kwds:</dt>
+<dd><dl class="first last docutils">
+<dt>alpha:</dt>
+<dd>amount of transparency applied</dd>
+<dt>grid:</dt>
+<dd>setting this to True will show the grid</dd>
+<dt>diagonal:</dt>
+<dd><p class="first">&#8216;kde&#8217;:  Kernel Density Estimation</p>
+<p>&#8216;hist&#8217;: 20 bin Histogram</p>
+<p class="last">None:  just labels</p>
+</dd>
+<dt>trend :</dt>
+<dd><p class="first">None:          no model fitting</p>
+<p>&#8216;linear&#8217;:      f(x) = a + b*x</p>
+<p>&#8216;exponential&#8217;: f(x) = a * x**b</p>
+<p>&#8216;logarithmic&#8217;: f(x) = a * log(x) + b</p>
+<p>&#8216;polynomial&#8217;:  f(x) = a * x**2 + b*x + c</p>
+<p class="last">&#8216;power&#8217;:       f(x) = a * x**b</p>
+</dd>
+<dt>alternate_labels: Specifies whether the labels and ticks should</dt>
+<dd>alternate. Default is True. When False tick labels
+will be on the left and botttom, and variable
+labels will be on the top and right.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<hr class="docutils" />
+<div class="section" id="pyvttbl-stats-wrappers">
+<h2>3.4. <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt> Wrappers<a class="headerlink" href="#pyvttbl-stats-wrappers" title="Permalink to this headline">¶</a></h2>
+<p>Methods to conduct descriptive and inferential statistical analyses.</p>
+<dl class="method">
+<dt id="pyvttbl.DataFrame.descriptives">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">descriptives</tt><big>(</big><em>key</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.descriptives" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conducts a descriptive statistical analysis of the data in self[key].</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>key: column label</dd>
+<dt>kwds:</dt>
+<dd>where: criterion to apply to table before running analysis</dd>
+<dt>returns:</dt>
+<dd>a <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt>. <tt class="xref py py-class docutils literal"><span class="pre">Descriptives</span></tt> object</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.histogram">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">histogram</tt><big>(</big><em>key</em>, <em>where=None</em>, <em>bins=10</em>, <em>range=None</em>, <em>density=False</em>, <em>cumulative=False</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.histogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conducts a histogram analysis of the data in self[key].</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>key: column label of dependent variable</dd>
+<dt>kwds:</dt>
+<dd><p class="first">where: criterion to apply to table before running analysis</p>
+<p>bins: number of bins (default = 10)</p>
+<p class="last">range: list of length 2 defining min and max bin edges</p>
+</dd>
+<dt>returns:</dt>
+<dd>a <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt>. <tt class="xref py py-class docutils literal"><span class="pre">Descriptives</span></tt> object</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.marginals">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">marginals</tt><big>(</big><em>key</em>, <em>factors</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.marginals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates means, counts, standard errors, and confidence intervals
+for the marginal conditions of the factorial combinations specified in
+the factors list.</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>key: column label (of the dependent variable)</dd>
+<dt>kwds:</dt>
+<dd><p class="first">factors: list of column labels to segregate data</p>
+<p class="last">where: criterion to apply to table before running analysis</p>
+</dd>
+<dt>returns:</dt>
+<dd>a <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt>. <tt class="xref py py-class docutils literal"><span class="pre">Marginals</span></tt> object</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.anova1way">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">anova1way</tt><big>(</big><em>val</em>, <em>factor</em>, <em>posthoc='tukey'</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.anova1way" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conducts a one-way analysis of variance
+on val over the conditions in factor. The conditions do not necessarily
+need to have equal numbers of samples.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd><blockquote class="first">
+<div><p>val: dependent variable</p>
+<p>factor: a dummy coded column label</p>
+</div></blockquote>
+<dl class="last docutils">
+<dt>kwds:</dt>
+<dd><dl class="first last docutils">
+<dt>posthoc:</dt>
+<dd><p class="first">&#8216;tukey&#8217;: conduct Tukey posthoc tests</p>
+<p class="last">&#8216;SNK&#8217;: conduct Newman-Keuls posthoc tests</p>
+</dd>
+</dl>
+</dd>
+<dt>where:</dt>
+<dd>conditions to apply before running analysis</dd>
+</dl>
+</dd>
+<dt>return:</dt>
+<dd>an <a class="reference internal" href="stats.html#pyvttbl.stats.Anova1way" title="pyvttbl.stats.Anova1way"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.Anova1way</span></tt></a> object</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.anova">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">anova</tt><big>(</big><em>dv</em>, <em>sub='SUBJECT'</em>, <em>wfactors=None</em>, <em>bfactors=None</em>, <em>measure=''</em>, <em>transform=''</em>, <em>alpha=0.05</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.anova" title="Permalink to this definition">¶</a></dt>
+<dd><p>conducts a betweeen, within, or mixed, analysis of variance</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>dv: label containing dependent variable</dd>
+<dt>kwds:</dt>
+<dd><p class="first">wfactors: list of within variable factor labels</p>
+<p>bfactors: list of between variable factor labels</p>
+<p>sub: label coding subjects (or the isomorphism)</p>
+<dl class="docutils">
+<dt>measure: string to describe dv (outputs &#8216;&lt;dv&gt; of</dt>
+<dd>&lt;measure&gt;&#8217;) intended when dv name is generic
+(e.g., MEAN, RMS, SD, ...)</dd>
+</dl>
+<p>transform: string specifying a data transformation</p>
+<blockquote class="last">
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="27%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">STRING OPTION</th>
+<th class="head">TRANSFORM</th>
+<th class="head">COMMENTS</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8216;&#8217;</td>
+<td>X</td>
+<td>default</td>
+</tr>
+<tr class="row-odd"><td>&#8216;log&#8217;,&#8217;log10&#8217;</td>
+<td>numpy.log(X)</td>
+<td>base 10 transform</td>
+</tr>
+<tr class="row-even"><td>&#8216;reciprocal&#8217;, &#8216;inverse&#8217;</td>
+<td>1/X</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>&#8216;square-root&#8217;, &#8216;sqrt&#8217;</td>
+<td>numpy.sqrt(X)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>&#8216;arcsine&#8217;, &#8216;arcsin&#8217;</td>
+<td>numpy.arcsin(X)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>&#8216;windsor 10&#8217;</td>
+<td>windsor(X, 10)</td>
+<td>10% windosr trim</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.chisquare1way">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">chisquare1way</tt><big>(</big><em>observed</em>, <em>expected_dict=None</em>, <em>alpha=0.05</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.chisquare1way" title="Permalink to this definition">¶</a></dt>
+<dd><p>conducts a one-way chi-square goodness-of-fit test on the data in observed</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>observed: column label containing categorical observations</dd>
+<dt>kwds:</dt>
+<dd><dl class="first docutils">
+<dt>expected_dict: a dictionary object with keys matching the categories</dt>
+<dd>in observed and values with the expected counts. The
+categories in the observed column must be a subset of
+the keys in the expected_dict. If expected_dict is None,
+the total N is assumed to be equally distributed across
+all groups.</dd>
+</dl>
+<p>alpha: the type-I error probability</p>
+<dl class="last docutils">
+<dt>where:</dt>
+<dd>conditions to apply before running analysis</dd>
+</dl>
+</dd>
+<dt>return:</dt>
+<dd>an <a class="reference internal" href="stats.html#pyvttbl.stats.ChiSquare1way" title="pyvttbl.stats.ChiSquare1way"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.ChiSquare1way</span></tt></a> object</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.chisquare2way">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">chisquare2way</tt><big>(</big><em>rfactor</em>, <em>cfactor</em>, <em>alpha=0.05</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.chisquare2way" title="Permalink to this definition">¶</a></dt>
+<dd><p>conducts a two-way chi-square goodness-of-fit test on the data in observed</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd><p class="first">rfactor: column key</p>
+<p class="last">cfactor: column key</p>
+</dd>
+<dt>kwds:</dt>
+<dd><p class="first">alpha: the type-I error probability</p>
+<dl class="last docutils">
+<dt>where:</dt>
+<dd>conditions to apply before running analysis</dd>
+</dl>
+</dd>
+<dt>return:</dt>
+<dd>an <a class="reference internal" href="stats.html#pyvttbl.stats.ChiSquare2way" title="pyvttbl.stats.ChiSquare2way"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.ChiSquare2way</span></tt></a> object</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.correlation">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">correlation</tt><big>(</big><em>variables</em>, <em>coefficient='pearson'</em>, <em>alpha=0.05</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.correlation" title="Permalink to this definition">¶</a></dt>
+<dd><p>produces a correlation matrix and conducts step-down significance testing
+on the column labels in variables.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd>variables: column keys to include in correlation matrix</dd>
+<dt>kwds:</dt>
+<dd><dl class="first docutils">
+<dt>coefficient:</dt>
+<dd>{ &#8216;pearson&#8217;, &#8216;spearman&#8217;, &#8216;kendalltau&#8217;, &#8216;pointbiserial&#8217; }</dd>
+</dl>
+<p>alpha: the type-I error probability</p>
+<dl class="last docutils">
+<dt>where:</dt>
+<dd>conditions to apply before running analysis</dd>
+</dl>
+</dd>
+<dt>return:</dt>
+<dd>an <a class="reference internal" href="stats.html#pyvttbl.stats.Correlation" title="pyvttbl.stats.Correlation"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.Correlation</span></tt></a> object</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame.ttest">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">ttest</tt><big>(</big><em>aname</em>, <em>bname=None</em>, <em>pop_mean=0.0</em>, <em>paired=False</em>, <em>equal_variance=True</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.ttest" title="Permalink to this definition">¶</a></dt>
+<dd><p>produces a correlation matrix and conducts step-down significance testing
+on the column labels in variables.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd>aname: column key</dd>
+<dt>kwds:</dt>
+<dd><dl class="first last docutils">
+<dt>bname: is not specified a one-sample t-test is performed on</dt>
+<dd>comparing the values in column aname with a hypothesized
+population mean.</dd>
+<dt>pop_mean: specifies the null population mean for one-sample t-test.</dt>
+<dd>Ignored if bname is supplied</dd>
+<dt>paired:</dt>
+<dd><p class="first">True: a paired t-test is conducted</p>
+<p class="last">False: an independent samples t-test is conducted</p>
+</dd>
+<dt>equal_variance:</dt>
+<dd><p class="first">True: assumes aname and bname have equal variance</p>
+<p class="last">False: assumes aname and bname have unequal variance</p>
+</dd>
+<dt>where:</dt>
+<dd>conditions to apply before running analysis</dd>
+</dl>
+</dd>
+<dt>return:</dt>
+<dd>an <a class="reference internal" href="stats.html#pyvttbl.stats.Ttest" title="pyvttbl.stats.Ttest"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.Ttest</span></tt></a> object</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<hr class="docutils" />
+<div class="section" id="private-methods">
+<h2>3.5. Private Methods<a class="headerlink" href="#private-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="method">
+<dt id="pyvttbl.DataFrame._get_sqltype">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">_get_sqltype</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._get_sqltype" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the sqlite3 type associated with the provided key</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>key: key in <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> (raises KeyError if key not in self)</dd>
+<dt>returns:</dt>
+<dd><dl class="first last docutils">
+<dt>a string specifiying the sqlite3 type associated with the data in self[key]:</dt>
+<dd>{ &#8216;null&#8217;, &#8216;integer&#8217;, &#8216;real&#8217;, &#8216;text&#8217;}</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame._get_nptype">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">_get_nptype</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._get_nptype" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the numpy type object associated with the provided key</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>key: key in <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> (raises KeyError if key not in self)</dd>
+<dt>returns:</dt>
+<dd><p class="first">a numpy object specifiying the type associated with the data in self[key]:</p>
+<blockquote class="last">
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">sql type</th>
+<th class="head">numpy type</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8216;null&#8217;</td>
+<td>np.dtype(object)</td>
+</tr>
+<tr class="row-odd"><td>&#8216;integer&#8217;</td>
+<td>np.dtype(int)</td>
+</tr>
+<tr class="row-even"><td>&#8216;real&#8217;</td>
+<td>np.dtype(float)</td>
+</tr>
+<tr class="row-odd"><td>&#8216;text&#8217;</td>
+<td>np.dtype(str)</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame._get_mafillvalue">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">_get_mafillvalue</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._get_mafillvalue" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the default fill value for invalid data associated with the provided key.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd>key: key in <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> (raises KeyError if key not in self)</dd>
+<dt>returns:</dt>
+<dd><p class="first">string, float, or int associated with the data in self[key]</p>
+<blockquote class="last">
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="43%" />
+<col width="57%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">sql type</th>
+<th class="head">default</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8216;null&#8217;</td>
+<td>&#8216;?&#8217;</td>
+</tr>
+<tr class="row-odd"><td>&#8216;integer&#8217;</td>
+<td>999999</td>
+</tr>
+<tr class="row-even"><td>&#8216;real&#8217;</td>
+<td>1e20</td>
+</tr>
+<tr class="row-odd"><td>&#8216;text&#8217;</td>
+<td>&#8216;N/A&#8217;</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</dd>
+</dl>
+</div></blockquote>
+<div class="line-block">
+<div class="line">returned values match the defaults associated with np.ma.MaskedArray</div>
+</div>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame._are_col_lengths_equal">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">_are_col_lengths_equal</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._are_col_lengths_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>private method to check if the items in self have equal lengths</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>None</dd>
+</dl>
+<p>returns:
+|   returns True if all the items are equal
+|   returns False otherwise</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame._determine_sqlite3_type">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">_determine_sqlite3_type</tt><big>(</big><em>iterable</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._determine_sqlite3_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>determine the sqlite3 datatype of iterable</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd>iterable: a 1-d iterable (list, tuple, np.array, etc.)</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>returns:</dt>
+<dd>sqlite3 type as string: &#8216;null&#8217;, &#8216;integer&#8217;, &#8216;real&#8217;, or &#8216;text&#8217;</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame._execute">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">_execute</tt><big>(</big><em>query</em>, <em>t=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>private method to execute sqlite3 query</p>
+<div class="line-block">
+<div class="line">When the PRINTQUERIES bool is true it prints the queries
+before executing them</div>
+</div>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame._executemany">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">_executemany</tt><big>(</big><em>query</em>, <em>tlist</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._executemany" title="Permalink to this definition">¶</a></dt>
+<dd><p>private method to execute sqlite3 queries</p>
+<div class="line-block">
+<div class="line">When the PRINTQUERIES bool is true it prints the queries
+before executing them. The execute many method is about twice
+as fast for building tables as the execute method.</div>
+</div>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame._get_indices_where">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">_get_indices_where</tt><big>(</big><em>where</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._get_indices_where" title="Permalink to this definition">¶</a></dt>
+<dd><p>determines the indices cooresponding to the conditions specified by the where
+argument.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd>where: a string criterion without the &#8216;where&#8217;</dd>
+<dt>returns:</dt>
+<dd>a list of indices</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.DataFrame._build_sqlite3_tbl">
+<tt class="descclassname">DataFrame.</tt><tt class="descname">_build_sqlite3_tbl</tt><big>(</big><em>nsubset</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._build_sqlite3_tbl" title="Permalink to this definition">¶</a></dt>
+<dd><p>build or rebuild sqlite table with columns in nsubset based on
+the where list.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd><p class="first">nsubset: a list of keys to include in the table</p>
+<p class="last">where: criterion the entries in the table must satisfy</p>
+</dd>
+<dt>returns:</dt>
+<dd>None</dd>
+</dl>
+</div></blockquote>
+<div class="line-block">
+<div class="line">where can be a list of tuples. Each tuple should have three
+elements. The first should be a column key (label). The second
+should be an operator: in, =, !=, &lt;, &gt;. The third element
+should contain value for the operator.</div>
+</div>
+<div class="line-block">
+<div class="line">where can also be a list of strings. or a single string.</div>
+</div>
+<div class="line-block">
+<div class="line">sqlite3 table is built in memory and has the id TBL</div>
+</div>
+</dd></dl>
+
+<hr class="docutils" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="PyvtTbl.html" title="4. pyvttbl.PyvtTbl"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="quick-start.html" title="2. Quick-Start Guide"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -45,16 +45,23 @@ class DataFrame(OrderedDict):
     """holds the data in a dummy-coded group format"""
     def __init__(self, *args, **kwds):
         """
-        initialize a DataFrame object
+        initialize a :class:`DataFrame` object.
 
-          keep in mind that because this class uses sqlite3
-          behind the scenes the keys are case-insensitive
+        |   Subclass of :mod:`collections`. :class:`OrderedDict`.           
+        |   Understands the typical initialization :class:`dict` signatures.
+        |   Keys must be hashable.
+        |   Values become numpy.arrays or numpy.ma.MaskedArrays.
+           
         """
         super(DataFrame, self).__init__()
         
-        # Initialize sqlite3
+        #: sqlite3 connection
         self.conn = sqlite3.connect(':memory:')
+        
+        #: sqlite3 cursor
         self.cur = self.conn.cursor()
+        
+        #: list of sqlite3 aggregates
         self.aggregates = tuple('avg count count group_concat '  \
                                 'group_concat max min sum total tolist' \
                                 .split())
@@ -63,26 +70,38 @@ class DataFrame(OrderedDict):
         for n, a, f in pystaggrelite3.getaggregators():
             self.bind_aggregate(n, a, f)
 
-        # prints the sqlite3 queries to stdout before
-        # executing them for debugging purposes
+        #: prints the sqlite3 queries to stdout before
+        #: executing them for debugging purposes
         self.PRINTQUERIES = False
 
-        # controls whether plot functions return the test dictionaries
+        #: controls whether plot functions return the test dictionaries
         self.TESTMODE = False
 
-        # holds the factors conditions (and all the data values)
-        # maybe this should be built on the fly for necessary
-        # columns only?
+        #: holds the factors conditions in a DictSet Singleton
         self.conditions = DictSet()
 
-        # dict to look up sqlite3 type by key
+        #: dict to map keys to sqlite3 types
         self._sqltypesdict = {}
 
         super(DataFrame, self).update(*args, **kwds)
 
     def bind_aggregate(self, name, arity, func):
         """
-        bind a sqlite3 aggregator to DataFrame
+        binds a sqlite3 aggregator to :class:`DataFrame`
+
+           args:
+              name: string to be associated with the aggregator
+              
+              arity: the number of inputs required by the aggregator
+              
+              func: the aggregator class
+
+           returns:
+              None
+              
+        |   :class:`DataFrame`.aggregates is a list of the available aggregators.
+        |   For information on rolling your own aggregators see:
+            http://docs.python.org/library/sqlite3.html
         """
         self.conn.create_aggregate(name, arity, func)
         
@@ -90,16 +109,65 @@ class DataFrame(OrderedDict):
         self.aggregates.append(name)
         self.aggregates = tuple(self.aggregates)
 
-    def get_sqltype(self, key):
+    def _get_sqltype(self, key):
+        """
+        returns the sqlite3 type associated with the provided key
+
+           args:
+              key: key in :class:`DataFrame` (raises KeyError if key not in self)
+
+           returns:
+              a string specifiying the sqlite3 type associated with the data in self[key]:
+                 { 'null', 'integer', 'real', 'text'}
+        """
         return self._sqltypesdict[key]
                        
-    def get_nptype(self, key):
+    def _get_nptype(self, key):
+        """
+        returns the numpy type object associated with the provided key
+
+           args:
+              key: key in :class:`DataFrame` (raises KeyError if key not in self)
+
+           returns:
+              a numpy object specifiying the type associated with the data in self[key]:
+
+                 =========   ================
+                 sql type    numpy type
+                 =========   ================
+                 'null'      np.dtype(object)
+                 'integer'   np.dtype(int)
+                 'real'      np.dtype(float)
+                 'text'      np.dtype(str)
+                 =========   ================
+        """
         return {'null' : np.dtype(object),
                 'integer' : np.dtype(int),
                 'real' : np.dtype(float),
                 'text' : np.dtype(str)}[self._sqltypesdict[key]]
     
-    def get_mafillvalue(self, key):
+    def _get_mafillvalue(self, key):
+
+        """
+        returns the default fill value for invalid data associated with the provided key.
+
+           args:
+              key: key in :class:`DataFrame` (raises KeyError if key not in self)
+
+           returns:
+              string, float, or int associated with the data in self[key]
+              
+                 =========   ============
+                 sql type    default
+                 =========   ============
+                 'null'      '?'
+                 'integer'   999999
+                 'real'      1e20
+                 'text'      'N/A'
+                 =========   ============
+        
+        |   returned values match the defaults associated with np.ma.MaskedArray
+        """
         return {'null' : '?',
                 'integer' : 999999,
                 'real' : 1e20,
@@ -108,9 +176,23 @@ class DataFrame(OrderedDict):
     def read_tbl(self, fname, skip=0, delimiter=',',labels=True):
         """
         loads tabulated data from a plain text file
+        
+           args:
+              fname: path and name of datafile
 
-          Checks and renames duplicate column labels as well as checking
-          for missing cells. readTbl will warn and skip over missing lines.
+           kwds:
+              skip: number of lines to skip before looking for column labels. (default = 0)
+              
+              delimiter: string to seperate values (default = "'")
+              
+              labels: bool specifiying whether first row (after skip) contains labels.
+              (default = True)
+              
+           returns:
+              None
+              
+        |   Checks and renames duplicate column labels as well as checking
+        |   for missing cells. readTbl will warn and skip over missing lines.
         """
         
         # open and read dummy coded data results file to data dictionary
@@ -186,16 +268,45 @@ class DataFrame(OrderedDict):
     def __setitem__(self, key, item, mask=None):
         """
         assign a column in the table
+        
+           args:
+              key: hashable object to associate with item
 
-          the key should be a string (it will be converted to a string)
-          if it is not supplied as one. The key must also not have white
-          space and must not be a case variant of an existing key. These
-          constraints are to avoid problems when placing data into
-          sqlite3.
+              item: an iterable that is put in an np.array or np.ma.array
 
-          The assigned item must be iterable. To add a single row use
-          the insert method. To  another table to this one use
-          the attach method.
+           kwds:
+              mask: mask value passed to np.ma.MaskedArray.__init__()
+              
+           returns:
+              None
+              
+        |   df.__setitem__(key, item) <==> df[key] = item
+        
+        |   The assigned item must be iterable. To add a single row use
+            the insert method. To  another table to this one use
+            the attach method.
+
+           example:
+              >>> ...
+              >>> print(df)
+              first      last       age   gender 
+              ==================================
+              Roger   Lew            28   male   
+              Bosco   Robinson        5   male   
+              Megan   Whittington    26   female 
+              John    Smith          51   male   
+              Jane    Doe            49   female 
+              >>> import numpy as np
+              >>> df['log10(age)'] = np.log10(df['age'])
+              >>> print(df)
+              first      last       age   gender   log10(age) 
+              ===============================================
+              Roger   Lew            28   male          1.447 
+              Bosco   Robinson        5   male          0.699 
+              Megan   Whittington    26   female        1.415 
+              John    Smith          51   male          1.708 
+              Jane    Doe            49   female        1.690 
+              >>> 
         """
         
         # check item
@@ -213,16 +324,16 @@ class DataFrame(OrderedDict):
 
                 # figure out the datatype of the valid entries
                 self._sqltypesdict[key] = \
-                    self._check_sqlite3_type([d for d,m in zip(item,mask) if not m])
+                    self._determine_sqlite3_type([d for d,m in zip(item,mask) if not m])
 
                 # replace invalid values
-                fill_val = self.get_mafillvalue(key)
+                fill_val = self._get_mafillvalue(key)
                 x = np.array([(d, fill_val)[m] for d,m in zip(item,mask)])
                 
                 # call super.__setitem__
                 super(DataFrame, self).\
                     __setitem__(key, \
-                        np.ma.array(x, mask=mask, dtype=self.get_nptype(key)))
+                        np.ma.array(x, mask=mask, dtype=self._get_nptype(key)))
 
                 # set or update self.conditions DictSet
                 self.conditions[key] = self[key]
@@ -231,9 +342,9 @@ class DataFrame(OrderedDict):
                 return
 
         # no mask provided or mask is all true
-        self._sqltypesdict[key] = self._check_sqlite3_type(item)
+        self._sqltypesdict[key] = self._determine_sqlite3_type(item)
         super(DataFrame, self).\
-            __setitem__(key, np.array(item, dtype=self.get_nptype(key)))
+            __setitem__(key, np.array(item, dtype=self._get_nptype(key)))
             
         self.conditions[key] = self[key]
 
@@ -243,6 +354,35 @@ class DataFrame(OrderedDict):
     def __delitem__(self, key):
         """
         delete a column from the table
+        
+           args:
+              key: associated with the item to delete
+              
+           returns:
+              None
+              
+        |   df.__delitem__(key) <==> del df[key]
+
+           example:
+              >>> ...
+              >>> print(df)
+              first      last       age   gender   log10(age) 
+              ===============================================
+              Roger   Lew            28   male          1.447 
+              Bosco   Robinson        5   male          0.699 
+              Megan   Whittington    26   female        1.415 
+              John    Smith          51   male          1.708 
+              Jane    Doe            49   female        1.690 
+              >>> del df['log10(age)']
+              >>> print(df)
+              first      last       age   gender 
+              ==================================
+              Roger   Lew            28   male   
+              Bosco   Robinson        5   male   
+              Megan   Whittington    26   female 
+              John    Smith          51   male   
+              Jane    Doe            49   female 
+              >>> 
         """
 
         del self._sqltypesdict[key]
@@ -252,6 +392,14 @@ class DataFrame(OrderedDict):
     def __str__(self):
         """
         returns human friendly string representation of object
+
+           args:
+              None
+              
+           returns:
+              string with easy to read representation of table
+
+        |   df.__str__() <==> str(df)
         """
         if self == {}:
             return '(table is empty)'
@@ -271,10 +419,49 @@ class DataFrame(OrderedDict):
 
         # output the table
         return tt.draw()
+
+    def row_iter(self):
+        """
+        iterate over the rows in table
+
+           args:
+              None
+
+           returns:
+              iterator that yields OrderedDict objects with (key,value) pairs
+              cooresponding to the data in each row
+
+           example:
+              >>> print(df)
+              first      last       age   gender 
+              ==================================
+              Roger   Lew            28   male   
+              Bosco   Robinson        5   male   
+              Megan   Whittington    26   male   
+              John    Smith          51   female 
+              Jane    Doe            49   female 
+              >>> for case in df.row_iter():
+                      print(case)
+              OrderedDict([('first', 'Roger'), ('last', 'Lew'), ('age', 28), ('gender', 'male')])
+              OrderedDict([('first', 'Bosco'), ('last', 'Robinson'), ('age', 5), ('gender', 'male')])
+              OrderedDict([('first', 'Megan'), ('last', 'Whittington'), ('age', 26), ('gender', 'male')])
+              OrderedDict([('first', 'John'), ('last', 'Smith'), ('age', 51), ('gender', 'female')])
+              OrderedDict([('first', 'Jane'), ('last', 'Doe'), ('age', 49), ('gender', 'female')])
+              >>> 
+"""
+        for i in _xrange(self.shape()[1]):
+            yield OrderedDict([(k, self[k][i]) for k in self])
         
     def types(self):
         """
         returns a list of the sqlite3 datatypes of the columns 
+           args:
+              None
+              
+           returns:
+              an ordered list of sqlite3 types.
+
+        |   order matches self.keys() 
         """
         if len(self) == 0:
             return []
@@ -283,10 +470,13 @@ class DataFrame(OrderedDict):
 
     def shape(self):
         """
-        returns the size of the table as a tuple
+        returns the size of the data in the table as a tuple
 
-          The first element is the number of columns.
-          The second element is the number of rows
+           args:
+              None
+              
+           returns:
+              tuple (number of columns, number of rows)
         """
         if len(self) == 0:
             return (0, 0)
@@ -297,8 +487,12 @@ class DataFrame(OrderedDict):
         """
         private method to check if the items in self have equal lengths
 
-          returns True if all the items are equal
-          returns False otherwise
+           args:
+              None
+              
+           returns:
+           |   returns True if all the items are equal
+           |   returns False otherwise
         """
         # if self is not empty
         counts = map(len, self.values())
@@ -307,11 +501,15 @@ class DataFrame(OrderedDict):
         else:
             return False
 
-    def _check_sqlite3_type(self, iterable):
+    def _determine_sqlite3_type(self, iterable):
         """
-        checks the sqlite3 datatype of iterable
-
-          returns either 'null', 'integer', 'real', or 'text'
+        determine the sqlite3 datatype of iterable
+        
+           args:
+              iterable: a 1-d iterable (list, tuple, np.array, etc.)
+              
+          returns:
+              sqlite3 type as string: 'null', 'integer', 'real', or 'text'
         """
         if len(iterable) == 0:
             return 'null'
@@ -322,13 +520,16 @@ class DataFrame(OrderedDict):
         else:
             return 'text'
 
-    def _execute(self, query, t=tuple()):
+    def _execute(self, query, t=None):
         """
         private method to execute sqlite3 query
 
-          When the PRINTQUERIES bool is true it prints the queries
-          before executing them
+        |   When the PRINTQUERIES bool is true it prints the queries
+            before executing them
         """
+        if t == None:
+            t=tuple()
+            
         if self.PRINTQUERIES:
             print(query)
             if len(t) > 0:
@@ -341,9 +542,9 @@ class DataFrame(OrderedDict):
         """
         private method to execute sqlite3 queries
 
-          When the PRINTQUERIES bool is true it prints the queries
-          before executing them. The execute many method is about twice
-          as fast for building tables as the execute method.
+        |   When the PRINTQUERIES bool is true it prints the queries
+            before executing them. The execute many method is about twice
+            as fast for building tables as the execute method.
         """
         if self.PRINTQUERIES:
             print(query)
@@ -353,7 +554,16 @@ class DataFrame(OrderedDict):
         self.cur.executemany(query, tlist)
 
     def _get_indices_where(self, where):
-        """ where should be string criterion without the 'where'"""
+        """
+        determines the indices cooresponding to the conditions specified by the where
+        argument.
+
+           args:
+              where: a string criterion without the 'where'
+
+           returns:
+              a list of indices
+        """
 
         # preprocess where
         tokens = []
@@ -379,7 +589,7 @@ class DataFrame(OrderedDict):
 
         self.conn.commit()
         query =  'create temp table GTBL\n  ('
-        query += ', '.join('%s %s'%(_sha1(n), self.get_sqltype(n)) for n in nsubset2)
+        query += ', '.join('%s %s'%(_sha1(n), self._get_sqltype(n)) for n in nsubset2)
         query += ')'
         self._execute(query)
 
@@ -399,14 +609,24 @@ class DataFrame(OrderedDict):
     def _build_sqlite3_tbl(self, nsubset, where=None):
         """
         build or rebuild sqlite table with columns in nsubset based on
-        the where list
+        the where list.
 
-          where can be a list of tuples. Each tuple should have three
-          elements. The first should be a column key (label). The second
-          should be an operator: in, =, !=, <, >. The third element
-          should contain value for the operator.
+           args:
+              nsubset: a list of keys to include in the table
 
-          where can also be a list of strings. or a single string.
+              where: criterion the entries in the table must satisfy
+
+           returns:
+              None
+
+        |   where can be a list of tuples. Each tuple should have three
+            elements. The first should be a column key (label). The second
+            should be an operator: in, =, !=, <, >. The third element
+            should contain value for the operator.
+
+        |   where can also be a list of strings. or a single string.
+
+        |   sqlite3 table is built in memory and has the id TBL
         """
         if where == None:
             where = []
@@ -444,7 +664,7 @@ class DataFrame(OrderedDict):
 
         self.conn.commit()
         query =  'create temp table TBL2\n  ('
-        query += ', '.join('%s %s'%(_sha1(n), self.get_sqltype(n)) for n in nsubset2)
+        query += ', '.join('%s %s'%(_sha1(n), self._get_sqltype(n)) for n in nsubset2)
         query += ')'
         self._execute(query)
 
@@ -473,7 +693,7 @@ class DataFrame(OrderedDict):
             
             query = []
             for n in nsubset:
-                query.append('%s %s'%(_sha1(n), self.get_sqltype(n)))
+                query.append('%s %s'%(_sha1(n), self._get_sqltype(n)))
             query = ', '.join(query)
             query =  'create temp table TBL\n  (' + query + ')'
             self._execute(query)
@@ -526,9 +746,14 @@ class DataFrame(OrderedDict):
         private method to get a list of tuples containing information
         relevant to the current sqlite3 table
 
-          Returns a list of tuples. Each tuple cooresponds to a column.
-          Tuples include the column name, data type, whether or not the
-          column can be NULL, and the default value for the column.
+           args:
+              None
+
+           returns:
+              list of tuples:
+        |        Each tuple cooresponds to a column.
+        |        Tuples include the column name, data type, whether or not the
+        |        column can be NULL, and the default value for the column.
         """
         self.conn.commit()
         self._execute('PRAGMA table_info(TBL)')
@@ -537,19 +762,32 @@ class DataFrame(OrderedDict):
     def pivot(self, val, rows=None, cols=None, aggregate='avg',
               where=None, attach_rlabels=False, method='valid'):
         """
-        val = the colname to place as the data in the table
-        rows = list of colnames whos combinations will become rows
-               in the table if left blank their will be one row
-        cols = list of colnames whos combinations will become cols
-               in the table if left blank their will be one col
-        aggregate = function applied across data going into each cell
-                  of the table
-                  http://www.sqlite.org/lang_aggfunc.html
-        where = list of tuples or list of strings for filtering data
-        method = when 'valid' only returns rows or columns with valid
-                 entries.
-                 when 'full' return full factorial combinations of the
-                 conditions specified by rows and cols
+        produces a contingency table according to the arguments and keywords
+        provided.
+
+           args:
+              val: the colname to place as the data in the table
+
+           kwds:
+              rows: list of colnames whos combinations will become rows
+                    in the table if left blank their will be one row
+                    
+              cols: list of colnames whos combinations will become cols
+                    in the table if left blank their will be one col
+                    
+              aggregate: function applied across data going into each cell
+                  of the table <http://www.sqlite.org/lang_aggfunc.html>_
+                  
+              where: list of tuples or list of strings for filtering data
+              
+              method:
+                 'valid': only returns rows or columns with valid entries.
+
+                 'full': return full factorial combinations of the
+                         conditions specified by rows and cols
+                         
+           returns:
+              :class:`PyvtTbl` object
         """
         
         calc_tots = True
@@ -728,8 +966,8 @@ class DataFrame(OrderedDict):
         ##############################################################
 
         data, mask = [],[]
-        val_type = self.get_sqltype(val)
-        fill_val = self.get_mafillvalue(val)
+        val_type = self._get_sqltype(val)
+        fill_val = self._get_mafillvalue(val)
 
         # keep the columns with the row labels
         if attach_rlabels:
@@ -895,10 +1133,33 @@ class DataFrame(OrderedDict):
                        row_tots=row_tots, col_tots=col_tots, grand_tot=grand_tot,
                        attach_rlabels=attach_rlabels)
             
-    def select_col(self, val, where=None):
+    def select_col(self, key, where=None):
         """
-        returns the a copy of the selected values based on the
-        where parameter
+        determines rows in table that satisfy the conditions given by where and returns
+        the values of key in the remaining rows
+
+           args:
+              key: column label of data to return
+
+           kwds:
+              where: constraints to apply to table before returning data
+
+           returns:
+               a list
+               
+           example:
+              >>> ...
+              >>> print(df)
+              first      last       age   gender 
+              ==================================
+              Roger   Lew            28   male   
+              Bosco   Robinson        5   male   
+              Megan   Whittington    26   female 
+              John    Smith          51   male   
+              Jane    Doe            49   female 
+              >>> df.select_col('age', where='gender == "male"')
+              [28, 5, 51]
+              >>> 
         """
         if where == None:
             where = []
@@ -910,21 +1171,21 @@ class DataFrame(OrderedDict):
 
         # 2.
         # check the supplied arguments
-        if val not in self.keys():
+        if key not in self.keys():
             raise KeyError(val)
 
-        # check to make sure exclude is mappable
-        # todo
-
-        # warn if exclude is not a subset of self.conditions
-        if not set(self.keys()) >= set(tup[0] for tup in where):
-            warnings.warn("where is not a subset of table conditions",
-                          RuntimeWarning)
+##        # check to make sure exclude is mappable
+##        # todo
+##
+##        # warn if exclude is not a subset of self.conditions
+##        if not set(self.keys()) >= set(tup[0] for tup in where):
+##            warnings.warn("where is not a subset of table conditions",
+##                          RuntimeWarning)
             
         if where == []: 
-            return copy(self[val])             
+            return copy(self[key])             
         else:
-            self._build_sqlite3_tbl([val], where)
+            self._build_sqlite3_tbl([key], where)
             self._execute('select * from TBL')
             return [r[0] for r in self.cur]
 
@@ -932,8 +1193,33 @@ class DataFrame(OrderedDict):
         """
         sort the table in-place
 
-          order is a list of factors to sort by
-          to reverse order append " desc" to the factor
+           kwds:
+              order: is a list of factors to sort by
+              to reverse order append " desc" to the factor
+
+           returns:
+              None
+              
+           example:
+              >>> from pyvttbl import DataFrame
+              >>> from collections import namedtuple
+              >>> Person = namedtuple('Person',['first','last','age','gender'])
+              >>> df =DataFrame()
+              >>> df.insert(Person('Roger', 'Lew', 28, 'male')._asdict())
+              >>> df.insert(Person('Bosco', 'Robinson', 5, 'male')._asdict())
+              >>> df.insert(Person('Megan', 'Whittington', 26, 'female')._asdict())
+              >>> df.insert(Person('John', 'Smith', 51, 'male')._asdict())
+              >>> df.insert(Person('Jane', 'Doe', 49, 'female')._asdict())
+              >>> df.sort(['gender', 'age'])
+              >>> print(df)
+              first      last       age   gender 
+              ==================================
+              Megan   Whittington    26   female 
+              Jane    Doe            49   female 
+              Bosco   Robinson        5   male   
+              Roger   Lew            28   male   
+              John    Smith          51   male   
+              >>> 
         """
         if order == None:
             order = []
@@ -993,6 +1279,29 @@ class DataFrame(OrderedDict):
         """
         Applies the where filter to a copy of the DataFrame, and
         returns the new DataFrame. The associated DataFrame is not copied.
+
+           args:
+              where: criterion to apply to new table
+
+           returns:
+              a new :class:`DataFrame`
+
+           example:
+              >>> ...
+              >>> print(df)
+              first      last       age   gender 
+              ==================================
+              Roger   Lew            28   male   
+              Bosco   Robinson        5   male   
+              Megan   Whittington    26   female 
+              John    Smith          51   male   
+              Jane    Doe            49   female
+              >>> print(df.where('age > 20 and age < 45'))
+              first      last       age   gender 
+              ==================================
+              Roger   Lew            28   male   
+              Megan   Whittington    26   female 
+              >>> 
         """
         new = DataFrame()
         
@@ -1006,6 +1315,12 @@ class DataFrame(OrderedDict):
     def where_update(self, where):
         """
         Applies the where filter in-place.
+        
+           args:
+              where: criterion to apply to table
+
+           returns:
+              None
         """
         self._build_sqlite3_tbl(self.keys(), where)
         self._execute('select * from TBL')
@@ -1016,13 +1331,56 @@ class DataFrame(OrderedDict):
     def validate(self, criteria, verbose=False, report=False):
         """
         validate the data in the table.
-        
-          The criteria argument should be a dict. The keys should
-          coorespond to columns in the table. The values should be
-          functions which take a single parameter and return a boolean.
 
-          Validation fails if the keys in the criteria dict is not a
-          subset of the table keys.
+           args:
+              criteria: a dict whose keys should coorespond to columns in the table.
+              The values should be functions which take a single parameter and return
+              a boolean.
+
+           kwds:
+              verbose:
+                 True: provide real-time feedback
+                 
+                 False: don't provide feedback (default)
+              
+              report:
+                 True: print a report upon completion
+                 
+                 False: don't print report (default)
+
+           returns:
+              True: the criteria was satisfied
+              
+              False: the critera was not satisfied
+           
+            example:
+              >>> ...
+              >>> print(df)
+              first      last       age   gender 
+              ==================================
+              Roger   Lew            28   male   
+              Bosco   Robinson        5   male   
+              Megan   Whittington    26   female 
+              John    Smith          51   male   
+              Jane    Doe            49   female
+              >>> def isint(x):
+                      try : return int(x)-float(x)==0
+                      except:  return False
+              >>> df.validate({'age' : lambda x: isint(x),
+                               'gender' : lambda x: x in ['male', 'female']},
+                               verbose=True, report=True)                    
+              Validating gender:
+              .....
+              Validating age:
+              .....
+              Report:
+                Values tested: 10 
+                Values passed: 10 
+                Values failed: 0
+              ***Validation PASSED***
+              True
+              >>>
+              
         """
         # do some checking
         if self == {}:
@@ -1114,9 +1472,13 @@ class DataFrame(OrderedDict):
 
     def attach(self, other):
         """
-        attaches a second DataFrame to this DataFrame
+        attaches a second :class:`DataFrame` to self
 
-          both DataFrames must have the same columns
+           args:
+              other: a :class:`DataFrame` object whose key set matches self
+
+           return:
+              None
         """
 
         # do some checking
@@ -1132,7 +1494,7 @@ class DataFrame(OrderedDict):
         if not set(self.keys()) == set(other.keys()):
             raise Exception('self and other must have the same columns')
 
-        if not all(self.get_sqltype(n) == other.get_sqltype(n) for n in self):
+        if not all(self._get_sqltype(n) == other._get_sqltype(n) for n in self):
             raise Exception('types of self and other must match')
 
         # perform attachment
@@ -1146,8 +1508,27 @@ class DataFrame(OrderedDict):
         """
         insert a row into the table
 
-          The row should be mappable. e.g. a dict or a list with
-          key/value pairs. 
+           args:
+              row: should be mappable. e.g. a dict or a list with key/value pairs.
+
+           returns:
+              None
+
+           example:
+              >>> from pyvttbl import DataFrame
+              >>> from collections import namedtuple
+              >>> Person = namedtuple('Person',['first','last','age','gender'])
+              >>> df =DataFrame()
+              >>> df.insert(Person('Roger', 'Lew', 28, 'male')._asdict())
+              >>> df.insert(Person('Bosco', 'Robinson', 5, 'male')._asdict())
+              >>> df.insert(Person('Megan', 'Whittington', 26, 'female')._asdict())
+              >>> print(df)
+              first      last       age   gender 
+              ==================================
+              Roger   Lew            28   male   
+              Bosco   Robinson        5   male   
+              Megan   Whittington    26   female 
+              >>> 
         """
         try:
             c = set(dict(row).keys())
@@ -1170,7 +1551,7 @@ class DataFrame(OrderedDict):
         elif c - s == set():
             for (k, v) in OrderedDict(row).items():
                 self[k]=np.concatenate((self[k],
-                                        np.array([v], dtype=self.get_nptype(k))))
+                                        np.array([v], dtype=self._get_nptype(k))))
                 self.conditions[k].add(v)
         else:
             raise Exception('row must have the same keys as the table')
@@ -1178,6 +1559,13 @@ class DataFrame(OrderedDict):
     def write(self, where=None, fname=None, delimiter=','):
         """
         write the contents of the DataFrame to a plaintext file
+
+           kwds:
+              where: criterion to apply to table before writing to file
+              
+              fname: the path + name of the output file
+
+              delimiter: string to separate row cells (default = ",")
         """
         if where == None:
             where = []
@@ -1218,9 +1606,18 @@ class DataFrame(OrderedDict):
                 self._execute('select * from TBL')
                 wtr.writerows(list(self.cur))
 
-    def descriptives(self, cname, where=None):
+    def descriptives(self, key, where=None):
         """
-        returns a dict of descriptive statistics for column cname
+        Conducts a descriptive statistical analysis of the data in self[key].
+
+           args:
+              key: column label
+
+           kwds:
+              where: criterion to apply to table before running analysis
+
+           returns:
+              a :mod:`pyvttbl.stats`. :class:`Descriptives` object
         """
 
         if where == None:
@@ -1233,18 +1630,25 @@ class DataFrame(OrderedDict):
         if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
 
-        if cname not in self.keys():
-            raise KeyError(cname)
+        if key not in self.keys():
+            raise KeyError(key)
         
-        V = self.select_col(cname, where=where)
+        V = self.select_col(key, where=where)
         d = stats.Descriptives()
-        d.run(V, cname)
+        d.run(V, key)
         return d
 
     def summary(self, where=None):
         """
-        prints a the (cname) for each column in the DataFrame
+        prints the descriptive information for each column in DataFrame
+
+           kwds:
+              where: criterion to apply to table before running analysis
+
+           returns:
+              None
         """
+
         for (cname,dtype) in self.keys():
             if dtype in ['real', 'integer']:
                 print(self.descriptives(cname, where))
@@ -1253,13 +1657,7 @@ class DataFrame(OrderedDict):
             else:
                 print('%s contains non-numerical data\n'%cname)
 
-    def marginals(self, val, factors, where=None):
-        """
-        returns a marginals object containg means, counts,
-        standard errors, and confidence intervals for the
-        marginal conditions of the factorial combinations
-        sepcified in the factors list.
-        """
+    def marginals(self, key, factors, where=None):
         if where == None:
             where = []
 
@@ -1271,15 +1669,34 @@ class DataFrame(OrderedDict):
             raise Exception('columns have unequal lengths')
         
         m = stats.Marginals()
-        m.run(self, val, factors, where)
+        m.run(self, key, factors, where)
         return m
 
+
+    marginals.__doc__ = stats.Marginals.__doc__
+    
     def anova1way(self, val, factor, posthoc='tukey', where=None):
         """
-        returns an ANOVA1way object containing the results of a
-        one-way analysis of variance on val over the conditions
-        in factor. The conditions do not necessarily need to have
-        equal numbers of samples.
+        Conducts a one-way analysis of variance
+        on val over the conditions in factor. The conditions do not necessarily
+        need to have equal numbers of samples.
+
+           args:
+              val: dependent variable
+
+              factor: a dummy coded column label
+
+            kwds:
+               posthoc:
+                  'tukey': conduct Tukey posthoc tests
+                  
+                  'SNK': conduct Newman-Keuls posthoc tests
+
+            where:
+               conditions to apply before running analysis
+
+           return:
+              an :class:`pyvttbl.stats.Anova1way` object 
         """
         if where == None:
             where = []
@@ -1309,16 +1726,28 @@ class DataFrame(OrderedDict):
     def chisquare1way(self, observed, expected_dict=None,
                       alpha=0.05, where=None):
         """
-        Returns a ChiSquare1way object containing the results of a
-        chi-square goodness-of-fit test on the data in observed. The data
-        in the observed column are treated a categorical. Expected counts
-        can be given with the expected_dict. It should be a dictionary
-        object with keys matching the categories in observed and values
-        with the expected counts. The categories in the observed column
-        must be a subset of the keys in the expected_dict. If
-        expected_dict is None,the total N is assumed to be equally
-        distributed across all groups.
+        conducts a one-way chi-square goodness-of-fit test on the data in observed
+
+           args:
+              observed: column label containing categorical observations
+              
+           kwds:
+               expected_dict: a dictionary object with keys matching the categories
+                              in observed and values with the expected counts. The
+                              categories in the observed column must be a subset of
+                              the keys in the expected_dict. If expected_dict is None,
+                              the total N is assumed to be equally distributed across
+                              all groups.
+
+               alpha: the type-I error probability
+               
+               where:
+                  conditions to apply before running analysis
+
+           return:
+              an :class:`pyvttbl.stats.ChiSquare1way` object 
         """
+
         # ched the expected_dict
         if expected_dict != None:
             try:
@@ -1356,6 +1785,23 @@ class DataFrame(OrderedDict):
         return x
 
     def chisquare2way(self, rfactor, cfactor, alpha=0.05, where=None):
+        """
+        conducts a two-way chi-square goodness-of-fit test on the data in observed
+
+           args:
+              rfactor: column key
+              
+              cfactor: column key
+              
+           kwds:
+               alpha: the type-I error probability 
+
+               where:
+                  conditions to apply before running analysis
+
+           return:
+              an :class:`pyvttbl.stats.ChiSquare2way` object 
+        """
         row_factor = self.select_col(rfactor, where)
         col_factor = self.select_col(cfactor, where)
 
@@ -1367,11 +1813,25 @@ class DataFrame(OrderedDict):
     def correlation(self, variables, coefficient='pearson',
                     alpha=0.05, where=None):
         """
-        calculates a correlation matrix between the measures
-        in the the variables parameter. The correlation
-        coefficient can be set to pearson, spearman,
-        kendalltau, or pointbiserial.
+        produces a correlation matrix and conducts step-down significance testing
+        on the column labels in variables.
+
+           args:
+              variables: column keys to include in correlation matrix
+              
+           kwds:
+               coefficient:
+                  { 'pearson', 'spearman', 'kendalltau', 'pointbiserial' }
+                  
+               alpha: the type-I error probability 
+
+               where:
+                  conditions to apply before running analysis
+
+           return:
+              an :class:`pyvttbl.stats.Correlation` object 
         """
+        
         list_of_lists = []
         for var in sorted(variables):
             list_of_lists.append(list(self.select_col(var, where)))
@@ -1384,18 +1844,39 @@ class DataFrame(OrderedDict):
     def ttest(self, aname, bname=None, pop_mean=0., paired=False,
               equal_variance=True, where=None):
         """
-        If bname is not specified a one-way t-test is performed on
-        comparing the values in column aname with a hypothesized
-        population mean of 0. The hypothesized population mean can
-        be specified through the pop_mean parameter.
+        produces a correlation matrix and conducts step-down significance testing
+        on the column labels in variables.
 
-        If bname is provided the values in aname and bname are
-        compared. When paired is True. A matched pairs t-test is
-        performed and the equal_variance parameter is ignored.
+           args:
+              aname: column key
+              
+           kwds:
+               bname: is not specified a one-sample t-test is performed on
+                    comparing the values in column aname with a hypothesized
+                    population mean.
+                    
+               pop_mean: specifies the null population mean for one-sample t-test.
+                    Ignored if bname is supplied
 
-        When paired is false the samples in aname and bname are
-        treated as independent.
+               paired:
+                  True: a paired t-test is conducted
+                  
+                  False: an independent samples t-test is conducted
+                  
+               equal_variance:
+                  True: assumes aname and bname have equal variance
+                  
+                  False: assumes aname and bname have unequal variance
+
+               where:
+                  conditions to apply before running analysis
+
+           return:
+              an :class:`pyvttbl.stats.Ttest` object 
         """
+        
+
+
         if where == None:
             where = []
 
@@ -1418,10 +1899,24 @@ class DataFrame(OrderedDict):
               aname=aname, bname=bname)
         return t
         
-    def histogram(self, cname, where=None, bins=10,
+    def histogram(self, key, where=None, bins=10,
                   range=None, density=False, cumulative=False):
+
         """
-        Returns Histogram object
+        Conducts a histogram analysis of the data in self[key].
+
+           args:
+              key: column label of dependent variable
+
+           kwds:
+              where: criterion to apply to table before running analysis
+
+              bins: number of bins (default = 10)
+
+              range: list of length 2 defining min and max bin edges
+
+           returns:
+              a :mod:`pyvttbl.stats`. :class:`Descriptives` object
         """
         if where == None:
             where = []
@@ -1433,17 +1928,49 @@ class DataFrame(OrderedDict):
         if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
 
-        if cname not in self.keys():
-            raise KeyError(cname)
+        if key not in self.keys():
+            raise KeyError(key)
         
-        V = sorted(self.select_col(cname, where=where))
+        V = sorted(self.select_col(key, where=where))
         h = stats.Histogram()
-        h.run(V, cname=cname, bins=bins, range=range,
+        h.run(V, cname=key, bins=bins, range=range,
               density=density, cumulative=cumulative)
+        
         return h
 
     def anova(self, dv, sub='SUBJECT', wfactors=None, bfactors=None,
               measure='', transform='', alpha=0.05):
+        """
+        conducts a betweeen, within, or mixed, analysis of variance
+
+           args:
+              dv: label containing dependent variable
+         
+
+           kwds:
+              wfactors: list of within variable factor labels
+
+              bfactors: list of between variable factor labels
+
+              sub: label coding subjects (or the isomorphism)
+
+              measure: string to describe dv (outputs '<dv> of
+                     <measure>') intended when dv name is generic
+                     (e.g., MEAN, RMS, SD, ...)
+                     
+              transform: string specifying a data transformation
+
+                 =======================  ===============  ==================  
+                 STRING OPTION            TRANSFORM        COMMENTS
+                 =======================  ===============  ==================
+                 ''                       X                default
+                 'log','log10'            numpy.log(X)     base 10 transform
+                 'reciprocal', 'inverse'  1/X
+                 'square-root', 'sqrt'    numpy.sqrt(X)
+                 'arcsine', 'arcsin'      numpy.arcsin(X)
+                 'windsor 10'             windsor(X, 10)   10% windosr trim
+                 =======================  ===============  ==================
+        """
         aov=stats.Anova()
         aov.run(self, dv, sub=sub, wfactors=wfactors, bfactors=bfactors,
                 measure=measure, transform=transform, alpha=alpha)
@@ -1497,24 +2024,24 @@ class _ptmathmethod(object):
         data = np.ma.MaskedArray(func(other, *args), subok=False)
 
         if isinstance(other, PyvtTbl):
-            func = getattr(np.array(instance.row_tots), self.__name__)
-            row_tots = list(func(other.row_tots, *args))
+            func = getattr(instance.row_tots, self.__name__)
+            row_tots = func(other.row_tots, *args)
 
-            func = getattr(np.array(instance.col_tots), self.__name__)
-            col_tots = list(func(other.col_tots, *args))
+            func = getattr(instance.col_tots, self.__name__)
+            col_tots = func(other.col_tots, *args)
 
-            func = getattr(np.array([instance.grand_tot]), self.__name__)
-            grand_tot = float(func(other.grand_tot, *args)[0])
+            func = getattr(np.ma.array([instance.grand_tot]), self.__name__)
+            grand_tot = func(other.grand_tot, *args)[0]
             
         elif _isfloat(other):        
-            func = getattr(np.array(instance.row_tots), self.__name__)
-            row_tots = list(func(other, *args))
+            func = getattr(instance.row_tots, self.__name__)
+            row_tots = func(other, *args)
 
-            func = getattr(np.array(instance.col_tots), self.__name__)
-            col_tots = list(func(other, *args))
+            func = getattr(instance.col_tots, self.__name__)
+            col_tots = func(other, *args)
 
-            func = getattr(np.array([instance.grand_tot]), self.__name__)
-            grand_tot = float(func(other, *args)[0])
+            func = getattr(np.ma.array([instance.grand_tot]), self.__name__)
+            grand_tot = func(other, *args)[0]
 
         else:
             row_tots = np.ma.masked_equal(np.zeros(len(instance.row_tots)), 0.)
@@ -1526,7 +2053,7 @@ class _ptmathmethod(object):
                        conditions=instance.conditions,
                        rnames=instance.rnames,
                        cnames=instance.cnames,
-                       aggregate=instance.aggregate,
+                       aggregate='N/A',
                        calc_tots=instance.calc_tots,
                        row_tots=row_tots,
                        col_tots=col_tots,
@@ -1536,16 +2063,40 @@ class _ptmathmethod(object):
     
 class PyvtTbl(np.ma.MaskedArray, object):
     """
-    list of lists container holding the pivoted data
+    container holding the pivoted data
     """
-    
-##    PyvtTbl(d, val, conditions, rnames, cnames, aggregate,
-##           calc_tots=calc_tots,
-##           row_tots=row_tots, col_tots=col_tots, grand_tot=grand_tot,
-##           attach_rlabels=attach_rlabels)
-    
+
     def __new__(cls, data, val, conditions, rnames, cnames, aggregate, **kwds):
-        # http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
+        """
+        creates a new PyvtTbl from scratch
+
+           args:
+              data: np.ma.array object holding pivoted data
+
+              val: string label for the data in the table
+
+              conditions: Dictset representing the factors and levels in the table
+
+              rnames: list of row labels
+
+              cnames: list of column labels
+
+              aggregate: string describing the aggregate function applied to the data
+
+           kwds:
+              calc tots: bool specifying whether totals were calculated
+
+              row_tots: row totals in a MaskedArray
+
+              col_tots: column totals in a MaskedArray
+
+              grand_tot: float holding grand total
+
+              attach_rlabels: bool specifying whether row labels are part of the table
+
+        |   subclassing Numpy objects are a little different from subclassing other objects.
+        |   see: http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
+        """
         if data == None:
             data = []
 
@@ -1621,6 +2172,8 @@ class PyvtTbl(np.ma.MaskedArray, object):
 
         np.ma.MaskedArray.__array_finalize__(self, obj)
 
+    __array_finalize__.__doc__ = np.ma.MaskedArray.__array_finalize__.__doc__
+
     def transpose(self):
         """
         returns a transposed PyvtTbl object
@@ -1640,6 +2193,50 @@ class PyvtTbl(np.ma.MaskedArray, object):
                              keep_mask=self.keep_mask,
                              hard_mask=self.hard_mask)
 
+    def astype(self, dtype):
+        """
+        Convert the input to an array.
+
+           args:
+              a: array_like Input data, in any form that can be converted to an array.  This
+                 includes lists, lists of tuples, tuples, tuples of tuples, tuples
+                 of lists and ndarrays.
+           kwds:
+              dtype: data-type. By default, the data-type is inferred from the input data.
+              
+              order: {'C', 'F'}  Whether to use row-major ('C') or column-major ('F' for FORTRAN)
+                     memory representation.  Defaults to 'C'.
+
+           returns:
+              out: ndarray
+                   Array interpretation of `a`.  No copy is performed if the input
+                   is already an ndarray.  If `a` is a subclass of ndarray, a base
+                   class ndarray is returned.
+        """
+        
+        if hasattr(self.mask, '__iter__'):
+            data = eval('np.ma.array(%s, mask=%s, dtype=dtype)'%\
+                        (repr(self.tolist()), repr(self.mask.tolist())))
+        else:
+            data =eval('np.ma.array(%s, mask=%s, dtype=dtype)'%\
+                        (repr(self.tolist()), repr(self.mask)))
+
+        return PyvtTbl(data,
+                      self.val,
+                      self.conditions,
+                      self.rnames,
+                      self.cnames,
+                      self.aggregate,
+                      calc_tots=self.calc_tots,
+                      row_tots=self.row_tots.astype(dtype),
+                      col_tots=self.col_tots.astype(dtype),
+                      grand_tot=(dtype(self.grand_tot), np.ma.masked)\
+                                [self.grand_tot is np.ma.masked],
+                      attach_rlabels=self.attach_rlabels,
+                      subok=self.subok,
+                      keep_mask=self.keep_mask,
+                      hard_mask=self.hard_mask)
+
     def flatten(self):
         """
         returns a the PyvtTbl flattened as a MaskedArray
@@ -1651,12 +2248,13 @@ class PyvtTbl(np.ma.MaskedArray, object):
         obj = super(PyvtTbl,self).flatten()
         if hasattr(obj.mask, '__iter__'):
             return eval('np.ma.array(%s, mask=%s)'%\
-                        (repr(obj.tolist()), repr(list(obj.mask))))
+                        (repr(obj.tolist()), repr(obj.mask.tolist())))
         else:
             return eval('np.ma.array(%s, mask=%s)'%\
                         (repr(obj.tolist()), repr(obj.mask)))
 
     def __iter__(self):
+        
         for i in _xrange(self.shape[0]):
             obj = self[i]
             
@@ -1667,24 +2265,33 @@ class PyvtTbl(np.ma.MaskedArray, object):
                 yield eval('np.ma.array(%s, mask=%s)'%\
                             (repr(obj.tolist()), repr(obj.mask.tolist())))
 
+    __iter__.__doc__ = np.ma.MaskedArray.__iter__.__doc__
+
     def ndenumerate(self):
+        """
+        Multidimensional index iterator.
+        
+        returns:
+           returns an iterator yielding pairs of array coordinates and values.
+
+    """
         for i in _xrange(self.shape[0]):
             for j in _xrange(self.shape[1]):
                 yield (i,j), self[i,j]
 
-    def _are_row_lengths_equal(self):
-        """
-        private method to check if the lists in self have equal lengths
-
-          returns True if all the items are equal
-          returns False otherwise
-        """
-        # if self is not empty
-        counts = map(len, self.__iter__())
-        if all(c - counts[0] + 1 == 1 for c in counts):
-            return True
-        else:
-            return False
+##    def _are_row_lengths_equal(self):
+##        """
+##        private method to check if the lists in self have equal lengths
+##
+##          returns True if all the items are equal
+##          returns False otherwise
+##        """
+##        # if self is not empty
+##        counts = map(len, self.__iter__())
+##        if all(c - counts[0] + 1 == 1 for c in counts):
+##            return True
+##        else:
+##            return False
         
     def _get_rows(self):
         """
@@ -1708,7 +2315,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
         """
         writes the pivot table to a plaintext file
 
-          as currently implemented does not write grand_totals
+        |   as currently implemented does not write grand_totals
         """
         
         if self == []:
@@ -1853,7 +2460,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
             # initialize the texttable and add stuff
             tt.set_cols_dtype(['t'])
             tt.set_cols_dtype(['l'])
-            tt.add_row(self[0])
+            tt.add_row(self)
             
         elif self.rnames == [1]: # no rows were specified
             # build the header
@@ -1973,8 +2580,8 @@ class PyvtTbl(np.ma.MaskedArray, object):
             kwds.append(', attach_rlabels=%s'%self.attach_rlabels)
 
         # masked array related parameters
-        if any(_flatten([self.mask])):
-            kwds.append(', mask=%s'%repr(list(self.mask)))
+        if any(_flatten([self.mask])) and hasattr(self.mask, '__iter__'):
+            kwds.append(', mask=%s'%repr(self.mask.tolist()))
             
         if self.dtype != None:
             kwds.append(', dtype=%s'%repr(self.dtype))
@@ -1997,18 +2604,57 @@ class PyvtTbl(np.ma.MaskedArray, object):
         return ('PyvtTbl(%s%s)'%(args,kwds)).replace('\n','')
     
     __add__ = _ptmathmethod('__add__')
+    __add__.__doc__ = np.ma.MaskedArray.\
+                      __add__.__doc__.replace('masked array', 'PyvtTbl')
+    
     __radd__ = _ptmathmethod('__add__')
+    __radd__.__doc__ = np.ma.MaskedArray.\
+                       __radd__.__doc__.replace('masked array', 'PyvtTbl')
+
     __sub__ = _ptmathmethod('__sub__')
+    __sub__.__doc__ = np.ma.MaskedArray.\
+                      __sub__.__doc__.replace('masked array', 'PyvtTbl')
+    
     __rsub__ = _ptmathmethod('__rsub__')
+    __rsub__.__doc__ = np.ma.MaskedArray.\
+                       __rsub__.__doc__.replace('masked array', 'PyvtTbl')
+
     __pow__ = _ptmathmethod('__pow__')
+    __pow__.__doc__ = np.ma.MaskedArray.\
+                      __pow__.__doc__.replace('masked array', 'PyvtTbl')
+
     __mul__ = _ptmathmethod('__mul__')
+    __mul__.__doc__ = np.ma.MaskedArray.\
+                      __mul__.__doc__.replace('masked array', 'PyvtTbl')
+    
     __rmul__ = _ptmathmethod('__mul__')
+    __rmul__.__doc__ = np.ma.MaskedArray.\
+                       __rmul__.__doc__.replace('masked array', 'PyvtTbl')
+    
     __div__ = _ptmathmethod('__div__')
+    __div__.__doc__ = np.ma.MaskedArray.\
+                      __div__.__doc__.replace('masked array', 'PyvtTbl')
+    
     __rdiv__ = _ptmathmethod('__rdiv__')
+    __rdiv__.__doc__ = np.ma.MaskedArray.\
+                       __rdiv__.__doc__.replace('masked array', 'PyvtTbl')
+    
     __truediv__ = _ptmathmethod('__truediv__')
+    __truediv__.__doc__ = np.ma.MaskedArray.\
+                          __truediv__.__doc__.replace('masked array', 'PyvtTbl')
+    
     __rtruediv__ = _ptmathmethod('__rtruediv__')
+    __rtruediv__.__doc__ = np.ma.MaskedArray.\
+                           __rtruediv__.__doc__.replace('masked array', 'PyvtTbl')
+    
     __floordiv__ = _ptmathmethod('__floordiv__')
+    __floordiv__.__doc__ = np.ma.MaskedArray.\
+                           __floordiv__.__doc__.replace('masked array', 'PyvtTbl')
+    
     __rfloordiv__ = _ptmathmethod('__rfloordiv__')
+    __rfloordiv__.__doc__ = np.ma.MaskedArray.\
+                            __rfloordiv__.__doc__.replace('masked array', 'PyvtTbl')
+    
 ##    __eq__ = _ptmathmethod('__eq__')
 ##    __ne__ = _ptmathmethod('__ne__')
 ##    __lt__ = _ptmathmethod('__lt__')
@@ -2030,3 +2676,11 @@ class PyvtTbl(np.ma.MaskedArray, object):
 ##    all = _tsaxismethod('all')
 ##    any = _tsaxismethod('any')
 ##
+
+
+    
+##df = DataFrame()
+##df['first']='Roger Bosco Megan John Jane'.split()
+##df['last']='Lew Robinson Whittington Smith Doe'.split()
+##df['age']=[28,5,26,51,49]
+##df['gender']=['male','male','male','female','female']

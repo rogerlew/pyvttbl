@@ -55,48 +55,37 @@ def windsor(X, percent)
     the tail.
 
 class anova:
-    def __init__(self,dframe,dv,wfactors=[],bfactors=[],sub='SUBJECT',
-                 measure='',exclude={},transform=''):  
+    def __init__(self, *args, **kwds):
+                 
+        conducts a betweeen, within, or mixed, analysis of variance
 
-        Fancy linear algebra is adapted from a matlab script by R.Henson,
-        17/3/03
-        rik.henson@mrc-cbu.cam.ac.uk
-        http://www.mrc-cbu.cam.ac.uk/people/rik.henson/personal/repanova.m
-        
-         Input:
-        
-         dframe    = a dataframe object with data specified
-                     (I'm passing the dataframe object into this function
-                     b/c the dataframe class has a ReadCSV method the user
-                     can take advantage of to read their data.)
-                     
-         dv        = text string of label containing dependent variable
+           args:
+              dv: label containing dependent variable
          
-         factors   = factors to use for ANOVA
-                     will average across unspecified factors
-         sub       = text string of label for the subjects data
-         
-         measure   = optional name to describe dv (outputs '<dv> of
+
+           kwds:
+              wfactors: list of within variable factor labels
+
+              bfactors: list of between variable factor labels
+
+              sub: label coding subjects (or the isomorphism)
+
+              measure: string to describe dv (outputs '<dv> of
                      <measure>') intended when dv name is generic
                      (e.g., MEAN, RMS, SD, ...)
                      
-         exclude   = a dictionary of levels of factors to exclude from
-                     analysis
-         
-         transform = either a string specifying a data transformation
-                     or a function to perform a data transformation.
-                     Error degrees of freedom are trimmed such that:
-                         total_df = N - 1 - num_trimmed_samples
-                         
-             (see Howell, 2001)
-                 
-             STRING OPTION            TRANSFORM        COMMENTS
-             ''                       X                default
-             'log','log10'            numpy.log(X)     base 10 transform
-             'reciprocal', 'inverse'  1/X
-             'square-root', 'sqrt'    numpy.sqrt(X)
-             'arcsine', 'arcsin'      numpy.arcsin(X)
-             'windsor 10'             windsor(X, 10)   10% windosr trim
+              transform: string specifying a data transformation
+
+                 =======================  ===============  ==================  
+                 STRING OPTION            TRANSFORM        COMMENTS
+                 =======================  ===============  ==================
+                 ''                       X                default
+                 'log','log10'            numpy.log(X)     base 10 transform
+                 'reciprocal', 'inverse'  1/X
+                 'square-root', 'sqrt'    numpy.sqrt(X)
+                 'arcsine', 'arcsin'      numpy.arcsin(X)
+                 'windsor 10'             windsor(X, 10)   10% windosr trim
+                 =======================  ===============  ==================
 
 
         Notes on the Greenhouse-Geisser epsilon calculation:
@@ -1089,7 +1078,8 @@ class Anova(OrderedDict):
 
                         # calculate non-centrality and observed power
                         r['lambda%s'%x]=r['lambda']
-                        r['power%s'%x]=observed_power( r['df'], r['dfe'], r['lambda'] ,eps=r['eps%s'%x])
+                        r['power%s'%x]=observed_power( r['df'], r['dfe'], r['lambda'],
+                                                       eps=r['eps%s'%x])
 
                     # record to dict
                     self[tuple(efs)]=r

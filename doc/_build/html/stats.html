@@ -1,0 +1,3127 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>6. pyvttbl.stats &mdash; pyvttbl v 0.5.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.0.0 documentation" href="index.html" />
+    <link rel="prev" title="5. pyvttbl.plotting" href="plotting.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="5. pyvttbl.plotting"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">6. <tt class="docutils literal"><span class="pre">pyvttbl.stats</span></tt></a><ul>
+<li><a class="reference internal" href="#description">6.1. Description</a></li>
+<li><a class="reference internal" href="#statistics-classes">6.2. Statistics Classes</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="plotting.html"
+                        title="previous chapter">5. <tt class="docutils literal docutils literal docutils literal"><span class="pre">pyvttbl.plotting</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/stats.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyvttbl-stats">
+<h1>6. <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt><a class="headerlink" href="#pyvttbl-stats" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="description">
+<h2>6.1. Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt> contains a collection of classes for
+data conducting descriptive and inferential analyses.</p>
+</div>
+<div class="section" id="statistics-classes">
+<h2>6.2. Statistics Classes<a class="headerlink" href="#statistics-classes" title="Permalink to this headline">¶</a></h2>
+<hr class="docutils" />
+<dl class="class">
+<dt id="pyvttbl.stats.Anova">
+<em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">Anova</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="pyvttbl.stats.Anova._MutableMapping__marker">
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FAF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#pyvttbl.stats.Anova.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__class__">
+<tt class="descname">__class__</tt><a class="headerlink" href="#pyvttbl.stats.Anova.__class__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__cmp__">
+<tt class="descname">__cmp__</tt><a class="headerlink" href="#pyvttbl.stats.Anova.__cmp__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__cmp__(y) &lt;==&gt; cmp(x,y)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__contains__">
+<tt class="descname">__contains__</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Anova.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__delattr__">
+<tt class="descname">__delattr__</tt><a class="headerlink" href="#pyvttbl.stats.Anova.__delattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__delattr__(&#8216;name&#8217;) &lt;==&gt; del x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>key</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_delitem=&lt;slot wrapper '__delitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__delitem__(y) &lt;==&gt; del od[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__dict__">
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000000EE33F48&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__eq__(y) &lt;==&gt; od==y.  Comparison to another OD is order-sensitive
+while comparison to a regular mapping is order-insensitive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__format__">
+<tt class="descname">__format__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__format__" title="Permalink to this definition">¶</a></dt>
+<dd><p>default object formatter</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__ge__">
+<tt class="descname">__ge__</tt><a class="headerlink" href="#pyvttbl.stats.Anova.__ge__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__ge__(y) &lt;==&gt; x&gt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__getattribute__">
+<tt class="descname">__getattribute__</tt><a class="headerlink" href="#pyvttbl.stats.Anova.__getattribute__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getattribute__(&#8216;name&#8217;) &lt;==&gt; x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getitem__(y) &lt;==&gt; x[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__gt__">
+<tt class="descname">__gt__</tt><a class="headerlink" href="#pyvttbl.stats.Anova.__gt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__gt__(y) &lt;==&gt; x&gt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__hash__">
+<tt class="descname">__hash__</tt><em class="property"> = None</em><a class="headerlink" href="#pyvttbl.stats.Anova.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><em>) &lt;==&gt; iter(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__le__">
+<tt class="descname">__le__</tt><a class="headerlink" href="#pyvttbl.stats.Anova.__le__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__le__(y) &lt;==&gt; x&lt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__len__">
+<tt class="descname">__len__</tt><a class="headerlink" href="#pyvttbl.stats.Anova.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__len__() &lt;==&gt; len(x)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__lt__">
+<tt class="descname">__lt__</tt><a class="headerlink" href="#pyvttbl.stats.Anova.__lt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__lt__(y) &lt;==&gt; x&lt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__metaclass__">
+<tt class="descname">__metaclass__</tt><a class="headerlink" href="#pyvttbl.stats.Anova.__metaclass__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'pyvttbl.stats._anova'</em><a class="headerlink" href="#pyvttbl.stats.Anova.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__ne__">
+<tt class="descname">__ne__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyvttbl.stats.Anova.__new__">
+<em class="property">static </em><tt class="descname">__new__</tt><big>(</big><em>S</em>, <em>...</em><big>)</big> &rarr; a new object with type S, a subtype of T<a class="headerlink" href="#pyvttbl.stats.Anova.__new__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__reduce__">
+<tt class="descname">__reduce__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__reduce__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return state information for pickling</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__reduce_ex__">
+<tt class="descname">__reduce_ex__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__reduce_ex__" title="Permalink to this definition">¶</a></dt>
+<dd><p>helper for pickle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__reversed__">
+<tt class="descname">__reversed__</tt><big>(</big><em>) &lt;==&gt; reversed(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__reversed__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__setattr__">
+<tt class="descname">__setattr__</tt><a class="headerlink" href="#pyvttbl.stats.Anova.__setattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__setattr__(&#8216;name&#8217;, value) &lt;==&gt; x.name = value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>value</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_setitem=&lt;slot wrapper '__setitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__setitem__(i, y) &lt;==&gt; od[i]=y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__sizeof__">
+<tt class="descname">__sizeof__</tt><big>(</big><big>)</big> &rarr; size of D in memory, in bytes<a class="headerlink" href="#pyvttbl.stats.Anova.__sizeof__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Anova.__subclasshook__">
+<em class="property">classmethod </em><tt class="descname">__subclasshook__</tt><big>(</big><em>C</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.__subclasshook__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#pyvttbl.stats.Anova.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova._abc_cache">
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x00000000063D13C8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova._abc_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova._abc_negative_cache">
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x00000000063D1438&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova._abc_negative_cache_version">
+<tt class="descname">_abc_negative_cache_version</tt><em class="property"> = 25</em><a class="headerlink" href="#pyvttbl.stats.Anova._abc_negative_cache_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova._abc_registry">
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x00000000063D1320&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova._abc_registry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova._between">
+<tt class="descname">_between</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova._between" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova._between_html">
+<tt class="descname">_between_html</tt><big>(</big><em>html</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova._between_html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova._between_str">
+<tt class="descname">_between_str</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova._between_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova._mixed">
+<tt class="descname">_mixed</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova._mixed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova._mixed_html">
+<tt class="descname">_mixed_html</tt><big>(</big><em>html</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova._mixed_html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova._mixed_str">
+<tt class="descname">_mixed_str</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova._mixed_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova._num2binvec">
+<tt class="descname">_num2binvec</tt><big>(</big><em>d</em>, <em>p=0</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova._num2binvec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sub-function to code all main effects/interactions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova._summary_html">
+<tt class="descname">_summary_html</tt><big>(</big><em>html</em>, <em>factors</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova._summary_html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova._summary_str">
+<tt class="descname">_summary_str</tt><big>(</big><em>factors</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova._summary_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova._within">
+<tt class="descname">_within</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova._within" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova._within_html">
+<tt class="descname">_within_html</tt><big>(</big><em>html</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova._within_html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova._within_str">
+<tt class="descname">_within_str</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova._within_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None.  Remove all items from od.<a class="headerlink" href="#pyvttbl.stats.Anova.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; a shallow copy of od<a class="headerlink" href="#pyvttbl.stats.Anova.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Anova.fromkeys">
+<em class="property">classmethod </em><tt class="descname">fromkeys</tt><big>(</big><em>S</em><span class="optional">[</span>, <em>v</em><span class="optional">]</span><big>)</big> &rarr; New ordered dictionary with keys from S<a class="headerlink" href="#pyvttbl.stats.Anova.fromkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>and values equal to v (which defaults to None).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.get">
+<tt class="descname">get</tt><big>(</big><em>k</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><big>)</big> &rarr; D[k] if k in D, else d.  d defaults to None.<a class="headerlink" href="#pyvttbl.stats.Anova.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Anova.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.items">
+<tt class="descname">items</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.iteritems">
+<tt class="descname">iteritems</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.iteritems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.iterkeys">
+<tt class="descname">iterkeys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.iterkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.itervalues">
+<tt class="descname">itervalues</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.itervalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.plot">
+<tt class="descname">plot</tt><big>(</big><em>val</em>, <em>xaxis</em>, <em>seplines=None</em>, <em>sepxplots=None</em>, <em>sepyplots=None</em>, <em>xmin='AUTO'</em>, <em>xmax='AUTO'</em>, <em>ymin='AUTO'</em>, <em>ymax='AUTO'</em>, <em>fname='.png'</em>, <em>quality='low'</em>, <em>errorbars='ci'</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>This functions is basically wraps the plot function from the
+dataframe module. It attempts to find the appropriate error bar
+term. Creats a filename if necessary and calls plot.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.pop">
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FAF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.popitem">
+<tt class="descname">popitem</tt><big>(</big><big>)</big> &rarr; (k, v), return and remove a (key, value) pair.<a class="headerlink" href="#pyvttbl.stats.Anova.popitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pairs are returned in LIFO order if last is true or FIFO order if false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.run">
+<tt class="descname">run</tt><big>(</big><em>dataframe</em>, <em>dv</em>, <em>wfactors=None</em>, <em>bfactors=None</em>, <em>sub='SUBJECT'</em>, <em>measure=''</em>, <em>transform=''</em>, <em>alpha=0.05</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fancy linear algebra is adapted from a matlab script by R.Henson,
+17/3/03
+<a class="reference external" href="mailto:rik&#46;henson&#37;&#52;&#48;mrc-cbu&#46;cam&#46;ac&#46;uk">rik<span>&#46;</span>henson<span>&#64;</span>mrc-cbu<span>&#46;</span>cam<span>&#46;</span>ac<span>&#46;</span>uk</a>
+<a class="reference external" href="http://www.mrc-cbu.cam.ac.uk/people/rik.henson/personal/repanova.m">http://www.mrc-cbu.cam.ac.uk/people/rik.henson/personal/repanova.m</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.setdefault">
+<tt class="descname">setdefault</tt><big>(</big><em>key</em>, <em>default=None</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.update">
+<tt class="descname">update</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.values">
+<tt class="descname">values</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.viewitems">
+<tt class="descname">viewitems</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's items<a class="headerlink" href="#pyvttbl.stats.Anova.viewitems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.viewkeys">
+<tt class="descname">viewkeys</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's keys<a class="headerlink" href="#pyvttbl.stats.Anova.viewkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova.viewvalues">
+<tt class="descname">viewvalues</tt><big>(</big><big>)</big> &rarr; an object providing a view on od's values<a class="headerlink" href="#pyvttbl.stats.Anova.viewvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="class">
+<dt id="pyvttbl.stats.Anova1way">
+<em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">Anova1way</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way._MutableMapping__marker">
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FAF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#pyvttbl.stats.Anova1way.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__class__">
+<tt class="descname">__class__</tt><a class="headerlink" href="#pyvttbl.stats.Anova1way.__class__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__cmp__">
+<tt class="descname">__cmp__</tt><a class="headerlink" href="#pyvttbl.stats.Anova1way.__cmp__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__cmp__(y) &lt;==&gt; cmp(x,y)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__contains__">
+<tt class="descname">__contains__</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Anova1way.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__delattr__">
+<tt class="descname">__delattr__</tt><a class="headerlink" href="#pyvttbl.stats.Anova1way.__delattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__delattr__(&#8216;name&#8217;) &lt;==&gt; del x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>key</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_delitem=&lt;slot wrapper '__delitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__delitem__(y) &lt;==&gt; del od[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__dict__">
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000000F003798&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__eq__(y) &lt;==&gt; od==y.  Comparison to another OD is order-sensitive
+while comparison to a regular mapping is order-insensitive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__format__">
+<tt class="descname">__format__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__format__" title="Permalink to this definition">¶</a></dt>
+<dd><p>default object formatter</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__ge__">
+<tt class="descname">__ge__</tt><a class="headerlink" href="#pyvttbl.stats.Anova1way.__ge__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__ge__(y) &lt;==&gt; x&gt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__getattribute__">
+<tt class="descname">__getattribute__</tt><a class="headerlink" href="#pyvttbl.stats.Anova1way.__getattribute__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getattribute__(&#8216;name&#8217;) &lt;==&gt; x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getitem__(y) &lt;==&gt; x[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__gt__">
+<tt class="descname">__gt__</tt><a class="headerlink" href="#pyvttbl.stats.Anova1way.__gt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__gt__(y) &lt;==&gt; x&gt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__hash__">
+<tt class="descname">__hash__</tt><em class="property"> = None</em><a class="headerlink" href="#pyvttbl.stats.Anova1way.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><em>) &lt;==&gt; iter(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__le__">
+<tt class="descname">__le__</tt><a class="headerlink" href="#pyvttbl.stats.Anova1way.__le__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__le__(y) &lt;==&gt; x&lt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__len__">
+<tt class="descname">__len__</tt><a class="headerlink" href="#pyvttbl.stats.Anova1way.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__len__() &lt;==&gt; len(x)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__lt__">
+<tt class="descname">__lt__</tt><a class="headerlink" href="#pyvttbl.stats.Anova1way.__lt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__lt__(y) &lt;==&gt; x&lt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__metaclass__">
+<tt class="descname">__metaclass__</tt><a class="headerlink" href="#pyvttbl.stats.Anova1way.__metaclass__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'pyvttbl.stats._anova1way'</em><a class="headerlink" href="#pyvttbl.stats.Anova1way.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__ne__">
+<tt class="descname">__ne__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyvttbl.stats.Anova1way.__new__">
+<em class="property">static </em><tt class="descname">__new__</tt><big>(</big><em>S</em>, <em>...</em><big>)</big> &rarr; a new object with type S, a subtype of T<a class="headerlink" href="#pyvttbl.stats.Anova1way.__new__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__reduce__">
+<tt class="descname">__reduce__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__reduce__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return state information for pickling</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__reduce_ex__">
+<tt class="descname">__reduce_ex__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__reduce_ex__" title="Permalink to this definition">¶</a></dt>
+<dd><p>helper for pickle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__reversed__">
+<tt class="descname">__reversed__</tt><big>(</big><em>) &lt;==&gt; reversed(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__reversed__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__setattr__">
+<tt class="descname">__setattr__</tt><a class="headerlink" href="#pyvttbl.stats.Anova1way.__setattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__setattr__(&#8216;name&#8217;, value) &lt;==&gt; x.name = value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>value</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_setitem=&lt;slot wrapper '__setitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__setitem__(i, y) &lt;==&gt; od[i]=y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__sizeof__">
+<tt class="descname">__sizeof__</tt><big>(</big><big>)</big> &rarr; size of D in memory, in bytes<a class="headerlink" href="#pyvttbl.stats.Anova1way.__sizeof__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Anova1way.__subclasshook__">
+<em class="property">classmethod </em><tt class="descname">__subclasshook__</tt><big>(</big><em>C</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.__subclasshook__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#pyvttbl.stats.Anova1way.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way._abc_cache">
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x00000000064469B0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._abc_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way._abc_negative_cache">
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006446A20&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way._abc_negative_cache_version">
+<tt class="descname">_abc_negative_cache_version</tt><em class="property"> = 25</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._abc_negative_cache_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Anova1way._abc_registry">
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006446978&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._abc_registry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way._snk">
+<tt class="descname">_snk</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way._snk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way._tukey">
+<tt class="descname">_tukey</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way._tukey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None.  Remove all items from od.<a class="headerlink" href="#pyvttbl.stats.Anova1way.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; a shallow copy of od<a class="headerlink" href="#pyvttbl.stats.Anova1way.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Anova1way.fromkeys">
+<em class="property">classmethod </em><tt class="descname">fromkeys</tt><big>(</big><em>S</em><span class="optional">[</span>, <em>v</em><span class="optional">]</span><big>)</big> &rarr; New ordered dictionary with keys from S<a class="headerlink" href="#pyvttbl.stats.Anova1way.fromkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>and values equal to v (which defaults to None).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.get">
+<tt class="descname">get</tt><big>(</big><em>k</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><big>)</big> &rarr; D[k] if k in D, else d.  d defaults to None.<a class="headerlink" href="#pyvttbl.stats.Anova1way.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Anova1way.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.items">
+<tt class="descname">items</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.iteritems">
+<tt class="descname">iteritems</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.iteritems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.iterkeys">
+<tt class="descname">iterkeys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.iterkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.itervalues">
+<tt class="descname">itervalues</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.itervalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.pop">
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FAF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.popitem">
+<tt class="descname">popitem</tt><big>(</big><big>)</big> &rarr; (k, v), return and remove a (key, value) pair.<a class="headerlink" href="#pyvttbl.stats.Anova1way.popitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pairs are returned in LIFO order if last is true or FIFO order if false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.run">
+<tt class="descname">run</tt><big>(</big><em>list_of_lists</em>, <em>val='Measure'</em>, <em>factor='Factor'</em>, <em>conditions_list=None</em>, <em>posthoc='tukey'</em>, <em>alpha=0.05</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>performs a one way analysis of variance on the data in
+list_of_lists. Each sub-list is treated as a group. factor
+is a label for the independent variable and conditions_list
+is a list of labels for the different treatment groups.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.setdefault">
+<tt class="descname">setdefault</tt><big>(</big><em>key</em>, <em>default=None</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.update">
+<tt class="descname">update</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.values">
+<tt class="descname">values</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.viewitems">
+<tt class="descname">viewitems</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's items<a class="headerlink" href="#pyvttbl.stats.Anova1way.viewitems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.viewkeys">
+<tt class="descname">viewkeys</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's keys<a class="headerlink" href="#pyvttbl.stats.Anova1way.viewkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Anova1way.viewvalues">
+<tt class="descname">viewvalues</tt><big>(</big><big>)</big> &rarr; an object providing a view on od's values<a class="headerlink" href="#pyvttbl.stats.Anova1way.viewvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="class">
+<dt id="pyvttbl.stats.ChiSquare1way">
+<em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">ChiSquare1way</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way" title="Permalink to this definition">¶</a></dt>
+<dd><p>1-way Chi-Square Test</p>
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way._MutableMapping__marker">
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FAF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__class__">
+<tt class="descname">__class__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__class__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__cmp__">
+<tt class="descname">__cmp__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__cmp__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__cmp__(y) &lt;==&gt; cmp(x,y)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__contains__">
+<tt class="descname">__contains__</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__delattr__">
+<tt class="descname">__delattr__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__delattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__delattr__(&#8216;name&#8217;) &lt;==&gt; del x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>key</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_delitem=&lt;slot wrapper '__delitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__delitem__(y) &lt;==&gt; del od[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__dict__">
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000000F0FE108&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__eq__(y) &lt;==&gt; od==y.  Comparison to another OD is order-sensitive
+while comparison to a regular mapping is order-insensitive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__format__">
+<tt class="descname">__format__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__format__" title="Permalink to this definition">¶</a></dt>
+<dd><p>default object formatter</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__ge__">
+<tt class="descname">__ge__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__ge__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__ge__(y) &lt;==&gt; x&gt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__getattribute__">
+<tt class="descname">__getattribute__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__getattribute__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getattribute__(&#8216;name&#8217;) &lt;==&gt; x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getitem__(y) &lt;==&gt; x[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__gt__">
+<tt class="descname">__gt__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__gt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__gt__(y) &lt;==&gt; x&gt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__hash__">
+<tt class="descname">__hash__</tt><em class="property"> = None</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><em>) &lt;==&gt; iter(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__le__">
+<tt class="descname">__le__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__le__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__le__(y) &lt;==&gt; x&lt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__len__">
+<tt class="descname">__len__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__len__() &lt;==&gt; len(x)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__lt__">
+<tt class="descname">__lt__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__lt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__lt__(y) &lt;==&gt; x&lt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__metaclass__">
+<tt class="descname">__metaclass__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__metaclass__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'pyvttbl.stats._chisquare1way'</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__ne__">
+<tt class="descname">__ne__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyvttbl.stats.ChiSquare1way.__new__">
+<em class="property">static </em><tt class="descname">__new__</tt><big>(</big><em>S</em>, <em>...</em><big>)</big> &rarr; a new object with type S, a subtype of T<a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__new__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__reduce__">
+<tt class="descname">__reduce__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__reduce__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return state information for pickling</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__reduce_ex__">
+<tt class="descname">__reduce_ex__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__reduce_ex__" title="Permalink to this definition">¶</a></dt>
+<dd><p>helper for pickle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__reversed__">
+<tt class="descname">__reversed__</tt><big>(</big><em>) &lt;==&gt; reversed(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__reversed__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__setattr__">
+<tt class="descname">__setattr__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__setattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__setattr__(&#8216;name&#8217;, value) &lt;==&gt; x.name = value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>value</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_setitem=&lt;slot wrapper '__setitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__setitem__(i, y) &lt;==&gt; od[i]=y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__sizeof__">
+<tt class="descname">__sizeof__</tt><big>(</big><big>)</big> &rarr; size of D in memory, in bytes<a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__sizeof__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.ChiSquare1way.__subclasshook__">
+<em class="property">classmethod </em><tt class="descname">__subclasshook__</tt><big>(</big><em>C</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__subclasshook__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way._abc_cache">
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006446DA0&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._abc_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way._abc_negative_cache">
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006446E10&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way._abc_negative_cache_version">
+<tt class="descname">_abc_negative_cache_version</tt><em class="property"> = 25</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._abc_negative_cache_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare1way._abc_registry">
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006446CF8&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._abc_registry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None.  Remove all items from od.<a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; a shallow copy of od<a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.ChiSquare1way.fromkeys">
+<em class="property">classmethod </em><tt class="descname">fromkeys</tt><big>(</big><em>S</em><span class="optional">[</span>, <em>v</em><span class="optional">]</span><big>)</big> &rarr; New ordered dictionary with keys from S<a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.fromkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>and values equal to v (which defaults to None).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.get">
+<tt class="descname">get</tt><big>(</big><em>k</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><big>)</big> &rarr; D[k] if k in D, else d.  d defaults to None.<a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.items">
+<tt class="descname">items</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.iteritems">
+<tt class="descname">iteritems</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.iteritems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.iterkeys">
+<tt class="descname">iterkeys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.iterkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.itervalues">
+<tt class="descname">itervalues</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.itervalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.pop">
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FAF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.popitem">
+<tt class="descname">popitem</tt><big>(</big><big>)</big> &rarr; (k, v), return and remove a (key, value) pair.<a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.popitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pairs are returned in LIFO order if last is true or FIFO order if false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.run">
+<tt class="descname">run</tt><big>(</big><em>observed</em>, <em>expected=None</em>, <em>conditions_list=None</em>, <em>measure='Measure'</em>, <em>alpha=0.05</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.setdefault">
+<tt class="descname">setdefault</tt><big>(</big><em>key</em>, <em>default=None</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.update">
+<tt class="descname">update</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.values">
+<tt class="descname">values</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.viewitems">
+<tt class="descname">viewitems</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's items<a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.viewitems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.viewkeys">
+<tt class="descname">viewkeys</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's keys<a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.viewkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare1way.viewvalues">
+<tt class="descname">viewvalues</tt><big>(</big><big>)</big> &rarr; an object providing a view on od's values<a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.viewvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="class">
+<dt id="pyvttbl.stats.ChiSquare2way">
+<em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">ChiSquare2way</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way._MutableMapping__marker">
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FAF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__class__">
+<tt class="descname">__class__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__class__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__cmp__">
+<tt class="descname">__cmp__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__cmp__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__cmp__(y) &lt;==&gt; cmp(x,y)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__contains__">
+<tt class="descname">__contains__</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__delattr__">
+<tt class="descname">__delattr__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__delattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__delattr__(&#8216;name&#8217;) &lt;==&gt; del x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>key</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_delitem=&lt;slot wrapper '__delitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__delitem__(y) &lt;==&gt; del od[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__dict__">
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000000F10B828&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__eq__(y) &lt;==&gt; od==y.  Comparison to another OD is order-sensitive
+while comparison to a regular mapping is order-insensitive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__format__">
+<tt class="descname">__format__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__format__" title="Permalink to this definition">¶</a></dt>
+<dd><p>default object formatter</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__ge__">
+<tt class="descname">__ge__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__ge__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__ge__(y) &lt;==&gt; x&gt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__getattribute__">
+<tt class="descname">__getattribute__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__getattribute__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getattribute__(&#8216;name&#8217;) &lt;==&gt; x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getitem__(y) &lt;==&gt; x[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__gt__">
+<tt class="descname">__gt__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__gt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__gt__(y) &lt;==&gt; x&gt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__hash__">
+<tt class="descname">__hash__</tt><em class="property"> = None</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><em>) &lt;==&gt; iter(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__le__">
+<tt class="descname">__le__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__le__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__le__(y) &lt;==&gt; x&lt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__len__">
+<tt class="descname">__len__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__len__() &lt;==&gt; len(x)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__lt__">
+<tt class="descname">__lt__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__lt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__lt__(y) &lt;==&gt; x&lt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__metaclass__">
+<tt class="descname">__metaclass__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__metaclass__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'pyvttbl.stats._chisquare2way'</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__ne__">
+<tt class="descname">__ne__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyvttbl.stats.ChiSquare2way.__new__">
+<em class="property">static </em><tt class="descname">__new__</tt><big>(</big><em>S</em>, <em>...</em><big>)</big> &rarr; a new object with type S, a subtype of T<a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__new__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__reduce__">
+<tt class="descname">__reduce__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__reduce__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return state information for pickling</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__reduce_ex__">
+<tt class="descname">__reduce_ex__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__reduce_ex__" title="Permalink to this definition">¶</a></dt>
+<dd><p>helper for pickle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__reversed__">
+<tt class="descname">__reversed__</tt><big>(</big><em>) &lt;==&gt; reversed(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__reversed__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__setattr__">
+<tt class="descname">__setattr__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__setattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__setattr__(&#8216;name&#8217;, value) &lt;==&gt; x.name = value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>value</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_setitem=&lt;slot wrapper '__setitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__setitem__(i, y) &lt;==&gt; od[i]=y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__sizeof__">
+<tt class="descname">__sizeof__</tt><big>(</big><big>)</big> &rarr; size of D in memory, in bytes<a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__sizeof__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns human readable string representaition of Marginals</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.ChiSquare2way.__subclasshook__">
+<em class="property">classmethod </em><tt class="descname">__subclasshook__</tt><big>(</big><em>C</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__subclasshook__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way._abc_cache">
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645B2E8&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._abc_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way._abc_negative_cache">
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645B358&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way._abc_negative_cache_version">
+<tt class="descname">_abc_negative_cache_version</tt><em class="property"> = 25</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._abc_negative_cache_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.ChiSquare2way._abc_registry">
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645B240&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._abc_registry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None.  Remove all items from od.<a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; a shallow copy of od<a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.ChiSquare2way.fromkeys">
+<em class="property">classmethod </em><tt class="descname">fromkeys</tt><big>(</big><em>S</em><span class="optional">[</span>, <em>v</em><span class="optional">]</span><big>)</big> &rarr; New ordered dictionary with keys from S<a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.fromkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>and values equal to v (which defaults to None).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.get">
+<tt class="descname">get</tt><big>(</big><em>k</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><big>)</big> &rarr; D[k] if k in D, else d.  d defaults to None.<a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.items">
+<tt class="descname">items</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.iteritems">
+<tt class="descname">iteritems</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.iteritems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.iterkeys">
+<tt class="descname">iterkeys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.iterkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.itervalues">
+<tt class="descname">itervalues</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.itervalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.pop">
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FAF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.popitem">
+<tt class="descname">popitem</tt><big>(</big><big>)</big> &rarr; (k, v), return and remove a (key, value) pair.<a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.popitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pairs are returned in LIFO order if last is true or FIFO order if false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.run">
+<tt class="descname">run</tt><big>(</big><em>row_factor</em>, <em>col_factor</em>, <em>alpha=0.05</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>runs a 2-way chi square on the matched data in row_factor
+and col_factor.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.setdefault">
+<tt class="descname">setdefault</tt><big>(</big><em>key</em>, <em>default=None</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.update">
+<tt class="descname">update</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.values">
+<tt class="descname">values</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.viewitems">
+<tt class="descname">viewitems</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's items<a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.viewitems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.viewkeys">
+<tt class="descname">viewkeys</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's keys<a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.viewkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.ChiSquare2way.viewvalues">
+<tt class="descname">viewvalues</tt><big>(</big><big>)</big> &rarr; an object providing a view on od's values<a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.viewvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="class">
+<dt id="pyvttbl.stats.Correlation">
+<em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">Correlation</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation" title="Permalink to this definition">¶</a></dt>
+<dd><p>bivariate correlation matrix</p>
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation._MutableMapping__marker">
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FAF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#pyvttbl.stats.Correlation.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__class__">
+<tt class="descname">__class__</tt><a class="headerlink" href="#pyvttbl.stats.Correlation.__class__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__cmp__">
+<tt class="descname">__cmp__</tt><a class="headerlink" href="#pyvttbl.stats.Correlation.__cmp__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__cmp__(y) &lt;==&gt; cmp(x,y)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__contains__">
+<tt class="descname">__contains__</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Correlation.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__delattr__">
+<tt class="descname">__delattr__</tt><a class="headerlink" href="#pyvttbl.stats.Correlation.__delattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__delattr__(&#8216;name&#8217;) &lt;==&gt; del x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>key</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_delitem=&lt;slot wrapper '__delitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__delitem__(y) &lt;==&gt; del od[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__dict__">
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000000ED73258&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__eq__(y) &lt;==&gt; od==y.  Comparison to another OD is order-sensitive
+while comparison to a regular mapping is order-insensitive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__format__">
+<tt class="descname">__format__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__format__" title="Permalink to this definition">¶</a></dt>
+<dd><p>default object formatter</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__ge__">
+<tt class="descname">__ge__</tt><a class="headerlink" href="#pyvttbl.stats.Correlation.__ge__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__ge__(y) &lt;==&gt; x&gt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__getattribute__">
+<tt class="descname">__getattribute__</tt><a class="headerlink" href="#pyvttbl.stats.Correlation.__getattribute__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getattribute__(&#8216;name&#8217;) &lt;==&gt; x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getitem__(y) &lt;==&gt; x[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__gt__">
+<tt class="descname">__gt__</tt><a class="headerlink" href="#pyvttbl.stats.Correlation.__gt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__gt__(y) &lt;==&gt; x&gt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__hash__">
+<tt class="descname">__hash__</tt><em class="property"> = None</em><a class="headerlink" href="#pyvttbl.stats.Correlation.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><em>) &lt;==&gt; iter(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__le__">
+<tt class="descname">__le__</tt><a class="headerlink" href="#pyvttbl.stats.Correlation.__le__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__le__(y) &lt;==&gt; x&lt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__len__">
+<tt class="descname">__len__</tt><a class="headerlink" href="#pyvttbl.stats.Correlation.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__len__() &lt;==&gt; len(x)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__lt__">
+<tt class="descname">__lt__</tt><a class="headerlink" href="#pyvttbl.stats.Correlation.__lt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__lt__(y) &lt;==&gt; x&lt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__metaclass__">
+<tt class="descname">__metaclass__</tt><a class="headerlink" href="#pyvttbl.stats.Correlation.__metaclass__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'pyvttbl.stats._correlation'</em><a class="headerlink" href="#pyvttbl.stats.Correlation.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__ne__">
+<tt class="descname">__ne__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyvttbl.stats.Correlation.__new__">
+<em class="property">static </em><tt class="descname">__new__</tt><big>(</big><em>S</em>, <em>...</em><big>)</big> &rarr; a new object with type S, a subtype of T<a class="headerlink" href="#pyvttbl.stats.Correlation.__new__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__reduce__">
+<tt class="descname">__reduce__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__reduce__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return state information for pickling</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__reduce_ex__">
+<tt class="descname">__reduce_ex__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__reduce_ex__" title="Permalink to this definition">¶</a></dt>
+<dd><p>helper for pickle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__reversed__">
+<tt class="descname">__reversed__</tt><big>(</big><em>) &lt;==&gt; reversed(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__reversed__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__setattr__">
+<tt class="descname">__setattr__</tt><a class="headerlink" href="#pyvttbl.stats.Correlation.__setattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__setattr__(&#8216;name&#8217;, value) &lt;==&gt; x.name = value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>value</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_setitem=&lt;slot wrapper '__setitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__setitem__(i, y) &lt;==&gt; od[i]=y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__sizeof__">
+<tt class="descname">__sizeof__</tt><big>(</big><big>)</big> &rarr; size of D in memory, in bytes<a class="headerlink" href="#pyvttbl.stats.Correlation.__sizeof__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Correlation.__subclasshook__">
+<em class="property">classmethod </em><tt class="descname">__subclasshook__</tt><big>(</big><em>C</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.__subclasshook__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#pyvttbl.stats.Correlation.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation._abc_cache">
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645B668&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation._abc_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation._abc_negative_cache">
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645B6D8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation._abc_negative_cache_version">
+<tt class="descname">_abc_negative_cache_version</tt><em class="property"> = 25</em><a class="headerlink" href="#pyvttbl.stats.Correlation._abc_negative_cache_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Correlation._abc_registry">
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645B5C0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation._abc_registry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None.  Remove all items from od.<a class="headerlink" href="#pyvttbl.stats.Correlation.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; a shallow copy of od<a class="headerlink" href="#pyvttbl.stats.Correlation.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Correlation.fromkeys">
+<em class="property">classmethod </em><tt class="descname">fromkeys</tt><big>(</big><em>S</em><span class="optional">[</span>, <em>v</em><span class="optional">]</span><big>)</big> &rarr; New ordered dictionary with keys from S<a class="headerlink" href="#pyvttbl.stats.Correlation.fromkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>and values equal to v (which defaults to None).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.get">
+<tt class="descname">get</tt><big>(</big><em>k</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><big>)</big> &rarr; D[k] if k in D, else d.  d defaults to None.<a class="headerlink" href="#pyvttbl.stats.Correlation.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Correlation.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.items">
+<tt class="descname">items</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.iteritems">
+<tt class="descname">iteritems</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.iteritems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.iterkeys">
+<tt class="descname">iterkeys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.iterkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.itervalues">
+<tt class="descname">itervalues</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.itervalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.lm_significance_testing">
+<tt class="descname">lm_significance_testing</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.lm_significance_testing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs Larzelere and Mulaik Significance Testing
+on the paired correlations in self.</p>
+<p>The testing follows a stepdown procedure similiar
+to the Holm for multiple comparisons.
+The absolute r values are are arranged in decreasing
+order and the significant alpha level is adjusted
+according to alpha/(k-i+1) where k is the total
+number of tests and i the current pair.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.pop">
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FAF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.popitem">
+<tt class="descname">popitem</tt><big>(</big><big>)</big> &rarr; (k, v), return and remove a (key, value) pair.<a class="headerlink" href="#pyvttbl.stats.Correlation.popitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pairs are returned in LIFO order if last is true or FIFO order if false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.run">
+<tt class="descname">run</tt><big>(</big><em>list_of_lists</em>, <em>conditions_list=None</em>, <em>coefficient='pearson'</em>, <em>alpha=0.05</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.setdefault">
+<tt class="descname">setdefault</tt><big>(</big><em>key</em>, <em>default=None</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.update">
+<tt class="descname">update</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.values">
+<tt class="descname">values</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.viewitems">
+<tt class="descname">viewitems</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's items<a class="headerlink" href="#pyvttbl.stats.Correlation.viewitems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.viewkeys">
+<tt class="descname">viewkeys</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's keys<a class="headerlink" href="#pyvttbl.stats.Correlation.viewkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Correlation.viewvalues">
+<tt class="descname">viewvalues</tt><big>(</big><big>)</big> &rarr; an object providing a view on od's values<a class="headerlink" href="#pyvttbl.stats.Correlation.viewvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="class">
+<dt id="pyvttbl.stats.Descriptives">
+<em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">Descriptives</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives._MutableMapping__marker">
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FAF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#pyvttbl.stats.Descriptives.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__class__">
+<tt class="descname">__class__</tt><a class="headerlink" href="#pyvttbl.stats.Descriptives.__class__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__cmp__">
+<tt class="descname">__cmp__</tt><a class="headerlink" href="#pyvttbl.stats.Descriptives.__cmp__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__cmp__(y) &lt;==&gt; cmp(x,y)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__contains__">
+<tt class="descname">__contains__</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Descriptives.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__delattr__">
+<tt class="descname">__delattr__</tt><a class="headerlink" href="#pyvttbl.stats.Descriptives.__delattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__delattr__(&#8216;name&#8217;) &lt;==&gt; del x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>key</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_delitem=&lt;slot wrapper '__delitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__delitem__(y) &lt;==&gt; del od[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__dict__">
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000000EDC1AF8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__eq__(y) &lt;==&gt; od==y.  Comparison to another OD is order-sensitive
+while comparison to a regular mapping is order-insensitive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__format__">
+<tt class="descname">__format__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__format__" title="Permalink to this definition">¶</a></dt>
+<dd><p>default object formatter</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__ge__">
+<tt class="descname">__ge__</tt><a class="headerlink" href="#pyvttbl.stats.Descriptives.__ge__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__ge__(y) &lt;==&gt; x&gt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__getattribute__">
+<tt class="descname">__getattribute__</tt><a class="headerlink" href="#pyvttbl.stats.Descriptives.__getattribute__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getattribute__(&#8216;name&#8217;) &lt;==&gt; x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getitem__(y) &lt;==&gt; x[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__gt__">
+<tt class="descname">__gt__</tt><a class="headerlink" href="#pyvttbl.stats.Descriptives.__gt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__gt__(y) &lt;==&gt; x&gt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__hash__">
+<tt class="descname">__hash__</tt><em class="property"> = None</em><a class="headerlink" href="#pyvttbl.stats.Descriptives.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><em>) &lt;==&gt; iter(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__le__">
+<tt class="descname">__le__</tt><a class="headerlink" href="#pyvttbl.stats.Descriptives.__le__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__le__(y) &lt;==&gt; x&lt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__len__">
+<tt class="descname">__len__</tt><a class="headerlink" href="#pyvttbl.stats.Descriptives.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__len__() &lt;==&gt; len(x)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__lt__">
+<tt class="descname">__lt__</tt><a class="headerlink" href="#pyvttbl.stats.Descriptives.__lt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__lt__(y) &lt;==&gt; x&lt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__metaclass__">
+<tt class="descname">__metaclass__</tt><a class="headerlink" href="#pyvttbl.stats.Descriptives.__metaclass__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'pyvttbl.stats._descriptives'</em><a class="headerlink" href="#pyvttbl.stats.Descriptives.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__ne__">
+<tt class="descname">__ne__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyvttbl.stats.Descriptives.__new__">
+<em class="property">static </em><tt class="descname">__new__</tt><big>(</big><em>S</em>, <em>...</em><big>)</big> &rarr; a new object with type S, a subtype of T<a class="headerlink" href="#pyvttbl.stats.Descriptives.__new__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__reduce__">
+<tt class="descname">__reduce__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__reduce__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return state information for pickling</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__reduce_ex__">
+<tt class="descname">__reduce_ex__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__reduce_ex__" title="Permalink to this definition">¶</a></dt>
+<dd><p>helper for pickle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Python friendly representation of the analysis</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__reversed__">
+<tt class="descname">__reversed__</tt><big>(</big><em>) &lt;==&gt; reversed(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__reversed__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__setattr__">
+<tt class="descname">__setattr__</tt><a class="headerlink" href="#pyvttbl.stats.Descriptives.__setattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__setattr__(&#8216;name&#8217;, value) &lt;==&gt; x.name = value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>value</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_setitem=&lt;slot wrapper '__setitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__setitem__(i, y) &lt;==&gt; od[i]=y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__sizeof__">
+<tt class="descname">__sizeof__</tt><big>(</big><big>)</big> &rarr; size of D in memory, in bytes<a class="headerlink" href="#pyvttbl.stats.Descriptives.__sizeof__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>A human friendly representation of the analysis</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Descriptives.__subclasshook__">
+<em class="property">classmethod </em><tt class="descname">__subclasshook__</tt><big>(</big><em>C</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.__subclasshook__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#pyvttbl.stats.Descriptives.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives._abc_cache">
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645B8D0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._abc_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives._abc_negative_cache">
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645B940&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives._abc_negative_cache_version">
+<tt class="descname">_abc_negative_cache_version</tt><em class="property"> = 25</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._abc_negative_cache_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Descriptives._abc_registry">
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645B828&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._abc_registry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None.  Remove all items from od.<a class="headerlink" href="#pyvttbl.stats.Descriptives.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; a shallow copy of od<a class="headerlink" href="#pyvttbl.stats.Descriptives.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Descriptives.fromkeys">
+<em class="property">classmethod </em><tt class="descname">fromkeys</tt><big>(</big><em>S</em><span class="optional">[</span>, <em>v</em><span class="optional">]</span><big>)</big> &rarr; New ordered dictionary with keys from S<a class="headerlink" href="#pyvttbl.stats.Descriptives.fromkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>and values equal to v (which defaults to None).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.get">
+<tt class="descname">get</tt><big>(</big><em>k</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><big>)</big> &rarr; D[k] if k in D, else d.  d defaults to None.<a class="headerlink" href="#pyvttbl.stats.Descriptives.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Descriptives.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.items">
+<tt class="descname">items</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.iteritems">
+<tt class="descname">iteritems</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.iteritems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.iterkeys">
+<tt class="descname">iterkeys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.iterkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.itervalues">
+<tt class="descname">itervalues</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.itervalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.pop">
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FAF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.popitem">
+<tt class="descname">popitem</tt><big>(</big><big>)</big> &rarr; (k, v), return and remove a (key, value) pair.<a class="headerlink" href="#pyvttbl.stats.Descriptives.popitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pairs are returned in LIFO order if last is true or FIFO order if false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.run">
+<tt class="descname">run</tt><big>(</big><em>V</em>, <em>cname=None</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conducts a descriptive statistical analysis of the data in V</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>V: an iterable containing numerical data</dd>
+<dt>kwds:</dt>
+<dd>cname: a string to label the data</dd>
+<dt>returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.setdefault">
+<tt class="descname">setdefault</tt><big>(</big><em>key</em>, <em>default=None</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.update">
+<tt class="descname">update</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.values">
+<tt class="descname">values</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.viewitems">
+<tt class="descname">viewitems</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's items<a class="headerlink" href="#pyvttbl.stats.Descriptives.viewitems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.viewkeys">
+<tt class="descname">viewkeys</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's keys<a class="headerlink" href="#pyvttbl.stats.Descriptives.viewkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Descriptives.viewvalues">
+<tt class="descname">viewvalues</tt><big>(</big><big>)</big> &rarr; an object providing a view on od's values<a class="headerlink" href="#pyvttbl.stats.Descriptives.viewvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="class">
+<dt id="pyvttbl.stats.Histogram">
+<em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">Histogram</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="pyvttbl.stats.Histogram._MutableMapping__marker">
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FAF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#pyvttbl.stats.Histogram.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__class__">
+<tt class="descname">__class__</tt><a class="headerlink" href="#pyvttbl.stats.Histogram.__class__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__cmp__">
+<tt class="descname">__cmp__</tt><a class="headerlink" href="#pyvttbl.stats.Histogram.__cmp__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__cmp__(y) &lt;==&gt; cmp(x,y)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__contains__">
+<tt class="descname">__contains__</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Histogram.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__delattr__">
+<tt class="descname">__delattr__</tt><a class="headerlink" href="#pyvttbl.stats.Histogram.__delattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__delattr__(&#8216;name&#8217;) &lt;==&gt; del x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>key</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_delitem=&lt;slot wrapper '__delitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__delitem__(y) &lt;==&gt; del od[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__dict__">
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x0000000010479588&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__eq__(y) &lt;==&gt; od==y.  Comparison to another OD is order-sensitive
+while comparison to a regular mapping is order-insensitive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__format__">
+<tt class="descname">__format__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__format__" title="Permalink to this definition">¶</a></dt>
+<dd><p>default object formatter</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__ge__">
+<tt class="descname">__ge__</tt><a class="headerlink" href="#pyvttbl.stats.Histogram.__ge__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__ge__(y) &lt;==&gt; x&gt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__getattribute__">
+<tt class="descname">__getattribute__</tt><a class="headerlink" href="#pyvttbl.stats.Histogram.__getattribute__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getattribute__(&#8216;name&#8217;) &lt;==&gt; x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getitem__(y) &lt;==&gt; x[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__gt__">
+<tt class="descname">__gt__</tt><a class="headerlink" href="#pyvttbl.stats.Histogram.__gt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__gt__(y) &lt;==&gt; x&gt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__hash__">
+<tt class="descname">__hash__</tt><em class="property"> = None</em><a class="headerlink" href="#pyvttbl.stats.Histogram.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><em>) &lt;==&gt; iter(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__le__">
+<tt class="descname">__le__</tt><a class="headerlink" href="#pyvttbl.stats.Histogram.__le__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__le__(y) &lt;==&gt; x&lt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__len__">
+<tt class="descname">__len__</tt><a class="headerlink" href="#pyvttbl.stats.Histogram.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__len__() &lt;==&gt; len(x)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__lt__">
+<tt class="descname">__lt__</tt><a class="headerlink" href="#pyvttbl.stats.Histogram.__lt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__lt__(y) &lt;==&gt; x&lt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__metaclass__">
+<tt class="descname">__metaclass__</tt><a class="headerlink" href="#pyvttbl.stats.Histogram.__metaclass__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'pyvttbl.stats._histogram'</em><a class="headerlink" href="#pyvttbl.stats.Histogram.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__ne__">
+<tt class="descname">__ne__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyvttbl.stats.Histogram.__new__">
+<em class="property">static </em><tt class="descname">__new__</tt><big>(</big><em>S</em>, <em>...</em><big>)</big> &rarr; a new object with type S, a subtype of T<a class="headerlink" href="#pyvttbl.stats.Histogram.__new__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__reduce__">
+<tt class="descname">__reduce__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__reduce__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return state information for pickling</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__reduce_ex__">
+<tt class="descname">__reduce_ex__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__reduce_ex__" title="Permalink to this definition">¶</a></dt>
+<dd><p>helper for pickle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__reversed__">
+<tt class="descname">__reversed__</tt><big>(</big><em>) &lt;==&gt; reversed(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__reversed__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__setattr__">
+<tt class="descname">__setattr__</tt><a class="headerlink" href="#pyvttbl.stats.Histogram.__setattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__setattr__(&#8216;name&#8217;, value) &lt;==&gt; x.name = value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>value</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_setitem=&lt;slot wrapper '__setitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__setitem__(i, y) &lt;==&gt; od[i]=y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__sizeof__">
+<tt class="descname">__sizeof__</tt><big>(</big><big>)</big> &rarr; size of D in memory, in bytes<a class="headerlink" href="#pyvttbl.stats.Histogram.__sizeof__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Histogram.__subclasshook__">
+<em class="property">classmethod </em><tt class="descname">__subclasshook__</tt><big>(</big><em>C</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.__subclasshook__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#pyvttbl.stats.Histogram.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram._abc_cache">
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645BAC8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram._abc_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram._abc_negative_cache">
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645BB38&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram._abc_negative_cache_version">
+<tt class="descname">_abc_negative_cache_version</tt><em class="property"> = 25</em><a class="headerlink" href="#pyvttbl.stats.Histogram._abc_negative_cache_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Histogram._abc_registry">
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645BA20&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram._abc_registry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None.  Remove all items from od.<a class="headerlink" href="#pyvttbl.stats.Histogram.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; a shallow copy of od<a class="headerlink" href="#pyvttbl.stats.Histogram.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Histogram.fromkeys">
+<em class="property">classmethod </em><tt class="descname">fromkeys</tt><big>(</big><em>S</em><span class="optional">[</span>, <em>v</em><span class="optional">]</span><big>)</big> &rarr; New ordered dictionary with keys from S<a class="headerlink" href="#pyvttbl.stats.Histogram.fromkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>and values equal to v (which defaults to None).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.get">
+<tt class="descname">get</tt><big>(</big><em>k</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><big>)</big> &rarr; D[k] if k in D, else d.  d defaults to None.<a class="headerlink" href="#pyvttbl.stats.Histogram.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Histogram.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.items">
+<tt class="descname">items</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.iteritems">
+<tt class="descname">iteritems</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.iteritems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.iterkeys">
+<tt class="descname">iterkeys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.iterkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.itervalues">
+<tt class="descname">itervalues</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.itervalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.pop">
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FAF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.popitem">
+<tt class="descname">popitem</tt><big>(</big><big>)</big> &rarr; (k, v), return and remove a (key, value) pair.<a class="headerlink" href="#pyvttbl.stats.Histogram.popitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pairs are returned in LIFO order if last is true or FIFO order if false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.run">
+<tt class="descname">run</tt><big>(</big><em>V</em>, <em>cname=None</em>, <em>bins=10</em>, <em>range=None</em>, <em>density=False</em>, <em>cumulative=False</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>generates and stores histogram data for numerical data in V</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.setdefault">
+<tt class="descname">setdefault</tt><big>(</big><em>key</em>, <em>default=None</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.update">
+<tt class="descname">update</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.values">
+<tt class="descname">values</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.viewitems">
+<tt class="descname">viewitems</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's items<a class="headerlink" href="#pyvttbl.stats.Histogram.viewitems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.viewkeys">
+<tt class="descname">viewkeys</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's keys<a class="headerlink" href="#pyvttbl.stats.Histogram.viewkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Histogram.viewvalues">
+<tt class="descname">viewvalues</tt><big>(</big><big>)</big> &rarr; an object providing a view on od's values<a class="headerlink" href="#pyvttbl.stats.Histogram.viewvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="class">
+<dt id="pyvttbl.stats.Marginals">
+<em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">Marginals</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates means, counts, standard errors, and confidence intervals
+for the marginal conditions of the factorial combinations specified in
+the factors list.</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>key: column label (of the dependent variable)</dd>
+<dt>kwds:</dt>
+<dd><p class="first">factors: list of column labels to segregate data</p>
+<p class="last">where: criterion to apply to table before running analysis</p>
+</dd>
+<dt>returns:</dt>
+<dd>a <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt>. <tt class="xref py py-class docutils literal"><span class="pre">Marginals</span></tt> object</dd>
+</dl>
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals._MutableMapping__marker">
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FAF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#pyvttbl.stats.Marginals.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__class__">
+<tt class="descname">__class__</tt><a class="headerlink" href="#pyvttbl.stats.Marginals.__class__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__cmp__">
+<tt class="descname">__cmp__</tt><a class="headerlink" href="#pyvttbl.stats.Marginals.__cmp__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__cmp__(y) &lt;==&gt; cmp(x,y)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__contains__">
+<tt class="descname">__contains__</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Marginals.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__delattr__">
+<tt class="descname">__delattr__</tt><a class="headerlink" href="#pyvttbl.stats.Marginals.__delattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__delattr__(&#8216;name&#8217;) &lt;==&gt; del x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>key</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_delitem=&lt;slot wrapper '__delitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__delitem__(y) &lt;==&gt; del od[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__dict__">
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000000E9976D8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__eq__(y) &lt;==&gt; od==y.  Comparison to another OD is order-sensitive
+while comparison to a regular mapping is order-insensitive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__format__">
+<tt class="descname">__format__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__format__" title="Permalink to this definition">¶</a></dt>
+<dd><p>default object formatter</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__ge__">
+<tt class="descname">__ge__</tt><a class="headerlink" href="#pyvttbl.stats.Marginals.__ge__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__ge__(y) &lt;==&gt; x&gt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__getattribute__">
+<tt class="descname">__getattribute__</tt><a class="headerlink" href="#pyvttbl.stats.Marginals.__getattribute__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getattribute__(&#8216;name&#8217;) &lt;==&gt; x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getitem__(y) &lt;==&gt; x[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__gt__">
+<tt class="descname">__gt__</tt><a class="headerlink" href="#pyvttbl.stats.Marginals.__gt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__gt__(y) &lt;==&gt; x&gt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__hash__">
+<tt class="descname">__hash__</tt><em class="property"> = None</em><a class="headerlink" href="#pyvttbl.stats.Marginals.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><em>) &lt;==&gt; iter(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__le__">
+<tt class="descname">__le__</tt><a class="headerlink" href="#pyvttbl.stats.Marginals.__le__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__le__(y) &lt;==&gt; x&lt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__len__">
+<tt class="descname">__len__</tt><a class="headerlink" href="#pyvttbl.stats.Marginals.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__len__() &lt;==&gt; len(x)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__lt__">
+<tt class="descname">__lt__</tt><a class="headerlink" href="#pyvttbl.stats.Marginals.__lt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__lt__(y) &lt;==&gt; x&lt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__metaclass__">
+<tt class="descname">__metaclass__</tt><a class="headerlink" href="#pyvttbl.stats.Marginals.__metaclass__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'pyvttbl.stats._marginals'</em><a class="headerlink" href="#pyvttbl.stats.Marginals.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__ne__">
+<tt class="descname">__ne__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyvttbl.stats.Marginals.__new__">
+<em class="property">static </em><tt class="descname">__new__</tt><big>(</big><em>S</em>, <em>...</em><big>)</big> &rarr; a new object with type S, a subtype of T<a class="headerlink" href="#pyvttbl.stats.Marginals.__new__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__reduce__">
+<tt class="descname">__reduce__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__reduce__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return state information for pickling</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__reduce_ex__">
+<tt class="descname">__reduce_ex__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__reduce_ex__" title="Permalink to this definition">¶</a></dt>
+<dd><p>helper for pickle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__reversed__">
+<tt class="descname">__reversed__</tt><big>(</big><em>) &lt;==&gt; reversed(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__reversed__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__setattr__">
+<tt class="descname">__setattr__</tt><a class="headerlink" href="#pyvttbl.stats.Marginals.__setattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__setattr__(&#8216;name&#8217;, value) &lt;==&gt; x.name = value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>value</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_setitem=&lt;slot wrapper '__setitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__setitem__(i, y) &lt;==&gt; od[i]=y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__sizeof__">
+<tt class="descname">__sizeof__</tt><big>(</big><big>)</big> &rarr; size of D in memory, in bytes<a class="headerlink" href="#pyvttbl.stats.Marginals.__sizeof__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns human readable string representaition of Marginals</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Marginals.__subclasshook__">
+<em class="property">classmethod </em><tt class="descname">__subclasshook__</tt><big>(</big><em>C</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.__subclasshook__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#pyvttbl.stats.Marginals.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals._abc_cache">
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645BC88&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals._abc_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals._abc_negative_cache">
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645BCF8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals._abc_negative_cache_version">
+<tt class="descname">_abc_negative_cache_version</tt><em class="property"> = 25</em><a class="headerlink" href="#pyvttbl.stats.Marginals._abc_negative_cache_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Marginals._abc_registry">
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000645BBE0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals._abc_registry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None.  Remove all items from od.<a class="headerlink" href="#pyvttbl.stats.Marginals.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; a shallow copy of od<a class="headerlink" href="#pyvttbl.stats.Marginals.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Marginals.fromkeys">
+<em class="property">classmethod </em><tt class="descname">fromkeys</tt><big>(</big><em>S</em><span class="optional">[</span>, <em>v</em><span class="optional">]</span><big>)</big> &rarr; New ordered dictionary with keys from S<a class="headerlink" href="#pyvttbl.stats.Marginals.fromkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>and values equal to v (which defaults to None).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.get">
+<tt class="descname">get</tt><big>(</big><em>k</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><big>)</big> &rarr; D[k] if k in D, else d.  d defaults to None.<a class="headerlink" href="#pyvttbl.stats.Marginals.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Marginals.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.items">
+<tt class="descname">items</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.iteritems">
+<tt class="descname">iteritems</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.iteritems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.iterkeys">
+<tt class="descname">iterkeys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.iterkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.itervalues">
+<tt class="descname">itervalues</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.itervalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.pop">
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FAF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.popitem">
+<tt class="descname">popitem</tt><big>(</big><big>)</big> &rarr; (k, v), return and remove a (key, value) pair.<a class="headerlink" href="#pyvttbl.stats.Marginals.popitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pairs are returned in LIFO order if last is true or FIFO order if false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.run">
+<tt class="descname">run</tt><big>(</big><em>df</em>, <em>val</em>, <em>factors</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>generates and stores marginal data from the DataFrame df
+and column labels in factors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.setdefault">
+<tt class="descname">setdefault</tt><big>(</big><em>key</em>, <em>default=None</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.update">
+<tt class="descname">update</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.values">
+<tt class="descname">values</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.viewitems">
+<tt class="descname">viewitems</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's items<a class="headerlink" href="#pyvttbl.stats.Marginals.viewitems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.viewkeys">
+<tt class="descname">viewkeys</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's keys<a class="headerlink" href="#pyvttbl.stats.Marginals.viewkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Marginals.viewvalues">
+<tt class="descname">viewvalues</tt><big>(</big><big>)</big> &rarr; an object providing a view on od's values<a class="headerlink" href="#pyvttbl.stats.Marginals.viewvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="class">
+<dt id="pyvttbl.stats.Ttest">
+<em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">Ttest</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Student&#8217;s t-test</p>
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest._MutableMapping__marker">
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FAF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__abstractmethods__">
+<tt class="descname">__abstractmethods__</tt><em class="property"> = frozenset([])</em><a class="headerlink" href="#pyvttbl.stats.Ttest.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__class__">
+<tt class="descname">__class__</tt><a class="headerlink" href="#pyvttbl.stats.Ttest.__class__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__cmp__">
+<tt class="descname">__cmp__</tt><a class="headerlink" href="#pyvttbl.stats.Ttest.__cmp__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__cmp__(y) &lt;==&gt; cmp(x,y)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__contains__">
+<tt class="descname">__contains__</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Ttest.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__delattr__">
+<tt class="descname">__delattr__</tt><a class="headerlink" href="#pyvttbl.stats.Ttest.__delattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__delattr__(&#8216;name&#8217;) &lt;==&gt; del x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>key</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_delitem=&lt;slot wrapper '__delitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__delitem__(y) &lt;==&gt; del od[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__dict__">
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x00000000105C61F8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__eq__(y) &lt;==&gt; od==y.  Comparison to another OD is order-sensitive
+while comparison to a regular mapping is order-insensitive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__format__">
+<tt class="descname">__format__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__format__" title="Permalink to this definition">¶</a></dt>
+<dd><p>default object formatter</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__ge__">
+<tt class="descname">__ge__</tt><a class="headerlink" href="#pyvttbl.stats.Ttest.__ge__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__ge__(y) &lt;==&gt; x&gt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__getattribute__">
+<tt class="descname">__getattribute__</tt><a class="headerlink" href="#pyvttbl.stats.Ttest.__getattribute__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getattribute__(&#8216;name&#8217;) &lt;==&gt; x.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__getitem__(y) &lt;==&gt; x[y]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__gt__">
+<tt class="descname">__gt__</tt><a class="headerlink" href="#pyvttbl.stats.Ttest.__gt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__gt__(y) &lt;==&gt; x&gt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__hash__">
+<tt class="descname">__hash__</tt><em class="property"> = None</em><a class="headerlink" href="#pyvttbl.stats.Ttest.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><em>) &lt;==&gt; iter(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__le__">
+<tt class="descname">__le__</tt><a class="headerlink" href="#pyvttbl.stats.Ttest.__le__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__le__(y) &lt;==&gt; x&lt;=y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__len__">
+<tt class="descname">__len__</tt><a class="headerlink" href="#pyvttbl.stats.Ttest.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__len__() &lt;==&gt; len(x)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__lt__">
+<tt class="descname">__lt__</tt><a class="headerlink" href="#pyvttbl.stats.Ttest.__lt__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__lt__(y) &lt;==&gt; x&lt;y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__metaclass__">
+<tt class="descname">__metaclass__</tt><a class="headerlink" href="#pyvttbl.stats.Ttest.__metaclass__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'pyvttbl.stats._ttest'</em><a class="headerlink" href="#pyvttbl.stats.Ttest.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__ne__">
+<tt class="descname">__ne__</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyvttbl.stats.Ttest.__new__">
+<em class="property">static </em><tt class="descname">__new__</tt><big>(</big><em>S</em>, <em>...</em><big>)</big> &rarr; a new object with type S, a subtype of T<a class="headerlink" href="#pyvttbl.stats.Ttest.__new__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__reduce__">
+<tt class="descname">__reduce__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__reduce__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return state information for pickling</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__reduce_ex__">
+<tt class="descname">__reduce_ex__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__reduce_ex__" title="Permalink to this definition">¶</a></dt>
+<dd><p>helper for pickle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__repr__">
+<tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__reversed__">
+<tt class="descname">__reversed__</tt><big>(</big><em>) &lt;==&gt; reversed(od</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__reversed__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__setattr__">
+<tt class="descname">__setattr__</tt><a class="headerlink" href="#pyvttbl.stats.Ttest.__setattr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>x.__setattr__(&#8216;name&#8217;, value) &lt;==&gt; x.name = value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>value</em>, <em>PREV=0</em>, <em>NEXT=1</em>, <em>dict_setitem=&lt;slot wrapper '__setitem__' of 'dict' objects&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>od.__setitem__(i, y) &lt;==&gt; od[i]=y</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__sizeof__">
+<tt class="descname">__sizeof__</tt><big>(</big><big>)</big> &rarr; size of D in memory, in bytes<a class="headerlink" href="#pyvttbl.stats.Ttest.__sizeof__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Ttest.__subclasshook__">
+<em class="property">classmethod </em><tt class="descname">__subclasshook__</tt><big>(</big><em>C</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.__subclasshook__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest.__weakref__">
+<tt class="descname">__weakref__</tt><a class="headerlink" href="#pyvttbl.stats.Ttest.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest._abc_cache">
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x00000000064E8198&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest._abc_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest._abc_negative_cache">
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x00000000064E8208&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest._abc_negative_cache_version">
+<tt class="descname">_abc_negative_cache_version</tt><em class="property"> = 25</em><a class="headerlink" href="#pyvttbl.stats.Ttest._abc_negative_cache_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyvttbl.stats.Ttest._abc_registry">
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x00000000064E80F0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest._abc_registry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None.  Remove all items from od.<a class="headerlink" href="#pyvttbl.stats.Ttest.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; a shallow copy of od<a class="headerlink" href="#pyvttbl.stats.Ttest.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyvttbl.stats.Ttest.fromkeys">
+<em class="property">classmethod </em><tt class="descname">fromkeys</tt><big>(</big><em>S</em><span class="optional">[</span>, <em>v</em><span class="optional">]</span><big>)</big> &rarr; New ordered dictionary with keys from S<a class="headerlink" href="#pyvttbl.stats.Ttest.fromkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>and values equal to v (which defaults to None).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.get">
+<tt class="descname">get</tt><big>(</big><em>k</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><big>)</big> &rarr; D[k] if k in D, else d.  d defaults to None.<a class="headerlink" href="#pyvttbl.stats.Ttest.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>k</em><big>)</big> &rarr; True if D has a key k, else False<a class="headerlink" href="#pyvttbl.stats.Ttest.has_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.items">
+<tt class="descname">items</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.iteritems">
+<tt class="descname">iteritems</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.iteritems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.iterkeys">
+<tt class="descname">iterkeys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.iterkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.itervalues">
+<tt class="descname">itervalues</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.itervalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.pop">
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FAF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.popitem">
+<tt class="descname">popitem</tt><big>(</big><big>)</big> &rarr; (k, v), return and remove a (key, value) pair.<a class="headerlink" href="#pyvttbl.stats.Ttest.popitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pairs are returned in LIFO order if last is true or FIFO order if false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.run">
+<tt class="descname">run</tt><big>(</big><em>A</em>, <em>B=None</em>, <em>pop_mean=None</em>, <em>paired=False</em>, <em>equal_variance=True</em>, <em>alpha=0.05</em>, <em>aname=None</em>, <em>bname=None</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.run" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Compares the data in A to the data in B. If A or B are</dt>
+<dd><p class="first">multidimensional they are flattened before testing.</p>
+<p>When paired is True, the equal_variance parameter has
+no effect, an exception is raised if A and B are not
+of equal length.</p>
+<blockquote class="last">
+<div>t =</div></blockquote>
+</dd>
+<dt>rac{overline{X}_D - mu_0}{s_D/sqrt{n}}</dt>
+<dd><blockquote class="first">
+<div><dl class="docutils">
+<dt>where:</dt>
+<dd>overline{X}_D is the difference of the averages
+s_D is the standard deviation of the differences</dd>
+</dl>
+<p>mathrm{d.f.} = n_1 - 1</p>
+</div></blockquote>
+<dl class="last docutils">
+<dt>When paired is False and equal_variance is True.</dt>
+<dd>t =</dd>
+</dl>
+</dd>
+</dl>
+<p>rac{ar {X}_1 - ar{X}_2}{S_{X_1X_2} cdot sqrt{
+rac{1}{n_1}+
+rac{1}{n_2}}}</p>
+<blockquote>
+<div><p>where:
+{S_{X_1X_2} is the pooled standard deviation
+computed as:</p>
+<blockquote>
+<div>S_{X_1X_2} = sqrt{</div></blockquote>
+</div></blockquote>
+<p>rac{(n_1-1)S_{X_1}^2+(n_2-1)S_{X_2}^2}{n_1+n_2-2}}</p>
+<blockquote>
+<div><blockquote>
+<div>mathrm{d.f.} = n_1 + n_2 - 2</div></blockquote>
+<dl class="docutils">
+<dt>When paired is False and equal_variance is False.</dt>
+<dd><p class="first">t = {overline{X}_1 - overline{X}_2 over s_{overline{X}_1 - overline{X}_2}}
+where:</p>
+<blockquote>
+<div>s_{overline{X}_1 - overline{X}_2} = sqrt{{s_1^2 over n_1} + {s_2^2  over n_2}}
+where:
+s_1^2 and s_2^2 are the unbiased variance estimates</div></blockquote>
+<p class="last">mathrm{d.f.} =</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>rac{(s_1^2/n_1 + s_2^2/n_2)^2}{(s_1^2/n_1)^2/(n_1-1) + (s_2^2/n_2)^2/(n_2-1)}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.setdefault">
+<tt class="descname">setdefault</tt><big>(</big><em>key</em>, <em>default=None</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.update">
+<tt class="descname">update</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.values">
+<tt class="descname">values</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.viewitems">
+<tt class="descname">viewitems</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's items<a class="headerlink" href="#pyvttbl.stats.Ttest.viewitems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.viewkeys">
+<tt class="descname">viewkeys</tt><big>(</big><big>)</big> &rarr; a set-like object providing a view on od's keys<a class="headerlink" href="#pyvttbl.stats.Ttest.viewkeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyvttbl.stats.Ttest.viewvalues">
+<tt class="descname">viewvalues</tt><big>(</big><big>)</big> &rarr; an object providing a view on od's values<a class="headerlink" href="#pyvttbl.stats.Ttest.viewvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="5. pyvttbl.plotting"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

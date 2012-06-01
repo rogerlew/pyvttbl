@@ -29,30 +29,53 @@ def interaction_plot(df, val, xaxis,
                      where=None, fname=None, output_dir='',
                      quality='low', yerr=None):
     """
-    Plots an interaction plot
+    makes an interaction plot
 
-    Parameters
-    ----------
-    df : a pyvttbl.DataFrame object
-    val : the label of the dependent variable
-    xaxis : the label of the variable to place on the xaxis
-            of each subplot
-    seplines : (optional) label specifying separate lines in
-               each subplot
-    sepxplots : (optional) label specifying separate horizontal
-                subplots
-    sepyplots : (optional)  label specifying separate vertical
-                subplots
-    xmin : ('AUTO' by default) minimum xaxis value across subplots
-    xmax : ('AUTO' by default) maximum xaxis value across subplots
-    ymin : ('AUTO' by default) minimum yaxis value across subplots
-    ymax : ('AUTO' by default) maximum yaxis value across subplots
-    where : (optional) a string, list of strings, or list of tuples
-            applied to the DataFrame before plotting
-    fname : (optional) output file name
-    quality: {'low' | 'medium' | 'high'} specifies image file dpi
-    yerr: {float, 'ci', 'se', 'sem'} designates errorbars across
-          datapoints in all subplots
+       args:
+          df:
+             a pyvttbl.DataFrame object
+    
+          val:
+             the label of the dependent variable
+    
+          xaxis:
+             the label of the variable to place on the xaxis of each subplot
+
+       kwds:
+          seplines:
+             label specifying seperate lines in each subplot
+               
+          sepxplots:
+             label specifying seperate horizontal subplots
+                
+          sepyplots:
+             label specifying separate vertical subplots
+                
+          xmin:
+             ('AUTO' by default) minimum xaxis value across subplots
+    
+          xmax:
+             ('AUTO' by default) maximum xaxis value across subplots
+    
+          ymin:
+             ('AUTO' by default) minimum yaxis value across subplots
+    
+          ymax:
+             ('AUTO' by default) maximum yaxis value across subplots
+    
+          where:
+             a string, list of strings, or list of tuples
+             applied to the DataFrame before plotting
+            
+          fname:
+             output file name
+    
+          quality:
+             {'low' | 'medium' | 'high'} specifies image file dpi
+    
+          yerr:
+             {float, 'ci', 'se', 'sem'} designates errorbars across
+             datapoints in all subplots
     """
 
     ##############################################################
