@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyvttbl.stats.Ttest Overview &mdash; pyvttbl v 0.5.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
+    <link rel="next" title="pyvttbl.plotting API" href="plotting.html" />
+    <link rel="prev" title="pyvttbl.stats.ChiSquare2way Overview" href="ChiSquare2way.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="pyvttbl.plotting API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ChiSquare2way.html" title="pyvttbl.stats.ChiSquare2way Overview"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">pyvttbl.stats.Ttest</span></tt> Overview</a><ul>
+<li><a class="reference internal" href="#example-1-sample-t-test">Example 1 sample t-test</a></li>
+<li><a class="reference internal" href="#example-paired-t-test">Example paired t-test</a></li>
+<li><a class="reference internal" href="#example-independent-sample-t-test-assuming-unequal-variances">Example Independent sample t-test assuming unequal variances</a></li>
+<li><a class="reference internal" href="#example-independent-sample-t-test-assuming-equal-variances">Example Independent sample t-test assuming equal variances</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ChiSquare2way.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">pyvttbl.stats.ChiSquare2way</span></tt> Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="plotting.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">pyvttbl.plotting</span></tt> API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Ttest.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyvttbl-stats-ttest-overview">
+<h1><a class="reference internal" href="stats.html#pyvttbl.stats.Ttest" title="pyvttbl.stats.Ttest"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.Ttest</span></tt></a> Overview<a class="headerlink" href="#pyvttbl-stats-ttest-overview" title="Permalink to this headline">¶</a></h1>
+<p>This class is capable of performing 1 sample, paired
+2 sample, and equal and unequal independent sample t-tests.</p>
+<p>The observed power estimates have been validated against G*Power.</p>
+<div class="section" id="example-1-sample-t-test">
+<h2>Example 1 sample t-test<a class="headerlink" href="#example-1-sample-t-test" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>pop_mean</cite> keyword specifies the population mean against which the data is tested.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data/suppression~subjectXgroupXageXcycleXphase.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">ttest</span><span class="p">(</span><span class="s">&#39;SUPPRESSION&#39;</span><span class="p">,</span> <span class="n">pop_mean</span><span class="o">=</span><span class="mf">17.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+<span class="go">t-Test: One Sample for means</span>
+
+<span class="go">                          SUPPRESSION</span>
+<span class="go">=====================================</span>
+<span class="go">Sample Mean                    19.541</span>
+<span class="go">Hypothesized Pop. Mean             17</span>
+<span class="go">Variance                      228.326</span>
+<span class="go">Observations                      384</span>
+<span class="go">df                                383</span>
+<span class="go">t Stat                          3.295</span>
+<span class="go">alpha                           0.050</span>
+<span class="go">P(T&lt;=t) one-tail            5.384e-04</span>
+<span class="go">t Critical one-tail             1.966</span>
+<span class="go">P(T&lt;=t) two-tail                0.001</span>
+<span class="go">t Critical two-tail             1.649</span>
+<span class="go">P(T&lt;=t) two-tail                0.001</span>
+<span class="go">Effect size d                   0.168</span>
+<span class="go">delta                           3.295</span>
+<span class="go">Observed power one-tail         0.950</span>
+<span class="go">Observed power two-tail         0.908</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-paired-t-test">
+<h2>Example paired t-test<a class="headerlink" href="#example-paired-t-test" title="Permalink to this headline">¶</a></h2>
+<p>Here the <tt class="xref py py-class docutils literal"><span class="pre">Ttest</span></tt> object is passed lists of data.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl.stats</span> <span class="kn">import</span> <span class="n">Ttest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">19</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span><span class="o">=</span><span class="n">Ttest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">paired</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+<span class="go">t-Test: Paired Two Sample for means</span>
+<span class="go">                    A        B</span>
+<span class="go">=========================================</span>
+<span class="go">Mean                       4.556    7.889</span>
+<span class="go">Variance                   6.778   47.111</span>
+<span class="go">Observations                   9        9</span>
+<span class="go">Pearson Correlation        0.102</span>
+<span class="go">df                             8</span>
+<span class="go">t Stat                    -1.411</span>
+<span class="go">alpha                      0.050</span>
+<span class="go">P(T&lt;=t) one-tail           0.098</span>
+<span class="go">t Critical one-tail        2.306</span>
+<span class="go">P(T&lt;=t) two-tail           0.196</span>
+<span class="go">t Critical two-tail        1.860</span>
+<span class="go">P(T&lt;=t) two-tail           0.196</span>
+<span class="go">Effect size dz             0.470</span>
+<span class="go">delta                      1.411</span>
+<span class="go">Observed power one-tail    0.362</span>
+<span class="go">Observed power two-tail    0.237</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-independent-sample-t-test-assuming-unequal-variances">
+<h2>Example Independent sample t-test assuming unequal variances<a class="headerlink" href="#example-independent-sample-t-test-assuming-unequal-variances" title="Permalink to this headline">¶</a></h2>
+<p>Can handle non-equivalent sample sizes.</p>
+<p>Example data from <a class="reference external" href="http://alamos.math.arizona.edu/~rychlik/math263/class_notes/Chapter7/R/">http://alamos.math.arizona.edu/~rychlik/math263/class_notes/Chapter7/R/</a></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl.stats</span> <span class="kn">import</span> <span class="n">Ttest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="mi">24</span><span class="p">,</span><span class="mi">61</span><span class="p">,</span><span class="mi">59</span><span class="p">,</span><span class="mi">46</span><span class="p">,</span><span class="mi">43</span><span class="p">,</span><span class="mi">44</span><span class="p">,</span><span class="mi">52</span><span class="p">,</span><span class="mi">43</span><span class="p">,</span><span class="mi">58</span><span class="p">,</span><span class="mi">67</span><span class="p">,</span><span class="mi">62</span><span class="p">,</span><span class="mi">57</span><span class="p">,</span><span class="mi">71</span><span class="p">,</span><span class="mi">49</span><span class="p">,</span><span class="mi">54</span><span class="p">,</span><span class="mi">43</span><span class="p">,</span><span class="mi">53</span><span class="p">,</span><span class="mi">57</span><span class="p">,</span><span class="mi">49</span><span class="p">,</span><span class="mi">56</span><span class="p">,</span><span class="mi">33</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="p">[</span><span class="mi">42</span><span class="p">,</span><span class="mi">33</span><span class="p">,</span><span class="mi">46</span><span class="p">,</span><span class="mi">37</span><span class="p">,</span><span class="mi">43</span><span class="p">,</span><span class="mi">41</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">42</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="mi">19</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="mi">26</span><span class="p">,</span><span class="mi">54</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="mi">62</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">53</span><span class="p">,</span><span class="mi">48</span><span class="p">,</span><span class="mi">37</span><span class="p">,</span><span class="mi">85</span><span class="p">,</span><span class="mi">42</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span><span class="o">=</span><span class="n">Ttest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">paired</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+<span class="go">t-Test: Two-Sample Assuming Unequal Variances</span>
+<span class="go">                         A         B</span>
+<span class="go">===========================================</span>
+<span class="go">Mean                       51.476    41.522</span>
+<span class="go">Variance                  121.162   294.079</span>
+<span class="go">Observations                   21        23</span>
+<span class="go">df                         37.855</span>
+<span class="go">t Stat                      2.311</span>
+<span class="go">alpha                       0.050</span>
+<span class="go">P(T&lt;=t) one-tail            0.013</span>
+<span class="go">t Critical one-tail         2.025</span>
+<span class="go">P(T&lt;=t) two-tail            0.026</span>
+<span class="go">t Critical two-tail         1.686</span>
+<span class="go">P(T&lt;=t) two-tail            0.026</span>
+<span class="go">Effect size d               0.691</span>
+<span class="go">delta                       2.185</span>
+<span class="go">Observed power one-tail     0.692</span>
+<span class="go">Observed power two-tail     0.567</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-independent-sample-t-test-assuming-equal-variances">
+<h2>Example Independent sample t-test assuming equal variances<a class="headerlink" href="#example-independent-sample-t-test-assuming-equal-variances" title="Permalink to this headline">¶</a></h2>
+<p>And last but not least...</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl.stats</span> <span class="kn">import</span> <span class="n">Ttest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">19</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span><span class="o">=</span><span class="n">Ttest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">equal_variance</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+<span class="go">t-Test: Two-Sample Assuming Equal Variances</span>
+<span class="go">                            A        B</span>
+<span class="go">=========================================</span>
+<span class="go">Mean                       4.556        9</span>
+<span class="go">Variance                   6.778   54.222</span>
+<span class="go">Observations                   9       10</span>
+<span class="go">Pooled Variance           31.895</span>
+<span class="go">df                            17</span>
+<span class="go">t Stat                    -1.713</span>
+<span class="go">alpha                      0.050</span>
+<span class="go">P(T&lt;=t) one-tail           0.052</span>
+<span class="go">t Critical one-tail        2.110</span>
+<span class="go">P(T&lt;=t) two-tail           0.105</span>
+<span class="go">t Critical two-tail        1.740</span>
+<span class="go">P(T&lt;=t) two-tail           0.105</span>
+<span class="go">Effect size d              0.805</span>
+<span class="go">delta                      1.610</span>
+<span class="go">Observed power one-tail    0.460</span>
+<span class="go">Observed power two-tail    0.330</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="pyvttbl.plotting API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ChiSquare2way.html" title="pyvttbl.stats.ChiSquare2way Overview"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
