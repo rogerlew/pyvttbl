@@ -7,8 +7,9 @@ Description
 They are instantiated through DataFrame.pivot. 
 
 
-General Public Methods
-----------------------
+Public Methods
+--------------
+
 Additional methods inherented from np.ma.MaskedArray that are not 
 explicitely listed here may also be available. Keep in mind methods not
 listed here may not been have extensively tested. 
@@ -41,15 +42,25 @@ listed here may not been have extensively tested.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. attribute:: pyvttbl.PyvtTbl.flat
+
+    Flat iterator object to iterate over PyvtTbl.
+    
+|        A `MaskedIterator` iterator is returned by ``x.flat`` for any PyvtTbl
+|        `x`. It allows iterating over the array as if it were a 1-D array,
+|        either in a for-loop or by calling its `next` method.
+|    
+|        Iteration is done in C-contiguous style, with the last index varying the
+|        fastest. The iterator can also be indexed using basic slicing or
+|        advanced indexing.
+        
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. automethod:: pyvttbl.PyvtTbl.__repr__
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automethod:: pyvttbl.PyvtTbl.__str__
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. automethod:: pyvttbl.PyvtTbl.write
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -111,6 +122,10 @@ listed here may not been have extensively tested.
 
 Private Methods
 ---------------
+
+helper methods for PyvtTbl
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automethod:: pyvttbl.PyvtTbl._get_rows
 

@@ -92,6 +92,7 @@ except ImportError:
     sys.stderr.write("Can't import textwrap module!\n")
     raise
 
+
 ##if sys.version_info[0] != 3:
 ##    try:
 ##        True, False
@@ -116,16 +117,18 @@ def _str(x, dtype='a', n=3):
         x- is the item being added
         dtype- is so we can index self._dtype 
     """
+    
+    if x == None : return '--'
+    
     try    : f=float(x)
     except : return str(x)
 
-    if math.isnan(f) : return '--'
-    if math.isinf(f) : return 'inf'
-    
-    if   dtype == 'i' : return str(int(round(f)))
-    elif dtype == 'f' : return '%.*f'%(n, f)
-    elif dtype == 'e' : return '%.*e'%(n, f)
-    elif dtype == 't' : return str(x)
+    if   math.isnan(f) : return '--'
+    elif math.isinf(f) : return 'inf'
+    elif dtype == 'i'  : return str(int(round(f)))
+    elif dtype == 'f'  : return '%.*f'%(n, f)
+    elif dtype == 'e'  : return '%.*e'%(n, f)
+    elif dtype == 't'  : return str(x)
     else:
         if f-round(f) == 0:
             if abs(f) > 1e8:
@@ -587,7 +590,7 @@ if __name__ == '__main__':
     # to 't' would make it 100% backwards compatible.
     
     table.add_rows([['text','float',  'exp',   'int',   'auto'],
-                    ['abcd', '67',    654,     89,      128.001],
+                    ['abcd', '67',    654,     None,      128.001],
                     ['efgh', 67.5434, .654,    89.6,    12800000000000000000000.00023],
                     ['ijkl', 5e-78,   5e-78,   89.4,    .000000000000128],
                     ['mnop', float('nan'),    5e+78,   92.,     12800000000000000000000]])

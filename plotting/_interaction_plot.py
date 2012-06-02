@@ -342,13 +342,13 @@ def interaction_plot(df, val, xaxis,
                 labels = []
                 for i, name in enumerate(y.rnames):
                     if aggregate != None:
-                        yerr = yerrs[i]
+                        yerr = yerrs[i].flatten()
                     
                     labels.append(name[0][1])
 
                     if all([_isfloat(a) for a in x]):
                         plots.append(
-                            axs[-1].errorbar(x, y[i], yerr)[0])
+                            axs[-1].errorbar(x, y[i].flatten(), yerr)[0])
                         
                         if xmin == 'AUTO' and xmax == 'AUTO':
                             xmin , xmax = axs[-1].get_xlim()
@@ -361,7 +361,7 @@ def interaction_plot(df, val, xaxis,
                     else : # categorical x axis
                         plots.append(
                             axs[-1].errorbar(
-                                _xrange(len(x)), y[i],yerr)[0])
+                                _xrange(len(x)), y[i].flatten(), yerr)[0])
                         
                         pylab.xticks(_xrange(len(x)), x)
                         xmin = - 0.5

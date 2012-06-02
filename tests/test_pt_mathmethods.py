@@ -39,7 +39,6 @@ Total           9.800       9.333       7.778    8.896 """
         pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
 ##        print(pt)
         pt2=pt+5
-##        print(pt2)
         
         self.assertEqual(str(pt2),R)
 
@@ -66,12 +65,10 @@ Total           9.600       8.667       5.556    7.792 """
         # __add__ ndarray
         R ="""\
 N/A(ERROR)
-TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total 
-=====================================================
-T1             12.167      11.500           9      -- 
-T2              8.222       7.889       6.556      -- 
-=====================================================
-Total              --          --          --      -- """
+TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3 
+=============================================
+T1             12.167      11.500           9 
+T2              8.222       7.889       6.556 """
                 
         df=DataFrame()
         df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
@@ -131,12 +128,10 @@ Total          23.040      18.778       7.716   15.178 """
         # __mul__ ndarray
         R ="""\
 N/A(ERROR)
-TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3   Total 
-=====================================================
-T1             35.833      32.500          20      -- 
-T2             16.111      14.444       7.778      -- 
-=====================================================
-Total              --          --          --      -- """
+TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3 
+=============================================
+T1             35.833      32.500          20 
+T2             16.111      14.444       7.778 """
                 
         df=DataFrame()
         df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')

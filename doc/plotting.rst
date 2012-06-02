@@ -1,4 +1,4 @@
-:mod:`pyvttbl.plotting`
+:mod:`pyvttbl.plotting` API
 =====================================
 
 Description

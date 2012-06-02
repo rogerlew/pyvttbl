@@ -790,8 +790,6 @@ class DataFrame(OrderedDict):
               :class:`PyvtTbl` object
         """
         
-        calc_tots = True
-            
         if rows == None:
             rows = []
             
@@ -1051,57 +1049,54 @@ class DataFrame(OrderedDict):
         row_tots, col_tots, grand_tot = [], [], np.nan
         row_mask, col_mask = [], []
         
-        if calc_tots:
-            if aggregate in ['tolist', 'group_concat', 'arbitrary']:
-                calc_tots = False
-            else:
-                query = 'select %s( %s ) from TBL'%(agg, _sha1(val))
-                self._execute(query)
-                grand_tot = list(self.cur)[0][0]
+        if aggregate not in ['tolist', 'group_concat', 'arbitrary']:
+            query = 'select %s( %s ) from TBL'%(agg, _sha1(val))
+            self._execute(query)
+            grand_tot = list(self.cur)[0][0]
 
-                if cnames != [1] and rnames != [1]:
-                    query = ['select %s( %s ) from TBL group by'%(agg, _sha1(val))]
-                    query.append(', '.join(_sha1(r) for r in rows))
-                    self._execute(' '.join(query))
-                    
-                    if method=='full':
-                        i=0
-                        row_tots=[]
-                        row_mask=[]
-                        for tup in self.cur:
-                            while not rnames_mask[i]:
-                                row_tots.append(fill_val)
-                                row_mask.append(True)
-                                i+=1
-                                
-                            row_tots.append(tup[0])
-                            row_mask.append(False)
+            if cnames != [1] and rnames != [1]:
+                query = ['select %s( %s ) from TBL group by'%(agg, _sha1(val))]
+                query.append(', '.join(_sha1(r) for r in rows))
+                self._execute(' '.join(query))
+                
+                if method=='full':
+                    i=0
+                    row_tots=[]
+                    row_mask=[]
+                    for tup in self.cur:
+                        while not rnames_mask[i]:
+                            row_tots.append(fill_val)
+                            row_mask.append(True)
                             i+=1
-                    else:
-                        row_tots = [tup[0] for tup in self.cur]    
-                        row_mask = [False for z in row_tots]   
-                    
-                    query = ['select %s( %s ) from TBL group by'%(agg, _sha1(val))]
-                    query.append(', '.join(_sha1(r) for r in cols))
-                    self._execute(' '.join(query))
+                            
+                        row_tots.append(tup[0])
+                        row_mask.append(False)
+                        i+=1
+                else:
+                    row_tots = [tup[0] for tup in self.cur]    
+                    row_mask = [False for z in row_tots]   
+                
+                query = ['select %s( %s ) from TBL group by'%(agg, _sha1(val))]
+                query.append(', '.join(_sha1(r) for r in cols))
+                self._execute(' '.join(query))
 
-                    if method=='full':
-                        i=0
-                        col_tots=[]
-                        col_mask=[]
-                        for tup in self.cur:
-                            while not cnames_mask[i]:
-                                col_tots.append(fill_val)
-                                col_mask.append(True)
-                                i+=1
-                                
-                            col_tots.append(tup[0])
-                            col_mask.append(False)
+                if method=='full':
+                    i=0
+                    col_tots=[]
+                    col_mask=[]
+                    for tup in self.cur:
+                        while not cnames_mask[i]:
+                            col_tots.append(fill_val)
+                            col_mask.append(True)
                             i+=1
-                    else:
-                        
-                        col_tots = [tup[0] for tup in self.cur]    
-                        col_mask = [False for z in col_tots]
+                            
+                        col_tots.append(tup[0])
+                        col_mask.append(False)
+                        i+=1
+                else:
+                    
+                    col_tots = [tup[0] for tup in self.cur]    
+                    col_mask = [False for z in col_tots]
                     
         row_tots = np.ma.array(row_tots, mask=row_mask)
         col_tots = np.ma.array(col_tots, mask=col_mask)
@@ -1129,7 +1124,7 @@ class DataFrame(OrderedDict):
 ##        print()
 ##        
         return PyvtTbl(data, val, Zconditions, rnames, cnames, aggregate,
-                       mask=mask, calc_tots=calc_tots,
+                       mask=mask, 
                        row_tots=row_tots, col_tots=col_tots, grand_tot=grand_tot,
                        attach_rlabels=attach_rlabels)
             
@@ -2054,7 +2049,6 @@ class _ptmathmethod(object):
                        rnames=instance.rnames,
                        cnames=instance.cnames,
                        aggregate='N/A',
-                       calc_tots=instance.calc_tots,
                        row_tots=row_tots,
                        col_tots=col_tots,
                        grand_tot=grand_tot,
@@ -2108,7 +2102,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
                        hard_mask=kwds.get('hard_mask',False))
 
         mask = kwds.get('mask', np.ma.nomask)
-        obj = np.ma.MaskedArray.__new__(cls, data, mask=mask, **maparms)
+        obj = np.ma.MaskedArray.__new__(cls, data, mask=mask, ndmin=2, **maparms)
 
         # Get data
         if not kwds.get('subok',True) or not isinstance(obj, PyvtTbl):
@@ -2120,17 +2114,16 @@ class PyvtTbl(np.ma.MaskedArray, object):
         obj.rnames = rnames
         obj.cnames = cnames
         obj.aggregate = aggregate
-        obj.calc_tots = kwds.get('calc_tots', True)
 
         if 'row_tots' in kwds:
             obj.row_tots = np.ma.array(kwds['row_tots'])
         else:
-            obj.row_tots = np.ma.masked_equal(np.zeros(len(cnames)), 0.)
+            obj.row_tots = []#np.ma.masked_equal(np.zeros(len(cnames)), 0.)
 
         if 'col_tots' in kwds:
             obj.col_tots = np.ma.array(kwds['col_tots'])
         else:
-            obj.col_tots = np.ma.masked_equal(np.zeros(len(rnames)), 0.)
+            obj.col_tots = []#np.ma.masked_equal(np.zeros(len(rnames)), 0.)
             
         obj.grand_tot = kwds.get('grand_tot', np.ma.masked)
         obj.where = kwds.get('where', [])
@@ -2149,8 +2142,6 @@ class PyvtTbl(np.ma.MaskedArray, object):
         self.rnames = getattr(obj, 'rnames', [1])
         self.cnames = getattr(obj, 'cnames', [1])
         self.aggregate = getattr(obj, 'aggregate', 'avg')
-
-        self.calc_tots = getattr(obj, 'calc_tots', True)
 
         if hasattr(obj, 'row_tots'):
             self.row_tots = np.ma.array(obj.row_tots)
@@ -2184,7 +2175,6 @@ class PyvtTbl(np.ma.MaskedArray, object):
                              self.cnames,
                              self.rnames,
                              self.aggregate,
-                             calc_tots=self.calc_tots,
                              row_tots=self.col_tots,
                              col_tots=self.row_tots,
                              grand_tot=self.grand_tot,
@@ -2227,7 +2217,6 @@ class PyvtTbl(np.ma.MaskedArray, object):
                       self.rnames,
                       self.cnames,
                       self.aggregate,
-                      calc_tots=self.calc_tots,
                       row_tots=self.row_tots.astype(dtype),
                       col_tots=self.col_tots.astype(dtype),
                       grand_tot=(dtype(self.grand_tot), np.ma.masked)\
@@ -2236,6 +2225,35 @@ class PyvtTbl(np.ma.MaskedArray, object):
                       subok=self.subok,
                       keep_mask=self.keep_mask,
                       hard_mask=self.hard_mask)
+
+    ######################################################################
+    
+    # Adapted from numpy.ma.core 
+    
+    def _get_flat(self):
+        "Return a flat iterator."
+        return np.ma.core.MaskedIterator(self)
+    
+    def _set_flat (self, value):
+        "Set a flattened version of self to value."
+        y = self.ravel()
+        y[:] = value
+
+    flat__doc__ = """\
+    Flat iterator object to iterate over PyvtTbl.
+    
+    |   A `MaskedIterator` iterator is returned by ``x.flat`` for any PyvtTbl
+        `x`. It allows iterating over the array as if it were a 1-D array,
+        either in a for-loop or by calling its `next` method.
+    
+    |   Iteration is done in C-contiguous style, with the last index varying the
+        fastest. The iterator can also be indexed using basic slicing or
+        advanced indexing.
+    """
+    
+    flat = property(fget=_get_flat, fset=_set_flat, doc=flat__doc__)
+
+    ######################################################################
 
     def flatten(self):
         """
@@ -2279,20 +2297,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
             for j in _xrange(self.shape[1]):
                 yield (i,j), self[i,j]
 
-##    def _are_row_lengths_equal(self):
-##        """
-##        private method to check if the lists in self have equal lengths
-##
-##          returns True if all the items are equal
-##          returns False otherwise
-##        """
-##        # if self is not empty
-##        counts = map(len, self.__iter__())
-##        if all(c - counts[0] + 1 == 1 for c in counts):
-##            return True
-##        else:
-##            return False
-        
+
     def _get_rows(self):
         """
         returns a list of tuples containing row labels and conditions
@@ -2301,7 +2306,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
             return [1]
         else:
             return [str(k) for (k, v) in self.rnames[0]]
-
+        
     def _get_cols(self):
         """
         returns a list of tuples containing column labels and conditions
@@ -2310,86 +2315,6 @@ class PyvtTbl(np.ma.MaskedArray, object):
             return [1]
         else:
             return [str(k) for (k, v) in self.cnames[0]]
-
-    def write(self, fname=None, delimiter=','):
-        """
-        writes the pivot table to a plaintext file
-
-        |   as currently implemented does not write grand_totals
-        """
-        
-        if self == []:
-            raise Exception('must call pivot before writing pivot table')
-
-        rows = self._get_rows()
-        cols = self._get_cols()
-        
-        # check or build fname
-        if fname != None:
-            if not isinstance(fname, _strobj):
-                raise TypeError('fname must be a string')
-        else:
-            # if rows == [1] then lower_rows becomes ['']
-            # if cols...
-            lower_rows = [str(n).lower().replace('1','') for n in rows]
-            lower_cols = [str(n).lower().replace('1','') for n in cols]
-            
-            fname = '%s~(%s)Z(%s)'%(self.val.lower(),
-                                    'X'.join(lower_rows),
-                                    'X'.join(lower_cols))
-            if delimiter == ',':
-                fname += '.csv' 
-            elif delimiter == '\t':               
-                fname += '.tsv'
-            else:
-                fname += '.txt'
-        
-        # build and write first line
-        first = ['%s(%s)'%(self.aggregate, self.val)]
-
-        data = [] # append the rows to this list and write with
-                  # csv writer in one call
-        
-        # no rows or cols were specified
-        if self.rnames == [1] and self.cnames == [1]:
-            # build and write the header
-            header = ['Value']
-
-            # initialize the texttable and add stuff
-            data.append(list(self[0]))
-            
-        elif self.rnames == [1]: # no rows were specified
-            # build the header
-            header = ['_'.join('%s=%s'%(f, c) for (f, c) in L) \
-                      for L in self.cnames]
-
-            # initialize the texttable and add stuff
-            data.append(list(self[0]))
-            
-        elif self.cnames == [1]: # no cols were specified
-            # build the header
-            header = rows + ['Value']
-            
-            # initialize the texttable and add stuff
-            for i, L in enumerate(self.rnames):
-                data.append([c for (f, c) in L] + list(self[i]))
-            
-        else: # table has rows and cols
-            # build the header
-            header = copy(rows)
-            for L in self.cnames:
-                header.append('_'.join('%s=%s'%(f, c) for (f, c) in L))
-
-            # initialize the texttable and add stuff
-            for i, L in enumerate(self.rnames):
-                data.append([c for (f, c) in L] + list(self[i]))
-
-        # write file
-        with open(fname, 'wb') as fid:
-            wtr = csv.writer(fid, delimiter=delimiter)
-            wtr.writerow(first)
-            wtr.writerow(header)
-            wtr.writerows(data)
 
     def to_dataframe(self):
         """
@@ -2415,15 +2340,27 @@ class PyvtTbl(np.ma.MaskedArray, object):
             header = [',\n'.join('%s=%s'%(f, c) for (f, c) in L) \
                       for L in self.cnames]
             
-            df.insert(zip(header, list(self[0])))
-            
+
+            if self[0,:].shape[0] == 1:
+                rdata = self[0,:].flatten().tolist()
+            else:
+                rdata = [self[0,j].flatten().tolist()
+                         for j in _xrange(len(self.cnames))]
+                
+            df.insert(zip(header, rdata))
+                
         elif self.cnames == [1]: # no cols were specified
             # build the header
             header = rows + ['Value']
-            
+
             for i, L in enumerate(self.rnames):
-                df.insert(zip(header, [c for (f, c) in L] + list(self[i])))
-            
+                if isinstance(self[i,0], PyvtTbl):
+                    rdata = [c for (f, c) in L] + [self[i,0].flatten().tolist()]
+                else:
+                    rdata = [c for (f, c) in L] + [self[i,0]]
+                    
+                df.insert(zip(header, rdata))
+                
         else: # table has rows and cols
             # build the header
             header = copy(rows)
@@ -2431,20 +2368,70 @@ class PyvtTbl(np.ma.MaskedArray, object):
                 header.append(',\n'.join('%s=%s'%(f, c) for (f, c) in L))
             
             for i, L in enumerate(self.rnames):
-                df.insert(zip(header, [c for (f, c) in L] + list(self[i])))
+                if self[i,:].shape[0] == 1:
+                    rdata =[c for (f, c) in L] + self[i,:].flatten().tolist()
+                else:
+                    rdata = [self[i,j].flatten().tolist()
+                             for j in _xrange(len(self.cnames))]
+                    
+                df.insert(zip(header, rdata))
 
         return df
+
+    def __getitem__(self, indx):
+
+        # x[i] <==> x[i,:] <==> x[i, slice(None, None, None)]
+        if _isint(indx) or isinstance(indx, slice):
+            return self.__getitem__((indx,slice(None, None, None)))
+        
+        obj = super(PyvtTbl, self).__getitem__(indx)
+
+        if isinstance(obj, PyvtTbl):
+            
+            if self.rnames == [1] or _isint(indx[0]):
+                m = 1
+            else:
+                m = len(self.rnames[indx[0]])
+
+            if self.cnames == [1] or _isint(indx[1]):
+                n = 1
+            else:
+                n = len(self.cnames[indx[1]])
+        
+            if obj.ndim == 1 and self.ndim == 2:
+                obj = np.reshape(obj, (m,n))
+
+            if obj.ndim == 1 and self.ndim == 3:
+                obj = np.reshape(obj, (m,n,-1))
+                
+            obj.rnames = self.rnames[indx[0]]
+            obj.cnames = self.cnames[indx[1]]
+
+            if _isint(indx[0]): obj.rnames = [obj.rnames]
+            if _isint(indx[1]): obj.cnames = [obj.cnames]
+            
+            obj.row_tots = np.ma.masked_equal(np.zeros(m), 0.)
+            obj.col_tots = np.ma.masked_equal(np.zeros(n), 0.)
+
+            obj.val = self.val
+
+        return obj
 
     def __str__(self):
         """
         returns a human friendly string representation of the table
         """
-##        return super(PyvtTbl, self).__str__()
+##        return 'PyvtTbl:\n'+'\n\n'.join(
+##            [super(PyvtTbl, self).__str__(),
+##             'row_tots:'+str(self.row_tots),
+##             'col_tots:'+str(self.col_tots)])+'\n\n'
     
         if self == []:
             return '(table is empty)'
-        
-        show_tots = self.calc_tots
+
+        show_col_tots = any(np.invert(self.col_tots.mask))
+        show_row_tots = any(np.invert(self.col_tots.mask))
+        show_grand_tot = _isfloat(self.grand_tot) and not math.isnan(self.grand_tot)
         
         rows = self._get_rows()
         cols = self._get_cols()
@@ -2463,20 +2450,30 @@ class PyvtTbl(np.ma.MaskedArray, object):
             tt.add_row(self)
             
         elif self.rnames == [1]: # no rows were specified
+            
             # build the header
             header = [',\n'.join('%s=%s'%(f, c) for (f, c) in L) \
                       for L in self.cnames]
-            if show_tots:
+            if show_grand_tot:
                 header.append('Total')
             
             # initialize the texttable and add stuff
             # False and True evaluate as 0 and 1 for integer addition
             # and list indexing
-            tt.set_cols_dtype(['a'] * (len(self.cnames)+show_tots))
-            tt.set_cols_align(['r'] * (len(self.cnames)+show_tots))
-            tt.add_row(list(self[0])+([],[self.grand_tot])[show_tots])
-            
+            tt.set_cols_dtype(['a'] * (len(self.cnames)+show_grand_tot))
+            tt.set_cols_align(['r'] * (len(self.cnames)+show_grand_tot))
+
+            if self[0,:].shape[0] == 1:
+                tt.add_row(self[0,:].flatten().tolist()+
+                           ([],[self.grand_tot])[show_grand_tot])
+            else:
+                rdata = [self[0,j].flatten().tolist()
+                         for j in _xrange(len(self.cnames))]
+                
+                tt.add_row(rdata + ([],[self.grand_tot])[show_grand_tot])
+                        
         elif self.cnames == [1]: # no cols were specified
+            
             # build the header
             header = rows + ['Value']
             
@@ -2484,42 +2481,53 @@ class PyvtTbl(np.ma.MaskedArray, object):
             tt.set_cols_dtype(['t'] * len(rows) + ['a'])
             tt.set_cols_align(['l'] * len(rows) + ['r'])
             for i, L in enumerate(self.rnames):
-                tt.add_row([c for (f, c) in L] + [self[i,0]])
+                if isinstance(self[i,0], PyvtTbl):
+                    tt.add_row([c for (f, c) in L] + [self[i,0].flatten().tolist()])
+                else:
+                    tt.add_row([c for (f, c) in L] + [self[i,0]])
 
-            if show_tots:
+            if show_grand_tot:
                 tt.footer(['Total'] + 
                           ['']*(len(rows)-1) +
                           [self.grand_tot])
-            
+
         else: # table has rows and cols
             # build the header
             header = copy(rows)
             for L in self.cnames:
                 header.append(',\n'.join('%s=%s'%(f, c) for (f, c) in L))
-            if show_tots:
+            if show_row_tots:
                 header.append('Total')
 
-            dtypes = ['t'] * len(rows) + ['a'] * (len(self.cnames)+show_tots)
-            aligns = ['l'] * len(rows) + ['r'] * (len(self.cnames)+show_tots)
+            dtypes = ['t'] * len(rows) + ['a'] * (len(self.cnames)+show_row_tots)
+            aligns = ['l'] * len(rows) + ['r'] * (len(self.cnames)+show_row_tots)
+            numcols = len(dtypes)
 
             # initialize the texttable and add stuff
             tt.set_cols_dtype(dtypes)
             tt.set_cols_align(aligns)
-            if show_tots:
+            if show_col_tots:
                 for i, L in enumerate(self.rnames):
+                    
                     tt.add_row([c for (f, c) in L] +
-                               list(self[i]) +
+                               self[i,:].flatten().tolist() +
                                [self.row_tots[i]])
 
                 tt.footer(['Total'] + 
                           ['']*(len(rows)-1) +
-                          list(self.col_tots) +
+                          self.col_tots.tolist() +
                           [self.grand_tot])
                 
             else:
                 for i, L in enumerate(self.rnames):
-                    tt.add_row([c for (f, c) in L] +
-                               self[i].tolist())
+                    if self[i,:].shape[0] == 1:
+                        tt.add_row([c for (f, c) in L] +
+                                   self[i,:].flatten().tolist())
+                    else:
+                        rdata = [self[i,j].flatten().tolist()
+                                 for j in _xrange(len(self.cnames))]
+                        
+                        tt.add_row([c for (f, c) in L] + rdata)
 
         # add header and decoration
         tt.header(header)
@@ -2543,9 +2551,6 @@ class PyvtTbl(np.ma.MaskedArray, object):
         args += ", '%s'"%self.aggregate
         
         kwds = []
-
-        if self.calc_tots != True:
-            kwds.append(", calc_tots=False")
 
         if self.row_tots != None:
             # sometimes np.ma.array.mask is a bool, somtimes it is a list.

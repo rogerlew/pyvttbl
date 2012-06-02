@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>3. pyvttbl.DataFrame &mdash; pyvttbl v 0.5.0.0 documentation</title>
+    <title>pyvttbl.DataFrame Overview &mdash; pyvttbl v 0.5.1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     'v 0.5.0.0',
+        VERSION:     'v 0.5.1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,9 +25,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pyvttbl v 0.5.0.0 documentation" href="index.html" />
-    <link rel="next" title="4. pyvttbl.PyvtTbl" href="PyvtTbl.html" />
-    <link rel="prev" title="2. Quick-Start Guide" href="quick-start.html" /> 
+    <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
+    <link rel="next" title="pyvttbl.PyvtTbl" href="PyvtTbl.html" />
+    <link rel="prev" title="Quick-Start Guide" href="quick-start.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,34 +40,34 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="PyvtTbl.html" title="4. pyvttbl.PyvtTbl"
+          <a href="PyvtTbl.html" title="pyvttbl.PyvtTbl"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="quick-start.html" title="2. Quick-Start Guide"
+          <a href="quick-start.html" title="Quick-Start Guide"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">3. <tt class="docutils literal"><span class="pre">pyvttbl.DataFrame</span></tt></a><ul>
-<li><a class="reference internal" href="#description">3.1. Description</a></li>
-<li><a class="reference internal" href="#general-public-methods">3.2. General Public Methods</a></li>
-<li><a class="reference internal" href="#pyvttbl-plotting-wrappers">3.3. <tt class="docutils literal"><span class="pre">pyvttbl.plotting</span></tt> Wrappers</a></li>
-<li><a class="reference internal" href="#pyvttbl-stats-wrappers">3.4. <tt class="docutils literal"><span class="pre">pyvttbl.stats</span></tt> Wrappers</a></li>
-<li><a class="reference internal" href="#private-methods">3.5. Private Methods</a></li>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">pyvttbl.DataFrame</span></tt> Overview</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#public-methods">Public Methods</a></li>
+<li><a class="reference internal" href="#pyvttbl-plotting-wrappers"><tt class="docutils literal"><span class="pre">pyvttbl.plotting</span></tt> Wrappers</a></li>
+<li><a class="reference internal" href="#pyvttbl-stats-wrappers"><tt class="docutils literal"><span class="pre">pyvttbl.stats</span></tt> Wrappers</a></li>
+<li><a class="reference internal" href="#private-methods">Private Methods</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="quick-start.html"
-                        title="previous chapter">2. Quick-Start Guide</a></p>
+                        title="previous chapter">Quick-Start Guide</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="PyvtTbl.html"
-                        title="next chapter">4. <tt class="docutils literal"><span class="pre">pyvttbl.PyvtTbl</span></tt></a></p>
+                        title="next chapter"><tt class="docutils literal docutils literal"><span class="pre">pyvttbl.PyvtTbl</span></tt></a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/DataFrame.txt"
@@ -94,18 +94,19 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="pyvttbl-dataframe">
-<h1>3. <tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.DataFrame</span></tt><a class="headerlink" href="#pyvttbl-dataframe" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pyvttbl-dataframe-overview">
+<h1><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.DataFrame</span></tt> Overview<a class="headerlink" href="#pyvttbl-dataframe-overview" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="description">
-<h2>3.1. Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
 <p><tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> objects are containers for holding tabulated data. They
 inherent <tt class="xref py py-class docutils literal"><span class="pre">collections.OrderedDict</span></tt> and hold data in
 <tt class="xref py py-class docutils literal"><span class="pre">numpy.array</span></tt> objects.</p>
 </div>
-<div class="section" id="general-public-methods">
-<h2>3.2. General Public Methods<a class="headerlink" href="#general-public-methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="public-methods">
+<h2>Public Methods<a class="headerlink" href="#public-methods" title="Permalink to this headline">¶</a></h2>
 <p>Methods to get data into a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>, manipulate and manage data,
-and write data.</p>
+and write data. For the most part these remove the user from the fact they
+are using sqlite3 to manipulate data.</p>
 <hr class="docutils" />
 <dl class="method">
 <dt id="pyvttbl.DataFrame.__init__">
@@ -629,8 +630,9 @@ a boolean.</dd>
 </div>
 <hr class="docutils" />
 <div class="section" id="pyvttbl-plotting-wrappers">
-<h2>3.3. <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.plotting</span></tt> Wrappers<a class="headerlink" href="#pyvttbl-plotting-wrappers" title="Permalink to this headline">¶</a></h2>
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.plotting</span></tt> Wrappers<a class="headerlink" href="#pyvttbl-plotting-wrappers" title="Permalink to this headline">¶</a></h2>
 <p>Methods to visualize data.</p>
+<hr class="docutils" />
 <dl class="method">
 <dt id="pyvttbl.DataFrame.histogram_plot">
 <tt class="descclassname">DataFrame.</tt><tt class="descname">histogram_plot</tt><big>(</big><em>val</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.histogram_plot" title="Permalink to this definition">¶</a></dt>
@@ -793,8 +795,9 @@ labels will be on the top and right.</dd>
 </div>
 <hr class="docutils" />
 <div class="section" id="pyvttbl-stats-wrappers">
-<h2>3.4. <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt> Wrappers<a class="headerlink" href="#pyvttbl-stats-wrappers" title="Permalink to this headline">¶</a></h2>
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt> Wrappers<a class="headerlink" href="#pyvttbl-stats-wrappers" title="Permalink to this headline">¶</a></h2>
 <p>Methods to conduct descriptive and inferential statistical analyses.</p>
+<hr class="docutils" />
 <dl class="method">
 <dt id="pyvttbl.DataFrame.descriptives">
 <tt class="descclassname">DataFrame.</tt><tt class="descname">descriptives</tt><big>(</big><em>key</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.descriptives" title="Permalink to this definition">¶</a></dt>
@@ -1057,7 +1060,10 @@ population mean.</dd>
 </div>
 <hr class="docutils" />
 <div class="section" id="private-methods">
-<h2>3.5. Private Methods<a class="headerlink" href="#private-methods" title="Permalink to this headline">¶</a></h2>
+<h2>Private Methods<a class="headerlink" href="#private-methods" title="Permalink to this headline">¶</a></h2>
+<p>These methods are for working interfacing <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>
+with sqlite3.</p>
+<hr class="docutils" />
 <dl class="method">
 <dt id="pyvttbl.DataFrame._get_sqltype">
 <tt class="descclassname">DataFrame.</tt><tt class="descname">_get_sqltype</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._get_sqltype" title="Permalink to this definition">¶</a></dt>
@@ -1281,12 +1287,12 @@ should contain value for the operator.</div>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="PyvtTbl.html" title="4. pyvttbl.PyvtTbl"
+          <a href="PyvtTbl.html" title="pyvttbl.PyvtTbl"
              >next</a> |</li>
         <li class="right" >
-          <a href="quick-start.html" title="2. Quick-Start Guide"
+          <a href="quick-start.html" title="Quick-Start Guide"
              >previous</a> |</li>
-        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

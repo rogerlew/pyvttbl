@@ -23,7 +23,17 @@ from pyvttbl.misc.support import *
 class Test_ttest1sample(unittest.TestCase):
     def test0(self):
         """1 sample ttest"""
-        R=OrderedDict([('t', -17.797126310672542), ('p2tail', 1.0172137120313963e-07), ('p1tail', 5.086068560156982e-08), ('n', 9), ('df', 8), ('mu', 4.555555555555555), ('pop_mean', 20), ('var', 6.777777777777778), ('tc2tail', 2.3060059174895287), ('tc1tail', 1.8595485016703606)])
+        R=OrderedDict([('t', -17.797126310672542),
+                       ('p2tail', 1.0172137120313963e-07),
+                       ('p1tail', 5.086068560156982e-08),
+                       ('n', 9),
+                       ('df', 8),
+                       ('mu', 4.555555555555555),
+                       ('pop_mean', 20),
+                       ('var', 6.777777777777778),
+                       ('tc2tail', 2.3060059174895287),
+                       ('tc1tail', 1.8595485016703606)])
+        
         A=[3,4, 5,8,9, 1,2,4, 5]
         pop_mean=20
       
@@ -35,7 +45,8 @@ class Test_ttest1sample(unittest.TestCase):
             self.assertTrue(D[k],R[k])
 
     def test1(self):
-        R="""t-Test: One Sample for means
+        R="""\
+t-Test: One Sample for means
 
                           SUPPRESSION 
 =====================================

@@ -23,13 +23,34 @@ from pyvttbl.misc.support import *
 class Test_ttest_paired(unittest.TestCase):
     def test0(self):
         """paired ttest"""
-        R=Ttest([('t', -1.4106912317171967), ('p2tail', 0.19601578492449323), ('p1tail', 0.09800789246224662), ('n1', 9), ('n2', 9), ('r', 0.10182008678393427), ('df', 8), ('mu1', 4.555555555555555), ('mu2', 7.888888888888889), ('var1', 6.777777777777778), ('var2', 47.111111111111114), ('tc2tail', 1.8595480375228424), ('tc1tail', 2.3060041350333704), ('cohen_d', 0.47023041057239895), ('delta', 1.410691231717197), ('power1tail', 0.36186192660269623), ('power2tail', 0.23741605057147952)], paired=True, aname='A', bname='B', type='t-Test: Paired Two Sample for means')
+        R=Ttest([('t', -1.4106912317171967),
+                 ('p2tail', 0.19601578492449323),
+                 ('p1tail', 0.09800789246224662),
+                 ('n1', 9),
+                 ('n2', 9),
+                 ('r', 0.10182008678393427),
+                 ('df', 8),
+                 ('mu1', 4.555555555555555),
+                 ('mu2', 7.888888888888889),
+                 ('var1', 6.777777777777778),
+                 ('var2', 47.111111111111114),
+                 ('tc2tail', 1.8595480375228424),
+                 ('tc1tail', 2.3060041350333704),
+                 ('cohen_d', 0.47023041057239895),
+                 ('delta', 1.410691231717197),
+                 ('power1tail', 0.36186192660269623),
+                 ('power2tail', 0.23741605057147952)],
+                paired=True,
+                aname='A', bname='B',
+                type='t-Test: Paired Two Sample for means')
+        
         A=[3,4, 5,8,9, 1,2,4, 5]
         B=[6,19,3,2,14,4,5,17,1]
       
         D=Ttest()
         D.run(A,B,paired=True)
-
+##        print(D)
+        
         for k in R.keys():
             self.assertTrue(D[k],R[k])
             

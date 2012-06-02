@@ -25,54 +25,54 @@ class Test_pt_mathmethods__iter__(unittest.TestCase):
 
     def test1(self):
         
-        R =[[7.16666666667, 6.5, 4.0],
-            [3.22222222222, 2.88888888889, 1.55555555556]]
+        R =np.array([[7.16666666667, 6.5, 4.0],
+                     [3.22222222222, 2.88888888889, 1.55555555556]])
         
         df=DataFrame()
         df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
 
-        for r,L in zip(R,pt):
-            self.assertEqual(','.join(['%.5f'%f for f in r]),
-                             ','.join(['%.5f'%f for f in L]))
+        self.assertEqual(str(R.shape),str(pt.shape))
+
+        for r,L in zip(R.flatten(),pt.flatten()):
+            self.assertAlmostEqual(r,L)
 
     def test2(self):
         
-        R =[[ 7.16666667],
-            [ 6.5],
-            [ 4.],
-            [ 3.22222222],
-            [ 2.88888889],
-            [ 1.55555556]]
+        R =np.array([[ 7.16666667],
+                     [ 6.5],
+                     [ 4.],
+                     [ 3.22222222],
+                     [ 2.88888889],
+                     [ 1.55555556]])
         
         df=DataFrame()
         df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         pt = df.pivot('ERROR', rows=['TIMEOFDAY','COURSE'])
-##        print(pt)
-##
-##        for row in pt:
-##            print(type(row),row)
 
-        for r,L in zip(R,pt):
-            self.assertEqual(','.join(['%.5f'%f for f in r]),
-                             ','.join(['%.5f'%f for f in L]))
+        self.assertEqual(str(R.shape),str(pt.shape))
 
+        for r,L in zip(R.flatten(),pt.flatten()):
+            self.assertAlmostEqual(r,L)
+            
     def test3(self):
         
-        R =[[7.16666667,
-             6.5,
-             4.,
-             3.22222222,
-             2.88888889,
-             1.55555556]]
-        
+        R =np.array([[7.16666667,
+                      6.5,
+                      4.,
+                      3.22222222,
+                      2.88888889,
+                      1.55555556]])
+         
         df=DataFrame()
         df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         pt = df.pivot('ERROR', cols=['TIMEOFDAY','COURSE'])
 
-        for r,L in zip(R,pt):
-            self.assertEqual(','.join(['%.5f'%f for f in r]),
-                             ','.join(['%.5f'%f for f in L]))
+        self.assertEqual(str(R.shape),str(pt.shape))
+
+        for r,L in zip(R.flatten(),pt.flatten()):
+            self.assertAlmostEqual(r,L)
+            
 
     def test4(self):
         

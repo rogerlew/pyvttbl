@@ -21,31 +21,10 @@ from copy import copy
 import scipy
 
 # included modules
+from pyvttbl.misc.support import _flatten
 from pyvttbl.stats import _stats
 from pyvttbl.stats._noncentral import nctcdf
 from pyvttbl.misc.texttable import Texttable as TextTable
-
-def _flatten(x):
-    """_flatten(sequence) -> list
-
-    Returns a single, flat list which contains all elements retrieved
-    from the sequence and all recursively contained sub-sequences
-    (iterables).
-
-    Examples:
-    >>> [1, 2, [3,4], (5,6)]
-    [1, 2, [3, 4], (5, 6)]
-    >>> _flatten([[[1,2,3], (42,None)], [4,5], [6], 7, MyVector(8,9,10)])
-    [1, 2, 3, 42, None, 4, 5, 6, 7, 8, 9, 10]"""
-
-    result = []
-    for el in x:
-        #if isinstance(el, (list, tuple)):
-        if hasattr(el, "__iter__") and not isinstance(el, _strobj):
-            result.extend(_flatten(el))
-        else:
-            result.append(el)
-    return result
 
 class Ttest(OrderedDict):
     """Student's t-test"""

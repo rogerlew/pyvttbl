@@ -158,7 +158,7 @@ class ChiSquare2way(OrderedDict):
         self['power'] = 1. - ncx2cdf(self['crit_chi2'],df,self['lambda'])
         
     def __str__(self):
-        """Returns human readable string representaition of Marginals"""
+        """Returns human readable string representation of ChiSquare2way"""
 
         if self == {}:
             return '(no data in object)'

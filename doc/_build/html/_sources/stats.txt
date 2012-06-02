@@ -1,4 +1,4 @@
-:mod:`pyvttbl.stats`
+:mod:`pyvttbl.stats` API
 =====================================
 
 Description

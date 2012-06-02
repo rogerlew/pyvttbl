@@ -1,4 +1,4 @@
-:class:`pyvttbl.DataFrame`
+:class:`pyvttbl.DataFrame` Overview
 =====================================
 
 Description
@@ -7,10 +7,11 @@ Description
 inherent :class:`collections.OrderedDict` and hold data in 
 :class:`numpy.array` objects. 
 
-General Public Methods
-----------------------
+Public Methods
+--------------
 Methods to get data into a :class:`DataFrame`, manipulate and manage data,
-and write data.
+and write data. For the most part these remove the user from the fact they 
+are using sqlite3 to manipulate data. 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -90,6 +91,8 @@ and write data.
 --------------------------------
 Methods to visualize data.
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. automethod:: pyvttbl.DataFrame.histogram_plot
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -113,6 +116,8 @@ Methods to visualize data.
 :mod:`pyvttbl.stats` Wrappers
 -----------------------------
 Methods to conduct descriptive and inferential statistical analyses.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automethod:: pyvttbl.DataFrame.descriptives
 
@@ -153,6 +158,10 @@ Methods to conduct descriptive and inferential statistical analyses.
              
 Private Methods
 ---------------
+These methods are for working interfacing :class:`DataFrame`
+with sqlite3.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automethod:: pyvttbl.DataFrame._get_sqltype
 

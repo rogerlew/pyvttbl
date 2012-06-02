@@ -78,19 +78,23 @@ def _xunique_combinations(items, n):
 
 
 def _str(x, dtype='a', n=3):
+    """Handles string formatting of cell data
+
+        x- is the item being added
+        dtype- is so we can index self._dtype 
     """
-    makes string formatting more human readable
-    """
+    
+    if x == None : return '--'
+    
     try    : f=float(x)
     except : return str(x)
 
-    if math.isnan(f) : return 'nan'
-    if math.isinf(f) : return 'inf'
-    
-    if   dtype == 'i' : return str(int(round(f)))
-    elif dtype == 'f' : return '%.*f'%(n, f)
-    elif dtype == 'e' : return '%.*e'%(n, f)
-    elif dtype == 't' : return str(x)
+    if   math.isnan(f) : return '--'
+    elif math.isinf(f) : return 'inf'
+    elif dtype == 'i'  : return str(int(round(f)))
+    elif dtype == 'f'  : return '%.*f'%(n, f)
+    elif dtype == 'e'  : return '%.*e'%(n, f)
+    elif dtype == 't'  : return str(x)
     else:
         if f-round(f) == 0:
             if abs(f) > 1e8:
@@ -98,9 +102,9 @@ def _str(x, dtype='a', n=3):
             else:
                 return str(int(round(f)))
         else:
-            if abs(f) > 1e8 or abs(f) < 1e-8:
+            if abs(f) > 1e8 or abs(f) <= float('1e-%i'%n):
                 return '%.*e'%(n, f)
             else:
                 return '%.*f'%(n, f)
-            
+
 __all__ = ['_sha1','_isfloat','_isint','_flatten','_xunique_combinations','_str']

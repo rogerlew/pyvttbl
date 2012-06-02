@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4. pyvttbl.PyvtTbl &mdash; pyvttbl v 0.5.0.0 documentation</title>
+    <title>pyvttbl.PyvtTbl &mdash; pyvttbl v 0.5.1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     'v 0.5.0.0',
+        VERSION:     'v 0.5.1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,9 +25,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pyvttbl v 0.5.0.0 documentation" href="index.html" />
-    <link rel="next" title="5. pyvttbl.plotting" href="plotting.html" />
-    <link rel="prev" title="3. pyvttbl.DataFrame" href="DataFrame.html" /> 
+    <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
+    <link rel="next" title="pyvttbl.stats.Correlation Overview" href="Correlation.html" />
+    <link rel="prev" title="pyvttbl.DataFrame Overview" href="DataFrame.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,32 +40,32 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="plotting.html" title="5. pyvttbl.plotting"
+          <a href="Correlation.html" title="pyvttbl.stats.Correlation Overview"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="DataFrame.html" title="3. pyvttbl.DataFrame"
+          <a href="DataFrame.html" title="pyvttbl.DataFrame Overview"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">4. <tt class="docutils literal"><span class="pre">pyvttbl.PyvtTbl</span></tt></a><ul>
-<li><a class="reference internal" href="#description">4.1. Description</a></li>
-<li><a class="reference internal" href="#general-public-methods">4.2. General Public Methods</a></li>
-<li><a class="reference internal" href="#private-methods">4.3. Private Methods</a></li>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">pyvttbl.PyvtTbl</span></tt></a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#public-methods">Public Methods</a></li>
+<li><a class="reference internal" href="#private-methods">Private Methods</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="DataFrame.html"
-                        title="previous chapter">3. <tt class="docutils literal docutils literal"><span class="pre">pyvttbl.DataFrame</span></tt></a></p>
+                        title="previous chapter"><tt class="docutils literal docutils literal"><span class="pre">pyvttbl.DataFrame</span></tt> Overview</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="plotting.html"
-                        title="next chapter">5. <tt class="docutils literal"><span class="pre">pyvttbl.plotting</span></tt></a></p>
+  <p class="topless"><a href="Correlation.html"
+                        title="next chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">pyvttbl.stats.Correlation</span></tt> Overview</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/PyvtTbl.txt"
@@ -93,14 +93,14 @@
           <div class="body">
             
   <div class="section" id="pyvttbl-pyvttbl">
-<h1>4. <tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.PyvtTbl</span></tt><a class="headerlink" href="#pyvttbl-pyvttbl" title="Permalink to this headline">¶</a></h1>
+<h1><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.PyvtTbl</span></tt><a class="headerlink" href="#pyvttbl-pyvttbl" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="description">
-<h2>4.1. Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
 <p><tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> objects are containers for holding pivoted data.
 They are instantiated through DataFrame.pivot.</p>
 </div>
-<div class="section" id="general-public-methods">
-<h2>4.2. General Public Methods<a class="headerlink" href="#general-public-methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="public-methods">
+<h2>Public Methods<a class="headerlink" href="#public-methods" title="Permalink to this headline">¶</a></h2>
 <p>Additional methods inherented from np.ma.MaskedArray that are not
 explicitely listed here may also be available. Keep in mind methods not
 listed here may not been have extensively tested.</p>
@@ -201,6 +201,22 @@ class ndarray is returned.</dd>
 </dd></dl>
 
 <hr class="docutils" />
+<dl class="attribute">
+<dt id="pyvttbl.PyvtTbl.flat">
+<tt class="descclassname">pyvttbl.PyvtTbl.</tt><tt class="descname">flat</tt><a class="headerlink" href="#pyvttbl.PyvtTbl.flat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flat iterator object to iterate over PyvtTbl.</p>
+</dd></dl>
+
+<div class="line-block">
+<div class="line">A <cite>MaskedIterator</cite> iterator is returned by <tt class="docutils literal"><span class="pre">x.flat</span></tt> for any PyvtTbl</div>
+<div class="line"><cite>x</cite>. It allows iterating over the array as if it were a 1-D array,</div>
+<div class="line">either in a for-loop or by calling its <cite>next</cite> method.</div>
+<div class="line"><br /></div>
+<div class="line">Iteration is done in C-contiguous style, with the last index varying the</div>
+<div class="line">fastest. The iterator can also be indexed using basic slicing or</div>
+<div class="line">advanced indexing.</div>
+</div>
+<hr class="docutils" />
 <dl class="method">
 <dt id="pyvttbl.PyvtTbl.__repr__">
 <tt class="descclassname">PyvtTbl.</tt><tt class="descname">__repr__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__repr__" title="Permalink to this definition">¶</a></dt>
@@ -212,16 +228,6 @@ class ndarray is returned.</dd>
 <dt id="pyvttbl.PyvtTbl.__str__">
 <tt class="descclassname">PyvtTbl.</tt><tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__str__" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a human friendly string representation of the table</p>
-</dd></dl>
-
-<hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.PyvtTbl.write">
-<tt class="descclassname">PyvtTbl.</tt><tt class="descname">write</tt><big>(</big><em>fname=None</em>, <em>delimiter='</em>, <em>'</em><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>writes the pivot table to a plaintext file</p>
-<div class="line-block">
-<div class="line">as currently implemented does not write grand_totals</div>
-</div>
 </dd></dl>
 
 <hr class="docutils" />
@@ -325,7 +331,9 @@ class ndarray is returned.</dd>
 </div>
 <hr class="docutils" />
 <div class="section" id="private-methods">
-<h2>4.3. Private Methods<a class="headerlink" href="#private-methods" title="Permalink to this headline">¶</a></h2>
+<h2>Private Methods<a class="headerlink" href="#private-methods" title="Permalink to this headline">¶</a></h2>
+<p>helper methods for PyvtTbl</p>
+<hr class="docutils" />
 <dl class="method">
 <dt id="pyvttbl.PyvtTbl._get_rows">
 <tt class="descclassname">PyvtTbl.</tt><tt class="descname">_get_rows</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl._get_rows" title="Permalink to this definition">¶</a></dt>
@@ -359,12 +367,12 @@ class ndarray is returned.</dd>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="plotting.html" title="5. pyvttbl.plotting"
+          <a href="Correlation.html" title="pyvttbl.stats.Correlation Overview"
              >next</a> |</li>
         <li class="right" >
-          <a href="DataFrame.html" title="3. pyvttbl.DataFrame"
+          <a href="DataFrame.html" title="pyvttbl.DataFrame Overview"
              >previous</a> |</li>
-        <li><a href="index.html">pyvttbl v 0.5.0.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

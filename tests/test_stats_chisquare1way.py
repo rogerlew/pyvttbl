@@ -23,7 +23,8 @@ from pyvttbl.misc.support import *
 class Test_chisquare1way(unittest.TestCase):
     def test0(self):
         """chi-square 1-way"""
-        R="""Chi-Square: Single Factor
+        R="""\
+Chi-Square: Single Factor
 
 SUMMARY
            A   B   C   D  
@@ -57,7 +58,8 @@ Power                   0.724 """
         self.assertEqual(repr(D),R)
         
     def test1(self):
-        R="""Chi-Square: Single Factor
+        R="""\
+Chi-Square: Single Factor
 
 SUMMARY
              1        2        3        4    
@@ -86,7 +88,8 @@ Power                    0.865 """
         self.assertEqual(str(X),R)
 
     def test2(self):
-        R="""Chi-Square: Single Factor
+        R="""\
+Chi-Square: Single Factor
 
 SUMMARY
              1        2        3        4        5    
@@ -112,12 +115,13 @@ Power                    0.998 """
         df = DataFrame()
         df.read_tbl('data/chi_test.csv')
         X=df.chisquare1way('RESULT',{1:11.8 ,2:11.8 ,3:11.8 ,4:11.8 ,5:11.8})
-        print(X)
+        
         self.assertEqual(str(X),R)
 
     def test3(self):
         """chi-square 1-way"""
-        R="""Chi-Square: Single Factor
+        R="""\
+Chi-Square: Single Factor
 
 SUMMARY
             A     B     C     D  

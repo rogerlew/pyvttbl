@@ -22,7 +22,8 @@ from pyvttbl.misc.support import *
 
 class Test_chisquare2way(unittest.TestCase):
     def test0(self):
-        R="""Chi-Square: two Factor
+        R="""\
+Chi-Square: two Factor
 
 SUMMARY
          Guilty     NotGuilty   Total 
@@ -59,7 +60,7 @@ Critical Chi-Square      3.841
 Power                    1.000 """
         df=DataFrame()
         df['FAULTS']=list(Counter(Low=177,High=181).elements())
-        df['FAULTS']=df['FAULTS'][::-1]
+        df['FAULTS']=df['FAULTS'][::-1] # reverse 'FAULT' data
         df['VERDICT']=list(Counter(Guilty=153, NotGuilty=24).elements()) + \
                       list(Counter(Guilty=105, NotGuilty=76).elements())
 
@@ -68,7 +69,8 @@ Power                    1.000 """
 
     def test1(self):
         """chi-square 2-way"""
-        R="""Chi-Square: two Factor
+        R="""\
+Chi-Square: two Factor
 
 SUMMARY
             Litter      Removed    Trash Can   Total 
@@ -104,8 +106,8 @@ Critical Chi-Square      5.991
 Power                    0.997 """
         
         df=DataFrame()
-        rfactors=['Countrol']*903 + ['Message']*869
-        cfactors=['Trash Can']*41 + ['Litter']*385 + ['Removed']*477
+        rfactors= ['Countrol']*903 + ['Message']*869
+        cfactors= ['Trash Can']*41 + ['Litter']*385 + ['Removed']*477
         cfactors+=['Trash Can']*80 + ['Litter']*290 + ['Removed']*499
         
         x2= ChiSquare2way()

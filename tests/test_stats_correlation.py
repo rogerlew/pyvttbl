@@ -59,11 +59,11 @@ A   spearman                 1       0.958      -0.924
     N                       21          21          21 
 ------------------------------------------------------
 B   spearman             0.958           1      -0.890 
-    Sig (2-tailed)   9.699e-12           .       0.000 
+    Sig (2-tailed)   9.699e-12           .   6.850e-08 
     N                       21          21          21 
 ------------------------------------------------------
 C   spearman            -0.924      -0.890           1 
-    Sig (2-tailed)   2.259e-09       0.000           . 
+    Sig (2-tailed)   2.259e-09   6.850e-08           . 
     N                       21          21          21 
 
 Larzelere and Mulaik Significance Testing
@@ -91,7 +91,7 @@ B vs. C   3         0.890   6.850e-08           0.050   **   """
                  -71.5901436929124, -76.43243666219388, -48.01082320924727]
         
         cor=df.correlation(['A','B','C'],coefficient='spearman')
-##        print(cor)
+        print(cor)
         self.assertEqual(str(cor),R)
 
     def test2(self):

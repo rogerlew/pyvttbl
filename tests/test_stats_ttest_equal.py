@@ -23,7 +23,25 @@ from pyvttbl.misc.support import *
 class Test_ttest_equal(unittest.TestCase):
     def test1(self):
         """independent equal variance ttest"""
-        R=Ttest([('t', -1.712764845721259), ('p2tail', 0.10493320627442616), ('p1tail', 0.05246660313721308), ('n1', 9), ('n2', 10), ('df', 17), ('mu1', 4.555555555555555), ('mu2', 9.0), ('var1', 6.777777777777777), ('var2', 54.22222222222222), ('vpooled', 31.895424836601304), ('tc2tail', 1.7396067260750672), ('tc1tail', 2.1098155778331806), ('cohen_d', 0.8047621870446092), ('delta', 1.6095243740892184), ('power1tail', 0.46028261750215127), ('power2tail', 0.32962069261917515)], aname='A', bname='B', type='t-Test: Two-Sample Assuming Equal Variances')
+        R=Ttest([('t', -1.712764845721259),
+                 ('p2tail', 0.10493320627442616),
+                 ('p1tail', 0.05246660313721308),
+                 ('n1', 9),
+                 ('n2', 10),
+                 ('df', 17),
+                 ('mu1', 4.555555555555555),
+                 ('mu2', 9.0),
+                 ('var1', 6.777777777777777),
+                 ('var2', 54.22222222222222),
+                 ('vpooled', 31.895424836601304),
+                 ('tc2tail', 1.7396067260750672),
+                 ('tc1tail', 2.1098155778331806),
+                 ('cohen_d', 0.8047621870446092),
+                 ('delta', 1.6095243740892184),
+                 ('power1tail', 0.46028261750215127),
+                 ('power2tail', 0.32962069261917515)],
+                aname='A', bname='B',
+                type='t-Test: Two-Sample Assuming Equal Variances')
 
         A=[3,4, 5,8,9, 1,2,4, 5]
         B=[6,19,3,2,14,4,5,17,1,19]
@@ -36,7 +54,8 @@ class Test_ttest_equal(unittest.TestCase):
 
     def test11(self):
         """independent equal variance ttest"""
-        R="""t-Test: Two-Sample Assuming Equal Variances
+        R="""\
+t-Test: Two-Sample Assuming Equal Variances
                             A        B    
 =========================================
 Mean                       4.556        9 
