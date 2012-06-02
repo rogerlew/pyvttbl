@@ -3,8 +3,8 @@
 
 Used to calculate histogram counts (no plotting).
 
-Example using DataFrame
---------------------------
+Example using :class:`DataFrame` wrapper
+----------------------------------------
 
 ::
 

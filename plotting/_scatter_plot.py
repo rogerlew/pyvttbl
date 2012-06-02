@@ -19,7 +19,7 @@ import numpy as np
 from pyvttbl.plotting.support import \
      _bivariate_trend_fit, _tick_formatter, _subplots
 
-def scatter_plot(df, aname, bname, where=None, trend='linear',
+def scatter_plot(df, aname, bname, where=None, trend=None,
                  fname=None, output_dir='',
                  quality='medium', alpha=0.6):
     """
@@ -46,7 +46,8 @@ def scatter_plot(df, aname, bname, where=None, trend='linear',
              'polynomial':  f(x) = a * x**2 + b*x + c
         
              'power':       f(x) = a * x**b
-    """ 
+    """
+    
     if where == None:
         where = []
 
@@ -107,9 +108,12 @@ def scatter_plot(df, aname, bname, where=None, trend='linear',
                    horizontalalignment='left',
                    verticalalignment='top',
                    fontsize=11)
-    
+
     if fname == None:
-        fname = 'scatter(%sX%s).png'%(aname.lower(),bname.lower())
+        fname = 'scatter(%s_X_%s'%(aname,bname)
+        if trend != None:
+            fname += ',trend=' + trend
+        fname += ').png'
 
     fname = os.path.join(output_dir, fname)
 
@@ -130,4 +134,4 @@ def scatter_plot(df, aname, bname, where=None, trend='linear',
 
     if df.TESTMODE:
         # build and return test dictionary
-        return {'bins':tup[0], 'counts':tup[1], 'fname':fname}
+        return {'aname':aname, 'bname':bname, 'fname':fname, 'trend':trend}

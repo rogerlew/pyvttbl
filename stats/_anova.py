@@ -1871,8 +1871,8 @@ class Anova(OrderedDict):
                 ys=self.df.pivot(self.dv,rows=efs,aggregate='tolist')
                 names=ys.rnames
                 
-                dave=array([   mean(y[0]) for y in ys ])
-                dsem=array([ stderr(y[0]) for y in ys ])
+                dave=array([   mean(y.flatten()) for y in ys ])
+                dsem=array([ stderr(y.flatten()) for y in ys ])
 
                 dlowr=dave-(dsem*1.96)
                 dhghr=dave+(dsem*1.96)
@@ -1899,19 +1899,18 @@ class Anova(OrderedDict):
              seplines=None,
              sepxplots=None,
              sepyplots=None,
-             xmin='AUTO',xmax='AUTO',ymin='AUTO',ymax='AUTO',
-             fname='.png',
+             xmin='AUTO',xmax='AUTO',
+             ymin='AUTO',ymax='AUTO',
+             fname=None,
              quality='low',
-             errorbars='ci'):
+             errorbars='ci',
+             output_dir=''):
         """
         This functions is basically wraps the plot function from the
         dataframe module. It attempts to find the appropriate error bar
         term. Creats a filename if necessary and calls plot.
         """
 
-        # Build filename
-        if fname=='.png' or fname=='.svg':
-            fname=md5sum(str(uniform()))+fname
 
         # Attempt to find errorbars
         factors=self.wfactors+self.bfactors
@@ -1930,14 +1929,20 @@ class Anova(OrderedDict):
         else:
             yerr=None
 
-        self.df.interaction_plot(val, xaxis, seplines=seplines,
+        # turn on TESTMODE in the DataFrame so we can get the filename
+        self.df.TESTMODE = True
+        
+        D = self.df.interaction_plot(val, xaxis, seplines=seplines,
                                  sepxplots=sepxplots,
                                  sepyplots=sepyplots,
                                  xmin=xmin, xmax=xmax,
                                  ymin=ymin, ymax=ymax,
                                  fname=fname,
                                  quality=quality,
-                                 yerr=yerr)
+                                 yerr=yerr,
+                                 output_dir=output_dir)
+
+        fname = D['fname']
 
         if '.png' in fname:
             dpi=100

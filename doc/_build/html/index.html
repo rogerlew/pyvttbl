@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to pyvttbl’s documentation! &mdash; pyvttbl v 0.5.1.0 documentation</title>
+    <title>pyvttbl Documentation Table of Contents &mdash; pyvttbl v 0.5.1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -48,7 +48,7 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to pyvttbl&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#">pyvttbl Documentation Table of Contents</a><ul>
 </ul>
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
@@ -83,16 +83,20 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="welcome-to-pyvttbl-s-documentation">
-<h1>Welcome to pyvttbl&#8217;s documentation!<a class="headerlink" href="#welcome-to-pyvttbl-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Pivot tables (also called contingency tables and cross tabulation tables)
-are a powerful means of data visualization and data summarization. When
-dealing with large data sets with multiple variables, or multiple
-datasets manually manipulating the pivot tables in WYSIWYG (what you see
-is what you get) spreadsheets can quickly become troublesome and error
-prone. In these instances it becomes preferred or even necessary to use
-a YAFIYGI (you ask for it you got it) model to automate all or part of
-the data summarization process.</p>
+  <div class="section" id="pyvttbl-documentation-table-of-contents">
+<h1>pyvttbl Documentation Table of Contents<a class="headerlink" href="#pyvttbl-documentation-table-of-contents" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Release:</th><td class="field-body">v 0.5.1.0</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">June 02, 2012</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
 <hr class="docutils" />
 <div class="toctree-wrapper compound">
 <ul>
@@ -104,8 +108,22 @@ the data summarization process.</p>
 <li class="toctree-l2"><a class="reference internal" href="quick-start.html#writing-data-from-a-dataframe">Writing Data from a <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
 <li class="toctree-l2"><a class="reference internal" href="quick-start.html#pivoting-data">Pivoting Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quick-start.html#multidimensional-pivoting">Multidimensional Pivoting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quick-start.html#pivot-aggregate-functions">Pivot Aggregate Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quick-start.html#manipulating-pyvttbl-objects">Manipulating <tt class="docutils literal"><span class="pre">PyvtTbl</span></tt> objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html#pivot-aggregate-functions">Pivot Aggregate Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quick-start.html#example-using-the-tolist-aggregator">Example using the &#8216;tolist&#8217; aggregator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html#manipulating-pyvttbl-objects">Manipulating <tt class="docutils literal"><span class="pre">PyvtTbl</span></tt> objects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quick-start.html#mathematical-operations">Mathematical Operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quick-start.html#pyvttbl-transpose"><tt class="docutils literal"><span class="pre">PyvtTbl</span></tt>. <tt class="docutils literal"><span class="pre">transpose()</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="quick-start.html#pyvttbl-flatten"><tt class="docutils literal"><span class="pre">PyvtTbl</span></tt>. <tt class="docutils literal"><span class="pre">flatten()</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html#iterating-over-pyvttbl-objects">Iterating over <tt class="docutils literal"><span class="pre">PyvtTbl</span></tt> objects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quick-start.html#pyvttbl-iter"><tt class="docutils literal"><span class="pre">PyvtTbl</span></tt>. <tt class="docutils literal"><span class="pre">__iter__()</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="quick-start.html#pyvttbl-flat"><tt class="docutils literal"><span class="pre">PyvtTbl</span></tt>. <cite>flat</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="quick-start.html#pyvttbl-ndenumerate"><tt class="docutils literal"><span class="pre">PyvtTbl</span></tt>. <tt class="docutils literal"><span class="pre">ndenumerate()</span></tt></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="quick-start.html#converting-a-pyvttbl-to-a-dataframe">Converting a <tt class="docutils literal"><span class="pre">PyvtTbl</span></tt> to a <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
 </ul>
 </li>
@@ -133,7 +151,7 @@ the data summarization process.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Histogram.html"><tt class="docutils literal"><span class="pre">pyvttbl.stats.Histogram</span></tt> Overview</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Histogram.html#example-using-dataframe">Example using DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Histogram.html#example-using-dataframe-wrapper">Example using <tt class="docutils literal"><span class="pre">DataFrame</span></tt> wrapper</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Histogram.html#example-using-histogram-directly">Example using <tt class="docutils literal"><span class="pre">Histogram</span></tt> directly</a></li>
 </ul>
 </li>
@@ -142,7 +160,12 @@ the data summarization process.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Anova.html"><tt class="docutils literal"><span class="pre">pyvttbl.stats.Anova</span></tt> Overview</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Anova.html#running-an-anova">Running an ANOVA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Anova.html#running-an-anova">Running an ANOVA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Anova.html#example-within-subjects-anova">Example Within-Subjects ANOVA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Anova.html#example-between-subjects-anova">Example Between-Subjects ANOVA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Anova.html#example-mixed-subjects-anova">Example Mixed-Subjects ANOVA</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="Anova.html#specifying-a-data-transformation">Specifying a Data Transformation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Anova.html#printing-a-summary">Printing a Summary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Anova.html#writing-summary-to-file">Writing Summary to File</a></li>
@@ -171,6 +194,38 @@ the data summarization process.</p>
 <li class="toctree-l2"><a class="reference internal" href="Ttest.html#example-paired-t-test">Example paired t-test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Ttest.html#example-independent-sample-t-test-assuming-unequal-variances">Example Independent sample t-test assuming unequal variances</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Ttest.html#example-independent-sample-t-test-assuming-equal-variances">Example Independent sample t-test assuming equal variances</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="box_plot.html"><tt class="docutils literal"><span class="pre">pyvttbl.plotting.box_plot()</span></tt> Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="box_plot.html#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="box_plot.html#example-with-a-single-factor">Example with a single factor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="box_plot.html#example-with-two-factors">Example with two factors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="histogram_plot.html"><tt class="docutils literal"><span class="pre">pyvttbl.plotting.histogram_plot()</span></tt> Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="histogram_plot.html#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="histogram_plot.html#example-with-where-query">Example with <cite>where</cite> query</a></li>
+<li class="toctree-l2"><a class="reference internal" href="histogram_plot.html#cumulative-histogram">Cumulative histogram</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="interaction_plot.html"><tt class="docutils literal"><span class="pre">pyvttbl.plotting.interaction_plot()</span></tt> Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="interaction_plot.html#way-interaction-plot">2 way interaction plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interaction_plot.html#example-with-a-single-factor">Example with a single factor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interaction_plot.html#example-with-error-bars">Example with error bars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interaction_plot.html#error-bars-for-repeated-measures-experiments">Error bars for repeated-measures experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interaction_plot.html#example-with-separate-horizontal-subplots">Example with separate horizontal subplots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interaction_plot.html#example-with-separate-horizontal-and-vertical-subplots">Example with separate horizontal and vertical subplots</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scatter_plot.html"><tt class="docutils literal"><span class="pre">pyvttbl.plotting.scatter_plot()</span></tt> Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="scatter_plot.html#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scatter_plot.html#example-with-power-trend-fit">Example with power trend fit</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scatter_matrix.html"><tt class="docutils literal"><span class="pre">pyvttbl.plotting.scatter_matrix()</span></tt> Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="scatter_matrix.html#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scatter_matrix.html#example-with-diagonal-hist">Example with diagonal=&#8217;hist&#8217;</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scatter_matrix.html#example-with-diagonal-kde-and-alternate-labels-false">Example with diagonal=&#8217;kde&#8217; and alternate_labels=False</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="plotting.html"><tt class="docutils literal"><span class="pre">pyvttbl.plotting</span></tt> API</a><ul>

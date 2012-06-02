@@ -31,53 +31,44 @@ class Test_scatter_matrix(unittest.TestCase):
     def test0(self):
         self.df.scatter_matrix('CCSA FIQ TOTSA TOTVOL'.split(),
                           diagonal=None,
-                          fname = 'scatter,4var,diag=None',
                           output_dir='output')
 
     def test1(self):
         self.df.scatter_matrix('CCSA HC FIQ TOTSA TOTVOL'.split(),
                           diagonal=None,
-                          fname = 'scatter,5var,diag=None',
                           output_dir='output')
 
     def test2(self):
 
         self.df.scatter_matrix('CCSA FIQ TOTSA TOTVOL'.split(),
                           diagonal='kde',
-                          fname = 'scatter,4var,diag=kde',
                           output_dir='output')
 
     def test3(self):
 
         self.df.scatter_matrix('CCSA HC FIQ TOTSA TOTVOL'.split(),
                           diagonal='kde',
-                          fname = 'scatter,5var,diag=kde',
                           output_dir='output')
 
     def test4(self):
         self.df.scatter_matrix('CCSA FIQ TOTSA TOTVOL'.split(),
                           diagonal='hist',
-                          fname = 'scatter,4var,diag=hist',
                           output_dir='output')
 
     def test5(self):
         self.df.scatter_matrix('CCSA HC FIQ TOTSA TOTVOL'.split(),
                           diagonal='hist',
-                          fname = 'scatter,5var,diag=hist',
                           output_dir='output')
 
     def test5(self):
         self.df.scatter_matrix('CCSA FIQ TOTSA TOTVOL'.split(),
                           diagonal='kde', alternate_labels=False,
-                          fname = 'scatter,4var,diag=kde,alternate_labels=False',
                           output_dir='output')
 
     def test6(self):
         self.df.scatter_matrix('CCSA HC FIQ TOTSA TOTVOL'.split(),
                           diagonal='kde', alternate_labels=False,
-                          fname = 'scatter,5var,diag=kde,alternate_labels=False',
                           output_dir='output')
-
 
 def suite():
     return unittest.TestSuite((

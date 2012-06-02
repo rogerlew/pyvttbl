@@ -22,7 +22,7 @@ from pyvttbl.plotting.support import \
      _bivariate_trend_fit, _tick_formatter, _subplots
 
 def scatter_matrix(df, variables, alpha=0.5, grid=False,
-                   diagonal=None, trend='power', alternate_labels=True,
+                   diagonal=None, trend='linear', alternate_labels=True,
                    fname=None, output_dir='', quality='medium', **kwds):
     """
     Plots a matrix of scatterplots
@@ -48,7 +48,7 @@ def scatter_matrix(df, variables, alpha=0.5, grid=False,
           trend :
              None:          no model fitting
         
-             'linear':      f(x) = a + b*x
+             'linear':      f(x) = a + b*x     (default)
         
              'exponential': f(x) = a * x**b
         
@@ -65,6 +65,15 @@ def scatter_matrix(df, variables, alpha=0.5, grid=False,
     """
 
    # code forked from pandas.tools.plotting
+
+    if diagonal!= None:
+        if diagonal.lower() in ['hist', 'histogram']:
+            diagonal = 'hist'
+
+        if diagonal.lower() in ['kernel', 'kde']:
+            diagonal = 'kde'
+    else:
+        diagonal = None
     
     n = len(variables)
     fig, axes = _subplots(nrows=n, ncols=n,
@@ -252,9 +261,15 @@ def scatter_matrix(df, variables, alpha=0.5, grid=False,
                 label.set_rotation(40) 
 
             axes[i, j].grid(b=grid)
-                   
+
     if fname == None:
-        fname = 'scatter_matrix(%s).png'%','.join(variables)
+        fname = 'scatter_matrix('
+        fname += '_X_'.join([str(f) for f in variables])
+        if diagonal != None:
+            fname += ',diagonal=' + diagonal
+        if not alternate_labels:
+            fname += ',alternate_labels=False'
+        fname += ').png'
 
     fname = os.path.join(output_dir, fname)
         

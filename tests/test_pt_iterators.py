@@ -25,18 +25,23 @@ class Test_pt_mathmethods__iter__(unittest.TestCase):
 
     def test1(self):
         
-        R =np.array([[7.16666666667, 6.5, 4.0],
-                     [3.22222222222, 2.88888888889, 1.55555555556]])
-        
+        R =["""\
+avg(ERROR)
+TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3 
+=============================================
+T1              7.167       6.500           4 """,
+"""\
+avg(ERROR)
+TIMEOFDAY   COURSE=C1   COURSE=C2   COURSE=C3 
+=============================================
+T2              3.222       2.889       1.556 """]
         df=DataFrame()
         df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
         pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
 
-        self.assertEqual(str(R.shape),str(pt.shape))
-
-        for r,L in zip(R.flatten(),pt.flatten()):
-            self.assertAlmostEqual(r,L)
-
+        for r,L in zip(R, pt):
+            self.assertAlmostEqual(r, str(L))
+            
     def test2(self):
         
         R =np.array([[ 7.16666667],
@@ -76,12 +81,16 @@ class Test_pt_mathmethods__iter__(unittest.TestCase):
 
     def test4(self):
         
-        R =["""[[10.0 8.0 6.0 8.0 7.0 4.0 -- -- --]
- [9.0 10.0 6.0 4.0 7.0 3.0 -- -- --]
- [7.0 6.0 3.0 4.0 5.0 2.0 3.0 4.0 2.0]]""","""\
-[[5.0 4.0 3.0 4.0 3.0 3.0 4.0 1.0 2.0]
- [4.0 3.0 3.0 4.0 2.0 2.0 3.0 3.0 2.0]
- [2.0 2.0 1.0 2.0 3.0 2.0 1.0 0.0 1.0]]"""]
+        R =["""\
+avg(ERROR)
+TIMEOFDAY                       COURSE=C1                                           COURSE=C2                                         COURSE=C3                   
+=================================================================================================================================================================
+T1          [10.0, 8.0, 6.0, 8.0, 7.0, 4.0, None, None, None]   [9.0, 10.0, 6.0, 4.0, 7.0, 3.0, None, None, None]   [7.0, 6.0, 3.0, 4.0, 5.0, 2.0, 3.0, 4.0, 2.0] """,
+"""\
+avg(ERROR)
+TIMEOFDAY                     COURSE=C1                                       COURSE=C2                                       COURSE=C3                   
+=========================================================================================================================================================
+T2          [5.0, 4.0, 3.0, 4.0, 3.0, 3.0, 4.0, 1.0, 2.0]   [4.0, 3.0, 3.0, 4.0, 2.0, 2.0, 3.0, 3.0, 2.0]   [2.0, 2.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0, 1.0] """]
         
         df=DataFrame()
         df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
@@ -89,6 +98,29 @@ class Test_pt_mathmethods__iter__(unittest.TestCase):
 
         for r,L in zip(R,pt):
             self.assertEqual(r, str(L))
+
+    def test5(self):
+        
+        R =["""\
+avg(ERROR)
+COURSE   TIMEOFDAY=T1   TIMEOFDAY=T2 
+====================================
+C1              7.167          3.222 ""","""\
+avg(ERROR)
+COURSE   TIMEOFDAY=T1   TIMEOFDAY=T2 
+====================================
+C2              6.500          2.889 ""","""\
+avg(ERROR)
+COURSE   TIMEOFDAY=T1   TIMEOFDAY=T2 
+====================================
+C3                  4          1.556 """]
+        
+        df=DataFrame()
+        df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
+        pt = df.pivot('ERROR', ['TIMEOFDAY'],['COURSE'])
+
+        for r,L in zip(R, pt.transpose()):
+            self.assertAlmostEqual(r, str(L))
             
 class Test_pt_mathmethods_flat(unittest.TestCase):
 

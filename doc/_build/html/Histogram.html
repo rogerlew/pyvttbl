@@ -53,7 +53,7 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">pyvttbl.stats.Histogram</span></tt> Overview</a><ul>
-<li><a class="reference internal" href="#example-using-dataframe">Example using DataFrame</a></li>
+<li><a class="reference internal" href="#example-using-dataframe-wrapper">Example using <tt class="docutils literal"><span class="pre">DataFrame</span></tt> wrapper</a></li>
 <li><a class="reference internal" href="#example-using-histogram-directly">Example using <tt class="docutils literal"><span class="pre">Histogram</span></tt> directly</a></li>
 </ul>
 </li>
@@ -61,10 +61,10 @@
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="Marginals.html"
-                        title="previous chapter"><tt class="docutils literal"><span class="pre">pyvttbl.stats.Marginals</span></tt> Overview</a></p>
+                        title="previous chapter"><tt class="docutils literal docutils literal"><span class="pre">pyvttbl.stats.Marginals</span></tt> Overview</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="Correlation.html"
-                        title="next chapter"><tt class="docutils literal"><span class="pre">pyvttbl.stats.Correlation</span></tt> Overview</a></p>
+                        title="next chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">pyvttbl.stats.Correlation</span></tt> Overview</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/Histogram.txt"
@@ -94,8 +94,8 @@
   <div class="section" id="pyvttbl-stats-histogram-overview">
 <h1><a class="reference internal" href="stats.html#pyvttbl.stats.Histogram" title="pyvttbl.stats.Histogram"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.Histogram</span></tt></a> Overview<a class="headerlink" href="#pyvttbl-stats-histogram-overview" title="Permalink to this headline">¶</a></h1>
 <p>Used to calculate histogram counts (no plotting).</p>
-<div class="section" id="example-using-dataframe">
-<h2>Example using DataFrame<a class="headerlink" href="#example-using-dataframe" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="example-using-dataframe-wrapper">
+<h2>Example using <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> wrapper<a class="headerlink" href="#example-using-dataframe-wrapper" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data/words~ageXcondition.csv&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="s">&#39;WORDS&#39;</span><span class="p">)</span>

@@ -74,7 +74,7 @@ def interaction_plot(df, val, xaxis,
              {'low' | 'medium' | 'high'} specifies image file dpi
     
           yerr:
-             {float, 'ci', 'se', 'sem'} designates errorbars across
+             {float, 'ci', 'stdev', 'sem'} designates errorbars across
              datapoints in all subplots
     """
 
@@ -436,10 +436,14 @@ def interaction_plot(df, val, xaxis,
     # 10. Save the figure
     ##############################################################
     if fname == None:
-        fname = maintitle.lower() \
-                         .replace('by', '~') \
-                         .replace('*', 'X') \
-                         .replace(' ', '')
+        fname = 'interaction_plot(%s'%val
+        factors = [xaxis,seplines,sepxplots,sepyplots]
+        fname += '~' + '_X_'.join([str(f) for f in factors if f != None])
+        if aggregate != None:
+            fname += ',yerr=' + aggregate
+        elif yerr != None:
+            fname += ',yerr=' + str(yerr[0])
+        fname += ').png'
 
     fname = os.path.join(output_dir, fname)
     

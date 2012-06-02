@@ -3,22 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pyvttbl's documentation!
-===================================
+   
+pyvttbl Documentation Table of Contents
+========================================
 
-Pivot tables (also called contingency tables and cross tabulation tables) 
-are a powerful means of data visualization and data summarization. When 
-dealing with large data sets with multiple variables, or multiple 
-datasets manually manipulating the pivot tables in WYSIWYG (what you see 
-is what you get) spreadsheets can quickly become troublesome and error 
-prone. In these instances it becomes preferred or even necessary to use 
-a YAFIYGI (you ask for it you got it) model to automate all or part of 
-the data summarization process.
+    :Release: |version|
+    :Date: |today|
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 0
 
    install
    quick-start
@@ -33,11 +28,14 @@ the data summarization process.
    ChiSquare1way
    ChiSquare2way
    Ttest
+   box_plot
+   histogram_plot
+   interaction_plot
+   scatter_plot
+   scatter_matrix
    plotting
    stats
    
-
-
 Indices and tables
 ==================
 

@@ -14,11 +14,10 @@ Options to install pyvttbl
 1.  Acquire pyvttbl from PyPi
 
     1. get `setuptools <http://pypi.python.org/pypi/setuptools/>`_
-    2. run easy_install -Z pyvttbl
+    2. run easy_install pyvttbl
 	
     .. note::
-        The "-Z" flag is optional and tells easy_install to install the 
-        packaged unzipped
+        the module should install un-zipped
 		
 2.  Install from source
 
@@ -33,14 +32,7 @@ Options to install pyvttbl
 		
     2. `Obtain source from PyPi <http://pypi.python.org/pypi/pyvttbl/>`_
 	3. Unzip
-	4. Run "setup.py install" or "setup.py develop"
-	
-        .. note::
-	
-             The develop command will install the package unzipped by 
-             essentially telling Python about your packages location. In your 
-             site-packages directory it creates a egg-info file that points to
-             where you unzipped the source. 
+	4. Run "setup.py install" 
 	
 To develop pyvttbl you should also have:
 

@@ -491,9 +491,13 @@ class DataFrame(OrderedDict):
               None
               
            returns:
-           |   returns True if all the items are equal
-           |   returns False otherwise
+              returns True if all the items are equal
+           
+              returns False otherwise
         """
+        if len(self) < 2:
+            return True
+        
         # if self is not empty
         counts = map(len, self.values())
         if all(c - counts[0] + 1 == 1 for c in counts):
@@ -1709,8 +1713,8 @@ class DataFrame(OrderedDict):
                         aggregate='tolist',
                         where=where)
         for L in pt:
-            list_of_lists.append(list(L[0]))
-
+            list_of_lists.append(L.flatten().tolist())
+        
         # build list of condiitons
         conditions_list = [tup[1] for [tup] in pt.rnames]
 
@@ -2271,18 +2275,10 @@ class PyvtTbl(np.ma.MaskedArray, object):
             return eval('np.ma.array(%s, mask=%s)'%\
                         (repr(obj.tolist()), repr(obj.mask)))
 
+    # this is so Sphinx can find it
     def __iter__(self):
-        
-        for i in _xrange(self.shape[0]):
-            obj = self[i]
-            
-            if _isfloat(obj):
-                yield obj
-
-            else:
-                yield eval('np.ma.array(%s, mask=%s)'%\
-                            (repr(obj.tolist()), repr(obj.mask.tolist())))
-
+        return super(PyvtTbl, self).__iter__()
+    
     __iter__.__doc__ = np.ma.MaskedArray.__iter__.__doc__
 
     def ndenumerate(self):
@@ -2340,8 +2336,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
             header = [',\n'.join('%s=%s'%(f, c) for (f, c) in L) \
                       for L in self.cnames]
             
-
-            if self[0,:].shape[0] == 1:
+            if self.ndim == 2:
                 rdata = self[0,:].flatten().tolist()
             else:
                 rdata = [self[0,j].flatten().tolist()
@@ -2368,7 +2363,8 @@ class PyvtTbl(np.ma.MaskedArray, object):
                 header.append(',\n'.join('%s=%s'%(f, c) for (f, c) in L))
             
             for i, L in enumerate(self.rnames):
-                if self[i,:].shape[0] == 1:
+                
+                if self.ndim == 2:
                     rdata =[c for (f, c) in L] + self[i,:].flatten().tolist()
                 else:
                     rdata = [self[i,j].flatten().tolist()
@@ -2379,6 +2375,22 @@ class PyvtTbl(np.ma.MaskedArray, object):
         return df
 
     def __getitem__(self, indx):
+        """
+        Return the item described by indx, as a PyvtTbl
+
+           args:
+              indx: index to array
+                    can be int, tuple(int, int), tuple(slice, int),
+                    tuple(int, slice) or tuple(slice, slice)
+
+                    x[int] <==> x[int,:]
+
+           returns:
+              PyvtTbl that is at least 2-dimensional
+              (unless indx is tuple(int, int))
+
+        |   x.__getitem__(indx) <==> x[indx]
+        """
 
         # x[i] <==> x[i,:] <==> x[i, slice(None, None, None)]
         if _isint(indx) or isinstance(indx, slice):
@@ -2397,13 +2409,24 @@ class PyvtTbl(np.ma.MaskedArray, object):
                 n = 1
             else:
                 n = len(self.cnames[indx[1]])
-        
-            if obj.ndim == 1 and self.ndim == 2:
+
+##            print(self.ndim, self.shape)
+##            print(obj.ndim, obj.shape)
+##            print((m,n))
+##            print()
+##            
+            if np.prod(obj.shape) == m*n:
                 obj = np.reshape(obj, (m,n))
 
-            if obj.ndim == 1 and self.ndim == 3:
+            else:
                 obj = np.reshape(obj, (m,n,-1))
-                
+        
+##            if obj.ndim == 1 and self.ndim == 2:
+##                obj = np.reshape(obj, (m,n))
+##
+##            if obj.ndim == 1 and self.ndim == 3:
+##                obj = np.reshape(obj, (m,n,-1))
+##                
             obj.rnames = self.rnames[indx[0]]
             obj.cnames = self.cnames[indx[1]]
 
@@ -2463,7 +2486,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
             tt.set_cols_dtype(['a'] * (len(self.cnames)+show_grand_tot))
             tt.set_cols_align(['r'] * (len(self.cnames)+show_grand_tot))
 
-            if self[0,:].shape[0] == 1:
+            if self.ndim == 2:
                 tt.add_row(self[0,:].flatten().tolist()+
                            ([],[self.grand_tot])[show_grand_tot])
             else:
@@ -2520,7 +2543,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
                 
             else:
                 for i, L in enumerate(self.rnames):
-                    if self[i,:].shape[0] == 1:
+                    if self.ndim == 2:
                         tt.add_row([c for (f, c) in L] +
                                    self[i,:].flatten().tolist())
                     else:
@@ -2688,4 +2711,4 @@ class PyvtTbl(np.ma.MaskedArray, object):
 ##df['first']='Roger Bosco Megan John Jane'.split()
 ##df['last']='Lew Robinson Whittington Smith Doe'.split()
 ##df['age']=[28,5,26,51,49]
-##df['gender']=['male','male','male','female','female']
+##df['gender']=['male','male','male','female','fem

@@ -25,7 +25,7 @@ class Test_del_item(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
         self.df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-        print(self.df)
+    
         del self.df['COURSE']
 
     def test0(self):

@@ -36,7 +36,7 @@ class Test_box_plot(unittest.TestCase):
                    16.0, 12.0, 11.0, 20.0, 16.0, 16.0, 15.0, 18.0, 16.0,
                    20.0, 22.0, 14.0, 19.0, 21.0, 19.0, 17.0, 15.0, 22.0,
                    16.0, 22.0, 22.0, 18.0, 21.0],
-             'fname': 'output\\box(words).png',
+             'fname': 'output\\box(WORDS).png',
              'maintitle': 'WORDS',
              'val': 'WORDS'}
         
@@ -64,7 +64,7 @@ class Test_box_plot(unittest.TestCase):
                               14, 11, 18, 14, 13, 22, 17, 16, 12, 11,
                               20, 16, 16, 15, 18, 16, 20, 22, 14, 19,
                               21, 19, 17, 15, 22, 16, 22, 22, 18, 21])],
-             'fname': 'output\\box(words).png',
+             'fname': 'output\\box(WORDS~AGE).png',
              'maintitle': 'WORDS by AGE',
              'xlabels': [u'AGE = old', u'AGE = young']}
         
@@ -92,7 +92,7 @@ class Test_box_plot(unittest.TestCase):
                    np.array([20, 16, 16, 15, 18, 16, 20, 22, 14, 19]),
                    np.array([21, 19, 17, 15, 22, 16, 22, 22, 18, 21]),
                    np.array([10,  7,  8, 10,  4,  7, 10,  6,  7,  7])],
-             'fname': 'output\\box(words).png',
+             'fname': 'output\\box(WORDS~AGE_X_CONDITION).png',
              'maintitle': 'WORDS by AGE * CONDITION',
              'xlabels': [u'AGE = old\nCONDITION = adjective',
                          u'AGE = old\nCONDITION = counting',

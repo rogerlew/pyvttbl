@@ -111,7 +111,7 @@ def box_plot(df, val, factors=None, where=None,
         xticks = pylab.xticks()[0]
         xlabels = ['\n'.join('%s = %s'%fc for fc in c) for c in D.rnames]
         pylab.xticks(xticks, xlabels,
-                     rotation='vertical',
+                     rotation=35,
                      verticalalignment='top')
 
         test['d'] = [np.array(_flatten(d)) for d in D]
@@ -130,7 +130,10 @@ def box_plot(df, val, factors=None, where=None,
     test['maintitle'] = maintitle
         
     if fname == None:
-        fname = 'box(%s).png'%val.lower()
+        fname = 'box(%s'%val
+        if factors != []:
+            fname += '~' + '_X_'.join([str(f) for f in factors])
+        fname += ').png'
 
     fname = os.path.join(output_dir, fname)
     

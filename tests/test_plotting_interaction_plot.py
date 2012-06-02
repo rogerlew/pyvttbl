@@ -22,11 +22,12 @@ from pyvttbl.plotting import interaction_plot
 from pyvttbl.misc.support import *
 
 class Test_interaction_plot(unittest.TestCase):
-    # TODO: check checking
+    
     def test0(self):
+        """no error bars specified"""
         R = {'aggregate': None,
              'clevels': [1],
-             'fname': 'output\\words~ageXcondition',
+             'fname': 'output\\interaction_plot(WORDS~AGE_X_CONDITION).png',
              'maintitle': 'WORDS by AGE * CONDITION',
              'numcols': 1,
              'numrows': 1,
@@ -69,11 +70,73 @@ class Test_interaction_plot(unittest.TestCase):
         for d,r in zip(np.array(D['yerr']).flat,
                        np.array(R['yerr']).flat):
             self.assertAlmostEqual(d,r)
+            
+    def test01(self):
+        """confidence interval error bars specified"""
         
+        R = {'aggregate': 'ci',
+             'clevels': [1],
+             'fname': 'output\\interaction_plot(WORDS~AGE_X_CONDITION,yerr=95% ci).png',
+             'maintitle': 'WORDS by AGE * CONDITION',
+             'numcols': 1,
+             'numrows': 1,
+             'rlevels': [1],
+             'subplot_titles': [''],
+             'xmaxs': [1.5],
+             'xmins': [-0.5],
+             'y': [[[11.0, 14.8],
+                    [7.0, 6.5],
+                    [13.4, 17.6],
+                    [12.0, 19.3],
+                    [6.9, 7.6]]],
+             'yerr': [[]],
+             'ymin': 0.0,
+             'ymax': 27.183257964740832}
+        
+        # a simple plot
+        df=DataFrame()
+        df.TESTMODE=True
+        df.read_tbl('data/words~ageXcondition.csv')
+        D=df.interaction_plot('WORDS','AGE',
+                              seplines='CONDITION',
+                              output_dir='output',
+                              yerr='ci')
+
+        self.assertEqual(D['aggregate'],      R['aggregate'])
+        self.assertEqual(D['clevels'],        R['clevels'])
+        self.assertEqual(D['rlevels'],        R['rlevels'])
+        self.assertEqual(D['numcols'],        R['numcols'])
+        self.assertEqual(D['numrows'],        R['numrows'])
+        self.assertEqual(D['fname'],          R['fname'])
+        self.assertEqual(D['maintitle'],      R['maintitle'])
+        self.assertEqual(D['subplot_titles'], R['subplot_titles'])
+        self.assertAlmostEqual(D['ymin'],     R['ymin'])
+        self.assertAlmostEqual(D['ymax'],     R['ymax'])
+
+        for d,r in zip(np.array(D['y']).flat,
+                       np.array(R['y']).flat):
+            self.assertAlmostEqual(d,r)
+
+        for d,r in zip(np.array(D['yerr']).flat,
+                       np.array(R['yerr']).flat):
+            self.assertAlmostEqual(d,r)
+
+            
+    def test02(self):
+        """using loftus and masson error bars"""
+        
+        # a simple plot
+        df=DataFrame()
+        df.read_tbl('data/words~ageXcondition.csv')
+        aov = df.anova('WORDS', wfactors=['AGE','CONDITION'])
+        aov.plot('WORDS','AGE', seplines='CONDITION',
+                 errorbars='ci', output_dir='output')
+
+
     def test1(self):
         R = {'aggregate': None,
              'clevels': ['M1', 'M2', 'M3'],
-             'fname': 'output\\error~timeofdayXcourseXmodel',
+             'fname': 'output\\interaction_plot(ERROR~TIMEOFDAY_X_COURSE_X_MODEL,yerr=1.0).png',
              'maintitle': 'ERROR by TIMEOFDAY * COURSE * MODEL',
              'numcols': 3,
              'numrows': 1,
@@ -128,7 +191,7 @@ class Test_interaction_plot(unittest.TestCase):
     def test2(self):
         R = {'aggregate': 'ci',
              'clevels': [1],
-             'fname': 'output\\suppression~cycleXageXphase',
+             'fname': 'output\\interaction_plot(SUPPRESSION~CYCLE_X_AGE_X_PHASE,yerr=95% ci).png',
              'maintitle': 'SUPPRESSION by CYCLE * AGE * PHASE',
              'numcols': 1,
              'numrows': 2,
@@ -255,7 +318,7 @@ class Test_interaction_plot(unittest.TestCase):
                          'imagery',
                          'intention',
                          'rhyming'],
-             'fname': 'output\\words~ageXcondition',
+             'fname': 'output\\interaction_plot(WORDS~AGE_X_CONDITION).png',
              'maintitle': 'WORDS by AGE * CONDITION',
              'numcols': 5,
              'numrows': 1,
@@ -306,7 +369,7 @@ class Test_interaction_plot(unittest.TestCase):
     def test5(self):
         R = {'aggregate': None,
              'clevels': ['M1', 'M2', 'M3'],
-             'fname': 'output\\error~timeofdayXmodel',
+             'fname': 'output\\interaction_plot(ERROR~TIMEOFDAY_X_MODEL,yerr=1.0).png',
              'maintitle': 'ERROR by TIMEOFDAY * MODEL',
              'numcols': 3,
              'numrows': 1,
@@ -352,7 +415,7 @@ class Test_interaction_plot(unittest.TestCase):
     def test6(self):
         R = {'aggregate': 'ci',
              'clevels': [1],
-             'fname': 'output\\suppression~cycleXphase',
+             'fname': 'output\\interaction_plot(SUPPRESSION~CYCLE_X_PHASE,yerr=95% ci).png',
              'maintitle': 'SUPPRESSION by CYCLE * PHASE',
              'numcols': 1,
              'numrows': 2,
@@ -398,7 +461,7 @@ class Test_interaction_plot(unittest.TestCase):
     def test7(self):
         R = {'aggregate': 'ci',
              'clevels': ['I', 'II'],
-             'fname': 'output\\suppression~cycleXphaseXgroup',
+             'fname': 'output\\interaction_plot(SUPPRESSION~CYCLE_X_PHASE_X_GROUP,yerr=95% ci).png',
              'maintitle': 'SUPPRESSION by CYCLE * PHASE * GROUP',
              'numcols': 2,
              'numrows': 2,

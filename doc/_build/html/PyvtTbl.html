@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
-    <link rel="next" title="pyvttbl.stats.Correlation Overview" href="Correlation.html" />
+    <link rel="next" title="pyvttbl.stats.Descriptives Overview" href="Descriptives.html" />
     <link rel="prev" title="pyvttbl.DataFrame Overview" href="DataFrame.html" /> 
   </head>
   <body>
@@ -40,7 +40,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="Correlation.html" title="pyvttbl.stats.Correlation Overview"
+          <a href="Descriptives.html" title="pyvttbl.stats.Descriptives Overview"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="DataFrame.html" title="pyvttbl.DataFrame Overview"
@@ -64,8 +64,8 @@
   <p class="topless"><a href="DataFrame.html"
                         title="previous chapter"><tt class="docutils literal docutils literal"><span class="pre">pyvttbl.DataFrame</span></tt> Overview</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="Correlation.html"
-                        title="next chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">pyvttbl.stats.Correlation</span></tt> Overview</a></p>
+  <p class="topless"><a href="Descriptives.html"
+                        title="next chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">pyvttbl.stats.Descriptives</span></tt> Overview</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/PyvtTbl.txt"
@@ -143,6 +143,32 @@ listed here may not been have extensively tested.</p>
 <dt id="pyvttbl.PyvtTbl.transpose">
 <tt class="descclassname">PyvtTbl.</tt><tt class="descname">transpose</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.transpose" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a transposed PyvtTbl object</p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="method">
+<dt id="pyvttbl.PyvtTbl.__getitem__">
+<tt class="descclassname">PyvtTbl.</tt><tt class="descname">__getitem__</tt><big>(</big><em>indx</em><big>)</big><a class="headerlink" href="#pyvttbl.PyvtTbl.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the item described by indx, as a PyvtTbl</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>args:</dt>
+<dd><dl class="first last docutils">
+<dt>indx: index to array</dt>
+<dd><p class="first">can be int, tuple(int, int), tuple(slice, int),
+tuple(int, slice) or tuple(slice, slice)</p>
+<p class="last">x[int] &lt;==&gt; x[int,:]</p>
+</dd>
+</dl>
+</dd>
+<dt>returns:</dt>
+<dd>PyvtTbl that is at least 2-dimensional
+(unless indx is tuple(int, int))</dd>
+</dl>
+</div></blockquote>
+<div class="line-block">
+<div class="line">x.__getitem__(indx) &lt;==&gt; x[indx]</div>
+</div>
 </dd></dl>
 
 <hr class="docutils" />
@@ -367,7 +393,7 @@ class ndarray is returned.</dd>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="Correlation.html" title="pyvttbl.stats.Correlation Overview"
+          <a href="Descriptives.html" title="pyvttbl.stats.Descriptives Overview"
              >next</a> |</li>
         <li class="right" >
           <a href="DataFrame.html" title="pyvttbl.DataFrame Overview"

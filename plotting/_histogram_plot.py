@@ -54,7 +54,12 @@ def histogram_plot(df, val, where=None, bins=10,
     pylab.title(val)
 
     if fname == None:
-        fname = 'hist(%s).png'%val.lower()
+        fname = 'hist(%s'%val
+        if cumulative:
+            fname += ',cumulative=True'
+        if density:
+            fname += ',density=True'
+        fname += ').png'
     
     fname = os.path.join(output_dir, fname)
     
