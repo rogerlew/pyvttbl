@@ -1,0 +1,231 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyvttbl.plotting.interaction_plot() Overview &mdash; pyvttbl v 0.5.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
+    <link rel="next" title="pyvttbl.plotting API" href="plotting.html" />
+    <link rel="prev" title="pyvttbl.plotting.histogram_plot() Overview" href="histogram_plot.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="pyvttbl.plotting API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="histogram_plot.html" title="pyvttbl.plotting.histogram_plot() Overview"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">pyvttbl.plotting.interaction_plot()</span></tt> Overview</a><ul>
+<li><a class="reference internal" href="#way-interaction-plot">2 way interaction plot</a></li>
+<li><a class="reference internal" href="#example-with-a-single-factor">Example with a single factor</a></li>
+<li><a class="reference internal" href="#example-with-error-bars">Example with error bars</a></li>
+<li><a class="reference internal" href="#error-bars-for-repeated-measures-experiments">Error bars for repeated-measures experiments</a></li>
+<li><a class="reference internal" href="#example-with-separate-horizontal-subplots">Example with separate horizontal subplots</a></li>
+<li><a class="reference internal" href="#example-with-separate-horizontal-and-vertical-subplots">Example with separate horizontal and vertical subplots</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="histogram_plot.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">pyvttbl.plotting.histogram_plot()</span></tt> Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="plotting.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">pyvttbl.plotting</span></tt> API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/interaction_plot.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyvttbl-plotting-interaction-plot-overview">
+<h1><a class="reference internal" href="plotting.html#pyvttbl.plotting.interaction_plot" title="pyvttbl.plotting.interaction_plot"><tt class="xref py py-meth docutils literal"><span class="pre">pyvttbl.plotting.interaction_plot()</span></tt></a> Overview<a class="headerlink" href="#pyvttbl-plotting-interaction-plot-overview" title="Permalink to this headline">¶</a></h1>
+<p>Produces interaction plots from the specified parameters</p>
+<div class="section" id="way-interaction-plot">
+<h2>2 way interaction plot<a class="headerlink" href="#way-interaction-plot" title="Permalink to this headline">¶</a></h2>
+<p>Two argumennts are required. The first specifies the dependent variable
+and the second specifies the variable to use on the x-axis.</p>
+<p>This example also specifies that the &#8216;CONDITION&#8217; factor should be
+seperated.</p>
+</div>
+<div class="section" id="example-with-a-single-factor">
+<h2>Example with a single factor<a class="headerlink" href="#example-with-a-single-factor" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data/words~ageXcondition.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">interaction_plot</span><span class="p">(</span><span class="s">&#39;WORDS&#39;</span><span class="p">,</span><span class="s">&#39;AGE&#39;</span><span class="p">,</span>
+<span class="go">                        seplines=&#39;CONDITION&#39;)</span>
+</pre></div>
+</div>
+<p>produces &#8216;interaction_plot(WORDS~AGE_X_CONDITION).png&#8217;</p>
+<img alt="interaction_plot(WORDS~AGE_X_CONDITION).png" class="align-center" src="_images/interaction_plot(WORDS~AGE_X_CONDITION).png" style="width: 600px; height: 500px;" />
+</div>
+<div class="section" id="example-with-error-bars">
+<h2>Example with error bars<a class="headerlink" href="#example-with-error-bars" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>yerr</cite> keyword controls the errorbars that are placed on
+the plot. It can be None, a float, &#8216;ci&#8217;, &#8216;stdev&#8217;, or &#8216;sem&#8217;.</p>
+<p>&#8216;ci&#8217; =&gt; 95% confidence intervals</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data/words~ageXcondition.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">interaction_plot</span><span class="p">(</span><span class="s">&#39;WORDS&#39;</span><span class="p">,</span><span class="s">&#39;AGE&#39;</span><span class="p">,</span>
+<span class="go">                        seplines=&#39;CONDITION&#39;,</span>
+<span class="go">                        yerr=&#39;ci&#39;)</span>
+</pre></div>
+</div>
+<p>produces &#8216;interaction_plot(WORDS~AGE_X_CONDITION,yerr=ci).png&#8217;</p>
+<img alt="interaction_plot(WORDS~AGE_X_CONDITION,yerr=ci).png" class="align-center" src="_images/interaction_plot(WORDS~AGE_X_CONDITION,yerr=ci).png" style="width: 600px; height: 500px;" />
+</div>
+<div class="section" id="error-bars-for-repeated-measures-experiments">
+<h2>Error bars for repeated-measures experiments<a class="headerlink" href="#error-bars-for-repeated-measures-experiments" title="Permalink to this headline">¶</a></h2>
+<p>If the data reflect a repeated measures design the error bars found by
+<tt class="xref py py-meth docutils literal"><span class="pre">interaction_plot()</span></tt> will actually be conservative due to the fact
+they do not take into account within-subject variability. <a class="footnote-reference" href="#id3" id="id1">[1]</a>, <a class="footnote-reference" href="#id4" id="id2">[2]</a> .</p>
+<p>In such circumstances the <cite>recommended</cite> method for constructing
+interaction plots is to run an analysis of variance using <tt class="xref py py-class docutils literal"><span class="pre">Anova</span></tt>
+and use <tt class="xref py py-class docutils literal"><span class="pre">Anova</span></tt>. <tt class="xref py py-meth docutils literal"><span class="pre">plot()</span></tt>. The <tt class="xref py py-class docutils literal"><span class="pre">Anova</span></tt> class will calculate
+the appropriate error bars based on the specified main effect or interaction.
+By default it uses the highest order main-effect/interaction specified by the
+factors of xaxis, seplines, sepxplots, and sepyplots.</p>
+<p>Here is an example of how you would go about doing this.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data/words~ageXcondition.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aov</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">anova</span><span class="p">(</span><span class="s">&#39;WORDS&#39;</span><span class="p">,</span> <span class="n">wfactors</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;AGE&#39;</span><span class="p">,</span><span class="s">&#39;CONDITION&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aov</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s">&#39;WORDS&#39;</span><span class="p">,</span><span class="s">&#39;AGE&#39;</span><span class="p">,</span> <span class="n">seplines</span><span class="o">=</span><span class="s">&#39;CONDITION&#39;</span><span class="p">,</span>
+<span class="go">             errorbars=&#39;ci&#39;, output_dir=&#39;output&#39;)</span>
+</pre></div>
+</div>
+<p>produces &#8216;interaction_plot(WORDS~AGE_X_CONDITION,yerr=0.319836724826).png&#8217;</p>
+<img alt="interaction_plot(WORDS~AGE_X_CONDITION,yerr=0.319836724826).png" class="align-center" src="_images/interaction_plot(WORDS~AGE_X_CONDITION,yerr=0.319836724826).png" style="width: 600px; height: 500px;" />
+</div>
+<div class="section" id="example-with-separate-horizontal-subplots">
+<h2>Example with separate horizontal subplots<a class="headerlink" href="#example-with-separate-horizontal-subplots" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data\suppression~subjectXgroupXageXcycleXphase.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">interaction_plot</span><span class="p">(</span><span class="s">&#39;SUPPRESSION&#39;</span><span class="p">,</span><span class="s">&#39;CYCLE&#39;</span><span class="p">,</span>
+<span class="go">                        seplines=&#39;AGE&#39;,</span>
+<span class="go">                        sepxplots=&#39;PHASE&#39;,</span>
+<span class="go">                        yerr=&#39;ci&#39;)</span>
+</pre></div>
+</div>
+<p>produces &#8216;interaction_plot(SUPPRESSION~CYCLE_X_AGE_X_PHASE,yerr=ci).png&#8217;</p>
+<img alt="interaction_plot(SUPPRESSION~CYCLE_X_AGE_X_PHASE,yerr=ci).png" class="align-center" src="_images/interaction_plot(SUPPRESSION~CYCLE_X_AGE_X_PHASE,yerr=ci).png" style="width: 600px; height: 250px;" />
+</div>
+<div class="section" id="example-with-separate-horizontal-and-vertical-subplots">
+<h2>Example with separate horizontal and vertical subplots<a class="headerlink" href="#example-with-separate-horizontal-and-vertical-subplots" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data\suppression~subjectXgroupXageXcycleXphase.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">interaction_plot</span><span class="p">(</span><span class="s">&#39;SUPPRESSION&#39;</span><span class="p">,</span><span class="s">&#39;CYCLE&#39;</span><span class="p">,</span>
+<span class="go">                        seplines=&#39;AGE&#39;,</span>
+<span class="go">                        sepxplots=&#39;GROUP&#39;,</span>
+<span class="go">                        sepyplots=&#39;PHASE&#39;,</span>
+<span class="go">                        yerr=&#39;sem&#39;)</span>
+</pre></div>
+</div>
+<p>produces &#8216;interaction_plot(SUPPRESSION~CYCLE_X_AGE_X_GROUP_X_PHASE,yerr=sem).png&#8217;</p>
+<img alt="interaction_plot(SUPPRESSION~CYCLE_X_AGE_X_GROUP_X_PHASE,yerr=sem).png" class="align-center" src="_images/interaction_plot(SUPPRESSION~CYCLE_X_AGE_X_GROUP_X_PHASE,yerr=sem).png" style="width: 800px; height: 400px;" />
+<hr class="docutils" />
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Loftus, G. R., &amp; Masson, M. E.  (1994).
+Using confidence intervals in within-subject designs.
+Psychonomic Bulletin &amp; Review, 1(4), 476-490.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Masson, M. E. J., &amp; Loftus, G. R.  (2003).
+Using confidence intervals for graphically based data interpretation.
+Canadian Journal of Experimental Psychology, 57(3), 203-220.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="pyvttbl.plotting API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="histogram_plot.html" title="pyvttbl.plotting.histogram_plot() Overview"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,146 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyvttbl.plotting.scatter_plot() Overview &mdash; pyvttbl v 0.5.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
+    <link rel="next" title="pyvttbl.plotting API" href="plotting.html" />
+    <link rel="prev" title="pyvttbl.plotting.interaction_plot() Overview" href="interaction_plot.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="pyvttbl.plotting API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="interaction_plot.html" title="pyvttbl.plotting.interaction_plot() Overview"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">pyvttbl.plotting.scatter_plot()</span></tt> Overview</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#example-with-power-trend-fit">Example with power trend fit</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="interaction_plot.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">pyvttbl.plotting.interaction_plot()</span></tt> Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="plotting.html"
+                        title="next chapter"><tt class="docutils literal docutils literal"><span class="pre">pyvttbl.plotting</span></tt> API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/scatter_plot.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyvttbl-plotting-scatter-plot-overview">
+<h1><a class="reference internal" href="plotting.html#pyvttbl.plotting.scatter_plot" title="pyvttbl.plotting.scatter_plot"><tt class="xref py py-meth docutils literal"><span class="pre">pyvttbl.plotting.scatter_plot()</span></tt></a> Overview<a class="headerlink" href="#pyvttbl-plotting-scatter-plot-overview" title="Permalink to this headline">¶</a></h1>
+<p>Produces a scatter_plot with optional trend fitting</p>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data/iqbrainsize.txt&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">scatter_plot</span><span class="p">(</span><span class="s">&#39;TOTVOL&#39;</span><span class="p">,</span> <span class="s">&#39;FIQ&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>produces &#8216;scatter(TOTVOL_X_FIQ).png&#8217;</p>
+<img alt="scatter(TOTVOL_X_FIQ).png" class="align-center" src="_images/scatter(TOTVOL_X_FIQ).png" style="width: 400px; height: 400px;" />
+</div>
+<div class="section" id="example-with-power-trend-fit">
+<h2>Example with power trend fit<a class="headerlink" href="#example-with-power-trend-fit" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">scatter_plot</span><span class="p">(</span><span class="s">&#39;TOTVOL&#39;</span><span class="p">,</span> <span class="s">&#39;FIQ&#39;</span><span class="p">,</span> <span class="n">trend</span><span class="o">=</span><span class="s">&#39;power&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>produces &#8216;scatter(TOTVOL_X_FIQ,trend=power).png&#8217;</p>
+<img alt="scatter(TOTVOL_X_FIQ,trend=power).png" class="align-center" src="_images/scatter(TOTVOL_X_FIQ,trend=power).png" style="width: 400px; height: 400px;" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="pyvttbl.plotting API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="interaction_plot.html" title="pyvttbl.plotting.interaction_plot() Overview"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
