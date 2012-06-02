@@ -1,0 +1,181 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyvttbl.stats.Correlation Overview &mdash; pyvttbl v 0.5.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
+    <link rel="next" title="pyvttbl.stats.Anova Overview" href="Anova.html" />
+    <link rel="prev" title="pyvttbl.PyvtTbl" href="PyvtTbl.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Anova.html" title="pyvttbl.stats.Anova Overview"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="PyvtTbl.html" title="pyvttbl.PyvtTbl"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">pyvttbl.stats.Correlation</span></tt> Overview</a><ul>
+<li><a class="reference internal" href="#example-using-dataframe-object">Example using <cite>DataFrame</cite> object</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="PyvtTbl.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">pyvttbl.PyvtTbl</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Anova.html"
+                        title="next chapter"><tt class="docutils literal docutils literal"><span class="pre">pyvttbl.stats.Anova</span></tt> Overview</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Correlation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyvttbl-stats-correlation-overview">
+<h1><a class="reference internal" href="stats.html#pyvttbl.stats.Correlation" title="pyvttbl.stats.Correlation"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.Correlation</span></tt></a> Overview<a class="headerlink" href="#pyvttbl-stats-correlation-overview" title="Permalink to this headline">¶</a></h1>
+<p><cite>Correlation</cite> is capable of performing pearson, spearman, kendalltau, or pointbiserial
+correlations between multiple variables. Printing the object will output coefficients,
+and non-familywise error corrected 2-tail p-values. Larzelere and Mulaik step down
+Significance testing is also performed.</p>
+<div class="section" id="example-using-dataframe-object">
+<h2>Example using <cite>DataFrame</cite> object<a class="headerlink" href="#example-using-dataframe-object" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mi">24</span><span class="p">,</span><span class="mi">61</span><span class="p">,</span><span class="mi">59</span><span class="p">,</span><span class="mi">46</span><span class="p">,</span><span class="mi">43</span><span class="p">,</span><span class="mi">44</span><span class="p">,</span><span class="mi">52</span><span class="p">,</span><span class="mi">43</span><span class="p">,</span><span class="mi">58</span><span class="p">,</span><span class="mi">67</span><span class="p">,</span><span class="mi">62</span><span class="p">,</span><span class="mi">57</span><span class="p">,</span><span class="mi">71</span><span class="p">,</span><span class="mi">49</span><span class="p">,</span><span class="mi">54</span><span class="p">,</span><span class="mi">43</span><span class="p">,</span><span class="mi">53</span><span class="p">,</span><span class="mi">57</span><span class="p">,</span><span class="mi">49</span><span class="p">,</span><span class="mi">56</span><span class="p">,</span><span class="mi">33</span><span class="p">]</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s">&#39;B&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">42.93472681237495</span><span class="p">,</span>  <span class="mf">78.87307334936268</span><span class="p">,</span>  <span class="mf">75.37292628918023</span><span class="p">,</span>
+         <span class="mf">65.49076317291956</span><span class="p">,</span>  <span class="mf">55.55965179772366</span><span class="p">,</span>  <span class="mf">56.777730638998236</span><span class="p">,</span>
+         <span class="mf">62.19451880792437</span><span class="p">,</span>  <span class="mf">54.73710611356715</span><span class="p">,</span>  <span class="mf">72.10021832823149</span><span class="p">,</span>
+         <span class="mf">85.94377749485642</span><span class="p">,</span>  <span class="mf">78.2087578930983</span><span class="p">,</span>   <span class="mf">72.01681829338037</span><span class="p">,</span>
+         <span class="mf">84.27889316830063</span><span class="p">,</span>  <span class="mf">60.20516982367225</span><span class="p">,</span>  <span class="mf">65.6276497088971</span><span class="p">,</span>
+         <span class="mf">62.36549856901088</span><span class="p">,</span>  <span class="mf">69.18772114281175</span><span class="p">,</span>  <span class="mf">67.00548667483324</span><span class="p">,</span>
+         <span class="mf">59.042687027269466</span><span class="p">,</span> <span class="mf">71.99214593063917</span><span class="p">,</span>  <span class="mf">45.00831155783992</span><span class="p">]</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">53.05540625388731</span><span class="p">,</span> <span class="o">-</span><span class="mf">96.33996451998567</span><span class="p">,</span>  <span class="o">-</span><span class="mf">92.32465861908086</span><span class="p">,</span>
+         <span class="o">-</span><span class="mf">70.90536432779966</span><span class="p">,</span> <span class="o">-</span><span class="mf">55.953777697739255</span><span class="p">,</span> <span class="o">-</span><span class="mf">74.12814626217357</span><span class="p">,</span>
+         <span class="o">-</span><span class="mf">75.89188834814621</span><span class="p">,</span> <span class="o">-</span><span class="mf">64.24093256012688</span><span class="p">,</span>  <span class="o">-</span><span class="mf">89.62208010083313</span><span class="p">,</span>
+         <span class="o">-</span><span class="mf">87.41075066046812</span><span class="p">,</span> <span class="o">-</span><span class="mf">80.40932820298143</span><span class="p">,</span>  <span class="o">-</span><span class="mf">77.99906284144805</span><span class="p">,</span>
+         <span class="o">-</span><span class="mf">95.31607277596169</span><span class="p">,</span> <span class="o">-</span><span class="mf">61.672429800914486</span><span class="p">,</span> <span class="o">-</span><span class="mf">85.26088499198657</span><span class="p">,</span>
+         <span class="o">-</span><span class="mf">63.4402296673869</span><span class="p">,</span>  <span class="o">-</span><span class="mf">74.84950736563589</span><span class="p">,</span>  <span class="o">-</span><span class="mf">85.00433219746624</span><span class="p">,</span>
+         <span class="o">-</span><span class="mf">71.5901436929124</span><span class="p">,</span>  <span class="o">-</span><span class="mf">76.43243666219388</span><span class="p">,</span>  <span class="o">-</span><span class="mf">48.01082320924727</span><span class="p">]</span>
+
+<span class="n">cor</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">correlation</span><span class="p">([</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;B&#39;</span><span class="p">,</span><span class="s">&#39;C&#39;</span><span class="p">],</span><span class="n">coefficient</span><span class="o">=</span><span class="s">&#39;spearman&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">cor</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>Bivariate Correlations
+
+                         A           B           C
+======================================================
+A   spearman                 1       0.958      -0.924
+    Sig (2-tailed)           .   9.699e-12   2.259e-09
+    N                       21          21          21
+------------------------------------------------------
+B   spearman             0.958           1      -0.890
+    Sig (2-tailed)   9.699e-12           .       0.000
+    N                       21          21          21
+------------------------------------------------------
+C   spearman            -0.924      -0.890           1
+    Sig (2-tailed)   2.259e-09       0.000           .
+    N                       21          21          21
+
+Larzelere and Mulaik Significance Testing
+
+ Pair     i   Correlation       P       alpha/(k-i+1)   Sig.
+============================================================
+A vs. B   1         0.958   9.699e-12           0.017   **
+A vs. C   2         0.924   2.259e-09           0.025   **
+B vs. C   3         0.890   6.850e-08           0.050   **</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Anova.html" title="pyvttbl.stats.Anova Overview"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="PyvtTbl.html" title="pyvttbl.PyvtTbl"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

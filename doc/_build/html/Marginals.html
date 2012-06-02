@@ -1,0 +1,150 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyvttbl.stats.Marginals Overview &mdash; pyvttbl v 0.5.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
+    <link rel="next" title="pyvttbl.stats.Marginals Overview" href="Histogram.html" />
+    <link rel="prev" title="pyvttbl.stats.Descriptives Overview" href="Descriptives.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Histogram.html" title="pyvttbl.stats.Marginals Overview"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Descriptives.html" title="pyvttbl.stats.Descriptives Overview"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">pyvttbl.stats.Marginals</span></tt> Overview</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Descriptives.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">pyvttbl.stats.Descriptives</span></tt> Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Histogram.html"
+                        title="next chapter"><tt class="docutils literal docutils literal"><span class="pre">pyvttbl.stats.Marginals</span></tt> Overview</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Marginals.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyvttbl-stats-marginals-overview">
+<h1><a class="reference internal" href="stats.html#pyvttbl.stats.Marginals" title="pyvttbl.stats.Marginals"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.Marginals</span></tt></a> Overview<a class="headerlink" href="#pyvttbl-stats-marginals-overview" title="Permalink to this headline">¶</a></h1>
+<p>Used to calculate marginal descriptive statistics.</p>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>To calculate marginals we first need to get data into a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data/words~ageXcondition.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">marginals</span><span class="p">(</span><span class="s">&#39;WORDS&#39;</span><span class="p">,</span><span class="n">factors</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;AGE&#39;</span><span class="p">,</span><span class="s">&#39;CONDITION&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+<span class="go">AGE    CONDITION    Mean    Count   Std.    95% CI   95% CI</span>
+<span class="go">                                    Error   lower    upper</span>
+<span class="go">============================================================</span>
+<span class="go">old     adjective   11.000   10      0.789    9.454   12.546</span>
+<span class="go">old     counting     7.000   10      0.577    5.868    8.132</span>
+<span class="go">old     imagery     13.400   10      1.424   10.610   16.190</span>
+<span class="go">old     intention   12.000   10      1.183    9.681   14.319</span>
+<span class="go">old     rhyming      6.900   10      0.674    5.579    8.221</span>
+<span class="go">young   adjective   14.800   10      1.104   12.637   16.963</span>
+<span class="go">young   counting     6.500   10      0.453    5.611    7.389</span>
+<span class="go">young   imagery     17.600   10      0.819   15.994   19.206</span>
+<span class="go">young   intention   19.300   10      0.844   17.646   20.954</span>
+<span class="go">young   rhyming      7.600   10      0.618    6.388    8.812</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Histogram.html" title="pyvttbl.stats.Marginals Overview"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Descriptives.html" title="pyvttbl.stats.Descriptives Overview"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

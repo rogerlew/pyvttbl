@@ -1,0 +1,231 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyvttbl.stats.ChiSquare2way Overview &mdash; pyvttbl v 0.5.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
+    <link rel="next" title="pyvttbl.plotting API" href="plotting.html" />
+    <link rel="prev" title="pyvttbl.stats.ChiSquare1way Overview" href="ChiSquare1way.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="pyvttbl.plotting API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ChiSquare1way.html" title="pyvttbl.stats.ChiSquare1way Overview"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">pyvttbl.stats.ChiSquare2way</span></tt> Overview</a><ul>
+<li><a class="reference internal" href="#a-2-x-2-example">A 2 x 2 example</a></li>
+<li><a class="reference internal" href="#a-2-x-3-example">A 2 x 3 example</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ChiSquare1way.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">pyvttbl.stats.ChiSquare1way</span></tt> Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="plotting.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">pyvttbl.plotting</span></tt> API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/ChiSquare2way.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyvttbl-stats-chisquare2way-overview">
+<h1><a class="reference internal" href="stats.html#pyvttbl.stats.ChiSquare2way" title="pyvttbl.stats.ChiSquare2way"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.ChiSquare2way</span></tt></a> Overview<a class="headerlink" href="#pyvttbl-stats-chisquare2way-overview" title="Permalink to this headline">¶</a></h1>
+<p><tt class="xref py py-class docutils literal"><span class="pre">ChiSquare2way</span></tt> conducts a two-sample chi-squared test on a list of frequencies.</p>
+<div class="section" id="a-2-x-2-example">
+<h2>A 2 x 2 example<a class="headerlink" href="#a-2-x-2-example" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref py py-class docutils literal"><span class="pre">ChiSquare2way</span></tt> needs the data in a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> with one
+observation per row. Once it is in a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> the user just has to
+specify the row factor and the column factor.</p>
+<p>In this example we use a  <tt class="xref py py-mod docutils literal"><span class="pre">collections</span></tt>. <tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt> object
+to build the DataFrame from frequency counts.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">collection</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="p">[</span><span class="s">&#39;FAULTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">Low</span><span class="o">=</span><span class="mi">177</span><span class="p">,</span><span class="n">High</span><span class="o">=</span><span class="mi">181</span><span class="p">)</span><span class="o">.</span><span class="n">elements</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="p">[</span><span class="s">&#39;FAULTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;FAULTS&#39;</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c"># reverse &#39;FAULT&#39; data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="p">[</span><span class="s">&#39;VERDICT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">Guilty</span><span class="o">=</span><span class="mi">153</span><span class="p">,</span> <span class="n">NotGuilty</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span><span class="o">.</span><span class="n">elements</span><span class="p">())</span> <span class="o">+</span> \
+<span class="go">                    list(Counter(Guilty=105, NotGuilty=76).elements())</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x2</span><span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">chisquare2way</span><span class="p">(</span><span class="s">&#39;FAULTS&#39;</span><span class="p">,</span><span class="s">&#39;VERDICT&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+<span class="go">Chi-Square: two Factor</span>
+
+<span class="go">SUMMARY</span>
+<span class="go">         Guilty     NotGuilty   Total</span>
+<span class="go">=====================================</span>
+<span class="go">High          105          76     181</span>
+<span class="go">        (130.441)    (50.559)</span>
+<span class="go">Low           153          24     177</span>
+<span class="go">        (127.559)    (49.441)</span>
+<span class="go">=====================================</span>
+<span class="go">Total         258         100     358</span>
+
+<span class="go">SYMMETRIC MEASURES</span>
+<span class="go">                          Value    Approx.</span>
+<span class="go">                                    Sig.</span>
+<span class="go">===========================================</span>
+<span class="go">Cramer&#39;s V                0.317   8.686e-10</span>
+<span class="go">Contingency Coefficient   0.302   5.510e-09</span>
+<span class="go">N of Valid Cases            358</span>
+
+<span class="go">CHI-SQUARE TESTS</span>
+<span class="go">                        Value    df       P</span>
+<span class="go">===============================================</span>
+<span class="go">Pearson Chi-Square      35.930    1   2.053e-09</span>
+<span class="go">Continuity Correction   34.532    1   4.201e-09</span>
+<span class="go">Likelihood Ratio        37.351    1           0</span>
+<span class="go">N of Valid Cases           358</span>
+
+<span class="go">CHI-SQUARE POST-HOC POWER</span>
+<span class="go">       Measure</span>
+<span class="go">==============================</span>
+<span class="go">Effect size w            0.317</span>
+<span class="go">Non-centrality lambda   35.930</span>
+<span class="go">Critical Chi-Square      3.841</span>
+<span class="go">Power                    1.000</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-2-x-3-example">
+<h2>A 2 x 3 example<a class="headerlink" href="#a-2-x-3-example" title="Permalink to this headline">¶</a></h2>
+<p>Here a different approach is taken to get the data into the <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rfactors</span><span class="o">=</span> <span class="p">[</span><span class="s">&#39;Countrol&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">903</span> <span class="o">+</span> <span class="p">[</span><span class="s">&#39;Message&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">869</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfactors</span><span class="o">=</span> <span class="p">[</span><span class="s">&#39;Trash Can&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">41</span> <span class="o">+</span> <span class="p">[</span><span class="s">&#39;Litter&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">385</span> <span class="o">+</span> <span class="p">[</span><span class="s">&#39;Removed&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">477</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfactors</span><span class="o">+=</span><span class="p">[</span><span class="s">&#39;Trash Can&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">80</span> <span class="o">+</span> <span class="p">[</span><span class="s">&#39;Litter&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">290</span> <span class="o">+</span> <span class="p">[</span><span class="s">&#39;Removed&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">499</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x2</span><span class="o">=</span> <span class="n">ChiSquare2way</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x2</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">rfactors</span><span class="p">,</span> <span class="n">cfactors</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+
+<span class="go">Chi-Square: two Factor</span>
+
+<span class="go">SUMMARY</span>
+<span class="go">            Litter      Removed    Trash Can   Total</span>
+<span class="go">====================================================</span>
+<span class="go">Countrol         385         477          41     903</span>
+<span class="go">           (343.976)   (497.363)    (61.661)</span>
+<span class="go">Message          290         499          80     869</span>
+<span class="go">           (331.024)   (478.637)    (59.339)</span>
+<span class="go">====================================================</span>
+<span class="go">Total            675         976         121    1772</span>
+
+<span class="go">SYMMETRIC MEASURES</span>
+<span class="go">                          Value    Approx.</span>
+<span class="go">                                    Sig.</span>
+<span class="go">===========================================</span>
+<span class="go">Cramer&#39;s V                0.121   3.510e-07</span>
+<span class="go">Contingency Coefficient   0.120   4.263e-07</span>
+<span class="go">N of Valid Cases           1772</span>
+
+<span class="go">CHI-SQUARE TESTS</span>
+<span class="go">                     Value    df       P</span>
+<span class="go">============================================</span>
+<span class="go">Pearson Chi-Square   25.794    2   2.506e-06</span>
+<span class="go">Likelihood Ratio     26.056    2   2.198e-06</span>
+<span class="go">N of Valid Cases       1772</span>
+
+<span class="go">CHI-SQUARE POST-HOC POWER</span>
+<span class="go">       Measure</span>
+<span class="go">==============================</span>
+<span class="go">Effect size w            0.121</span>
+<span class="go">Non-centrality lambda   25.794</span>
+<span class="go">Critical Chi-Square      5.991</span>
+<span class="go">Power                    0.997</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="pyvttbl.plotting API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ChiSquare1way.html" title="pyvttbl.stats.ChiSquare1way Overview"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

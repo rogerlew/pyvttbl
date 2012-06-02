@@ -1,0 +1,211 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyvttbl.stats.Descriptives Overview &mdash; pyvttbl v 0.5.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
+    <link rel="next" title="pyvttbl.stats.Correlation Overview" href="Correlation.html" />
+    <link rel="prev" title="pyvttbl.PyvtTbl" href="PyvtTbl.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Correlation.html" title="pyvttbl.stats.Correlation Overview"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="PyvtTbl.html" title="pyvttbl.PyvtTbl"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">pyvttbl.stats.Descriptives</span></tt> Overview</a><ul>
+<li><a class="reference internal" href="#using-class-directly">Using class directly</a></li>
+<li><a class="reference internal" href="#using-dataframe-wrapper">Using DataFrame wrapper</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="PyvtTbl.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">pyvttbl.PyvtTbl</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Correlation.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">pyvttbl.stats.Correlation</span></tt> Overview</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Descriptives.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyvttbl-stats-descriptives-overview">
+<h1><a class="reference internal" href="stats.html#pyvttbl.stats.Descriptives" title="pyvttbl.stats.Descriptives"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.Descriptives</span></tt></a> Overview<a class="headerlink" href="#pyvttbl-stats-descriptives-overview" title="Permalink to this headline">¶</a></h1>
+<p>This class calculates, reports, and stores summary statistics.</p>
+<div class="section" id="using-class-directly">
+<h2>Using class directly<a class="headerlink" href="#using-class-directly" title="Permalink to this headline">¶</a></h2>
+<p>Here we examine data sampled from a normal distribution with
+a mean of 0 and a standard deviation of 1.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl.stats</span> <span class="kn">import</span> <span class="n">Descriptives</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">normalvariate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">desc</span> <span class="o">=</span> <span class="n">Descriptives</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">desc</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">normalvariate</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1000</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+<span class="go">Descriptive Statistics</span>
+
+<span class="go">==========================</span>
+<span class="go"> count        1000.000</span>
+<span class="go"> mean            0.025</span>
+<span class="go"> mode           -0.182</span>
+<span class="go"> var             0.934</span>
+<span class="go"> stdev           0.967</span>
+<span class="go"> sem             0.031</span>
+<span class="go"> rms             0.966</span>
+<span class="go"> min            -2.863</span>
+<span class="go"> Q1             -0.589</span>
+<span class="go"> median          0.004</span>
+<span class="go"> Q3              0.681</span>
+<span class="go"> max             3.467</span>
+<span class="go"> range           6.330</span>
+<span class="go"> 95ci_lower     -0.035</span>
+<span class="go"> 95ci_upper      0.085</span>
+</pre></div>
+</div>
+<p><tt class="xref py py-class docutils literal"><span class="pre">Descriptives</span></tt> objects inherent <tt class="xref py py-mod docutils literal"><span class="pre">collections</span></tt>. <tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">desc</span>
+<span class="go">Descriptives([(&#39;count&#39;, 1000.0),</span>
+<span class="go">              (&#39;mean&#39;, 0.025036481568892106),</span>
+<span class="go">              (&#39;mode&#39;, -0.18188273915666869),</span>
+<span class="go">              (&#39;var&#39;, 0.93438245182138646),</span>
+<span class="go">              (&#39;stdev&#39;, 0.9666346009849774),</span>
+<span class="go">              (&#39;sem&#39;, 0.030567670042405695),</span>
+<span class="go">              (&#39;rms&#39;, 0.9664755013857896),</span>
+<span class="go">              (&#39;min&#39;, -2.8632575029784033),</span>
+<span class="go">              (&#39;Q1&#39;, -0.58880378505312103),</span>
+<span class="go">              (&#39;median&#39;, 0.0040778734181358472),</span>
+<span class="go">              (&#39;Q3&#39;, 0.68105047745497083),</span>
+<span class="go">              (&#39;max&#39;, 3.4671371053896305),</span>
+<span class="go">              (&#39;range&#39;, 6.3303946083680334),</span>
+<span class="go">              (&#39;95ci_lower&#39;, -0.034876151714223057),</span>
+<span class="go">              (&#39;95ci_upper&#39;, 0.084949114852007263)],</span>
+<span class="go">              cname=&#39;&#39;)</span>
+</pre></div>
+</div>
+<p>This means data can be accessed as if the descriptive statistics were stored in a dict.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">desc</span><span class="p">[</span><span class="s">&#39;var&#39;</span><span class="p">]</span>
+<span class="go">0.93438245182138646</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-dataframe-wrapper">
+<h2>Using DataFrame wrapper<a class="headerlink" href="#using-dataframe-wrapper" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">desc</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">descriptives</span><span class="p">(</span><span class="s">&#39;ERROR&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+<span class="go">Descriptive Statistics</span>
+<span class="go">  ERROR</span>
+<span class="go">==========================</span>
+<span class="go"> count        48.000</span>
+<span class="go"> mean          3.896</span>
+<span class="go"> mode          3.000</span>
+<span class="go"> var           5.797</span>
+<span class="go"> stdev         2.408</span>
+<span class="go"> sem           0.348</span>
+<span class="go"> rms           4.567</span>
+<span class="go"> min           0.000</span>
+<span class="go"> Q1            2.000</span>
+<span class="go"> median        3.000</span>
+<span class="go"> Q3            5.000</span>
+<span class="go"> max          10.000</span>
+<span class="go"> range        10.000</span>
+<span class="go"> 95ci_lower    3.215</span>
+<span class="go"> 95ci_upper    4.577</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Correlation.html" title="pyvttbl.stats.Correlation Overview"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="PyvtTbl.html" title="pyvttbl.PyvtTbl"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

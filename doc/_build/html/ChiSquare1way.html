@@ -1,0 +1,293 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyvttbl.stats.ChiSquare1way Overview &mdash; pyvttbl v 0.5.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     'v 0.5.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
+    <link rel="next" title="pyvttbl.stats.ChiSquare2way Overview" href="ChiSquare2way.html" />
+    <link rel="prev" title="pyvttbl.stats.Anova1way Overview" href="Anova1way.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ChiSquare2way.html" title="pyvttbl.stats.ChiSquare2way Overview"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Anova1way.html" title="pyvttbl.stats.Anova1way Overview"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">pyvttbl.stats.ChiSquare1way</span></tt> Overview</a><ul>
+<li><a class="reference internal" href="#a-simple-example">A simple example</a></li>
+<li><a class="reference internal" href="#running-analysis-from-a-dataframe">Running analysis from a DataFrame</a></li>
+<li><a class="reference internal" href="#direct-access-to-results">Direct access to results</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Anova1way.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">pyvttbl.stats.Anova1way</span></tt> Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ChiSquare2way.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">pyvttbl.stats.ChiSquare2way</span></tt> Overview</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/ChiSquare1way.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyvttbl-stats-chisquare1way-overview">
+<h1><a class="reference internal" href="stats.html#pyvttbl.stats.ChiSquare1way" title="pyvttbl.stats.ChiSquare1way"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.ChiSquare1way</span></tt></a> Overview<a class="headerlink" href="#pyvttbl-stats-chisquare1way-overview" title="Permalink to this headline">¶</a></h1>
+<p><tt class="xref py py-class docutils literal"><span class="pre">ChiSquare1way</span></tt> conducts a chi-squared test on a list of frequencies.</p>
+<div class="section" id="a-simple-example">
+<h2>A simple example<a class="headerlink" href="#a-simple-example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl.stats</span> <span class="kn">import</span> <span class="n">ChiSquare1way</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x2</span> <span class="o">=</span> <span class="n">ChiSquare1way</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x2</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="mi">17</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+<span class="go">Chi-Square: Single Factor</span>
+
+<span class="go">SUMMARY</span>
+<span class="go">           A    B    C    D    E    F</span>
+<span class="go">======================================</span>
+<span class="go">Observed   17   19   18   20   32   20</span>
+<span class="go">Expected   21   21   21   21   21   21</span>
+
+<span class="go">CHI-SQUARE TESTS</span>
+<span class="go">                     Value   df     P</span>
+<span class="go">=======================================</span>
+<span class="go">Pearson Chi-Square   7.238    5   0.204</span>
+<span class="go">Likelihood Ratio     6.517    5   0.259</span>
+<span class="go">Observations           126</span>
+
+<span class="go">POST-HOC POWER</span>
+<span class="go">       Measure</span>
+<span class="go">==============================</span>
+<span class="go">Effect size w            0.240</span>
+<span class="go">Non-centrality lambda    7.238</span>
+<span class="go">Critical Chi-Square     11.070</span>
+<span class="go">Power                    0.516</span>
+</pre></div>
+</div>
+<p>If only one argument is provided the expected counts are assumed to be
+evenly distributed amongst the possible outcomes. Unequal expected outcomes
+can be specified using the <cite>expected</cite> keyword.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x2</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="mi">17</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">expected</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">102</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+<span class="go">Chi-Square: Single Factor</span>
+
+<span class="go">SUMMARY</span>
+<span class="go">           A    B    C    D    E     F</span>
+<span class="go">=======================================</span>
+<span class="go">Observed   17   19   18   20   32    20</span>
+<span class="go">Expected   10   10   10   10   10   102</span>
+
+<span class="go">CHI-SQUARE TESTS</span>
+<span class="go">                      Value    df   P</span>
+<span class="go">=====================================</span>
+<span class="go">Pearson Chi-Square   143.722    5   0</span>
+<span class="go">Likelihood Ratio     100.590    5   0</span>
+<span class="go">Observations             126</span>
+
+<span class="go">POST-HOC POWER</span>
+<span class="go">       Measure</span>
+<span class="go">===============================</span>
+<span class="go">Effect size w             1.068</span>
+<span class="go">Non-centrality lambda   143.722</span>
+<span class="go">Critical Chi-Square      11.070</span>
+<span class="go">Power                         1</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>Meaningful column labels can also be supplied to the analysis.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">x2</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="mi">17</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">conditions_list</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Chi-Square: Single Factor</p>
+<dl class="docutils">
+<dt>SUMMARY</dt>
+<dd>1    2    3    4    5    6</dd>
+</dl>
+<dl class="docutils">
+<dt>CHI-SQUARE TESTS</dt>
+<dd>Value   df     P</dd>
+</dl>
+<p>Observations           126</p>
+<dl class="docutils">
+<dt>POST-HOC POWER</dt>
+<dd>Measure</dd>
+</dl>
+<p>Critical Chi-Square     11.070
+Power                    0.516
+&gt;&gt;&gt;</p>
+</div>
+<div class="section" id="running-analysis-from-a-dataframe">
+<h2>Running analysis from a DataFrame<a class="headerlink" href="#running-analysis-from-a-dataframe" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> has a wrapper method for conducting a one-way chi-squared
+analysis. It assumes the data is denote individual categorical events and
+will calculate the frequencies for the user.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span> <span class="c"># simulate a 6-sided die</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">_xrange</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+<span class="go">    df.insert([(&#39;roll&#39;,i), (&#39;outcome&#39;, randint(1,6))])</span>
+<span class="gp">...</span>
+<span class="go">SyntaxError: invalid syntax</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">_xrange</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+<span class="go">    df.insert([(&#39;roll&#39;,i), (&#39;outcome&#39;, randint(1,6))])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">descriptives</span><span class="p">(</span><span class="s">&#39;outcome&#39;</span><span class="p">))</span>
+<span class="go">Descriptive Statistics</span>
+<span class="go">  outcome</span>
+<span class="go">==========================</span>
+<span class="go"> count        1000.000</span>
+<span class="go"> mean            3.536</span>
+<span class="go"> mode            5.000</span>
+<span class="go"> var             2.960</span>
+<span class="go"> stdev           1.720</span>
+<span class="go"> sem             0.054</span>
+<span class="go"> rms             3.932</span>
+<span class="go"> min             1.000</span>
+<span class="go"> Q1              2.000</span>
+<span class="go"> median          4.000</span>
+<span class="go"> Q3              5.000</span>
+<span class="go"> max             6.000</span>
+<span class="go"> range           5.000</span>
+<span class="go"> 95ci_lower      3.429</span>
+<span class="go"> 95ci_upper      3.643</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">chisquare1way</span><span class="p">(</span><span class="s">&#39;outcome&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+<span class="go">Chi-Square: Single Factor</span>
+
+<span class="go">SUMMARY</span>
+<span class="go">              1         2         3         4         5         6</span>
+<span class="go">====================================================================</span>
+<span class="go">Observed       164       172       147       169       177       171</span>
+<span class="go">Expected   166.667   166.667   166.667   166.667   166.667   166.667</span>
+
+<span class="go">CHI-SQUARE TESTS</span>
+<span class="go">                     Value   df     P</span>
+<span class="go">=======================================</span>
+<span class="go">Pearson Chi-Square   3.320    5   0.651</span>
+<span class="go">Likelihood Ratio     3.402    5   0.638</span>
+<span class="go">Observations          1000</span>
+
+<span class="go">POST-HOC POWER</span>
+<span class="go">       Measure</span>
+<span class="go">==============================</span>
+<span class="go">Effect size w            0.058</span>
+<span class="go">Non-centrality lambda    3.320</span>
+<span class="go">Critical Chi-Square     11.070</span>
+<span class="go">Power                    0.244</span>
+</pre></div>
+</div>
+<p>And we fail to reject the null.</p>
+</div>
+<div class="section" id="direct-access-to-results">
+<h2>Direct access to results<a class="headerlink" href="#direct-access-to-results" title="Permalink to this headline">¶</a></h2>
+<p>Like many of the <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt> objects <tt class="xref py py-class docutils literal"><span class="pre">ChiSquare1way</span></tt>
+inherents an <tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ChiSquare1way</span><span class="p">([(</span><span class="s">&#39;chisq&#39;</span><span class="p">,</span> <span class="mf">7.238095238095238</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">,</span> <span class="mf">0.20352651555710358</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;df&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;lnchisq&#39;</span><span class="p">,</span> <span class="mf">6.517343547697185</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;lnp&#39;</span><span class="p">,</span> <span class="mf">0.25907994276152624</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;lndf&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;N&#39;</span><span class="p">,</span> <span class="mi">126</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="mf">0.23967728365938887</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;lambda&#39;</span><span class="p">,</span> <span class="mf">7.238095238095237</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;crit_chi2&#39;</span><span class="p">,</span> <span class="mf">11.070497693516351</span><span class="p">),</span>
+               <span class="p">(</span><span class="s">&#39;power&#39;</span><span class="p">,</span> <span class="mf">0.51617215660330651</span><span class="p">)],</span>
+               <span class="n">conditions_list</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ChiSquare2way.html" title="pyvttbl.stats.ChiSquare2way Overview"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Anova1way.html" title="pyvttbl.stats.Anova1way Overview"
+             >previous</a> |</li>
+        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Roger Lew.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
