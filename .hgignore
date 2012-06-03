@@ -1,0 +1,5 @@
+syntax: glob
+doc/_logo/Thumbs.db
+doc/_static/Thumbs.db
+stats/ols.py
+tests/Thumbs.db
