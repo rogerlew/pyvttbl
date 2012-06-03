@@ -14,24 +14,24 @@ df['data'] = data1+data2
 df['conditions'] = ['A']*len(data1)+['B']*len(data2)
 
 # visually verify data in DataFrame
-print df
+print(df)
 
 # run 1 way analysis of variance
 # returns another dict-like object
 aov = df.anova1way('data', 'conditions')
 
 # print anova results
-print aov
+print(aov)
 
 # this is just to show the data in the aov object
-print aov.keys()
+print(aov.keys())
 
 # calculate omega-squared
 aov['omega-sq'] = (aov['ssbn'] - aov['dfbn']*aov['mswn']) / \
                   (aov['ssbn'] + aov['sswn'] + aov['mswn'])
 
 # you can access the results this way
-print aov['omega-sq']
-print aov['f']
-print aov['p']
+print(aov['omega-sq'])
+print(aov['f'])
+print(aov['p'])
 
