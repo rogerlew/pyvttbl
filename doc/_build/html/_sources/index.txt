@@ -4,12 +4,7 @@
    contain the root `toctree` directive.
 
 Table of Contents
-========================================
-    
-    :Release: |version|
-    :Date: |today|
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=================
 
 .. toctree::
    :maxdepth: 0

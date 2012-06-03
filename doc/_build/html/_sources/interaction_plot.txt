@@ -1,5 +1,5 @@
-:meth:`pyvttbl.plotting.interaction_plot` Overview
-=================================================
+interaction_plot
+================
 
 Produces interaction plots from the specified parameters
 

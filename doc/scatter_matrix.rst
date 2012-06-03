@@ -1,5 +1,5 @@
-:meth:`pyvttbl.plotting.scatter_matrix` Overview
-=================================================
+scatter_matrix
+==============
 
 Produces a scatter_matrix with optional trend fitting 
 histograms, and Gaussian kernel density estimation.

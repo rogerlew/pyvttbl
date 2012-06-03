@@ -1,5 +1,5 @@
-Installing pyvttbl
-================
+Installation
+============
 
 The requirements for using pyvttbl are:
 

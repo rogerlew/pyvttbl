@@ -1,4 +1,4 @@
-:class:`pyvttbl.stats.Descriptives` Overview
+Descriptives
 ==============================================
 
 This class calculates, reports, and stores summary statistics.

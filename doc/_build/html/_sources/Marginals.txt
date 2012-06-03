@@ -1,4 +1,4 @@
-:class:`pyvttbl.stats.Marginals` Overview
+Marginals
 ==============================================
 
 Used to calculate marginal descriptive statistics.

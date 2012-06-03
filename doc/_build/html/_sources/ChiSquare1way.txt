@@ -1,4 +1,4 @@
-:class:`pyvttbl.stats.ChiSquare1way` Overview
+ChiSquare1way
 ==========================================
 
 :class:`ChiSquare1way` conducts a chi-squared test on a list of frequencies.

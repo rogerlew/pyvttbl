@@ -1,4 +1,4 @@
-:class:`pyvttbl.stats.Histogram` Overview
+Histogram
 ==============================================
 
 Used to calculate histogram counts (no plotting).

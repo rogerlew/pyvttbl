@@ -1,5 +1,5 @@
-:class:`pyvttbl.DataFrame` Overview
-=====================================
+DataFrame Overview
+==================
 
 Description
 -----------

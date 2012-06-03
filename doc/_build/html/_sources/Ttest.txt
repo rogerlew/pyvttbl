@@ -1,4 +1,4 @@
-:class:`pyvttbl.stats.Ttest` Overview
+Ttest
 ==============================================
 This class is capable of performing 1 sample, paired 
 2 sample, and equal and unequal independent sample t-tests.

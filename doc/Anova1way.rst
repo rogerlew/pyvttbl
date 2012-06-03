@@ -1,4 +1,4 @@
-:class:`pyvttbl.stats.Anova1way` Overview
+Anova1way
 ==========================================
 
 `Anova1way` performs a single factor between analysis of variance.

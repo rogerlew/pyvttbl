@@ -1,4 +1,4 @@
-:class:`pyvttbl.stats.Correlation` Overview
+Correlation
 ======================================
 
 `Correlation` is capable of performing pearson, spearman, kendalltau, or pointbiserial 

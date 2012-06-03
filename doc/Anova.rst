@@ -1,4 +1,4 @@
-:class:`pyvttbl.stats.Anova` Overview
+Anova
 ======================================
 
 :class:`Anova` is capable of performing multiple factor between, within, and 

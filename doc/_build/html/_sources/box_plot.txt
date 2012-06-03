@@ -1,5 +1,5 @@
-:meth:`pyvttbl.plotting.box_plot` Overview
-=================================================
+box_plot
+========
 
 Produces a box plot over a factor or factors
 

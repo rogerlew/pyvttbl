@@ -1,4 +1,4 @@
-:class:`pyvttbl.stats.ChiSquare2way` Overview
+ChiSquare2way
 ==============================================
 
 :class:`ChiSquare2way` conducts a two-sample chi-squared test on a list of frequencies.

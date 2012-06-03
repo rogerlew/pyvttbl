@@ -1,5 +1,5 @@
-:meth:`pyvttbl.plotting.histogram_plot` Overview
-=================================================
+histogram_plot
+==============
 
 Produces a histogram plot
 

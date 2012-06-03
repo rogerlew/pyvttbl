@@ -1,4 +1,4 @@
-:class:`pyvttbl.PyvtTbl`
+PyvtTbl Overview
 =====================================
 
 Description

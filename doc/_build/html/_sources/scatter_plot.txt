@@ -1,5 +1,5 @@
-:meth:`pyvttbl.plotting.scatter_plot` Overview
-=================================================
+scatter_plot
+============
 
 Produces a scatter_plot with optional trend fitting
 
