@@ -14,16 +14,16 @@ Options to install pyvttbl
 1.  Acquire pyvttbl from PyPi
 
     1. get `setuptools <http://pypi.python.org/pypi/setuptools/>`_
-    2. run easy_install pyvttbl
+    2. run easy_install -U pyvttbl
 	
     .. note::
-        the module should install un-zipped
+        the module should install unzipped
 		
 2.  Install from source
 
-    1. You will also need to acquire `dictset 
-       <http://code.google.com/p/dictset/>`_ and `pystaggrelite3 
-       <http://code.google.com/p/py-st-a-ggre-lite3/>`_
+    1. You will also need to acquire 
+       `dictset <http://code.google.com/p/dictset/>`_ and 
+       `pystaggrelite3 <http://code.google.com/p/py-st-a-ggre-lite3/>`_
 	   
     .. note::
 	

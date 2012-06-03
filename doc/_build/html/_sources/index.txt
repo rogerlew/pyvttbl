@@ -3,9 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-pyvttbl Documentation Table of Contents
+Table of Contents
 ========================================
-
+    
     :Release: |version|
     :Date: |today|
 
