@@ -27,9 +27,19 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
     <link rel="next" title="pyvttbl.PyvtTbl" href="PyvtTbl.html" />
-    <link rel="prev" title="Quick-Start Guide" href="quick-start.html" /> 
+    <link rel="prev" title="Quick-Start Guide" href="quick-start.html" />
+ 
+<style type="text/css">
+  table.right { float: right; margin-left: 20px; }
+  table.right td { border: 1px solid #ccc; }
+</style>
+
   </head>
   <body>
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<img src="_static/pyvttbl_logo.png" alt="pyvttbl logo" />
+</div>
+
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -45,7 +55,10 @@
         <li class="right" >
           <a href="quick-start.html" title="Quick-Start Guide"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+        <li><a href="http://code.google.com/p/pyvttbl/">pyvttbl home</a>&nbsp;|&nbsp;</li>
+        <li><a href="index.html">Documentation</a>
+          &raquo;</li>
+ 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -745,7 +758,7 @@ applied to the DataFrame before plotting</dd>
 <dt>quality:</dt>
 <dd>{&#8216;low&#8217; | &#8216;medium&#8217; | &#8216;high&#8217;} specifies image file dpi</dd>
 <dt>yerr:</dt>
-<dd>{float, &#8216;ci&#8217;, &#8216;se&#8217;, &#8216;sem&#8217;} designates errorbars across
+<dd>{float, &#8216;ci&#8217;, &#8216;stdev&#8217;, &#8216;sem&#8217;} designates errorbars across
 datapoints in all subplots</dd>
 </dl>
 </dd>
@@ -777,7 +790,7 @@ datapoints in all subplots</dd>
 </dd>
 <dt>trend :</dt>
 <dd><p class="first">None:          no model fitting</p>
-<p>&#8216;linear&#8217;:      f(x) = a + b*x</p>
+<p>&#8216;linear&#8217;:      f(x) = a + b*x     (default)</p>
 <p>&#8216;exponential&#8217;: f(x) = a * x**b</p>
 <p>&#8216;logarithmic&#8217;: f(x) = a * log(x) + b</p>
 <p>&#8216;polynomial&#8217;:  f(x) = a * x**2 + b*x + c</p>
@@ -1175,10 +1188,11 @@ with sqlite3.</p>
 <dl class="docutils">
 <dt>args:</dt>
 <dd>None</dd>
+<dt>returns:</dt>
+<dd><p class="first">returns True if all the items are equal</p>
+<p class="last">returns False otherwise</p>
+</dd>
 </dl>
-<p>returns:
-|   returns True if all the items are equal
-|   returns False otherwise</p>
 </dd></dl>
 
 <hr class="docutils" />
@@ -1292,7 +1306,10 @@ should contain value for the operator.</div>
         <li class="right" >
           <a href="quick-start.html" title="Quick-Start Guide"
              >previous</a> |</li>
-        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+        <li><a href="http://code.google.com/p/pyvttbl/">pyvttbl home</a>&nbsp;|&nbsp;</li>
+        <li><a href="index.html">Documentation</a>
+          &raquo;</li>
+ 
       </ul>
     </div>
     <div class="footer">

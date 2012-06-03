@@ -27,9 +27,19 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="pyvttbl v 0.5.1.0 documentation" href="index.html" />
     <link rel="next" title="pyvttbl.stats API" href="stats.html" />
-    <link rel="prev" title="pyvttbl.plotting.scatter_matrix() Overview" href="scatter_matrix.html" /> 
+    <link rel="prev" title="pyvttbl.plotting.scatter_matrix() Overview" href="scatter_matrix.html" />
+ 
+<style type="text/css">
+  table.right { float: right; margin-left: 20px; }
+  table.right td { border: 1px solid #ccc; }
+</style>
+
   </head>
   <body>
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<img src="_static/pyvttbl_logo.png" alt="pyvttbl logo" />
+</div>
+
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -45,7 +55,10 @@
         <li class="right" >
           <a href="scatter_matrix.html" title="pyvttbl.plotting.scatter_matrix() Overview"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+        <li><a href="http://code.google.com/p/pyvttbl/">pyvttbl home</a>&nbsp;|&nbsp;</li>
+        <li><a href="index.html">Documentation</a>
+          &raquo;</li>
+ 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -103,10 +116,165 @@ visualizing data in <tt class="xref py py-class docutils literal"><span class="p
 <p>Methods to get data into a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>, manipulate and manage data,
 and write data.</p>
 <hr class="docutils" />
+<dl class="staticmethod">
+<dt id="pyvttbl.plotting.box_plot">
+<em class="property">static </em><tt class="descclassname">plotting.</tt><tt class="descname">box_plot</tt><big>(</big><em>df</em>, <em>val</em>, <em>factors=None</em>, <em>where=None</em>, <em>fname=None</em>, <em>output_dir=''</em>, <em>quality='medium'</em><big>)</big><a class="headerlink" href="#pyvttbl.plotting.box_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a box plot</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd><dl class="first last docutils">
+<dt>df:</dt>
+<dd>a pyvttbl.DataFrame object</dd>
+<dt>val:</dt>
+<dd>the label of the dependent variable</dd>
+</dl>
+</dd>
+<dt>kwds:</dt>
+<dd><dl class="first last docutils">
+<dt>factors:</dt>
+<dd>a list of factors to include in boxplot</dd>
+<dt>where:</dt>
+<dd>a string, list of strings, or list of tuples
+applied to the DataFrame before plotting</dd>
+<dt>fname:</dt>
+<dd>output file name</dd>
+<dt>quality:</dt>
+<dd>{&#8216;low&#8217; | &#8216;medium&#8217; | &#8216;high&#8217;} specifies image file dpi</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 <hr class="docutils" />
+<dl class="staticmethod">
+<dt id="pyvttbl.plotting.histogram_plot">
+<em class="property">static </em><tt class="descclassname">plotting.</tt><tt class="descname">histogram_plot</tt><big>(</big><em>df</em>, <em>val</em>, <em>where=None</em>, <em>bins=10</em>, <em>range=None</em>, <em>density=False</em>, <em>cumulative=False</em>, <em>fname=None</em>, <em>output_dir=''</em>, <em>quality='medium'</em><big>)</big><a class="headerlink" href="#pyvttbl.plotting.histogram_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a histogram plot</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd>key: column label of dependent variable</dd>
+<dt>kwds:</dt>
+<dd><p class="first">where: criterion to apply to table before running analysis</p>
+<p>bins: number of bins (default = 10)</p>
+<p class="last">range: list of length 2 defining min and max bin edges</p>
+</dd>
+</dl>
+</dd></dl>
+
 <hr class="docutils" />
+<dl class="staticmethod">
+<dt id="pyvttbl.plotting.interaction_plot">
+<em class="property">static </em><tt class="descclassname">plotting.</tt><tt class="descname">interaction_plot</tt><big>(</big><em>df</em>, <em>val</em>, <em>xaxis</em>, <em>seplines=None</em>, <em>sepxplots=None</em>, <em>sepyplots=None</em>, <em>xmin='AUTO'</em>, <em>xmax='AUTO'</em>, <em>ymin='AUTO'</em>, <em>ymax='AUTO'</em>, <em>where=None</em>, <em>fname=None</em>, <em>output_dir=''</em>, <em>quality='low'</em>, <em>yerr=None</em><big>)</big><a class="headerlink" href="#pyvttbl.plotting.interaction_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>makes an interaction plot</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd><dl class="first last docutils">
+<dt>df:</dt>
+<dd>a pyvttbl.DataFrame object</dd>
+<dt>val:</dt>
+<dd>the label of the dependent variable</dd>
+<dt>xaxis:</dt>
+<dd>the label of the variable to place on the xaxis of each subplot</dd>
+</dl>
+</dd>
+<dt>kwds:</dt>
+<dd><dl class="first last docutils">
+<dt>seplines:</dt>
+<dd>label specifying seperate lines in each subplot</dd>
+<dt>sepxplots:</dt>
+<dd>label specifying seperate horizontal subplots</dd>
+<dt>sepyplots:</dt>
+<dd>label specifying separate vertical subplots</dd>
+<dt>xmin:</dt>
+<dd>(&#8216;AUTO&#8217; by default) minimum xaxis value across subplots</dd>
+<dt>xmax:</dt>
+<dd>(&#8216;AUTO&#8217; by default) maximum xaxis value across subplots</dd>
+<dt>ymin:</dt>
+<dd>(&#8216;AUTO&#8217; by default) minimum yaxis value across subplots</dd>
+<dt>ymax:</dt>
+<dd>(&#8216;AUTO&#8217; by default) maximum yaxis value across subplots</dd>
+<dt>where:</dt>
+<dd>a string, list of strings, or list of tuples
+applied to the DataFrame before plotting</dd>
+<dt>fname:</dt>
+<dd>output file name</dd>
+<dt>quality:</dt>
+<dd>{&#8216;low&#8217; | &#8216;medium&#8217; | &#8216;high&#8217;} specifies image file dpi</dd>
+<dt>yerr:</dt>
+<dd>{float, &#8216;ci&#8217;, &#8216;stdev&#8217;, &#8216;sem&#8217;} designates errorbars across
+datapoints in all subplots</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 <hr class="docutils" />
+<dl class="staticmethod">
+<dt id="pyvttbl.plotting.scatter_matrix">
+<em class="property">static </em><tt class="descclassname">plotting.</tt><tt class="descname">scatter_matrix</tt><big>(</big><em>df</em>, <em>variables</em>, <em>alpha=0.5</em>, <em>grid=False</em>, <em>diagonal=None</em>, <em>trend='linear'</em>, <em>alternate_labels=True</em>, <em>fname=None</em>, <em>output_dir=''</em>, <em>quality='medium'</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.plotting.scatter_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a matrix of scatterplots</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd><dl class="first last docutils">
+<dt>variables:</dt>
+<dd>column labels to include in scatter matrix</dd>
+</dl>
+</dd>
+<dt>kwds:</dt>
+<dd><dl class="first last docutils">
+<dt>alpha:</dt>
+<dd>amount of transparency applied</dd>
+<dt>grid:</dt>
+<dd>setting this to True will show the grid</dd>
+<dt>diagonal:</dt>
+<dd><p class="first">&#8216;kde&#8217;:  Kernel Density Estimation</p>
+<p>&#8216;hist&#8217;: 20 bin Histogram</p>
+<p class="last">None:  just labels</p>
+</dd>
+<dt>trend :</dt>
+<dd><p class="first">None:          no model fitting</p>
+<p>&#8216;linear&#8217;:      f(x) = a + b*x     (default)</p>
+<p>&#8216;exponential&#8217;: f(x) = a * x**b</p>
+<p>&#8216;logarithmic&#8217;: f(x) = a * log(x) + b</p>
+<p>&#8216;polynomial&#8217;:  f(x) = a * x**2 + b*x + c</p>
+<p class="last">&#8216;power&#8217;:       f(x) = a * x**b</p>
+</dd>
+<dt>alternate_labels: Specifies whether the labels and ticks should</dt>
+<dd>alternate. Default is True. When False tick labels
+will be on the left and botttom, and variable
+labels will be on the top and right.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 <hr class="docutils" />
+<dl class="staticmethod">
+<dt id="pyvttbl.plotting.scatter_plot">
+<em class="property">static </em><tt class="descclassname">plotting.</tt><tt class="descname">scatter_plot</tt><big>(</big><em>df</em>, <em>aname</em>, <em>bname</em>, <em>where=None</em>, <em>trend=None</em>, <em>fname=None</em>, <em>output_dir=''</em>, <em>quality='medium'</em>, <em>alpha=0.6</em><big>)</big><a class="headerlink" href="#pyvttbl.plotting.scatter_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a scatter plot with the specified parameters</p>
+<dl class="docutils">
+<dt>args:</dt>
+<dd><p class="first">aname: variable on x-axis</p>
+<p class="last">bname: variable on y-axis</p>
+</dd>
+<dt>kwds:</dt>
+<dd><dl class="first last docutils">
+<dt>alpha:</dt>
+<dd>amount of transparency applied</dd>
+<dt>trend :</dt>
+<dd><p class="first">None:          no model fitting</p>
+<p>&#8216;linear&#8217;:      f(x) = a + b*x</p>
+<p>&#8216;exponential&#8217;: f(x) = a * x**b</p>
+<p>&#8216;logarithmic&#8217;: f(x) = a * log(x) + b</p>
+<p>&#8216;polynomial&#8217;:  f(x) = a * x**2 + b*x + c</p>
+<p class="last">&#8216;power&#8217;:       f(x) = a * x**b</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 <hr class="docutils" />
 </div>
 </div>
@@ -132,7 +300,10 @@ and write data.</p>
         <li class="right" >
           <a href="scatter_matrix.html" title="pyvttbl.plotting.scatter_matrix() Overview"
              >previous</a> |</li>
-        <li><a href="index.html">pyvttbl v 0.5.1.0 documentation</a> &raquo;</li> 
+        <li><a href="http://code.google.com/p/pyvttbl/">pyvttbl home</a>&nbsp;|&nbsp;</li>
+        <li><a href="index.html">Documentation</a>
+          &raquo;</li>
+ 
       </ul>
     </div>
     <div class="footer">
