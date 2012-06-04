@@ -52,7 +52,7 @@ produces 'scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=hist).png'
     
     
 Example with diagonal='kde' and alternate_labels=False
-----------------------------------------------------
+------------------------------------------------------
 
 Specifying diagonal='kde' produces kernel density estimation plots along
 the diagonal. The y-axis labels do not relate to the density estimates.

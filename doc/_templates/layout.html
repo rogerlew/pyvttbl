@@ -6,6 +6,39 @@
 <style type="text/css">
   table.right { float: right; margin-left: 20px; }
   table.right td { border: 1px solid #ccc; }
+
+/* These are for the citation customization
+   
+   I don't like using long variable names but don't want
+   to figure out what is in the namespace */
+div.specialfooter {
+    height:25px;
+    background-color: #E3EFF1;
+    color: #86989B;
+    padding: 3px 8px 3px 8px;
+    clear: both;
+    font-size: 0.8em;
+}
+div.specialfooter a {
+    color: #86989B;
+    text-decoration: underline;
+}
+div.specialfooterleft {
+    float:left;
+    width:60%
+    padding-left:15px;
+    padding-bottom:6px;
+    white-space:nowrap;
+    text-align:left;
+}
+div.specialfooterright {
+    float:right;
+    width:40%
+    padding-right:13px;
+    padding-bottom:6px;
+    white-space:nowrap;
+    text-align:right;
+}
 </style>
 {%- endif %}
 {% endblock %}
@@ -21,3 +54,28 @@
 <img src="{{ pathto("_static/pyvttbl_logo.png", 1) }}" alt="pyvttbl logo" />
 </div>
 {% endblock %}
+
+<!-- This was modified from site-packages/sphinx/.../themes/basic/layout.html
+     To get the citation to the left of the regular footer we need to be able to 
+     put stuff inside the footer div. This isn't possible by calling super() -->
+     
+{%- block footer %}
+    <div class="specialfooter">
+        <div class="specialfooterleft">This software is funded in part by NIH Grant P20 RR016454.</div>
+        <div class="specialfooterright">
+        {%- if show_copyright %}
+          {%- if hasdoc('copyright') %}
+            {% trans path=pathto('copyright'), copyright=copyright|e %}&copy; <a href="{{ path }}">Copyright</a> {{ copyright }}.{% endtrans %}
+          {%- else %}
+            {% trans copyright=copyright|e %}&copy; Copyright {{ copyright }}.{% endtrans %}
+          {%- endif %}
+        {%- endif %}
+        {%- if last_updated %}
+          {% trans last_updated=last_updated|e %}Last updated on {{ last_updated }}.{% endtrans %}
+        {%- endif %}
+        {%- if show_sphinx %}
+          {% trans sphinx_version=sphinx_version|e %}Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> {{ sphinx_version }}.{% endtrans %}
+        {%- endif %}
+        </div>
+    </div>
+{%- endblock %}

@@ -32,6 +32,39 @@
 <style type="text/css">
   table.right { float: right; margin-left: 20px; }
   table.right td { border: 1px solid #ccc; }
+
+/* These are for the citation customization
+   
+   I don't like using long variable names but don't want
+   to figure out what is in the namespace */
+div.specialfooter {
+    height:25px;
+    background-color: #E3EFF1;
+    color: #86989B;
+    padding: 3px 8px 3px 8px;
+    clear: both;
+    font-size: 0.8em;
+}
+div.specialfooter a {
+    color: #86989B;
+    text-decoration: underline;
+}
+div.specialfooterleft {
+    float:left;
+    width:60%
+    padding-left:15px;
+    padding-bottom:6px;
+    white-space:nowrap;
+    text-align:left;
+}
+div.specialfooterright {
+    float:right;
+    width:40%
+    padding-right:13px;
+    padding-bottom:6px;
+    white-space:nowrap;
+    text-align:right;
+}
 </style>
 
   </head>
@@ -134,13 +167,13 @@ are the names of the columns and the <em>values</em> are NumPy arrays or
 NumPy MaskedArrays if missing data is specified or encountered when
 reading datafiles.</p>
 <p>DataFrames can be pivoted to created <tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> objects. These are
-subclasses of <tt class="xref py py-class docutils literal"><span class="pre">NumPy.MaskedArray</span></tt>. The use of <tt class="xref py py-class docutils literal"><span class="pre">MaskedArray'</span> <span class="pre">helps</span> <span class="pre">to</span> <span class="pre">make</span>
-<span class="pre">:class:`PyvtTbl</span></tt> objects robust to invalid or missing data.</p>
+subclasses of <tt class="xref py py-class docutils literal"><span class="pre">NumPy.MaskedArray</span></tt>. The use of <tt class="xref py py-class docutils literal"><span class="pre">MaskedArray</span></tt> helps to make
+<tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> objects robust to invalid or missing data.</p>
 <div class="section" id="loading-data-into-a-dataframe">
 <h2>Loading Data into a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt><a class="headerlink" href="#loading-data-into-a-dataframe" title="Permalink to this headline">¶</a></h2>
 <p>Before we can start building contingency tables we need to first load the
 data into a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> object. Data can be read from plaintext datafiles
-using the <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>.:meth:<cite>read_tbl</cite> method or inserted one row at a time using
+using the <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>. <tt class="xref py py-meth docutils literal"><span class="pre">read_tbl()</span></tt> method or inserted one row at a time using
 <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>. <tt class="xref py py-meth docutils literal"><span class="pre">insert()</span></tt>. DataFrames can be attached to one another using
 <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>. <tt class="xref py py-meth docutils literal"><span class="pre">attach()</span></tt>. The read_tbl method is looking for comma separated values
 (CSV) files. Other delimited file types should also work; just specify the
@@ -396,7 +429,7 @@ data. A variety of other aggregators can also be applied:</p>
 </tbody>
 </table>
 <p>The pyvttbl module takes advantage of aggregate functions in from pystaggrelite3.
-You can also bind your own using <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>.:meth:<cite>bind_aggregate</cite>.</p>
+You can also bind your own using <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>. <tt class="xref py py-meth docutils literal"><span class="pre">bind_aggregate()</span></tt>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pt</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="s">&#39;SUPPRESSION&#39;</span><span class="p">,</span>
 <span class="go">                  rows=[&#39;CYCLE&#39;, &#39;PHASE&#39;],</span>
 <span class="go">                  cols=[&#39;GROUP&#39;, &#39;AGE&#39;],</span>
@@ -485,12 +518,14 @@ You can also bind your own using <tt class="xref py py-class docutils literal"><
 <p class="first admonition-title">Note</p>
 <p>Numpy ndarray objects and their subclasses need to have an equal number of elements at their
 greatest depth. If more elements meet the contingency criteria in one cell compared to another
-the cells are padded with masked values to the dimension with the greatest number of elements</p>
+the cells are padded with masked values to the dimension with the greatest number of elements.</p>
 <blockquote class="last">
-<div><div class="highlight-python"><div class="highlight"><pre><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+<div><p>for example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
  <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span>
 </pre></div>
 </div>
+<p>would become:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">--</span><span class="p">],</span>
  <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span>
 </pre></div>
@@ -740,7 +775,7 @@ in the table.</p>
 </div>
 <div class="section" id="converting-a-pyvttbl-to-a-dataframe">
 <h2>Converting a <tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> to a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt><a class="headerlink" href="#converting-a-pyvttbl-to-a-dataframe" title="Permalink to this headline">¶</a></h2>
-<p><tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt>.:meth:<cite>to_dataframe</cite> will return the pivoted data as a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> object</p>
+<p><tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt>. <tt class="xref py py-meth docutils literal"><span class="pre">to_dataframe()</span></tt> will return the pivoted data as a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> object</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
@@ -785,9 +820,12 @@ in the table.</p>
  
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2012, Roger Lew.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    <div class="specialfooter">
+        <div class="specialfooterleft">This software is funded in part by NIH Grant P20 RR016454.</div>
+        <div class="specialfooterright">
+            &copy; Copyright 2012, Roger Lew.
+          Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        </div>
     </div>
   </body>
 </html>

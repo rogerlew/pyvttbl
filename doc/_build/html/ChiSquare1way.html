@@ -32,6 +32,39 @@
 <style type="text/css">
   table.right { float: right; margin-left: 20px; }
   table.right td { border: 1px solid #ccc; }
+
+/* These are for the citation customization
+   
+   I don't like using long variable names but don't want
+   to figure out what is in the namespace */
+div.specialfooter {
+    height:25px;
+    background-color: #E3EFF1;
+    color: #86989B;
+    padding: 3px 8px 3px 8px;
+    clear: both;
+    font-size: 0.8em;
+}
+div.specialfooter a {
+    color: #86989B;
+    text-decoration: underline;
+}
+div.specialfooterleft {
+    float:left;
+    width:60%
+    padding-left:15px;
+    padding-bottom:6px;
+    white-space:nowrap;
+    text-align:left;
+}
+div.specialfooterright {
+    float:right;
+    width:40%
+    padding-right:13px;
+    padding-bottom:6px;
+    white-space:nowrap;
+    text-align:right;
+}
 </style>
 
   </head>
@@ -301,9 +334,12 @@ inherents an <tt class="xref py py-class docutils literal"><span class="pre">Ord
  
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2012, Roger Lew.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    <div class="specialfooter">
+        <div class="specialfooterleft">This software is funded in part by NIH Grant P20 RR016454.</div>
+        <div class="specialfooterright">
+            &copy; Copyright 2012, Roger Lew.
+          Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        </div>
     </div>
   </body>
 </html>

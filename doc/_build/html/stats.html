@@ -31,6 +31,39 @@
 <style type="text/css">
   table.right { float: right; margin-left: 20px; }
   table.right td { border: 1px solid #ccc; }
+
+/* These are for the citation customization
+   
+   I don't like using long variable names but don't want
+   to figure out what is in the namespace */
+div.specialfooter {
+    height:25px;
+    background-color: #E3EFF1;
+    color: #86989B;
+    padding: 3px 8px 3px 8px;
+    clear: both;
+    font-size: 0.8em;
+}
+div.specialfooter a {
+    color: #86989B;
+    text-decoration: underline;
+}
+div.specialfooterleft {
+    float:left;
+    width:60%
+    padding-left:15px;
+    padding-bottom:6px;
+    white-space:nowrap;
+    text-align:left;
+}
+div.specialfooterright {
+    float:right;
+    width:40%
+    padding-right:13px;
+    padding-bottom:6px;
+    white-space:nowrap;
+    text-align:right;
+}
 </style>
 
   </head>
@@ -112,7 +145,7 @@ data conducting descriptive and inferential analyses.</p>
 <em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">Anova</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
 <dt id="pyvttbl.stats.Anova._MutableMapping__marker">
-<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FDF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001F8F040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -151,7 +184,7 @@ data conducting descriptive and inferential analyses.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Anova.__dict__">
-<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000000F034618&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova.__dict__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000000F077D38&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -302,12 +335,12 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Anova._abc_cache">
-<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000655BC50&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova._abc_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x00000000065684E0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova._abc_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Anova._abc_negative_cache">
-<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000655BCC0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006568550&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -317,7 +350,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Anova._abc_registry">
-<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000655BBA8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova._abc_registry" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006568438&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova._abc_registry" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -442,7 +475,7 @@ term. Creats a filename if necessary and calls plot.</p>
 
 <dl class="method">
 <dt id="pyvttbl.stats.Anova.pop">
-<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FDF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.pop" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001F8F040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova.pop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -498,7 +531,7 @@ term. Creats a filename if necessary and calls plot.</p>
 <em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">Anova1way</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
 <dt id="pyvttbl.stats.Anova1way._MutableMapping__marker">
-<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FDF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001F8F040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -537,7 +570,7 @@ term. Creats a filename if necessary and calls plot.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Anova1way.__dict__">
-<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000001046F348&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way.__dict__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x00000000104F0B28&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -688,12 +721,12 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Anova1way._abc_cache">
-<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006608278&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._abc_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006607AC8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._abc_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Anova1way._abc_negative_cache">
-<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x00000000066082E8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006607B38&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -703,7 +736,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Anova1way._abc_registry">
-<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006608240&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._abc_registry" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006607A90&gt;</em><a class="headerlink" href="#pyvttbl.stats.Anova1way._abc_registry" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -769,7 +802,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="method">
 <dt id="pyvttbl.stats.Anova1way.pop">
-<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FDF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.pop" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001F8F040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Anova1way.pop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -826,7 +859,7 @@ is a list of labels for the different treatment groups.</p>
 <dd><p>1-way Chi-Square Test</p>
 <dl class="attribute">
 <dt id="pyvttbl.stats.ChiSquare1way._MutableMapping__marker">
-<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FDF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001F8F040&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -865,7 +898,7 @@ is a list of labels for the different treatment groups.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.ChiSquare1way.__dict__">
-<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000000D4D3828&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__dict__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000000D985198&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1016,12 +1049,12 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.ChiSquare1way._abc_cache">
-<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006608668&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._abc_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006607EB8&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._abc_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.ChiSquare1way._abc_negative_cache">
-<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x00000000066086D8&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006607F28&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1031,7 +1064,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.ChiSquare1way._abc_registry">
-<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x00000000066085C0&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._abc_registry" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006607E10&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way._abc_registry" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1087,7 +1120,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="method">
 <dt id="pyvttbl.stats.ChiSquare1way.pop">
-<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FDF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.pop" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001F8F040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare1way.pop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1139,7 +1172,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 <em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">ChiSquare2way</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
 <dt id="pyvttbl.stats.ChiSquare2way._MutableMapping__marker">
-<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FDF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001F8F040&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1178,7 +1211,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.ChiSquare2way.__dict__">
-<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000000EFDC1F8&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__dict__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x00000000104CC438&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1330,12 +1363,12 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.ChiSquare2way._abc_cache">
-<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006608B70&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._abc_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661E400&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._abc_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.ChiSquare2way._abc_negative_cache">
-<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006608BE0&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661E470&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1345,7 +1378,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.ChiSquare2way._abc_registry">
-<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006608AC8&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._abc_registry" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661E358&gt;</em><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way._abc_registry" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1401,7 +1434,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="method">
 <dt id="pyvttbl.stats.ChiSquare2way.pop">
-<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FDF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.pop" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001F8F040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.ChiSquare2way.pop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1456,7 +1489,7 @@ and col_factor.</p>
 <dd><p>bivariate correlation matrix</p>
 <dl class="attribute">
 <dt id="pyvttbl.stats.Correlation._MutableMapping__marker">
-<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FDF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001F8F040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1495,7 +1528,7 @@ and col_factor.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Correlation.__dict__">
-<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x0000000010556588&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation.__dict__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x00000000105E3B28&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1646,12 +1679,12 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Correlation._abc_cache">
-<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006608EF0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation._abc_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661E780&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation._abc_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Correlation._abc_negative_cache">
-<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006608F60&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661E7F0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1661,7 +1694,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Correlation._abc_registry">
-<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006608E48&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation._abc_registry" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661E6D8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Correlation._abc_registry" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1730,7 +1763,7 @@ number of tests and i the current pair.</p>
 
 <dl class="method">
 <dt id="pyvttbl.stats.Correlation.pop">
-<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FDF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.pop" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001F8F040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Correlation.pop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1782,7 +1815,7 @@ number of tests and i the current pair.</p>
 <em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">Descriptives</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
 <dt id="pyvttbl.stats.Descriptives._MutableMapping__marker">
-<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FDF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001F8F040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1821,7 +1854,7 @@ number of tests and i the current pair.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Descriptives.__dict__">
-<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x00000000105FAD68&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives.__dict__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x00000000104F99A8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1974,12 +2007,12 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Descriptives._abc_cache">
-<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661C198&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._abc_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661E9E8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._abc_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Descriptives._abc_negative_cache">
-<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661C208&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661EA58&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1989,7 +2022,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Descriptives._abc_registry">
-<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661C0F0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._abc_registry" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661E940&gt;</em><a class="headerlink" href="#pyvttbl.stats.Descriptives._abc_registry" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2045,7 +2078,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="method">
 <dt id="pyvttbl.stats.Descriptives.pop">
-<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FDF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.pop" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001F8F040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Descriptives.pop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2106,7 +2139,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 <em class="property">class </em><tt class="descclassname">pyvttbl.stats.</tt><tt class="descname">Histogram</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
 <dt id="pyvttbl.stats.Histogram._MutableMapping__marker">
-<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FDF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001F8F040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2145,7 +2178,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Histogram.__dict__">
-<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x00000000105F8C78&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram.__dict__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000001068B3D8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2296,12 +2329,12 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Histogram._abc_cache">
-<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661C390&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram._abc_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661EBE0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram._abc_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Histogram._abc_negative_cache">
-<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661C400&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661EC50&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2311,7 +2344,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Histogram._abc_registry">
-<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661C2E8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram._abc_registry" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661EB38&gt;</em><a class="headerlink" href="#pyvttbl.stats.Histogram._abc_registry" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2367,7 +2400,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="method">
 <dt id="pyvttbl.stats.Histogram.pop">
-<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FDF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.pop" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001F8F040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Histogram.pop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2433,7 +2466,7 @@ the factors list.</p>
 </dl>
 <dl class="attribute">
 <dt id="pyvttbl.stats.Marginals._MutableMapping__marker">
-<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FDF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001F8F040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2472,7 +2505,7 @@ the factors list.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Marginals.__dict__">
-<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x000000001069BE88&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals.__dict__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x0000000010729228&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2624,12 +2657,12 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Marginals._abc_cache">
-<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661C550&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals._abc_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661EDA0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals._abc_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Marginals._abc_negative_cache">
-<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661C5C0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661EE10&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2639,7 +2672,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Marginals._abc_registry">
-<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661C4A8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals._abc_registry" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661ECF8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Marginals._abc_registry" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2695,7 +2728,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="method">
 <dt id="pyvttbl.stats.Marginals.pop">
-<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FDF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.pop" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001F8F040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Marginals.pop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2750,7 +2783,7 @@ and column labels in factors.</p>
 <dd><p>Student&#8217;s t-test</p>
 <dl class="attribute">
 <dt id="pyvttbl.stats.Ttest._MutableMapping__marker">
-<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001FDF040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_MutableMapping__marker</tt><em class="property"> = &lt;object object at 0x0000000001F8F040&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest._MutableMapping__marker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2789,7 +2822,7 @@ and column labels in factors.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Ttest.__dict__">
-<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x00000000107F5B28&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest.__dict__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__dict__</tt><em class="property"> = &lt;dictproxy object at 0x00000000108688E8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2940,12 +2973,12 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Ttest._abc_cache">
-<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661CA58&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest._abc_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x00000000066272E8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest._abc_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Ttest._abc_negative_cache">
-<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661CAC8&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_negative_cache</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006627358&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest._abc_negative_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2955,7 +2988,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="attribute">
 <dt id="pyvttbl.stats.Ttest._abc_registry">
-<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x000000000661C9B0&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest._abc_registry" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_abc_registry</tt><em class="property"> = &lt;_weakrefset.WeakSet object at 0x0000000006627240&gt;</em><a class="headerlink" href="#pyvttbl.stats.Ttest._abc_registry" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -3011,7 +3044,7 @@ while comparison to a regular mapping is order-insensitive.</p>
 
 <dl class="method">
 <dt id="pyvttbl.stats.Ttest.pop">
-<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001FDF040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.pop" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pop</tt><big>(</big><em>key</em>, <em>default=&lt;object object at 0x0000000001F8F040&gt;</em><big>)</big><a class="headerlink" href="#pyvttbl.stats.Ttest.pop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -3135,9 +3168,12 @@ s_1^2 and s_2^2 are the unbiased variance estimates</div></blockquote>
  
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2012, Roger Lew.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    <div class="specialfooter">
+        <div class="specialfooterleft">This software is funded in part by NIH Grant P20 RR016454.</div>
+        <div class="specialfooterright">
+            &copy; Copyright 2012, Roger Lew.
+          Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        </div>
     </div>
   </body>
 </html>

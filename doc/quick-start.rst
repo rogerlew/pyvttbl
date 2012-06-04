@@ -9,7 +9,7 @@ NumPy MaskedArrays if missing data is specified or encountered when
 reading datafiles.
 
 DataFrames can be pivoted to created :class:`PyvtTbl` objects. These are 
-subclasses of :class:`NumPy.MaskedArray`. The use of :class:`MaskedArray' helps to make
+subclasses of :class:`NumPy.MaskedArray`. The use of :class:`MaskedArray` helps to make
 :class:`PyvtTbl` objects robust to invalid or missing data. 
 
    
@@ -18,7 +18,7 @@ Loading Data into a :class:`DataFrame`
 
 Before we can start building contingency tables we need to first load the 
 data into a :class:`DataFrame` object. Data can be read from plaintext datafiles 
-using the :class:`DataFrame`.:meth:`read_tbl` method or inserted one row at a time using 
+using the :class:`DataFrame`. :meth:`read_tbl` method or inserted one row at a time using 
 :class:`DataFrame`. :meth:`insert`. DataFrames can be attached to one another using 
 :class:`DataFrame`. :meth:`attach`. The read_tbl method is looking for comma separated values 
 (CSV) files. Other delimited file types should also work; just specify the 
@@ -232,7 +232,7 @@ data. A variety of other aggregators can also be applied:
 ==================   ===========================================================
 
 The pyvttbl module takes advantage of aggregate functions in from pystaggrelite3. 
-You can also bind your own using :class:`DataFrame`.:meth:`bind_aggregate`.
+You can also bind your own using :class:`DataFrame`. :meth:`bind_aggregate`.
 
 .. sourcecode:: python
 
@@ -321,12 +321,16 @@ Example using the 'tolist' aggregator
 
 .. note:: Numpy ndarray objects and their subclasses need to have an equal number of elements at their
           greatest depth. If more elements meet the contingency criteria in one cell compared to another
-          the cells are padded with masked values to the dimension with the greatest number of elements
+          the cells are padded with masked values to the dimension with the greatest number of elements.
+         
+            for example:
          
             .. sourcecode:: python
             
                 [[1, 2],
                  [3, 4, 5]]
+                 
+            would become:
 
             .. sourcecode:: python
             
@@ -593,7 +597,7 @@ These indices can be used to lookup the row and column labels
 
 Converting a :class:`PyvtTbl` to a :class:`DataFrame`
 -----------------------------------------------------
-:class:`PyvtTbl`.:meth:`to_dataframe` will return the pivoted data as a :class:`DataFrame` object
+:class:`PyvtTbl`. :meth:`to_dataframe` will return the pivoted data as a :class:`DataFrame` object
 
 .. sourcecode:: python
 

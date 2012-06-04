@@ -3,6 +3,42 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+   Notes to future self or curious visitors on setting up the custom layout
+   
+     TO ADD THE LOGO AND LINKS BELOW THE LOGO TO THE TOP OF EVERY PAGE
+       I copied and edited the layout.html folder from the sphinx.pocoo.org repo 
+       (doc/_templates/layout.html) to my templates folder.
+       
+       The version used for this page can be found at:
+       https://code.google.com/p/pyvttbl/source/browse/doc/_templates/indexsidebar.html
+     
+       In conf.py uncomment or add "templates_path = ['_templates']"
+     
+     TO ADD CUSTOM SIDEBAR TO INDEX PAGE 
+       I copied and edited the indexsidbar.html folder from the sphinx.pocoo.org repo 
+       (doc/_templates/indexsidebar.html) to my templates folder.
+
+       The version used for this page can be found at:
+       https://code.google.com/p/pyvttbl/source/browse/doc/_templates/indexsidebar.html
+       
+         referenced images have to be in doc/_static from what I can tell
+       
+       
+       inside conf.py initialize an html_sidebars dict to reflect what you would like 
+       on the sidebar:
+           html_sidebars = {'index': ['indexsidebar.html',
+                                      'relations.html',
+                                      'searchbox.html',
+                                      'sourcelink.html']}
+                                      
+           'indexsidebar.html' obviously lives in the my doc/_templates folder
+           
+           the other html files reference files in site-packages/.../sphinx/themes/basic
+           
+     TO ADD FUNDING CITATION TO FOOTER
+       In the _templates/layout.html we need some CSS to handle the div alignment.
+       Then we just have to override the footer.
+
 Table of Contents
 =================
 
