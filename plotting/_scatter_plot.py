@@ -84,8 +84,8 @@ def scatter_plot(df, aname, bname, where=None, trend=None,
     pylab.scatter(adata, bdata, alpha=alpha)
 
     # format stuff
-    pylab.xticks(xticks, rotation=30)
-    pylab.yticks(yticks)
+    pylab.xticks(xticks, _tick_formatter(xticks),rotation=30)
+    pylab.yticks(yticks, _tick_formatter(yticks))
     pylab.xlim(xlim)
     pylab.ylim(ylim)
     pylab.xlabel(aname)

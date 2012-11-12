@@ -953,7 +953,8 @@ class Anova(OrderedDict):
                 efs+=[self.sub]
                 
                 r={}
-                tmp=array(df.pivot(self.dv, cols=efs), dtype=numpy.float64)
+                tmp=array(df.pivot(self.dv, cols=efs[:-1], rows=[self.sub]),
+                          dtype=numpy.float64).flatten()
                 r['ss']  = nsum((tmp-mean(pt_asarray))**2)
                 r['ss'] *= prod([len(conditions[f]) for f in wfactors
                                  if f not in efs])
