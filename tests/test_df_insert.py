@@ -74,7 +74,38 @@ class Test_insert(unittest.TestCase):
         df=DataFrame()
         df.insert([('A',1.23), ('B',2), ('C','A')])
         self.assertEqual(df.types(), ['real', 'integer', 'text'])
+
+    def test5(self):
+        from pyvttbl import DataFrame
+        from collections import namedtuple
+        import sys
+        import time
+
+##        N = 2560;
+        N=10
+
+        ROW = namedtuple('ROW', ['A', 'B'])
+        dt = DataFrame()
+
+        start = time.clock()
+##        interval = 5
+##        print('insert\tsecs\tt/i\tt/i*2')
+##        for i in range(N) :
+##            dt.insert( ROW(i, i*i)._asdict() )
+##            if i>0 and i % interval == 0 :
+##                now = time.clock()
+##                delta = now-start
+##                print('%d\t%f\t%f\t%f' %(i, delta, delta/i, delta/(float(i)*i)))
+##                interval *=2
+##
+##        print(dt)
+        dt['A'] = range(2560)
+        dt['B'] = [i*i for i in xrange(2560)]
+
+        now = time.clock()
+        print(now-start)
         
+            
 def suite():
     return unittest.TestSuite((
             unittest.makeSuite(Test_insert)

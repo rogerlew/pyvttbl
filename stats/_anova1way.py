@@ -147,9 +147,12 @@ class Anova1way(OrderedDict):
         # put means into a dict
         d = dict([(k,v) for k,v in zip(self.conditions_list, self['mus'])])
 
-        # calculate the number of comparisons
-        s = sum(range(len(d)))
+##        # calculate the number of comparisons
+##        s = sum(range(len(d)))
 
+        # calculate the number of observations per group
+        s = min(self['ns'])
+        
         # calculate critical studentized range q statistic
         k = len(d)
         df = sum(self['ns']) - k

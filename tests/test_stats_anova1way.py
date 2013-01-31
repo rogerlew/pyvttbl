@@ -144,8 +144,8 @@ POSTHOC MULTIPLE COMPARISONS
 Tukey HSD: Table of q-statistics
     A      B          C     
 ===========================
-A   0   0.440 ns   2.869 ns 
-B       0          3.308 +  
+A   0   0.950 ns   6.197 ** 
+B       0          7.147 ** 
 C                  0        
 ===========================
   + p < .10 (q-critical[3, 42] = 2.98361663917)
@@ -158,7 +158,6 @@ C                  0
 
         D=Anova1way()
         D.run(listOflists)
-        
         self.assertEqual(str(D),R)
         
     def test11(self):
@@ -239,8 +238,8 @@ POSTHOC MULTIPLE COMPARISONS
 Tukey HSD: Table of q-statistics
       AA      AB        LAB    
 ==============================
-AA    0    0.421 ns   0.816 ns 
-AB         0          0.395 ns 
+AA    0    2.749 ns   5.330 ** 
+AB         0          2.581 ns 
 LAB                   0        
 ==============================
   + p < .10 (q-critical[3, 381] = 2.91125483514)
@@ -252,7 +251,60 @@ LAB                   0
         D=df.anova1way('SUPPRESSION', 'GROUP')
         
         self.assertEqual(str(D),R)
-            
+
+    def test3(self):
+        R = """Anova: Single Factor on Measure
+
+SUMMARY
+Groups   Count     Sum     Average   Variance 
+=============================================
+A           10   431.400    43.140      9.000 
+B           10   894.400    89.440      4.920 
+C           10   679.500    67.950      4.703 
+D           10   404.700    40.470      5.936 
+
+O'BRIEN TEST FOR HOMOGENEITY OF VARIANCE
+Source of Variation      SS      df     MS       F     P-value   eta^2   Obs. power 
+===================================================================================
+Treatments             117.768    3   39.256   0.601     0.619   0.048        0.170 
+Error                 2351.332   36   65.315                                        
+===================================================================================
+Total                 2469.100   39                                                 
+
+ANOVA
+Source of Variation      SS       df      MS         F       P-value    eta^2   Obs. power 
+==========================================================================================
+Treatments            15953.466    3   5317.822   866.118   1.341e-33   0.986        1.000 
+Error                   221.034   36      6.140                                            
+==========================================================================================
+Total                 16174.500   39                                                       
+
+POSTHOC MULTIPLE COMPARISONS
+
+Tukey HSD: Table of q-statistics
+    A       B           C           D     
+=========================================
+A   0   59.088 **   31.663 **   3.407 +   
+B       0           27.426 **   62.496 ** 
+C                   0           35.070 ** 
+D                               0         
+=========================================
+  + p < .10 (q-critical[4, 36] = 3.36095129998)
+  * p < .05 (q-critical[4, 36] = 3.8088367871)
+ ** p < .01 (q-critical[4, 36] = 4.72966194222)"""
+        
+        # self data: seems incorrect q_obs
+        d = [[43.9,39,46.7,43.8,44.2,47.7,43.6,38.9,43.6,40],\
+             [89.8,87.1,92.7,90.6,87.7,92.4,86.1,88.1,90.8,89.1],\
+             [68.4,69.3,68.5,66.4,70,68.1,70.6,65.2,63.8,69.2],\
+             [36.2,45.2,40.7,40.5,39.3,40.3,43.2,38.7,40.9,39.7]]
+        conditions_list = 'A B C D'.split()
+
+
+        D = Anova1way()
+        D.run(d, conditions_list=conditions_list)        
+        self.assertEqual(str(D),R)
+
 def suite():
     return unittest.TestSuite((
             unittest.makeSuite(Test_anova1way)
