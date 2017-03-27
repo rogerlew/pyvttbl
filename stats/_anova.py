@@ -1221,21 +1221,21 @@ class Anova(OrderedDict):
 
         # Loop through and calculate Generalize eta effect sizes
         for efs,r in self.items():        
-            r['eta']   = r['ss']/(ss_subject + ss_err_tot)
-            self[tuple(efs)]=r
+            r['eta'] = r['ss']/(ss_subject + ss_err_tot)
+            self[tuple(efs)] = r
 
     def _num2binvec(self,d,p=0):
         """Sub-function to code all main effects/interactions"""
-        d,p=float(d),float(p)
-        d=abs(round(d))
+        d, p = float(d), int(p)
+        d = abs(round(d))
 
-        if d==0.:
-            b=0.
+        if d == 0.0:
+            b = 0.0
         else:
-            b=[]
-            while d>0.:
+            b = []
+            while d > 0.0:
                 b.insert(0,float(rem(d,2.)))
-                d=floor(d/2.)
+                d = floor(d/2.)
 
         return list(array(list(zeros((p-len(b))))+b)+1.)
                           
