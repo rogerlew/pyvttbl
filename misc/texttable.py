@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+from functools import reduce
+
 #!/usr/bin/env python
 #
 # texttable - module for creating simple ASCII tables
@@ -78,7 +80,6 @@ Roger Lew:
 """
 
 import sys
-import string
 import math
 
 try:
@@ -195,14 +196,14 @@ class Texttable:
         """
 
         self._check_row_size(array)
-        self._header = map(_str, array)
+        self._header = [_str(x) for x in array]
 
     def footer(self, array):
         """Specify the footer of the table
         """
 
         self._check_row_size(array)
-        self._footer = map(_str, array)
+        self._footer = list(map(_str, array))
         
     def add_row(self, array):
         """Add a row in the rows stack
@@ -336,7 +337,7 @@ class Texttable:
 
         self._check_row_size(array)
         try:
-            array = map(int, array)
+            array = list(map(int, array))
             if reduce(min, array) <= 0:
                 raise ValueError
         except ValueError:
@@ -440,7 +441,7 @@ class Texttable:
         s = "%s%s%s" % (horiz, [horiz, self._char_corner][self._has_vlines()],
             horiz)
         # build the line
-        l = string.join([horiz*n for n in self._width], s)
+        l = s.join([horiz * n for n in self._width])
         # add border if needed
         if self._has_border():
             l = "%s%s%s%s%s\n" % (self._char_corner, horiz, l, horiz,
@@ -482,7 +483,7 @@ class Texttable:
         if self._header:
             maxi = [ self._len_cell(x) for x in self._header ]
         if self._footer:
-            for cell,i in zip(self._footer, range(len(self._footer))):
+            for cell,i in zip(self._footer, list(range(len(self._footer)))):
                 maxi[i] = max(maxi[i], self._len_cell(cell))
         for row in self._rows:
             for cell,i in zip(row, range(len(row))):
@@ -516,6 +517,7 @@ class Texttable:
         line = self._splitit(line, isheader)
         space = " "
         out  = ""
+
         for i in range(len(line[0])):
             if self._has_border():
                 out += "%s " % self._char_vert
@@ -529,8 +531,8 @@ class Texttable:
                 if align == "r":
                     out += "%s " % (fill * space + cell_line)
                 elif align == "c":
-                    out += "%s " % (fill/2 * space + cell_line \
-                            + (fill/2 + fill%2) * space)
+                    out += "%s " % (int(fill/2) * space + cell_line \
+                            + (int(fill/2) + int(fill%2)) * space)
                 else:
                     out += "%s " % (cell_line + fill * space)
                 if length < len(line):
@@ -549,9 +551,12 @@ class Texttable:
         for cell, width in zip(line, self._width):
             array = []
             for c in cell.split('\n'):
-                array.extend(textwrap.wrap(unicode(c, 'utf'), width))
+                array.extend(textwrap.wrap(c, width))
             line_wrapped.append(array)
-        max_cell_lines = reduce(max, map(len, line_wrapped))
+        if not line_wrapped:
+            max_cell_lines = 0
+        else:
+            max_cell_lines = reduce(max, map(len, line_wrapped))
         for cell, valign in zip(line_wrapped, self._valign):
             if isheader:
                 valign = "t"

@@ -15,6 +15,8 @@ elif sys.version_info[0] == 3:
 from collections import Counter
 from pyvttbl.misc.support import *
 
+import difflib
+
 def fcmp(d,r):
     """
     Compares two files, d and r, cell by cell. Float comparisons 
@@ -22,29 +24,13 @@ def fcmp(d,r):
     be a project in and of itself.
     """
     # we need to compare the files
-    dh=open(d,'rb')
-    rh=open(r,'rb')
-    
-    dlines = dh.readlines()
-    rlines = rh.readlines()
-    boolCounter = Counter()
-    for dline, rline in zip(dlines,rlines):
-        for dc,rc in zip(dline.split(','), rline.split(',')):
-            if _isfloat(dc):
-                if round(float(dc),4)!=round(float(rc),4):
-                    boolCounter[False] += 1
-                else:
-                    boolCounter[True] += 1 
-            else:
-                pass
-                if dc!=rc:
-                    boolCounter[False]+= 1
-                else:
-                    boolCounter[True]+= 1    
-    dh.close()
-    rh.close()
+    dh=open(d,'r')
+    rh=open(r,'r')
 
-    if all(boolCounter):
-        return True
-    else:
-        return False
+    
+
+    diff = difflib.ndiff(dh.read().splitlines(keepends=True),
+                         rh.read().splitlines(keepends=True))
+    print(''.join(diff))
+
+    

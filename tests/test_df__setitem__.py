@@ -34,9 +34,9 @@ class Test__setitem__(unittest.TestCase):
         
         df=DataFrame()
         df.read_tbl('data/error~subjectXtimeofdayXcourseXmodel_MISSING.csv')
-        df['DUM']=range(48) # Shouldn't complain
+        df['DUM']=list(range(48)) # Shouldn't complain
 
-        self.assertEqual(df.keys(),
+        self.assertEqual(list(df.keys()),
             ['SUBJECT', 'TIMEOFDAY', 'COURSE', 'MODEL', 'ERROR', 'DUM'])
 
         for k in R:
@@ -45,24 +45,24 @@ class Test__setitem__(unittest.TestCase):
         
     def test11(self):
         df=DataFrame()
-        df['DUM']=range(48) # Shouldn't complain
-        self.assertEqual(df.keys(),['DUM'])
+        df['DUM']=list(range(48)) # Shouldn't complain
+        self.assertEqual(list(df.keys()),['DUM'])
 
     def test12(self):
         df=DataFrame()
-        df['DUM']=range(48) # Shouldn't complain
-        self.assertEqual(df.keys(),['DUM'])
+        df['DUM']=list(range(48)) # Shouldn't complain
+        self.assertEqual(list(df.keys()),['DUM'])
         
         df['DUM']=['A' for i in range(48)] # Shouldn't complain
-        self.assertEqual(df.keys(),['DUM'])
+        self.assertEqual(list(df.keys()),['DUM'])
         self.assertEqual(df._sqltypesdict['DUM'],'text')
         
 
     def test21(self):
         df=DataFrame()
-        df[1]=range(48)
+        df[1]=list(range(48))
         df[2]=['A' for i in range(48)]
-        self.assertEqual(df.keys(),[1,2])
+        self.assertEqual(list(df.keys()),[1,2])
 
     def test2(self):
         df=DataFrame()
@@ -88,7 +88,7 @@ class Test__setitem__(unittest.TestCase):
         y = [23]*len(df['X'])
         df['X'] = y
         
-        self.assertEqual(df.keys(), ['CASE', 'TIME', 'CONDITION', 'X'])
+        self.assertEqual(list(df.keys()), ['CASE', 'TIME', 'CONDITION', 'X'])
         
     def test3(self):
         R = """c   b{L@^hsa aj}   a(1%32@) 

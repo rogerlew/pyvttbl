@@ -18,42 +18,24 @@ from collections import Counter,OrderedDict
 from copy import copy
 
 # third party modules
-import pystaggrelite3
+from pyvttbl.misc import pystaggrelite3
 
 # included modules
 from pyvttbl.misc.texttable import Texttable as TextTable
 from pyvttbl.misc.support import *
+
 
 class Histogram(OrderedDict):
     def __init__(self, *args, **kwds):
         if len(args) > 1:
             raise Exception('expecting only 1 argument')
 
-        if kwds.has_key('cname'):
-            self.cname = kwds['cname']
-        else:
-            self.cname = None
+        self.cname = kwds.get('cname', None)
+        self.bins = kwds.get('bins', 10)
+        self.range = kwds.get('range', None)
+        self.density = kwds.get('density', False)
+        self.cumulative = kwds.get('cumulative', False)
 
-        if kwds.has_key('bins'):
-            self.bins = kwds['bins']
-        else:
-            self.bins = 10.
-
-        if kwds.has_key('range'):
-            self.range = kwds['range']
-        else:
-            self.range = None
-
-        if kwds.has_key('density'):
-            self.density = kwds['density']
-        else:
-            self.density = False
-
-        if kwds.has_key('cumulative'):
-            self.cumulative = kwds['cumulative']
-        else:
-            self.cumulative = False 
-            
         if len(args) == 1:
             super(Histogram, self).__init__(args[0])
         else:
@@ -122,13 +104,13 @@ class Histogram(OrderedDict):
         args = '[' + ', '.join(s) + ']'
         
         kwds = []            
-        if self.cname != None:
+        if self.cname is not None:
             kwds.append(", cname='%s'"%self.cname)
 
         if self.bins != 10:
             kwds.append(', bins=%s'%self.bins)
 
-        if self.range != None:
+        if self.range is not None:
             kwds.append(', range=%s'%repr(range))
 
         if self.density != False:

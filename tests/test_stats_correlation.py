@@ -9,7 +9,7 @@ import os
 import math
 from random import shuffle, random
 from collections import Counter,OrderedDict
-from dictset import DictSet,_rep_generator
+from pyvttbl.misc.dictset import DictSet,_rep_generator
 from math import isnan, isinf, floor
 import numpy as np
 from pprint import pprint as pp
@@ -22,11 +22,7 @@ from pyvttbl.misc.support import *
 
 class Test_correlation(unittest.TestCase):
     def test0(self):
-        R="""Correlation([\
-(('t1', 't2'), {'p': 9.699461194116956e-12, 'r': 0.9577922077922078}), \
-(('t1', 't3'), {'p': 2.2594982244811486e-09, 'r': -0.924025974025974}), \
-(('t2', 't3'), {'p': 6.850166042119375e-08, 'r': -0.8896103896103895})], \
-conditions_list=['t1', 't2', 't3'], coefficient='spearman', N=21)"""
+        R="""Correlation([(('t1', 't2'), {'r': 0.9577922077922078, 'p': 9.699461194116956e-12}), (('t1', 't3'), {'r': -0.924025974025974, 'p': 2.2594982244811486e-09}), (('t2', 't3'), {'r': -0.8896103896103895, 'p': 6.850166042119375e-08})], conditions_list=['t1', 't2', 't3'], coefficient='spearman', N=21)"""
         
         A=[24,61,59,46,43,44,52,43,58,67,62,57,71,49,54,43,53,57,49,56,33]
         B=[42.93472681237495, 78.87307334936268, 75.37292628918023,
@@ -46,6 +42,8 @@ conditions_list=['t1', 't2', 't3'], coefficient='spearman', N=21)"""
 
         cor=Correlation()
         cor.run([A,B,C],['t1','t2','t3'],coefficient='spearman')
+
+        print(repr(cor))
         self.assertEqual(repr(cor),R)
 
     def test1(self):

@@ -29,7 +29,7 @@ class Test_del_item(unittest.TestCase):
         del self.df['COURSE']
 
     def test0(self):
-        self.assertEqual(self.df.keys(),
+        self.assertEqual(list(self.df.keys()),
                          ['SUBJECT', 'TIMEOFDAY', 'MODEL', 'ERROR'])
 
     def test1(self):

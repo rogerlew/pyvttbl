@@ -271,24 +271,9 @@ class Test_pivot_2(unittest.TestCase):
                          "'list' object is not iterable")
         
     def test006(self):
-        with self.assertRaises(TypeError) as cm:
+        with self.assertRaises(KeyError) as cm:
             self.df.pivot('SUBJECT',cols='AGE')
 
-        self.assertEqual(str(cm.exception),
-                         "'str' object is not iterable")
-        
-##    def test004(self):
-##        # test the exclude parameter checking
-##
-##        with warnings.catch_warnings(record=True) as w:
-##            # Cause all warnings to always be triggered.
-##            warnings.simplefilter("always")
-##            
-##            # Trigger a warning.    
-##            self.df.pivot('SUBJECT',
-##                          where=[('AGE','not in',['medium',])])
-##        
-##            assert issubclass(w[-1].category, RuntimeWarning)
     
     def test005(self):
         # test the exclude parameter

@@ -37,7 +37,7 @@ def histogram_plot(df, val, where=None, bins=10,
         where = []
 
     # check fname
-    if not isinstance(fname, _strobj) and fname != None:
+    if not isinstance(fname, _strobj) and fname is not None:
         raise TypeError('fname must be None or string')
 
     if isinstance(fname, _strobj):
@@ -50,7 +50,7 @@ def histogram_plot(df, val, where=None, bins=10,
     
     fig=pylab.figure()
     tup = pylab.hist(np.array(v), bins=bins, range=range,
-                     normed=density, cumulative=cumulative)
+                     density=density, cumulative=cumulative)
     pylab.title(val)
 
     if fname == None:

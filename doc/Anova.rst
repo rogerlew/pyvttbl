@@ -258,7 +258,7 @@ with Python all you need to know is that turning the object into a string (via `
 yields the summary as a big string. This means that writing the summary to a file is pretty 
 straightforward.
     
-    >>> with open('output.txt','wb') as f:
+    >>> with open('output.txt','w') as f:
             f.write(str(aov))
     >>>
     

@@ -28,14 +28,12 @@ import pylab
 import scipy
 import numpy as np
 
-import pystaggrelite3
-from dictset import DictSet
+from .misc import pystaggrelite3
+from .misc.dictset import DictSet
 
-import stats
-from stats.qsturng import qsturng, psturng
-from misc.texttable import Texttable as TextTable
-from misc.support import *
-import plotting
+from .misc.texttable import Texttable as TextTable
+from .misc.support import *
+from . import plotting
 
 # base.py holds DataFrame and Pyvttbl
 # this file is a bit long but they can't be split without
@@ -317,18 +315,18 @@ class DataFrame(OrderedDict):
             del self[key]
 
         # a mask was provided
-        if mask != None:
+        if mask is not  None:
             # data contains invalid entries and a masked array should be created
-            # this needs to be nested incase mask != None
+            # this needs to be nested incase mask is not None
             if not all([m==0 for m in mask]):
 
                 # figure out the datatype of the valid entries
                 self._sqltypesdict[key] = \
-                    self._determine_sqlite3_type([d for d,m in zip(item,mask) if not m])
+                    self._determine_sqlite3_type([d for d, m in zip(item,mask) if not m])
 
                 # replace invalid values
                 fill_val = self._get_mafillvalue(key)
-                x = np.array([(d, fill_val)[m] for d,m in zip(item,mask)])
+                x = np.array([(d, fill_val)[m] for d, m in zip(item,mask)])
                 
                 # call super.__setitem__
                 super(DataFrame, self).\
@@ -412,9 +410,9 @@ class DataFrame(OrderedDict):
         aligns = [('l','r')[dt in 'fi'] for dt in dtypes]
         tt.set_cols_align(aligns)
         
-        tt.header(self.keys())
+        tt.header(list(self.keys()))
         if self.shape()[1] > 0:
-            tt.add_rows(zip(*list(self.values())), header=False)
+            tt.add_rows(list(zip(*list(self.values()))), header=False)
         tt.set_deco(TextTable.HEADER)
 
         # output the table
@@ -481,7 +479,7 @@ class DataFrame(OrderedDict):
         if len(self) == 0:
             return (0, 0)
         
-        return (len(self), len(self.values()[0]))
+        return (len(self), len(list(self.values())[0]))
     
     def _are_col_lengths_equal(self):
         """
@@ -499,7 +497,8 @@ class DataFrame(OrderedDict):
             return True
         
         # if self is not empty
-        counts = map(len, self.values())
+        counts = [len(c) for c in self.values()]
+
         if all(c - counts[0] + 1 == 1 for c in counts):
             return True
         else:
@@ -531,7 +530,7 @@ class DataFrame(OrderedDict):
         |   When the PRINTQUERIES bool is true it prints the queries
             before executing them
         """
-        if t == None:
+        if t is None:
             t=tuple()
             
         if self.PRINTQUERIES:
@@ -583,7 +582,7 @@ class DataFrame(OrderedDict):
         where = ' '.join(tokens)
 
         super(DataFrame, self).__setitem__(('INDICES','integer'),
-                                         range(self.shape()[1]))
+                                         list(range(self.shape()[1])))
                                          
         nsubset2.add('INDICES')
 
@@ -600,7 +599,7 @@ class DataFrame(OrderedDict):
         # build insert query
         query = 'insert into GTBL values ('
         query += ','.join('?' for n in nsubset2) + ')'
-        self._executemany(query, zip(*[self[n] for n in nsubset2]))
+        self._executemany(query, list(zip(*[self[n] for n in nsubset2])))
         self.conn.commit()
 
         super(DataFrame, self).__delitem__(('INDICES','integer'))
@@ -632,7 +631,7 @@ class DataFrame(OrderedDict):
 
         |   sqlite3 table is built in memory and has the id TBL
         """
-        if where == None:
+        if where is None:
             where = []
 
         if isinstance(where, _strobj):
@@ -666,6 +665,9 @@ class DataFrame(OrderedDict):
         self.conn.commit()
         self._execute('drop table if exists TBL2')
 
+        if len(nsubset2) == 0:
+            return
+
         self.conn.commit()
         query =  'create temp table TBL2\n  ('
         query += ', '.join('%s %s'%(_sha1(n), self._get_sqltype(n)) for n in nsubset2)
@@ -678,10 +680,10 @@ class DataFrame(OrderedDict):
 
         # because sqlite3 does not understand numpy datatypes we need to recast them
         # using astype to numpy.object
-        self._executemany(query, zip(*[self[n].astype(np.object) for n in nsubset2]))
+        self._executemany(query, list(zip(*[self[n].astype(object) for n in nsubset2])))
         self.conn.commit()
 
-        #  4. If where == None then we are done. Otherwise we need
+        #  4. If where is None then we are done. Otherwise we need
         #     to build query to filter the rows
         ##############################################################
         if where == []:
@@ -794,13 +796,13 @@ class DataFrame(OrderedDict):
               :class:`PyvtTbl` object
         """
         
-        if rows == None:
+        if rows is None:
             rows = []
             
-        if cols == None:
+        if cols is None:
             cols = []
             
-        if where == None:
+        if where is None:
             where = []
             
         ##############################################################
@@ -880,7 +882,8 @@ class DataFrame(OrderedDict):
         # Refresh conditions list so we can build row and col list
         self._execute('select %s from TBL'
                       %', '.join(_sha1(n) for n in [val] + rows + cols))
-        Zconditions = DictSet(zip([val]+rows+cols, zip(*list(self.cur))))
+        
+        Zconditions = DictSet(list(zip([val]+rows+cols, list(zip(*list(self.cur))))))
 
         # rnames_mask and cnanes_mask specify which unique combinations of
         # factor conditions have valid entries in the table.
@@ -898,7 +901,7 @@ class DataFrame(OrderedDict):
             conditions_set = set(zip(*[self[n] for n in rows]))
             for vals in Zconditions.unique_combinations(rows):
                 rnames_mask.append(tuple(vals) in conditions_set)                    
-                rnames.append(zip(rows,vals))
+                rnames.append(list(zip(rows,vals)))
         
         # Build cnames
         if cols == []:
@@ -911,7 +914,7 @@ class DataFrame(OrderedDict):
             conditions_set = set(zip(*[self[n] for n in cols]))
             for vals in Zconditions.unique_combinations(cols):
                 cnames_mask.append(tuple(vals) in conditions_set)
-                cnames.append(zip(cols,vals))
+                cnames.append(list(zip(cols,vals)))
         
         
         #  4. Build query based on val, rows, and cols
@@ -942,7 +945,7 @@ class DataFrame(OrderedDict):
             else:
                 for cs in cnames:
                     query.append('\n  , %s( case when '%agg)
-                    if all(map(_isfloat, zip(*cols)[1])):
+                    if all(map(_isfloat, list(zip(*cols))[1])):
                         query.append(
                         ' and '.join(('%s=%s'%(_sha1(k), v) for k, v in cs)))
                     else:
@@ -988,13 +991,13 @@ class DataFrame(OrderedDict):
                     data.append([])
                     mask.append([])
                     for cell, _mask in zip(list(row)[-len(cnames):], cnames_mask):
-                        if cell == None or not _mask:
+                        if cell is None or not _mask:
                             data[-1].append([fill_val])
                             mask[-1].append([True])
                         else:
                             if val_type == 'real' or val_type == 'integer':
                                 split =cell.split(',')
-                                data[-1].append(map(float, split))
+                                data[-1].append([float(v) for v in  split])
                                 mask[-1].append([False for j in _xrange(len(split))])
                             else:
                                 split =cell.split(',')
@@ -1007,12 +1010,12 @@ class DataFrame(OrderedDict):
                     mask.append([])
                     for cell, _mask in zip(list(row)[-len(cnames):], cnames_mask):
                         if _mask:
-                            if cell == None:
+                            if cell is None:
                                 data[-1].append([fill_val])
                                 mask[-1].append([True])
                             elif val_type == 'real' or val_type == 'integer':
                                 split =cell.split(',')
-                                data[-1].append(map(float, split))
+                                data[-1].append([float(v) for v in  split])
                                 mask[-1].append([False for j in _xrange(len(split))])
                             else:
                                 split =cell.split(',')
@@ -1160,7 +1163,7 @@ class DataFrame(OrderedDict):
               [28, 5, 51]
               >>> 
         """
-        if where == None:
+        if where is None:
             where = []
 
         # 1.
@@ -1171,7 +1174,7 @@ class DataFrame(OrderedDict):
         # 2.
         # check the supplied arguments
         if key not in self.keys():
-            raise KeyError(val)
+            raise KeyError(key)
 
 ##        # check to make sure exclude is mappable
 ##        # todo
@@ -1220,7 +1223,7 @@ class DataFrame(OrderedDict):
               John    Smith          51   male   
               >>> 
         """
-        if order == None:
+        if order is None:
             order = []
 
         # Check arguments        
@@ -1270,8 +1273,8 @@ class DataFrame(OrderedDict):
         for row in self.cur:
             d.append(list(row))
 
-        d = zip(*d) # transpose
-        for i, n in enumerate(self.keys()):
+        d = list(zip(*d)) # transpose
+        for i, n in enumerate(list(self.keys())):
             self[n] = list(d[i])
 
     def where(self, where):
@@ -1306,7 +1309,7 @@ class DataFrame(OrderedDict):
         
         self._build_sqlite3_tbl(self.keys(), where)
         self._execute('select * from TBL')
-        for n, values in zip(self.keys(), zip(*list(self.cur))):
+        for n, values in list(zip(self.keys(), zip(*list(self.cur)))):
             new[n] = list(values)        
 
         return new
@@ -1323,7 +1326,7 @@ class DataFrame(OrderedDict):
         """
         self._build_sqlite3_tbl(self.keys(), where)
         self._execute('select * from TBL')
-        for n, values in zip(self.keys(), zip(*list(self.cur))):
+        for n, values in list(zip(self.keys(), zip(*list(self.cur)))):
             del self[n]
             self[n] = list(values)
     
@@ -1497,7 +1500,7 @@ class DataFrame(OrderedDict):
             raise Exception('types of self and other must match')
 
         # perform attachment
-        for n in self.keys():
+        for n in list(self.keys()):
             self[n] = np.concatenate((self[n], other[n]))
 
         # update state variables
@@ -1566,7 +1569,7 @@ class DataFrame(OrderedDict):
 
               delimiter: string to separate row cells (default = ",")
         """
-        if where == None:
+        if where is None:
             where = []
 
         if self == {}:
@@ -1580,7 +1583,7 @@ class DataFrame(OrderedDict):
             raise Exception('Table must have at least one row to print data')
         
         # check or build fname
-        if fname != None:
+        if fname:
             if not isinstance(fname, _strobj):
                 raise TypeError('fname must be a string')
         else:
@@ -1594,12 +1597,12 @@ class DataFrame(OrderedDict):
             else:
                 fname += '.txt'
 
-        with open(fname,'wb') as fid:
-            wtr = csv.writer(fid, delimiter=delimiter)
+        with open(fname,'w') as fid:
+            wtr = csv.writer(fid, delimiter=delimiter, lineterminator='\n')
             wtr.writerow(self.keys())
 
             if where == []: 
-                wtr.writerows(zip(*list(self[n] for n in self)))
+                wtr.writerows(zip(*(list(self[n] for n in self))))
             else:
                 self._build_sqlite3_tbl(self.keys(), where)
                 self._execute('select * from TBL')
@@ -1618,8 +1621,9 @@ class DataFrame(OrderedDict):
            returns:
               a :mod:`pyvttbl.stats`. :class:`Descriptives` object
         """
+        from pyvttbl.stats import Descriptives
 
-        if where == None:
+        if where is None:
             where = []
 
         if self == {}:
@@ -1633,7 +1637,7 @@ class DataFrame(OrderedDict):
             raise KeyError(key)
         
         V = self.select_col(key, where=where)
-        d = stats.Descriptives()
+        d = Descriptives()
         d.run(V, key)
         return d
 
@@ -1657,7 +1661,10 @@ class DataFrame(OrderedDict):
                 print('%s contains non-numerical data\n'%cname)
 
     def marginals(self, key, factors, where=None):
-        if where == None:
+    
+        from pyvttbl.stats import Marginals
+        
+        if where is None:
             where = []
 
         if self == {}:
@@ -1667,13 +1674,11 @@ class DataFrame(OrderedDict):
         if not self._are_col_lengths_equal():
             raise Exception('columns have unequal lengths')
         
-        m = stats.Marginals()
+        m = Marginals()
         m.run(self, key, factors, where)
         return m
 
 
-    marginals.__doc__ = stats.Marginals.__doc__
-    
     def anova1way(self, val, factor, posthoc='tukey', where=None):
         """
         Conducts a one-way analysis of variance
@@ -1697,7 +1702,9 @@ class DataFrame(OrderedDict):
            return:
               an :class:`pyvttbl.stats.Anova1way` object 
         """
-        if where == None:
+        from pyvttbl.stats import Anova1way
+        
+        if where is None:
             where = []
 
         if self == {}:
@@ -1718,10 +1725,10 @@ class DataFrame(OrderedDict):
         # build list of condiitons
         conditions_list = [tup[1] for [tup] in pt.rnames]
 
-        a = stats.Anova1way()
+        a = Anova1way()
         a.run(list_of_lists, val, factor, conditions_list, posthoc=posthoc)
         return a
-    
+        
     def chisquare1way(self, observed, expected_dict=None,
                       alpha=0.05, where=None):
         """
@@ -1746,9 +1753,10 @@ class DataFrame(OrderedDict):
            return:
               an :class:`pyvttbl.stats.ChiSquare1way` object 
         """
+        from pyvttbl.stats import ChiSquare1way
 
-        # ched the expected_dict
-        if expected_dict != None:
+        # check the expected_dict
+        if expected_dict is not None:
             try:
                 expected_dict2 = dict(copy(expected_dict))
             except:
@@ -1773,11 +1781,11 @@ class DataFrame(OrderedDict):
             observed_list.append(observed_dict[key])
             expected_list.append(expected_dict2[key])
 
-        if expected_dict == None:
+        if expected_dict is None:
             expected_list = None
 
         # run analysis
-        x = stats.ChiSquare1way()
+        x = ChiSquare1way()
         x.run(observed_list, expected_list, conditions_list=conditions_list,
               measure=observed, alpha=alpha)
 
@@ -1801,10 +1809,12 @@ class DataFrame(OrderedDict):
            return:
               an :class:`pyvttbl.stats.ChiSquare2way` object 
         """
+        from pyvttbl.stats import ChiSquare2way
+        
         row_factor = self.select_col(rfactor, where)
         col_factor = self.select_col(cfactor, where)
 
-        x2= stats.ChiSquare2way()
+        x2 = ChiSquare2way()
         x2.run(row_factor, col_factor, alpha=alpha)
         return x2
 
@@ -1830,15 +1840,17 @@ class DataFrame(OrderedDict):
            return:
               an :class:`pyvttbl.stats.Correlation` object 
         """
+        from pyvttbl.stats import Correlation
         
         list_of_lists = []
         for var in sorted(variables):
             list_of_lists.append(list(self.select_col(var, where)))
 
-        cor= stats.Correlation()
+        cor = Correlation()
         cor.run(list_of_lists, sorted(variables),
                 coefficient=coefficient, alpha=alpha)
         return cor
+        
                 
     def ttest(self, aname, bname=None, pop_mean=0., paired=False,
               equal_variance=True, where=None):
@@ -1873,10 +1885,9 @@ class DataFrame(OrderedDict):
            return:
               an :class:`pyvttbl.stats.Ttest` object 
         """
+        from pyvttbl.stats import Ttest
         
-
-
-        if where == None:
+        if where is None:
             where = []
 
         if self == {}:
@@ -1887,12 +1898,12 @@ class DataFrame(OrderedDict):
             raise Exception('columns have unequal lengths')
         
         adata = self.select_col(aname, where=where)
-        if bname != None:
+        if bname is not None:
             bdata = self.select_col(bname, where=where)
         else:
             bdata = None
         
-        t = stats.Ttest()
+        t = Ttest()
         t.run(adata, bdata, pop_mean=pop_mean,
               paired=paired, equal_variance=equal_variance,
               aname=aname, bname=bname)
@@ -1917,7 +1928,9 @@ class DataFrame(OrderedDict):
            returns:
               a :mod:`pyvttbl.stats`. :class:`Descriptives` object
         """
-        if where == None:
+        from pyvttbl.stats import Histogram
+        
+        if where is None:
             where = []
             
         if self == {}:
@@ -1931,12 +1944,12 @@ class DataFrame(OrderedDict):
             raise KeyError(key)
         
         V = sorted(self.select_col(key, where=where))
-        h = stats.Histogram()
+        h = Histogram()
         h.run(V, cname=key, bins=bins, range=range,
               density=density, cumulative=cumulative)
         
         return h
-
+        
     def anova(self, dv, sub='SUBJECT', wfactors=None, bfactors=None,
               measure='', transform='', alpha=0.05):
         """
@@ -1970,7 +1983,9 @@ class DataFrame(OrderedDict):
                  'windsor 10'             windsor(X, 10)   10% windosr trim
                  =======================  ===============  ==================
         """
-        aov=stats.Anova()
+        from pyvttbl.stats import Anova
+        
+        aov = Anova()
         aov.run(self, dv, sub=sub, wfactors=wfactors, bfactors=bfactors,
                 measure=measure, transform=transform, alpha=alpha)
         return aov
@@ -1999,6 +2014,7 @@ class DataFrame(OrderedDict):
         return plotting.scatter_matrix(self, variables, **kwargs)
 
     scatter_matrix.__doc__ = plotting.scatter_matrix.__doc__        
+
 
 class _ptmathmethod(object):
     """
@@ -2095,7 +2111,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
         |   subclassing Numpy objects are a little different from subclassing other objects.
         |   see: http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
         """
-        if data == None:
+        if data is None:
             data = []
 
         maparms = dict(copy=kwds.get('copy',False),
@@ -2342,7 +2358,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
                 rdata = [self[0,j].flatten().tolist()
                          for j in _xrange(len(self.cnames))]
                 
-            df.insert(zip(header, rdata))
+            df.insert(list(zip(header, rdata)))
                 
         elif self.cnames == [1]: # no cols were specified
             # build the header
@@ -2354,7 +2370,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
                 else:
                     rdata = [c for (f, c) in L] + [self[i,0]]
                     
-                df.insert(zip(header, rdata))
+                df.insert(list(zip(header, rdata)))
                 
         else: # table has rows and cols
             # build the header
@@ -2370,7 +2386,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
                     rdata = [self[i,j].flatten().tolist()
                              for j in _xrange(len(self.cnames))]
                     
-                df.insert(zip(header, rdata))
+                df.insert(list(zip(header, rdata)))
 
         return df
 
@@ -2449,7 +2465,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
 ##             'row_tots:'+str(self.row_tots),
 ##             'col_tots:'+str(self.col_tots)])+'\n\n'
     
-        if self == []:
+        if self.size == 0:
             return '(table is empty)'
 
         show_col_tots = any(np.invert(self.col_tots.mask))
@@ -2575,7 +2591,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
         
         kwds = []
 
-        if self.row_tots != None:
+        if self.row_tots is not None:
             # sometimes np.ma.array.mask is a bool, somtimes it is a list.
             # if we just copy the mask over it will first create a list and then
             # keep appending to the list everytime the object is reprized. Not sure if
@@ -2588,14 +2604,14 @@ class PyvtTbl(np.ma.MaskedArray, object):
             kwds.append(', row_tots=np.ma.array(%s%s)'%\
                         (self.row_tots.tolist(), mask_str))
                 
-        if self.col_tots != None:
+        if self.col_tots is not None:
             mask_str =''
             if any(_flatten([self.col_tots.mask])):
                 mask_str = ', mask=%s'%repr(self.col_tots.mask)
             kwds.append(', col_tots=np.ma.array(%s%s)'%\
                         (self.col_tots.tolist(), mask_str))
             
-        if self.grand_tot != None:
+        if self.grand_tot is not None:
             kwds.append(', grand_tot=%s'%repr(self.grand_tot))            
             
         if self.where != []:
@@ -2611,10 +2627,10 @@ class PyvtTbl(np.ma.MaskedArray, object):
         if any(_flatten([self.mask])) and hasattr(self.mask, '__iter__'):
             kwds.append(', mask=%s'%repr(self.mask.tolist()))
             
-        if self.dtype != None:
+        if self.dtype is not None:
             kwds.append(', dtype=%s'%repr(self.dtype))
                 
-        if self.fill_value != None:
+        if self.fill_value is not None:
             kwds.append(', fill_value=%s'%repr(self.fill_value))
             
         if self.subok != True:
@@ -2663,9 +2679,9 @@ class PyvtTbl(np.ma.MaskedArray, object):
     __div__.__doc__ = np.ma.MaskedArray.\
                       __div__.__doc__.replace('masked array', 'PyvtTbl')
     
-    __rdiv__ = _ptmathmethod('__rdiv__')
-    __rdiv__.__doc__ = np.ma.MaskedArray.\
-                       __rdiv__.__doc__.replace('masked array', 'PyvtTbl')
+#    __rdiv__ = _ptmathmethod('__rdiv__')
+#    __rdiv__.__doc__ = np.ma.MaskedArray.\
+#                       __rdiv__.__doc__.replace('masked array', 'PyvtTbl')
     
     __truediv__ = _ptmathmethod('__truediv__')
     __truediv__.__doc__ = np.ma.MaskedArray.\

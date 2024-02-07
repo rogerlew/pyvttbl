@@ -107,7 +107,7 @@ def interaction_plot(df, val, xaxis,
     # a plot without finishing it, we do some extensive checking
     # up front
 
-    if where == None:
+    if where is None:
         where = []
 
     # check for data
@@ -125,13 +125,13 @@ def interaction_plot(df, val, xaxis,
     if xaxis not in df.keys():
         raise KeyError(xaxis)
     
-    if seplines not in df.keys() and seplines != None:
+    if seplines not in df.keys() and seplines is not None:
         raise KeyError(seplines)
 
-    if sepxplots not in df.keys() and sepxplots != None:
+    if sepxplots not in df.keys() and sepxplots is not None:
         raise KeyError(sepxplots)
     
-    if sepyplots not in df.keys() and sepyplots != None:
+    if sepyplots not in df.keys() and sepyplots is not None:
         raise KeyError(sepyplots)
 
     # check for duplicate names
@@ -141,7 +141,7 @@ def interaction_plot(df, val, xaxis,
         raise Exception('duplicate labels specified as plot parameters')
 
     # check fname
-    if not isinstance(fname, _strobj) and fname != None:
+    if not isinstance(fname, _strobj) and fname is not None:
         raise TypeError('fname must be None or string')
 
     if isinstance(fname, _strobj):
@@ -190,7 +190,7 @@ def interaction_plot(df, val, xaxis,
         aggregate = 'ci'
 
     for count in counts:
-        if aggregate != None and count < 2:
+        if aggregate is not None and count < 2:
             raise Exception('cell count too low to calculate %s'%yerr)
 
     test['yerr'] = yerr
@@ -220,14 +220,14 @@ def interaction_plot(df, val, xaxis,
     ##############################################################      
     numrows = 1
     rlevels = [1]
-    if sepyplots != None:
+    if sepyplots is not None:
         rlevels = copy(conditions[sepyplots]) # a set
         numrows = len(rlevels) # a int
         rlevels = sorted(rlevels) # set -> sorted list
             
     numcols = 1
     clevels = [1]            
-    if sepxplots != None:
+    if sepxplots is not None:
         clevels = copy(conditions[sepxplots])
         numcols = len(clevels)
         clevels = sorted(clevels) # set -> sorted list
@@ -274,9 +274,9 @@ def interaction_plot(df, val, xaxis,
     for r, rlevel in enumerate(rlevels):
         for c, clevel in enumerate(clevels):
             where_extension = []
-            if sepxplots!=None:
+            if sepxplots is not None:
                 where_extension.append((sepxplots, '=', [clevel]))
-            if sepyplots!=None:
+            if sepyplots is not None:
                 where_extension.append((sepyplots, '=', [rlevel]))
             
             #  8.1 Create new axes for the subplot
@@ -284,7 +284,7 @@ def interaction_plot(df, val, xaxis,
             axs.append(pylab.subplot(numrows, numcols, plotnum))
 
             ######## If separate lines are not specified #########
-            if seplines == None:
+            if seplines is None:
                 y = df.pivot(val, cols=[xaxis],
                                where=where+where_extension,
                                aggregate='avg')
@@ -292,7 +292,7 @@ def interaction_plot(df, val, xaxis,
                 cnames = y.cnames
                 y = y.flatten()
 
-                if aggregate != None:
+                if aggregate is not None:
                     yerr = df.pivot(val, cols=[xaxis],
                                       where=where+where_extension,
                                       aggregate=aggregate).flatten()
@@ -326,7 +326,7 @@ def interaction_plot(df, val, xaxis,
                                where=where+where_extension,
                                aggregate='avg')
                 
-                if aggregate != None:
+                if aggregate is not None:
                     yerrs = df.pivot(val,
                                        rows=[seplines],
                                        cols=[xaxis],
@@ -341,7 +341,7 @@ def interaction_plot(df, val, xaxis,
                 plots = []
                 labels = []
                 for i, name in enumerate(y.rnames):
-                    if aggregate != None:
+                    if aggregate is not None:
                         yerr = yerrs[i].flatten()
                     
                     labels.append(name[0][1])
@@ -370,12 +370,13 @@ def interaction_plot(df, val, xaxis,
                         axs[-1].plot([xmin, xmax], [0., 0.], 'k:')
 
                 pylab.figlegend(plots, labels, loc=1,
-                                labelsep=.005,
-                                handlelen=.01,
-                                handletextsep=.005)
+#                                labelsep=.005,
+#                                handlelen=.01,
+#                                handletextsep=.005
+                                )
 
             test['y'].append(y)
-            if yerr == None:
+            if yerr is None:
                 test['yerr'].append([])
             else:
                 test['yerr'].append(yerr)
@@ -425,7 +426,7 @@ def interaction_plot(df, val, xaxis,
 
     #  9. Place yerr text in bottom right corner
     ##############################################################
-    if aggregate != None:
+    if aggregate is not None:
         if aggregate == 'ci':
             aggregate = '95% ci' 
             
@@ -435,13 +436,13 @@ def interaction_plot(df, val, xaxis,
 
     # 10. Save the figure
     ##############################################################
-    if fname == None:
+    if fname is None:
         fname = 'interaction_plot(%s'%val
         factors = [xaxis,seplines,sepxplots,sepyplots]
-        fname += '~' + '_X_'.join([str(f) for f in factors if f != None])
-        if aggregate != None:
+        fname += '~' + '_X_'.join([str(f) for f in factors if f is not None])
+        if aggregate is not None:
             fname += ',yerr=' + aggregate
-        elif yerr != None:
+        elif yerr is not None:
             fname += ',yerr=' + str(yerr[0])
         fname += ').png'
 

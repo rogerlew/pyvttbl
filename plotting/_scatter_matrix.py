@@ -66,7 +66,7 @@ def scatter_matrix(df, variables, alpha=0.5, grid=False,
 
    # code forked from pandas.tools.plotting
 
-    if diagonal!= None:
+    if diagonal is not None:
         if diagonal.lower() in ['hist', 'histogram']:
             diagonal = 'hist'
 
@@ -265,7 +265,7 @@ def scatter_matrix(df, variables, alpha=0.5, grid=False,
     if fname == None:
         fname = 'scatter_matrix('
         fname += '_X_'.join([str(f) for f in variables])
-        if diagonal != None:
+        if diagonal is not None:
             fname += ',diagonal=' + diagonal
         if not alternate_labels:
             fname += ',alternate_labels=False'

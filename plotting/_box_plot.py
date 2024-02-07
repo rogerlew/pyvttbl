@@ -79,7 +79,7 @@ def box_plot(df, val, factors=None, where=None,
         raise Exception('duplicate labels specified as plot parameters')
 
     # check fname
-    if not isinstance(fname, _strobj) and fname != None:
+    if not isinstance(fname, _strobj) and fname is not None:
         raise TypeError('fname must be None or string')
 
     if isinstance(fname, _strobj):

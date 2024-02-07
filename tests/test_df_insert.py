@@ -18,7 +18,7 @@ import os
 
 import numpy as np
 
-from dictset import DictSet,_rep_generator
+from pyvttbl.misc.dictset import DictSet,_rep_generator
 
 from pyvttbl import DataFrame
 from pyvttbl.misc.support import *
@@ -87,22 +87,22 @@ class Test_insert(unittest.TestCase):
         ROW = namedtuple('ROW', ['A', 'B'])
         dt = DataFrame()
 
-        start = time.clock()
+        start = time.time()
 ##        interval = 5
 ##        print('insert\tsecs\tt/i\tt/i*2')
 ##        for i in range(N) :
 ##            dt.insert( ROW(i, i*i)._asdict() )
 ##            if i>0 and i % interval == 0 :
-##                now = time.clock()
+##                now = time.time()
 ##                delta = now-start
 ##                print('%d\t%f\t%f\t%f' %(i, delta, delta/i, delta/(float(i)*i)))
 ##                interval *=2
 ##
 ##        print(dt)
         dt['A'] = range(2560)
-        dt['B'] = [i*i for i in xrange(2560)]
+        dt['B'] = [i*i for i in range(2560)]
 
-        now = time.clock()
+        now = time.time()
         print(now-start)
         
             

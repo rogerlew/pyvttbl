@@ -22,7 +22,6 @@ import scipy
 
 # included modules
 from pyvttbl.misc.support import _flatten
-from pyvttbl.stats import _stats
 from pyvttbl.stats._noncentral import nctcdf
 from pyvttbl.misc.texttable import Texttable as TextTable
 
@@ -32,35 +31,13 @@ class Ttest(OrderedDict):
         if len(args) > 1:
             raise Exception('expecting only 1 argument')
 
-        if kwds.has_key('paired'):
-            self.paired = kwds['paired']
-        else:
-            self.paired = False
+        self.paired = kwds.get('paired', False)
+        self.equal_variance = kwds.get('equal_variance', True)
+        self.alpha = kwds.get('alpha', 0.05)
+        self.aname = kwds.get('aname', None)
+        self.bname = kwds.get('bname', None)
+        self.type = kwds.get('type', None)
 
-        if kwds.has_key('equal_variance'):
-            self.equal_variance = kwds['equal_variance']
-        else:
-            self.equal_variance = True
-
-        if kwds.has_key('alpha'):
-            self.alpha = kwds['alpha']
-        else:
-            self.alpha = 0.05
-
-        if kwds.has_key('aname'):
-            self.aname = kwds['aname']
-        else:
-            self.aname = None
-                
-        if kwds.has_key('bname'):
-            self.bname = kwds['bname']
-        else:
-            self.bname = None
-
-        if kwds.has_key('type'):
-            self.type = kwds['type']
-        else:
-            self.type = None
             
         if len(args) == 1:
             super(Ttest, self).__init__(args[0])
@@ -101,6 +78,7 @@ class Ttest(OrderedDict):
 
           \mathrm{d.f.} = \frac{(s_1^2/n_1 + s_2^2/n_2)^2}{(s_1^2/n_1)^2/(n_1-1) + (s_2^2/n_2)^2/(n_2-1)}
         """
+        from . import _stats
 
         A = _flatten(list(copy(A)))
 ##        try:
@@ -109,7 +87,7 @@ class Ttest(OrderedDict):
 ##            raise TypeError('A must be a list-like object')
             
         try:
-            if B != None:
+            if B is not None:
                 B = _flatten(list(copy(B)))
         except:
             raise TypeError('B must be a list-like object')
@@ -370,13 +348,13 @@ class Ttest(OrderedDict):
         if self.alpha != 0.05:
             kwds.append(", alpha=%s"%self.alpha)
 
-        if self.aname != None:
+        if self.aname is not None:
             kwds.append(", aname='%s'"%self.aname)
             
-        if self.bname != None:
+        if self.bname is not None:
             kwds.append(", bname='%s'"%self.bname)
             
-        if self.type != None:
+        if self.type is not None:
             kwds.append(", type='%s'"%self.type)
                 
         kwds= ''.join(kwds)

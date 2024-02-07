@@ -66,7 +66,7 @@ if __name__ == '__main__':
     skip = int(get("lines to skip [0]: "))
     delimiter = get("delimiter [,]: ")
 
-    with open(ifname,'rb') as f:
+    with open(ifname,'r') as f:
         lines = f.readlines()
         
     header = lines[skip].split(delimiter)

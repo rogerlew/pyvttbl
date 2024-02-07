@@ -18,10 +18,13 @@ import os
 
 import numpy as np
 
+from numpy import dtype
+
+
 from pyvttbl import DataFrame,PyvtTbl
 from pyvttbl.misc.support import *
 
-from dictset import DictSet
+from pyvttbl.misc.dictset import DictSet
 
 class Test_pt__repr__(unittest.TestCase):
     def test0(self):

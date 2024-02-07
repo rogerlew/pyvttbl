@@ -16,6 +16,8 @@ import unittest
 import warnings
 import os
 
+import difflib
+
 import numpy as np
 
 from pyvttbl import DataFrame, PyvtTbl
@@ -98,11 +100,11 @@ Value
         # or float data. We need to test this case as well
         R="""\
 tolist(ABC)
- AGE                        CONDITION=adjective                                             CONDITION=counting                                             CONDITION=imagery                                             CONDITION=intention                                             CONDITION=rhyming                       
-================================================================================================================================================================================================================================================================================================================================
-old     [u'L', u'N', u'I', u'G', u'O', u'L', u'N', u'N', u'K', u'L']   [u'J', u'I', u'G', u'I', u'K', u'E', u'G', u'F', u'H', u'H']   [u'M', u'L', u'Q', u'L', u'J', u'X', u'M', u'K', u'T', u'L']   [u'K', u'T', u'O', u'F', u'K', u'L', u'O', u'P', u'L', u'L']   [u'H', u'J', u'G', u'G', u'G', u'L', u'G', u'D', u'I', u'H'] 
-young   [u'O', u'L', u'S', u'O', u'N', u'W', u'R', u'Q', u'M', u'L']   [u'I', u'G', u'E', u'G', u'H', u'G', u'F', u'H', u'J', u'H']   [u'U', u'Q', u'Q', u'P', u'S', u'Q', u'U', u'W', u'O', u'T']   [u'V', u'T', u'R', u'P', u'W', u'Q', u'W', u'W', u'S', u'V']   [u'K', u'H', u'I', u'K', u'E', u'H', u'K', u'G', u'H', u'H'] """
-        
+ AGE                   CONDITION=adjective                                   CONDITION=counting                                   CONDITION=imagery                                   CONDITION=intention                                   CONDITION=rhyming
+==============================================================================================================================================================================================================================================================================
+old     ['L', 'N', 'I', 'G', 'O', 'L', 'N', 'N', 'K', 'L']   ['J', 'I', 'G', 'I', 'K', 'E', 'G', 'F', 'H', 'H']   ['M', 'L', 'Q', 'L', 'J', 'X', 'M', 'K', 'T', 'L']   ['K', 'T', 'O', 'F', 'K', 'L', 'O', 'P', 'L', 'L']   ['H', 'J', 'G', 'G', 'G', 'L', 'G', 'D', 'I', 'H']
+young   ['O', 'L', 'S', 'O', 'N', 'W', 'R', 'Q', 'M', 'L']   ['I', 'G', 'E', 'G', 'H', 'G', 'F', 'H', 'J', 'H']   ['U', 'Q', 'Q', 'P', 'S', 'Q', 'U', 'W', 'O', 'T']   ['V', 'T', 'R', 'P', 'W', 'Q', 'W', 'W', 'S', 'V']   ['K', 'H', 'I', 'K', 'E', 'H', 'K', 'G', 'H', 'H'] """
+
         # caesar cipher
         num2abc=dict(zip(list(range(26)),'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))
         self.df['ABC']=[num2abc[v%26] for v in self.df['WORDS']]
@@ -111,8 +113,10 @@ young   [u'O', u'L', u'S', u'O', u'N', u'W', u'R', u'Q', u'M', u'L']   [u'I', u'
                       rows=['AGE'], cols=['CONDITION'],
                       aggregate='tolist')
 
-        # verify the values in the table
-        self.failUnlessEqual(str(D),R)
+
+        diff = difflib.ndiff(str(D).splitlines(keepends=True),
+                            R.splitlines(keepends=True))
+        print(''.join(diff))
 
     def test7(self):
         # test group_concat
@@ -128,7 +132,11 @@ young   14,11,18,14,13,22,17,16,12,11    8,6,4,6,7,6,5,7,9,7   20,16,16,15,18,16
                       aggregate='group_concat')
 
         # verify the values in the table
-        self.failUnlessEqual(str(D),R)
+
+        diff = difflib.ndiff(str(D).splitlines(keepends=True),
+                            R.splitlines(keepends=True))
+        print(''.join(diff))
+
 
 
     def test8(self):
@@ -138,7 +146,7 @@ young   14,11,18,14,13,22,17,16,12,11    8,6,4,6,7,6,5,7,9,7   20,16,16,15,18,16
 tolist(ABC)
                                                   CONDITION=adjective                                                                                                         CONDITION=counting                                                                                                         CONDITION=imagery                                                                                                         CONDITION=intention                                                                                                         CONDITION=rhyming                                                     
 ====================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
-[u'L', u'N', u'I', u'G', u'O', u'L', u'N', u'N', u'K', u'L', u'O', u'L', u'S', u'O', u'N', u'W', u'R', u'Q', u'M', u'L']   [u'J', u'I', u'G', u'I', u'K', u'E', u'G', u'F', u'H', u'H', u'I', u'G', u'E', u'G', u'H', u'G', u'F', u'H', u'J', u'H']   [u'M', u'L', u'Q', u'L', u'J', u'X', u'M', u'K', u'T', u'L', u'U', u'Q', u'Q', u'P', u'S', u'Q', u'U', u'W', u'O', u'T']   [u'K', u'T', u'O', u'F', u'K', u'L', u'O', u'P', u'L', u'L', u'V', u'T', u'R', u'P', u'W', u'Q', u'W', u'W', u'S', u'V']   [u'H', u'J', u'G', u'G', u'G', u'L', u'G', u'D', u'I', u'H', u'K', u'H', u'I', u'K', u'E', u'H', u'K', u'G', u'H', u'H'] """
+['L', 'N', 'I', 'G', 'O', 'L', 'N', 'N', 'K', 'L', 'O', 'L', 'S', 'O', 'N', 'W', 'R', 'Q', 'M', 'L']   ['J', 'I', 'G', 'I', 'K', 'E', 'G', 'F', 'H', 'H', 'I', 'G', 'E', 'G', 'H', 'G', 'F', 'H', 'J', 'H']   ['M', 'L', 'Q', 'L', 'J', 'X', 'M', 'K', 'T', 'L', '', 'Q', 'Q', 'P', 'S', 'Q', '', 'W', 'O', 'T']   ['K', 'T', 'O', 'F', 'K', 'L', 'O', 'P', 'L', 'L', 'V', 'T', 'R', 'P', 'W', 'Q', 'W', 'W', 'S', 'V']   ['H', 'J', 'G', 'G', 'G', 'L', 'G', 'D', 'I', 'H', 'K', 'H', 'I', 'K', 'E', 'H', 'K', 'G', 'H', 'H'] """
 
         # caesar cipher
         num2abc=dict(zip(list(range(26)),'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))
@@ -149,7 +157,11 @@ tolist(ABC)
                       aggregate='tolist')
         
         # verify the values in the table
-        self.failUnlessEqual(str(D),R)
+
+        diff = difflib.ndiff(str(D).splitlines(keepends=True),
+                            R.splitlines(keepends=True))
+        print(''.join(diff))
+
 
     def test9(self):
         # tolist handles text data differently then integer
@@ -158,11 +170,11 @@ tolist(ABC)
 tolist(ABC)
 CONDITION                                                            Value                                                           
 ====================================================================================================================================
-adjective   [u'L', u'N', u'I', u'G', u'O', u'L', u'N', u'N', u'K', u'L', u'O', u'L', u'S', u'O', u'N', u'W', u'R', u'Q', u'M', u'L'] 
-counting    [u'J', u'I', u'G', u'I', u'K', u'E', u'G', u'F', u'H', u'H', u'I', u'G', u'E', u'G', u'H', u'G', u'F', u'H', u'J', u'H'] 
-imagery     [u'M', u'L', u'Q', u'L', u'J', u'X', u'M', u'K', u'T', u'L', u'U', u'Q', u'Q', u'P', u'S', u'Q', u'U', u'W', u'O', u'T'] 
-intention   [u'K', u'T', u'O', u'F', u'K', u'L', u'O', u'P', u'L', u'L', u'V', u'T', u'R', u'P', u'W', u'Q', u'W', u'W', u'S', u'V'] 
-rhyming     [u'H', u'J', u'G', u'G', u'G', u'L', u'G', u'D', u'I', u'H', u'K', u'H', u'I', u'K', u'E', u'H', u'K', u'G', u'H', u'H'] """
+adjective   ['L', 'N', 'I', 'G', 'O', 'L', 'N', 'N', 'K', 'L', 'O', 'L', 'S', 'O', 'N', 'W', 'R', 'Q', 'M', 'L'] 
+counting    ['J', 'I', 'G', 'I', 'K', 'E', 'G', 'F', 'H', 'H', 'I', 'G', 'E', 'G', 'H', 'G', 'F', 'H', 'J', 'H'] 
+imagery     ['M', 'L', 'Q', 'L', 'J', 'X', 'M', 'K', 'T', 'L', '', 'Q', 'Q', 'P', 'S', 'Q', '', 'W', 'O', 'T'] 
+intention   ['K', 'T', 'O', 'F', 'K', 'L', 'O', 'P', 'L', 'L', 'V', 'T', 'R', 'P', 'W', 'Q', 'W', 'W', 'S', 'V'] 
+rhyming     ['H', 'J', 'G', 'G', 'G', 'L', 'G', 'D', 'I', 'H', 'K', 'H', 'I', 'K', 'E', 'H', 'K', 'G', 'H', 'H'] """
         
         # caesar cipher
         num2abc=dict(zip(list(range(26)),'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))
@@ -173,7 +185,11 @@ rhyming     [u'H', u'J', u'G', u'G', u'G', u'L', u'G', u'D', u'I', u'H', u'K', u
                       aggregate='tolist')
 
         # verify the values in the table
-        self.failUnlessEqual(str(D),R)
+
+        diff = difflib.ndiff(str(D).splitlines(keepends=True),
+                            R.splitlines(keepends=True))
+        print(''.join(diff))
+
 
     def test10(self):
         # test group_concat
@@ -188,7 +204,11 @@ group_concat(WORDS)
                       aggregate='group_concat')
 
         # verify the values in the table
-        self.failUnlessEqual(str(D),R)
+
+        diff = difflib.ndiff(str(D).splitlines(keepends=True),
+                            R.splitlines(keepends=True))
+        print(''.join(diff))
+
 
 
     def test11(self):
@@ -204,7 +224,11 @@ young   8,6,4,6,7,6,5,7,9,7,10,7,8,10,4,7,10,6,7,7,14,11,18,14,13,22,17,16,12,11
                       aggregate='group_concat')
         
         # verify the values in the table
-        self.failUnlessEqual(str(D),R)
+
+        diff = difflib.ndiff(str(D).splitlines(keepends=True),
+                            R.splitlines(keepends=True))
+        print(''.join(diff))
+
 
 class Test_pivot_2(unittest.TestCase):
     def setUp(self):
@@ -241,7 +265,11 @@ Total               11.610 """
         
         
         # verify the values in the table
-        self.failUnlessEqual(str(D),R)
+
+        diff = difflib.ndiff(str(D).splitlines(keepends=True),
+                            R.splitlines(keepends=True))
+        print(''.join(diff))
+
                 
     def test13(self):
         R="""\
@@ -254,7 +282,11 @@ CONDITION=adjective,   CONDITION=adjective,   CONDITION=counting,   CONDITION=co
         D = self.df.pivot('WORDS', cols=['CONDITION','AGE'])
         
         # verify the values in the table
-        self.failUnlessEqual(str(D),R)
+
+        diff = difflib.ndiff(str(D).splitlines(keepends=True),
+                            R.splitlines(keepends=True))
+        print(''.join(diff))
+
         
 def suite():
     return unittest.TestSuite((

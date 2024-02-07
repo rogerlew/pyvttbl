@@ -52,7 +52,7 @@ def scatter_plot(df, aname, bname, where=None, trend=None,
         where = []
 
     # check fname
-    if not isinstance(fname, _strobj) and fname != None:
+    if not isinstance(fname, _strobj) and fname is not None:
         raise TypeError('fname must be None or string')
 
     if isinstance(fname, _strobj):
@@ -111,7 +111,7 @@ def scatter_plot(df, aname, bname, where=None, trend=None,
 
     if fname == None:
         fname = 'scatter(%s_X_%s'%(aname,bname)
-        if trend != None:
+        if trend is not None:
             fname += ',trend=' + trend
         fname += ').png'
 

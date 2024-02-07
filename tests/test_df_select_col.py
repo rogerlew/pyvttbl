@@ -31,7 +31,7 @@ class Test_writeTable(unittest.TestCase):
         d='data/suppression~subjectXgroupXageXcycleXphase.csv'
         r='subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv'
         self.df.write()
-        self.assertTrue(fcmp(d,r))
+        self.assertTrue(fcmp(d,r) is None)
 
         # clean up
         os.remove('./subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv')        
@@ -41,10 +41,10 @@ class Test_writeTable(unittest.TestCase):
         d='data/suppression~subjectXgroupXageXcycleXphase.csv'
         r='subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv'
         self.df.write(where=[('AGE','not in',['young'])])
-        self.assertTrue(fcmp(d,r))
+        self.assertTrue(fcmp(d,r) is None)
 
         # clean up
-        os.remove('./subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv') 
+        #os.remove('./subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv') 
                
 def suite():
     return unittest.TestSuite((

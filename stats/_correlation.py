@@ -22,7 +22,6 @@ import scipy
 import numpy as np
 
 # included modules
-from pyvttbl.stats import _stats
 from pyvttbl.misc.texttable import Texttable as TextTable
 from pyvttbl.misc.support import *
 
@@ -32,25 +31,10 @@ class Correlation(OrderedDict):
         if len(args) > 1:
             raise Exception('expecting only 1 argument')
 
-        if kwds.has_key('conditions_list'):
-            self.conditions_list = kwds['conditions_list']
-        else:
-            self.conditions_list = []
-            
-        if kwds.has_key('coefficient'):
-            self.coefficient = kwds['coefficient']
-        else:
-            self.coefficient = 'pearson'
-            
-        if kwds.has_key('alpha'):
-            self.alpha = kwds['alpha']
-        else:
-            self.alpha = 0.05
-            
-        if kwds.has_key('N'):
-            self.N = kwds['N']
-        else:
-            self.N = 0
+        self.conditions_list = kwds.get('conditions_list', [])
+        self.coefficient = kwds.get('coefficient', 'pearson')
+        self.alpha = kwds.get('alpha', 0.05)
+        self.N = kwds.get('N', 0)
 
         if len(args) == 1:
             super(Correlation, self).__init__(args[0])
@@ -62,6 +46,7 @@ class Correlation(OrderedDict):
         """
         
         """
+        from . import _stats 
 
         # check list_of_lists
         if len(list_of_lists) < 2:
@@ -155,11 +140,11 @@ class Correlation(OrderedDict):
                     rline.append('1')
                     pline.append(' .')
                     nline.append(self.N)
-                elif self.has_key((a,b)):
+                elif (a,b) in self:
                     rline.append(self[(a,b)]['r'])
                     pline.append(self[(a,b)]['p'])
                     nline.append(self.N)
-                elif self.has_key((b,a)):
+                elif (b,a) in self:
                     rline.append(self[(b,a)]['r'])
                     pline.append(self[(b,a)]['p'])
                     nline.append(self.N)

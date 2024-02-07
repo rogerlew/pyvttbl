@@ -371,7 +371,7 @@ A = {(0.1, 2.0): [-2.2485085243379075, -1.5641014278923464, 0.55942294426816752,
 p_keys = [.1,.5,.675,.75,.8,.85,.9,.95,.975,.99,.995,.999]
 
 # v values that are defined in the A table
-v_keys = range(2, 21) + [24, 30, 40, 60, 120, inf]
+v_keys = list(range(2, 21)) + [24, 30, 40, 60, 120, inf]
 
 def _isfloat(x):
     """
@@ -682,7 +682,7 @@ def _qsturng(p, r, v):
             raise ValueError('v must be > 1 when p >= .9')
 
     # The easy case. A tabled value is requested.
-    if A.has_key((p,v)):
+    if (p,v) in A:
         y = _func(A[(p,v)], p, r, v) + 1.
         
     elif p not in p_keys and v not in v_keys+([],[1])[p>=.90]:

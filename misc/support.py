@@ -16,7 +16,10 @@ import math
 import hashlib
 
 def _sha1(item):
-    return '_%s'%hashlib.sha1(str(item)).hexdigest()
+    # Encode the string representation of 'item' to bytes before hashing
+    # Default encoding is utf-8, but you can specify another encoding if necessary
+    return '_%s' % hashlib.sha1(str(item).encode('utf-8')).hexdigest()
+
 
 def _isfloat(string):
     """

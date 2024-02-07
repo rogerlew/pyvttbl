@@ -9,7 +9,7 @@ import os
 import math
 from random import shuffle, random
 from collections import Counter,OrderedDict
-from dictset import DictSet,_rep_generator
+from pyvttbl.misc.dictset import DictSet,_rep_generator
 from math import isnan, isinf, floor
 import numpy as np
 from pprint import pprint as pp
@@ -82,7 +82,6 @@ Observed power two-tail    0.237          """
         D=Ttest()
         D.run(A,B,paired=True)
 
-
         self.assertEqual(str(D),R)
 
     def test4(self):
@@ -111,13 +110,15 @@ Observed power two-tail      0.035            """
         self.assertEqual(str(D),R)
         
     def test__repr__(self):
-        R=Ttest([('t', 2.310889197854228), ('p2tail', 0.026382412254338405), ('p1tail', 0.013191206127169203), ('n1', 21), ('n2', 23), ('df', 37.855400659439084), ('mu1', 51.476190476190474), ('mu2', 41.52173913043478), ('var1', 121.16190476190475), ('var2', 294.0790513833993), ('tc2tail', 1.6861153650443554), ('tc1tail', 2.0246481352107009), ('cohen_d', 0.6908475708680588), ('delta', 2.1846518399376538), ('power1tail', 0.6916337616595899), ('power2tail', 0.56712772561445368)], equal_variance=False, aname='A', bname='B', type='t-Test: Two-Sample Assuming Unequal Variances')
+        R=Ttest([('t', 2.310889197854228), ('p2tail', 0.026382412254338405), ('p1tail', 0.013191206127169203), ('n1', 21), ('n2', 23), ('df', 37.855400659439084), ('mu1', 51.476190476190474), ('mu2', 41.52173913043478), ('var1', 121.16190476190475), ('var2', 294.0790513833993), ('tc2tail', 1.6861153650443554), ('tc1tail', 2.0246481352107009), ('cohen_d', 0.6908475708680588), ('delta', 2.288913928949838), ('power1tail',  0.7266931034075151), ('power2tail', 0.60665945455069)], equal_variance=False, aname='A', bname='B', type='t-Test: Two-Sample Assuming Unequal Variances')
         
         A=[24,61,59,46,43,44,52,43,58,67,62,57,71,49,54,43,53,57,49,56,33]
         B=[42,33,46,37,43,41,10,42,55,19,17,55,26,54,60,28,62,20,53,48,37,85,42]
         
         D=Ttest()
         D.run(A,B,equal_variance=False)
+
+        print(repr(D))
 
         for key in R.keys():
             self.assertAlmostEqual(D[key],R[key])

@@ -64,7 +64,7 @@ def long2wide(in_fname, id, dvs, between=[], within=[],
     if out_fname == None:
         out_fname = 'wide_data.csv'
 
-    with open(out_fname,'wb') as f:
+    with open(out_fname,'w') as f:
         wtr = csv.writer(f)
         wtr.writerow([n.upper() for n in header])
         wtr.writerows(zip(*d)) # transpose and write

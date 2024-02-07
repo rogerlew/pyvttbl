@@ -22,7 +22,7 @@ import scipy
 import numpy as np
 
 # included modules
-from pyvttbl.stats import _stats
+
 from pyvttbl.stats._noncentral import ncfcdf
 from pyvttbl.stats.qsturng import qsturng, psturng
 from pyvttbl.misc.texttable import Texttable as TextTable
@@ -33,35 +33,12 @@ class Anova1way(OrderedDict):
         if len(args) > 1:
             raise Exception('expecting only 1 argument')
 
-        if kwds.has_key('posthoc'):
-            self.posthoc = kwds['posthoc']
-        else:
-            self.posthoc = 'tukey'
-
-        if kwds.has_key('multtest'):
-            self.multtest = kwds['multtest']
-        else:
-            self.multtest = None
-            
-        if kwds.has_key('val'):
-            self.val = kwds['val']
-        else:
-            self.val = 'Measure'
-            
-        if kwds.has_key('factor'):
-            self.factor = kwds['factor']
-        else:
-            self.factor = 'Factor'
-            
-        if kwds.has_key('conditions_list'):
-            self.conditions_list = kwds['conditions_list']
-        else:
-            self.conditions_list = []
-            
-        if kwds.has_key('alpha'):
-            self.alpha = kwds['alpha']
-        else:
-            self.alpha = 0.05
+        self.posthoc = kwds.get('posthoc', 'tukey')
+        self.multtest = kwds.get('multtest')
+        self.val = kwds.get('val', 'Measure')
+        self.factor = kwds.get('factor', 'Factor')
+        self.conditions_list = kwds.get('conditions_list', [])
+        self.alpha = kwds.get('alpha', 0.05)
 
         if len(args) == 1:
             super(Anova1way, self).__init__(args[0])
@@ -77,13 +54,15 @@ class Anova1way(OrderedDict):
         is a label for the independent variable and conditions_list
         is a list of labels for the different treatment groups.
         """
+        from . import _stats
+
         self.L = list_of_lists
         self.val = val
         self.factor = factor
         self.alpha = alpha
         self.posthoc = posthoc
         
-        if conditions_list == None:
+        if conditions_list is None:
             abc = lambda i : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'\
                              [i%26]*(int(math.floor(i/26))+1)
             for i in _xrange(len(list_of_lists)):
@@ -165,7 +144,7 @@ class Anova1way(OrderedDict):
         
         for x in sorted(self.conditions_list):
             for y in sorted(self.conditions_list):
-                if not multtest.has_key((y,x)):
+                if (y,x) not in multtest:
                     abs_diff = abs(d[x]-d[y])
                     q = abs_diff / math.sqrt(self['mswn']*(1./s))
                     sig = 'ns'
@@ -198,7 +177,7 @@ class Anova1way(OrderedDict):
         L = {}
         for x in sorted(self.conditions_list):
             for y in sorted(self.conditions_list):
-                if not L.has_key((y,x)) and x!=y:
+                if (y,x) not in L and x!=y:
                     L[(x,y)] = abs(d[x]-d[y])
 
         L = sorted(list(L.items()), key=lambda t: t[1], reverse=True)
@@ -280,7 +259,7 @@ class Anova1way(OrderedDict):
                               self['dfbn']+self['dfwn'],' ',' ',' ',' ', ' '])
 
         posthoc = ''
-        if self.posthoc.lower() == 'tukey' and self.multtest != None:
+        if self.posthoc.lower() == 'tukey' and self.multtest is not None:
             tt_m = TextTable(max_width=0)
             tt_m.set_cols_dtype(['t'] + ['a']*len(self.conditions_list))
             tt_m.set_cols_align(['l'] + ['l']*len(self.conditions_list))
@@ -292,7 +271,7 @@ class Anova1way(OrderedDict):
                 for b in sorted(self.conditions_list):
                     if a == b:
                         rline.append('0')
-                    elif self.multtest.has_key((a,b)):
+                    elif (a,b) in self.multtest:
                         q = self.multtest[(a,b)]['q']
                         sig = self.multtest[(a,b)]['sig']
                         rline.append('%s %s'%(_str(q), sig))
@@ -314,7 +293,7 @@ class Anova1way(OrderedDict):
             posthoc += '\n  * p < .05 (q-critical[%i, %i] = %s)'%(k, df, q_crit05)
             posthoc += '\n ** p < .01 (q-critical[%i, %i] = %s)'%(k, df, q_crit01)
 
-        if self.posthoc.lower() == 'snk' and self.multtest != None:
+        if self.posthoc.lower() == 'snk' and self.multtest is not None:
 
             tt_m = TextTable(max_width=0)
             tt_m.set_cols_dtype(['t', 'i', 'f', 'a', 'a', 'a', 'a', 't'])
@@ -356,7 +335,7 @@ class Anova1way(OrderedDict):
         if self.posthoc != 'tukey':
             kwds.append(', posthoc="%s"'%self.posthoc)
 
-        if self.multtest != None:
+        if self.multtest is not None:
             kwds.append(', multtest=%s'%repr(self.multtest))
             
         if self.factor != 'Factor':

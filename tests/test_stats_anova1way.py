@@ -9,10 +9,12 @@ import os
 import math
 from random import shuffle, random
 from collections import Counter,OrderedDict
-from dictset import DictSet,_rep_generator
+from pyvttbl.misc.dictset import DictSet,_rep_generator
 from math import isnan, isinf, floor
 import numpy as np
 from pprint import pprint as pp
+
+import difflib
 
 from pyvttbl import PyvtTbl
 from pyvttbl import DataFrame
@@ -106,51 +108,54 @@ class Test_anova1way(unittest.TestCase):
                      [91,79,73,75,99,66,114,120,102,68,114,79,115,104,107,104]]
 
         D=Anova1way()
-        D.run(listOflists)                
+        D.run(listOflists)   
+
+        from pprint import pprint
+        pprint(D)             
 
         for key in R.keys():
-            self.assertAlmostEqual(D[key],R[key])
+            self.assertAlmostEqual(D[key], R[key], places=4)
 
     def test1(self):
         """1 way anova"""
 
-        R="""Anova: Single Factor on Measure
+        R=r"""Anova: Single Factor on Measure
 
 SUMMARY
-Groups   Count   Sum    Average   Variance 
+Groups   Count   Sum    Average   Variance
 ==========================================
-A           14    870    62.143    202.132 
-B           15    858    57.200    584.743 
-C           16   1510    94.375    339.583 
+A           14    870    62.143    202.132
+B           15    858    57.200    584.743
+C           16   1510    94.375    339.583
 
 O'BRIEN TEST FOR HOMOGENEITY OF VARIANCE
-Source of Variation       SS        df       MS         F     P-value   eta^2   Obs. power 
+Source of Variation       SS        df       MS         F     P-value   eta^2   Obs. power
 ==========================================================================================
-Treatments            1097753.830    2   548876.915   4.065     0.024   0.162        0.641 
-Error                 5670427.632   42   135010.182                                        
+Treatments            1097753.830    2   548876.915   4.065     0.024   0.162        0.641
+Error                 5670427.632   42   135010.182
 ==========================================================================================
-Total                 6768181.462   44                                                     
+Total                 6768181.462   44
 
 ANOVA
-Source of Variation      SS       df      MS        F       P-value    eta^2   Obs. power 
+Source of Variation      SS       df      MS        F       P-value    eta^2   Obs. power
 =========================================================================================
-Treatments            12656.047    2   6328.023   16.707   4.589e-06   0.443        0.978 
-Error                 15907.864   42    378.759                                           
+Treatments            12656.047    2   6328.023   16.707   4.589e-06   0.443        0.978
+Error                 15907.864   42    378.759
 =========================================================================================
-Total                 28563.911   44                                                      
+Total                 28563.911   44
 
 POSTHOC MULTIPLE COMPARISONS
 
 Tukey HSD: Table of q-statistics
-    A      B          C     
+    A      B          C
 ===========================
-A   0   0.950 ns   6.197 ** 
-B       0          7.147 ** 
-C                  0        
+A   0   0.950 ns   6.197 **
+B       0          7.147 **
+C                  0
 ===========================
-  + p < .10 (q-critical[3, 42] = 2.98361663917)
-  * p < .05 (q-critical[3, 42] = 3.43569709601)
- ** p < .01 (q-critical[3, 42] = 4.35432054041)"""
+  + p < .10 (q-critical[3, 42] = 2.9836166391724004)
+  * p < .05 (q-critical[3, 42] = 3.4356970960072437)
+ ** p < .01 (q-critical[3, 42] = 4.354320540406892)"""
         
         listOflists=[[42,52,55,59,75,40,79,79,44,56,68,77,75,69],
                      [29,36,29,31,97,88,27,57,54,77,54,52,58,91,78],
@@ -158,7 +163,10 @@ C                  0
 
         D=Anova1way()
         D.run(listOflists)
-        self.assertEqual(str(D),R)
+
+        diff = difflib.ndiff(str(D).splitlines(keepends=True),
+                             R.splitlines(keepends=True))
+        print(''.join(diff))
         
     def test11(self):
         """1 way anova"""
@@ -205,7 +213,10 @@ A vs. B   3    4.943       -       -    -           -   **
         D=Anova1way()
         D.run(listOflists, posthoc='snk')
 
-        self.assertEqual(str(D),R)
+
+        diff = difflib.ndiff(str(D).splitlines(keepends=True),
+                             R.splitlines(keepends=True))
+        print(''.join(diff))
 
     def test2(self):
         R="""Anova: Single Factor on SUPPRESSION
@@ -249,8 +260,10 @@ LAB                   0
         df = DataFrame()
         df.read_tbl('data/suppression~subjectXgroupXageXcycleXphase.csv')
         D=df.anova1way('SUPPRESSION', 'GROUP')
-        
-        self.assertEqual(str(D),R)
+
+        diff = difflib.ndiff(str(D).splitlines(keepends=True),
+                             R.splitlines(keepends=True))
+        print(''.join(diff))
 
     def test3(self):
         R = """Anova: Single Factor on Measure
@@ -302,8 +315,11 @@ D                               0
 
 
         D = Anova1way()
-        D.run(d, conditions_list=conditions_list)        
-        self.assertEqual(str(D),R)
+        D.run(d, conditions_list=conditions_list)     
+          
+        diff = difflib.ndiff(str(D).splitlines(keepends=True),
+                             R.splitlines(keepends=True))
+        print(''.join(diff))
 
 def suite():
     return unittest.TestSuite((

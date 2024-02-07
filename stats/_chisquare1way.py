@@ -21,7 +21,6 @@ from copy import copy
 import scipy
 
 # included modules
-from pyvttbl.stats import _stats
 from pyvttbl.stats._noncentral import ncx2cdf
 from pyvttbl.misc.texttable import Texttable as TextTable
 from pyvttbl.misc.support import *
@@ -80,20 +79,9 @@ class ChiSquare1way(OrderedDict):
         if len(args) > 1:
             raise Exception('expecting only 1 argument')
 
-        if kwds.has_key('measure'):
-            self.measure = kwds['measure']
-        else:
-            self.measure = 'Measure'
-            
-        if kwds.has_key('conditions_list'):
-            self.conditions_list = kwds['conditions_list']
-        else:
-            self.conditions_list = []
-            
-        if kwds.has_key('alpha'):
-            self.alpha = kwds['alpha']
-        else:
-            self.alpha = 0.05
+        self.measure = kwds.get('measure', 'Measure')
+        self.conditions_list = kwds.get('conditions_list', [])
+        self.alpha = kwds.get('alpha', 0.05)
 
         if len(args) == 1:
             super(ChiSquare1way, self).__init__(args[0])
@@ -105,6 +93,8 @@ class ChiSquare1way(OrderedDict):
         """
         
         """
+        from . import _stats
+        
         chisq, prob, df, expected = _stats.lchisquare(observed, expected)
         try:
             lnchisq, lnprob, lndf, lnexpected = \

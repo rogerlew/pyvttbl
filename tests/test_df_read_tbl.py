@@ -26,7 +26,7 @@ class Test_read_tbl(unittest.TestCase):
 
         # skip 4 lines
         # DON'T MESS WITH THE SPACING
-        with open('test.csv','wb') as f:
+        with open('test.csv','w') as f:
             f.write("""
 
 
@@ -51,7 +51,7 @@ x,y,z
     def test01(self):
 
         # no labels
-        with open('test.csv','wb') as f:
+        with open('test.csv','w') as f:
             f.write("""
 1,5,9
 2,6,10
@@ -72,7 +72,7 @@ x,y,z
     def test03(self):
 
         # duplicate labels
-        with open('test.csv','wb') as f:
+        with open('test.csv','w') as f:
             f.write("""
 x,x,x
 1,5,9
@@ -102,7 +102,7 @@ x,x,x
     def test04(self):
 
         # line missing data, no comma after 6
-        with open('test.csv','wb') as f:
+        with open('test.csv','w') as f:
             f.write("""
 x,y,z
 1,5,9
@@ -140,7 +140,7 @@ x   y   z
 4   8   12 """
 
         # cell has empty string, comma after 6
-        with open('test.csv','wb') as f:
+        with open('test.csv','w') as f:
             f.write("""
 x,y,z
 1,5,9
@@ -151,7 +151,9 @@ x,y,z
         self.df=DataFrame()
         self.df.read_tbl('test.csv',skip=1,labels=True)
 
-        self.assertAlmostEqual(str(self.df),R)
+        print('list(self.df.keys()', list(self.df.keys()))
+
+        self.assertEqual(str(self.df),R)
 
     def test06(self):
         R = """\
@@ -163,7 +165,7 @@ y 1   y 2   y 3
   4     8    12 """
 
         # labels have spaces
-        with open('test.csv','wb') as f:
+        with open('test.csv','w') as f:
             f.write("""
 y 1,y 2,y 3
 1,5,9
@@ -174,12 +176,12 @@ y 1,y 2,y 3
         self.df=DataFrame()
         self.df.read_tbl('test.csv',skip=1,labels=True)
         
-        self.assertAlmostEqual(str(self.df),R)
+        self.assertEqual(str(self.df),R)
         
     def test07(self):
 
         # labels have spaces
-        with open('test.csv','wb') as f:
+        with open('test.csv','w') as f:
             f.write("""
 y 1,   y 2   ,   y 3
 1,5,9

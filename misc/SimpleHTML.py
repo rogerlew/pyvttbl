@@ -7,7 +7,7 @@
 """SimpleHTML Writer Module"""
 import re
 from copy import copy
-from md5 import md5
+from hashlib import md5
 
 def isfloat(string):
     """Returns True if string is a float"""
@@ -177,7 +177,7 @@ class SimpleHTML:
             txt2write=txt2write.replace('\t','')
             txt2write=txt2write.replace('\n','')
             
-        fid=open(fname,'wb')
+        fid=open(fname,'w')
         fid.write(txt2write)
         fid.close()
 
@@ -226,7 +226,7 @@ class NavFrame(SimpleHTML):
         self.write('nav.htm')
 
         # nav stylesheet
-        fid=open('nav.css','wb')
+        fid=open('nav.css','w')
         fid.write('a { text-decoration:none; color:black; }\n')
         fid.write('a:hover { color:blue; }\n')
         fid.write('ul { list-style-type: none; padding:0; margin:0; }\n')
@@ -235,7 +235,7 @@ class NavFrame(SimpleHTML):
         fid.close()
 
         # write index
-        fid=open(fname,'wb')
+        fid=open(fname,'w')
         fid.write('<html>\n')
         fid.write('<frameset cols="200,*">\n')
         fid.write('<frame src="nav.htm">\n')

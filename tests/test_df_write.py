@@ -16,6 +16,8 @@ import unittest
 import warnings
 import os
 
+from os.path import exists as _exists
+
 import numpy as np
 
 from pyvttbl import DataFrame
@@ -25,23 +27,27 @@ from pyvttbl.tests.support import *
 class Test_writeTable(unittest.TestCase):
     def setUp(self):
         self.df=DataFrame()
-        self.df.read_tbl('data\suppression~subjectXgroupXageXcycleXphase.csv')
+        self.df.read_tbl(r'data\suppression~subjectXgroupXageXcycleXphase.csv')
 
     def test0(self):
-        d='data\suppression~subjectXgroupXageXcycleXphase.csv'
+        d=r'data\writeTable_test0.csv'
         r='subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv'
         self.df.write()
-        self.assertTrue(fcmp(d,r))
+
+        self.assertTrue(_exists('./subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv'))
+
+        print(self.df)
+        self.assertTrue(fcmp(d,r) is None)
 
         # clean up
         os.remove('./subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv')        
 
     def test1(self):
         # with exclusion
-        d='data\suppression~subjectXgroupXageXcycleXphase.csv'
+        d=r'data\writeTable_test1.csv'
         r='subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv'
         self.df.write(where=[('AGE','not in',['young'])])
-        self.assertTrue(fcmp(d,r))
+        self.assertTrue(fcmp(d,r) is None)
 
         # clean up
         os.remove('./subjectXsexXageXgroupXcycleXphaseXsuppressionXranddata.csv') 

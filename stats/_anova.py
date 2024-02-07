@@ -180,14 +180,13 @@ class anova:
             html = a SimpleHTML.SimpleHTML object        
 """
 
-# Python 2 to 3 workarounds
 import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
+_strobj = str
+_xrange = range
+
+def _range(n):
+    return list(range(n))
+
 
 import csv
 import numpy
@@ -211,7 +210,7 @@ except:
     from scipy.stats import sem as stderr
 
 from scipy.signal import detrend
-from sets import Set
+
 
 from pyvttbl.misc.SimpleHTML import *
 from pyvttbl.misc.texttable import Texttable as TextTable
@@ -274,7 +273,7 @@ def std_error(X):
 def _xunique_combinations(items, n):
     if n==0: yield []
     else:
-        for i in xrange(len(items)):
+        for i in range(len(items)):
             for cc in _xunique_combinations(items[i+1:],n-1):
                 yield [items[i]]+cc
 
@@ -559,45 +558,14 @@ class Anova(OrderedDict):
     def __init__(self, *args, **kwds):
 
 
-        if kwds.has_key('df'):
-            self.df = kwds['df']
-        else:
-            self.df = {}
-            
-        if kwds.has_key('wfactors'):
-            self.wfactors = kwds['wfactors']
-        else:
-            self.wfactors = []
-                
-        if kwds.has_key('bfactors'):
-            self.bfactors = kwds['bfactors']
-        else:
-            self.bfactors = []
-
-        if kwds.has_key('alpha'):
-            self.alpha = kwds['alpha']
-        else:
-            self.alpha = 0.05
-
-        if kwds.has_key('measure'):
-            self.measure = kwds['measure']
-        else:
-            self.measure = ''
-
-        if kwds.has_key('dv'):
-            self.dv = kwds['dv']
-        else:
-            self.dv = None
-            
-        if kwds.has_key('sub'):
-            self.sub = kwds['sub']
-        else:
-            self.sub = 'SUBJECT'
-
-        if kwds.has_key('transform'):
-            self.transform = kwds['transform']
-        else:
-            self.transform = ''
+        self.df = kwds.get('df', {})
+        self.wfactors = kwds.get('wfactors', [])
+        self.bfactors = kwds.get('bfactors', [])
+        self.alpha = kwds.get('alpha', 0.05)
+        self.measure = kwds.get('measure', '')
+        self.dv = kwds.get('dv')
+        self.sub = kwds.get('sub', 'SUBJECT')
+        self.transform = kwds.get('transform', '')
         
         if len(args) == 1:
             super(Anova, self).__init__(args[0])
@@ -733,7 +701,7 @@ class Anova(OrderedDict):
                             shape(pt_asarray,1),Nd)
         
         sc, sy = {}, {}
-        for f in xrange(1,Nf+1):
+        for f in range(1,Nf+1):
             # create main effect/interaction component contrasts
             sc[(f,1)] = ones((D[f-1],1))
             sc[(f,2)] = detrend(eye(D[f-1]),type='constant')
@@ -745,7 +713,7 @@ class Anova(OrderedDict):
         # Loop through effects
         # Do fancy calculations
         # Record the results of the important fancy calcuations
-        for e in xrange(1,Ne+1):
+        for e in range(1,Ne+1):
             
             # code effects so we can build contrasts
             cw = self._num2binvec(e,Nf)
@@ -754,7 +722,7 @@ class Anova(OrderedDict):
         
             # create full contrasts
             c = sc[(1,cw[Nf-1])];  
-            for f in xrange(2,Nf+1):
+            for f in range(2,Nf+1):
                 c = kron(c, sc[(f,cw[Nf-f])])
                 
             Nc = shape(c,1) # Number of conditions in effect
@@ -766,7 +734,7 @@ class Anova(OrderedDict):
             
             # calculate component means
             cy = sy[(1, cw[Nf-1])]
-            for f in xrange(2,Nf+1):
+            for f in range(2,Nf+1):
                 cy = kron(cy, sy[(f,cw[Nf-f])] )
         
             r['y2'] = mean(dot(pt_asarray,cy),0)
@@ -783,13 +751,13 @@ class Anova(OrderedDict):
         ss_error = ss_total
         dfe=len(self.df[self.dv])-1.-self.dftrim
         
-        for i in xrange(1,len(factors)+1):
+        for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
                 ss_error -= self[tuple(efs)]['ss']
                 dfe -= self[tuple(efs)]['df']
 
         # calculate F, p, and standard errors
-        for i in xrange(1,len(factors)+1):
+        for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
 
                 r = self[tuple(efs)]
@@ -848,7 +816,7 @@ class Anova(OrderedDict):
                             shape(pt_asarray,1),Nd)
         
         sc,sy = {},{}
-        for f in xrange(1,Nf+1):
+        for f in range(1,Nf+1):
             # create main effect/interaction component contrasts
             sc[(f,1)] = ones((D[f-1],1))
             sc[(f,2)] = detrend(eye(D[f-1]),type='constant')
@@ -860,7 +828,7 @@ class Anova(OrderedDict):
         # Loop through effects
         # Do fancy calculations
         # Record the results of the important fancy calcuations
-        for e in xrange(1,Ne+1):
+        for e in range(1,Ne+1):
 
             # code effects so we can build contrasts
             cw = self._num2binvec(e,Nf)
@@ -869,7 +837,7 @@ class Anova(OrderedDict):
         
             # create full contrasts
             c = sc[(1,cw[Nf-1])];  
-            for f in xrange(2,Nf+1):
+            for f in range(2,Nf+1):
                 c = kron(c, sc[(f,cw[Nf-f])])
                 
             Nc = shape(c,1) # Number of conditions in effect
@@ -880,7 +848,7 @@ class Anova(OrderedDict):
 
             # calculate component means
             cy = sy[(1, cw[Nf-1])]
-            for f in xrange(2,Nf+1):
+            for f in range(2,Nf+1):
                 cy = kron(cy, sy[(f,cw[Nf-f])] )
         
             r['y2'] = mean(dot(pt_asarray,cy),0)
@@ -923,7 +891,7 @@ class Anova(OrderedDict):
 
         sse_b = ss_bsub 
         self.befs = [] # list of between subjects effects
-        for i in xrange(1,len(bfactors)+1):
+        for i in range(1,len(bfactors)+1):
             for efs in _xunique_combinations(bfactors, i):
                 sse_b -= self[tuple(efs)]['ss']
                 self.befs.append(efs) 
@@ -946,7 +914,7 @@ class Anova(OrderedDict):
         
         # calculate ss, df, and mss for within subjects effects
         self.wefs=[]
-        for i in xrange(1, len(wfactors)+1):
+        for i in range(1, len(wfactors)+1):
             for efs in _xunique_combinations(wfactors, i):
                     
                 self.wefs.append(efs)
@@ -959,12 +927,12 @@ class Anova(OrderedDict):
                 r['ss'] *= prod([len(conditions[f]) for f in wfactors
                                  if f not in efs])
 
-                for j in xrange(1, len(efs+bfactors)+1):
+                for j in range(1, len(efs+bfactors)+1):
                     for efs2 in _xunique_combinations(efs+bfactors, j):
                         
                         if efs2 not in self.befs and efs2!=efs:
                             if self.sub in efs2 and \
-                            len(Set(efs2).intersection(Set(bfactors)))>0:
+                            len(set(efs2).intersection(set(bfactors)))>0:
                                 pass
                             
                             else:
@@ -988,7 +956,7 @@ class Anova(OrderedDict):
         
         # calculate mse, dfe, sse, F, p, and standard errors
         # between subjects effects        
-        for i in xrange(1,len(bfactors)+1):
+        for i in range(1,len(bfactors)+1):
             for efs in _xunique_combinations(bfactors, i):
                 r = self[tuple(efs)]
                 
@@ -1024,7 +992,7 @@ class Anova(OrderedDict):
         
         # calculate mse, dfe, sse, F, p, and standard errors
         # within subjects effects
-        for i in xrange(1,len(factors)+1):
+        for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
                 
                 if efs not in self.befs:
@@ -1103,7 +1071,7 @@ class Anova(OrderedDict):
                             shape(pt_asarray,1),Nd)
         
         sc,sy = {},{}
-        for f in xrange(1,Nf+1):
+        for f in range(1,Nf+1):
             # create main effect/interaction component contrasts
             sc[(f,1)] = ones((D[f-1],1))
             sc[(f,2)] = detrend(eye(D[f-1]),type='constant')
@@ -1114,7 +1082,7 @@ class Anova(OrderedDict):
             
         # Calulate dfs and dfes
         dfe_sum=0.
-        for i in xrange(1,len(factors)+1):
+        for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
                 r={}
                 
@@ -1128,7 +1096,7 @@ class Anova(OrderedDict):
         # Loop through effects
         # Do fancy calculations
         # Record the results of the important fancy calcuations
-        for e in xrange(1,Ne+1):
+        for e in range(1,Ne+1):
             # code effects so we can build contrasts
             cw = self._num2binvec(e,Nf)
             efs = asarray(factors)[Nf-1-where(asarray(cw)==2.)[0][::-1]]
@@ -1136,7 +1104,7 @@ class Anova(OrderedDict):
         
             # create full contrasts
             c = sc[(1,cw[Nf-1])];  
-            for f in xrange(2,Nf+1):
+            for f in range(2,Nf+1):
                 c = kron(c, sc[(f,cw[Nf-f])])
                 
             Nc = shape(c,1) # Number of conditions in effect
@@ -1148,7 +1116,7 @@ class Anova(OrderedDict):
 
             # calculate component means
             cy = sy[(1, cw[Nf-1])]
-            for f in xrange(2,Nf+1):
+            for f in range(2,Nf+1):
                 cy = kron(cy, sy[(f,cw[Nf-f])] )
         
             r['y2'] = mean(dot(pt_asarray,cy),0)
@@ -1291,7 +1259,7 @@ class Anova(OrderedDict):
               'SE of x&#772;,&#177;95% CI,&lambda;,Obs. Power'.split(',')
         tbodys=[[]]
 
-        for i in xrange(1,len(factors)+1):
+        for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
                 r=self[tuple(efs)]
                 src=''.join(['%s * '%f for f in efs])[:-3]
@@ -1343,7 +1311,7 @@ class Anova(OrderedDict):
 
         tbodys.append([])
         
-        for i in xrange(1,len(bfactors)+1):
+        for i in range(1,len(bfactors)+1):
             for efs in _xunique_combinations(bfactors, i):
                 r=self[tuple(efs)]
                 src='&nbsp;'*9+''.join(['%s * '%f for f in efs])[:-3]
@@ -1374,7 +1342,7 @@ class Anova(OrderedDict):
         tbodys=[]
 
         defs=[]
-        for i in xrange(1,len(wfactors)+1):
+        for i in range(1,len(wfactors)+1):
             for efs in _xunique_combinations(wfactors, i):
                 defs.append(efs)
                 
@@ -1398,12 +1366,12 @@ class Anova(OrderedDict):
                    r['p_lb'],r['eta'],r['obs_lb'],r['se_lb'],r['ci_lb'],
                    r['lambda_lb'],r['power_lb']]))
 
-                for i in xrange(1,len(factors)+1):
+                for i in range(1,len(factors)+1):
                     for efs2 in _xunique_combinations(factors, i):
                         if efs2 not in self.befs and \
                            efs2 not in defs and \
                            efs2 not in self.wefs \
-                           and len(Set(efs2).difference(Set(efs+bfactors)))==0:
+                           and len(set(efs2).difference(set(efs+bfactors)))==0:
                             defs.append(efs2)
                             
                             tbodys.append([])
@@ -1464,7 +1432,7 @@ class Anova(OrderedDict):
                'SE of x&#772;,&#177;95% CI,&lambda;,Obs. Power'.split(',')
         tbodys=[]
 
-        for i in xrange(1,len(factors)+1):
+        for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
                 tbodys.append([])
                 r=self[tuple(efs)]
@@ -1510,7 +1478,7 @@ class Anova(OrderedDict):
         txt='Tables of Estimated Marginal Means'
         html.add(h(a(txt,name='1_'+md5sum(txt)),2,'center'))
                  
-        for i in xrange(1,len(factors)+1):
+        for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
                 html.add(br())
                 txt='Estimated Marginal Means for ' + \
@@ -1608,7 +1576,7 @@ class Anova(OrderedDict):
         tt.header('Source,Type III\nSS,df,MS,F,Sig.,et2_G,'
                   'Obs.,SE,95% CI,lambda,Obs.\nPower'.split(','))
         
-        for i in xrange(1,len(factors)+1):
+        for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
                 r=self[tuple(efs)]
                 src=''.join(['%s * '%f for f in efs])[:-3]
@@ -1661,7 +1629,7 @@ class Anova(OrderedDict):
                     self[(self.sub,)]['df'],
                     '','','','','','','','',''])
         
-        for i in xrange(1,len(bfactors)+1):
+        for i in range(1,len(bfactors)+1):
             for efs in _xunique_combinations(bfactors, i):
                 r=self[tuple(efs)]
                 src=''.join(['%s * '%f for f in efs])[:-3]
@@ -1697,7 +1665,7 @@ class Anova(OrderedDict):
                   'SE,95% CI,lambda,Obs.\nPower'.split(','))
         
         defs=[]
-        for i in xrange(1,len(wfactors)+1):
+        for i in range(1,len(wfactors)+1):
             for efs in _xunique_combinations(wfactors, i):
                 defs.append(efs)
                 treatment = []
@@ -1721,17 +1689,17 @@ class Anova(OrderedDict):
                    r['ci_lb'],r['lambda_lb'],r['power_lb']])
 
                 row = []
-                for i in _xrange(14):
+                for i in _range(14):
                     row.append('\n'.join(_str(treatment[j][i])
-                                         for j in _xrange(4)))
+                                         for j in _range(4)))
                 tt.add_row(row)
                 
-                for i in xrange(1,len(factors)+1):
+                for i in range(1,len(factors)+1):
                     for efs2 in _xunique_combinations(factors, i):
                         if efs2 not in self.befs and \
                            efs2 not in defs and \
                            efs2 not in self.wefs \
-                           and len(Set(efs2).difference(Set(efs+bfactors)))==0:
+                           and len(set(efs2).difference(set(efs+bfactors)))==0:
                             defs.append(efs2)
                             treatment = []
                             r=self[tuple(efs2)]
@@ -1757,9 +1725,9 @@ class Anova(OrderedDict):
                                r['lambda_lb'],r['power_lb']])
                             
                             row = []
-                            for i in _xrange(14):
+                            for i in _range(14):
                                 row.append('\n'.join(_str(treatment[j][i])
-                                                     for j in _xrange(4)))
+                                                     for j in _range(4)))
                             tt.add_row(row)
                             
                 error = []
@@ -1780,9 +1748,9 @@ class Anova(OrderedDict):
                    '','','','','','','',''])
 
                 row = []
-                for i in _xrange(14):
+                for i in _range(14):
                     row.append('\n'.join(_str(error[j][i])
-                                         for j in _xrange(4)))
+                                         for j in _range(4)))
                 tt.add_row(row)
 
         s.append(tt.draw())
@@ -1807,7 +1775,7 @@ class Anova(OrderedDict):
                   'et2_G,Obs.,'
                   'SE,95% CI,lambda,Obs.\nPower'.split(','))
         
-        for i in xrange(1,len(factors)+1):
+        for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
                 treatment = []
                 r=self[tuple(efs)]
@@ -1830,9 +1798,9 @@ class Anova(OrderedDict):
                    r['ci_lb'],r['lambda_lb'],r['power_lb']])
 
                 row = []
-                for i in _xrange(14):
+                for i in _range(14):
                     row.append('\n'.join(_str(treatment[j][i])
-                                         for j in _xrange(4)))
+                                         for j in _range(4)))
                 tt.add_row(row)
 
                 error = []
@@ -1851,9 +1819,9 @@ class Anova(OrderedDict):
                    '','','','','','','',''])
 
                 row = []
-                for i in _xrange(14):
+                for i in _range(14):
                     row.append('\n'.join(_str(error[j][i])
-                                         for j in _xrange(4)))
+                                         for j in _range(4)))
                 tt.add_row(row)
 
         s.append(tt.draw())
@@ -1864,7 +1832,7 @@ class Anova(OrderedDict):
         
         # Write Summary Means
         s = ['\n\nTABLES OF ESTIMATED MARGINAL MEANS\n\n']
-        for i in xrange(1,len(factors)+1):
+        for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
                 s.append('Estimated Marginal Means for ' + \
                      ''.join(['%s * '%f for f in efs])[:-3] + '\n')
@@ -2012,7 +1980,7 @@ class Anova(OrderedDict):
         if self.measure != '':
             kwds.append(", measure='%s'"%self.measure)
 
-        if self.dv != None:
+        if self.dv is not None:
             kwds.append(", dv='%s'"%self.dv)
             
         if self.sub != 'SUBJECT':

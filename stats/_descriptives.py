@@ -26,12 +26,9 @@ class Descriptives(OrderedDict):
     def __init__(self, *args, **kwds):
         if len(args) > 1:
             raise Exception('expecting only 1 argument')
+        
+        self.cname = kwds.get('cname', None)
 
-        if kwds.has_key('cname'):
-            self.cname = kwds['cname']
-        else:
-            self.cname = None
-            
         if len(args) == 1:
             super(Descriptives, self).__init__(args[0])
         else:
@@ -109,7 +106,7 @@ class Descriptives(OrderedDict):
         args = '[' + ', '.join(s) + ']'
         
         kwds = ''     
-        if self.cname != None:
+        if self.cname is not None:
             kwds = ", cname='%s'"%self.cname
 
 

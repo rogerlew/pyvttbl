@@ -9,7 +9,7 @@ import os
 import math
 from random import shuffle, random
 from collections import Counter,OrderedDict
-from dictset import DictSet,_rep_generator
+from pyvttbl.misc.dictset import DictSet,_rep_generator
 from math import isnan, isinf, floor
 import numpy as np
 from pprint import pprint as pp

@@ -21,7 +21,6 @@ from copy import copy
 import scipy
 
 # included modules
-from pyvttbl.stats import _stats
 from pyvttbl.stats._noncentral import ncx2cdf
 from pyvttbl.misc.texttable import Texttable as TextTable
 from pyvttbl.misc.support import *
@@ -31,36 +30,13 @@ class ChiSquare2way(OrderedDict):
         if len(args) > 1:
             raise Exception('expecting only 1 argument')
 
-        if kwds.has_key('counter'):
-            self.counter = kwds['counter']
-        else:
-            self.counter = None
-
-        if kwds.has_key('row_counter'):
-            self.row_counter = kwds['row_counter']
-        else:
-            self.row_counter = None
-
-        if kwds.has_key('col_counter'):
-            self.col_counter = kwds['col_counter']
-        else:
-            self.col_counter = None
-
-        if kwds.has_key('N_r'):
-            self.N_r = kwds['N_r']
-        else:
-            self.N_r = None
-
-        if kwds.has_key('N_c'):
-            self.N_c = kwds['N_c']
-        else:
-            self.N_c = None
-
-        if kwds.has_key('alpha'):
-            self.alpha = kwds['alpha']
-        else:
-            self.alpha = 0.05
-            
+        self.counter = kwds.get('counter', None)
+        self.row_counter = kwds.get('row_counter', None)
+        self.col_counter = kwds.get('col_counter', None)
+        self.N_r = kwds.get('N_r', None)
+        self.N_c = kwds.get('N_c', None)
+        self.alpha = kwds.get('alpha', 0.05)
+    
         if len(args) == 1:
             super(ChiSquare2way, self).__init__(args[0])
         else:
@@ -71,6 +47,8 @@ class ChiSquare2way(OrderedDict):
         runs a 2-way chi square on the matched data in row_factor
         and col_factor.
         """
+
+        from . import _stats
 
         if len(row_factor) != len(col_factor):
             raise Exception('row_factor and col_factor must be equal lengths')
@@ -200,7 +178,7 @@ class ChiSquare2way(OrderedDict):
         tt_a.header([' ', 'Value', 'df', 'P'])
         tt_a.add_row(['Pearson Chi-Square',
                       self['chisq'], self['df'], self['p']])
-        if self['ccchisq'] != None:
+        if self['ccchisq'] is not None:
             tt_a.add_row(['Continuity Correction',
                           self['ccchisq'], self['df'], self['ccp']])
         tt_a.add_row(['Likelihood Ratio',
@@ -236,19 +214,19 @@ class ChiSquare2way(OrderedDict):
         args = '[' + ', '.join(s) + ']'
         
         kwds = []                        
-        if self.counter != None:
+        if self.counter is not None:
             kwds.append(', counter=%s'%repr(self.counter))
 
-        if self.row_counter != None:
+        if self.row_counter is not None:
             kwds.append(', row_counter=%s'%repr(self.row_counter))
 
-        if self.col_counter != None:
+        if self.col_counter is not None:
             kwds.append(', col_counter=%s'%repr(self.col_counter))
 
-        if self.N_r != None:
+        if self.N_r is not None:
             kwds.append(', N_r=%i'%self.N_r)
 
-        if self.N_c != None:
+        if self.N_c is not None:
             kwds.append(', N_c=%i'%self.N_c)
 
         if self.alpha != 0.05:

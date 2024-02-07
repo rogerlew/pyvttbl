@@ -40,21 +40,10 @@ class Marginals(OrderedDict):
         if len(args) > 1:
             raise Exception('expecting only 1 argument')
 
-        if kwds.has_key('val'):
-            self.val = kwds['val']
-        else:
-            self.val = None
+        self.val = kwds.get('val')
+        self.factors = kwds.get('factors')
+        self.where = kwds.get('where', [])
 
-        if kwds.has_key('factors'):
-            self.factors = kwds['factors']
-        else:
-            self.factors = None
-            
-        if kwds.has_key('where'):
-            self.where = kwds['where']
-        else:
-            self.where = []
-            
         if len(args) == 1:
             super(Marginals, self).__init__(args[0])
         else:
@@ -66,7 +55,7 @@ class Marginals(OrderedDict):
         and column labels in factors.
         """
 
-        if where == None:
+        if where is None:
             where = []
         
         if df == {}:
@@ -89,7 +78,7 @@ class Marginals(OrderedDict):
 
         if not hasattr(factors, '__iter__'):
             raise TypeError( "'%s' object is not iterable"
-                         % type(cols).__name__)
+                         % type(factors).__name__)
         
         dmu = df.pivot(val, rows=factors, where=where,
                          aggregate='avg')
@@ -118,11 +107,11 @@ class Marginals(OrderedDict):
         super(Marginals, self).__init__()
 
         self['factorials'] = factorials
-        self['dmu'] = list(dmu)
-        self['dN'] = list(dN)
-        self['dsem'] = list(dsem)
-        self['dlower'] = list(dlower)
-        self['dupper'] = list(dupper)
+        self['dmu'] = [float(v) for v in dmu]
+        self['dN'] = [float(v) for v in dN]
+        self['dsem'] = [float(v) for v in dsem]
+        self['dlower'] = [float(v) for v in dlower]
+        self['dupper'] = [float(v) for v in dupper]
 
         self.val = val
         self.factors = factors
@@ -176,10 +165,10 @@ class Marginals(OrderedDict):
         args = '[' + ', '.join(s) + ']'
         
         kwds = []            
-        if self.val != None:
+        if self.val is not None:
             kwds.append(", val='%s'"%self.val)
             
-        if self.factors != None:
+        if self.factors is not None:
             kwds.append(", factors=%s"%self.factors)
             
         if self.where != []:
