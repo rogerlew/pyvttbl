@@ -24,7 +24,7 @@ By default Anova1way will use the Tukey test for pairwise comparisons.
 
 .. sourcecode:: python
 
-    from pyvttbl import Anova1way
+    from pyvttbl.stats import Anova1way
     d = [[21.0, 20.0, 26.0, 46.0, 35.0, 13.0, 41.0, 30.0, 42.0, 26.0],
          [23.0, 30.0, 34.0, 51.0, 20.0, 38.0, 34.0, 44.0, 41.0, 35.0],
          [35.0, 35.0, 52.0, 29.0, 54.0, 32.0, 30.0, 42.0, 50.0, 21.0],
@@ -85,7 +85,7 @@ Using the Newman-Keuls Test
 
 .. sourcecode:: python
 
-    from pyvttbl import Anova1way
+    from pyvttbl.stats import Anova1way
     d = [[21.0, 20.0, 26.0, 46.0, 35.0, 13.0, 41.0, 30.0, 42.0, 26.0],
          [23.0, 30.0, 34.0, 51.0, 20.0, 38.0, 34.0, 44.0, 41.0, 35.0],
          [35.0, 35.0, 52.0, 29.0, 54.0, 32.0, 30.0, 42.0, 50.0, 21.0],
