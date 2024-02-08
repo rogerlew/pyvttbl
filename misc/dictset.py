@@ -1,17 +1,12 @@
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
 """This module contains the DictSet class"""
 
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    from functools import reduce
-    _xrange = range
+from functools import reduce
 
 from copy import copy, deepcopy    
 import numpy as np
+
 
 # for unique_combinations method
 def _rep_generator(A, times, each):
@@ -30,7 +25,7 @@ def _rep_generator(A, times, each):
         >>> [v for v in g]
         [1, 1, 2, 2, 3, 3, 1, 1, 2, 2, 3, 3]
     """
-    return (a for t in _xrange(times) for a in A for e in _xrange(each))
+    return (a for t in range(times) for a in A for e in range(each))
 
 
 class DictSet(dict):
@@ -696,7 +691,7 @@ class DictSet(dict):
                                              int(times),int(each))
 
             # Now we just have to yield the results
-            for i in _xrange(N):
+            for i in range(N):
                 yield [next(gen_dict[k]) for k in keys]
 
     @classmethod

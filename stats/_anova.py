@@ -1,6 +1,4 @@
-from __future__ import print_function
-
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
 #
 # Change Log
@@ -19,7 +17,9 @@ from __future__ import print_function
 # 05/17/2012
 #   all power estimates based on partial eta squares and
 #   validated against G*Power
-
+#
+# 02/08/2024
+#   added support for Python 3
 
 """
 class to perform one-way and factorial analyses of variance on between,
@@ -180,29 +180,18 @@ class anova:
             html = a SimpleHTML.SimpleHTML object        
 """
 
-import sys
-_strobj = str
-_xrange = range
-
-def _range(n):
-    return list(range(n))
-
-
-import csv
 import numpy
 import scipy
 import pylab
 
 from collections import OrderedDict
 from copy import copy
-from numpy import any,array,asarray,concatenate, \
-                  cov,diag,dot,eye,fix,floor,isnan, \
-                  kron,min,max,mean,ones,prod,shape, \
+from numpy import array,asarray, \
+                  cov,diag,dot,eye,floor,isnan, \
+                  kron,mean,ones,prod,shape, \
                   sqrt,std,trace,where,zeros 
 from numpy import remainder as rem
 from numpy import sum as nsum
-from numpy.random import uniform
-from pprint import pprint as pp
 
 try:
     from scipy.stats.stats import stderr
@@ -211,10 +200,12 @@ except:
 
 from scipy.signal import detrend
 
-
 from pyvttbl.misc.SimpleHTML import *
 from pyvttbl.misc.texttable import Texttable as TextTable
 from pyvttbl.misc.support import *
+
+def _range(n):
+    return list(range(n))
 
 def observed_power(df,dfe,nc,alpha=0.05,eps=1.0):
     """
@@ -1505,41 +1496,12 @@ class Anova(OrderedDict):
                                               dlowr[i],dhghr[i]]))
 
                 html.add(table(tbodys, thead))
-
-##    def summary(self, sig_only=True, criterion='gg',
-##                sphericity_assumed=True,
-##                greenhouse_geisser=True,
-##                huynh_feldt=True,
-##                box=True,
-##                marginals=False):
-##        if self.measure == '':
-##            title  = '%s ~'%self.dv
-##        else:
-##            title  = '%s of %s ~'%(measure, self.dv)
-##
-##        factors = self.wfactors + self.bfactors
-##        title += ''.join([' %s *'%f for f in factors])[:-2]
-##
-##        s = [title]
-##        if len(self.wfactors)!=0 and len(self.bfactors)==0:
-##            s.append(self._within_str())
-##            
-##        if len(self.wfactors)==0 and len(self.bfactors)!=0:
-##            s.append(self._between_str())
-##            
-##        if len(self.wfactors)!=0 and len(self.bfactors)!=0:
-##            s.append(self._mixed_str())
-##
-##        if marginals:
-##            s.append(self._summary_str(factors))
-##        return ''.join(s)
-
         
     def __str__(self):
         if self.measure == '':
             title  = '%s ~'%self.dv
         else:
-            title  = '%s of %s ~'%(measure, self.dv)
+            title  = '%s of %s ~'%(self.measure, self.dv)
 
         factors = self.wfactors + self.bfactors
         title += ''.join([' %s *'%f for f in factors])[:-2]

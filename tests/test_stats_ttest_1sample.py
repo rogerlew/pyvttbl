@@ -1,13 +1,7 @@
-from __future__ import print_function
-
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
 
 import unittest
-import warnings
-import os
-import math
-from random import shuffle, random
 from collections import Counter,OrderedDict
 from pyvttbl.misc.dictset import DictSet,_rep_generator
 from math import isnan, isinf, floor

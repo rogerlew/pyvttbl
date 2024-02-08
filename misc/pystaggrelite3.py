@@ -1,6 +1,4 @@
-from __future__ import print_function
-
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
 
 """
@@ -53,21 +51,14 @@ and mode are implemented with running tallies.
 
 import sys
 import inspect
-from math import sqrt,isnan,isinf,log10,log,exp,floor
+from math import sqrt,isnan,isinf,log,exp,floor
 from copy import copy
 from collections import Counter
 
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
+_xrange = range
     
-maxfloat=    sys.float_info.max
-minfloat=-1.*sys.float_info.max
+maxfloat = sys.float_info.max
+minfloat = -1.0 * sys.float_info.max
 
 def getaggregators():
     """returns a generator of the (name,arity,function) of the
@@ -99,6 +90,7 @@ def isfloat(x):
     except: return False
     return True
 
+
 def _flatten(x):
     """_flatten(sequence) -> list
 
@@ -120,6 +112,7 @@ def _flatten(x):
         else:
             result.append(el)
     return result
+
 
 def hist(V, bins=10, range=None, density=False, weights=None, cumulative=False):
     # docstring mostly borrowed from numpy.histogram and pylab.hist
@@ -233,15 +226,14 @@ def hist(V, bins=10, range=None, density=False, weights=None, cumulative=False):
         for i in _xrange(bins):
             N[i] /= (dbin*total)
 
-##    for n,b in zip(N, B):
-##        print(_str(b,'f',3),n)
-
     return N,B
+
 
 class ignore:
     """getaggregators shouldn't return this"""
     def __init__(self):
         pass
+
 
 class hasnan:
     """

@@ -1,31 +1,21 @@
 
+<!DOCTYPE html>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Anova1way &mdash; pyvttbl v 0.5.2.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     'v 0.5.2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pyvttbl v 0.5.2.0 documentation" href="index.html" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Anova1way &#8212; pyvttbl v 0.5.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ChiSquare1way" href="ChiSquare1way.html" />
     <link rel="prev" title="Anova" href="Anova.html" />
  
@@ -67,13 +57,12 @@ div.specialfooterright {
 }
 </style>
 
-  </head>
-  <body>
+  </head><body>
 <div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
 <img src="_static/pyvttbl_logo.png" alt="pyvttbl logo" />
 </div>
 
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -91,57 +80,20 @@ div.specialfooterright {
         <li><a href="http://code.google.com/p/pyvttbl/">pyvttbl home</a>&nbsp;|&nbsp;</li>
         <li><a href="index.html">Documentation</a>
           &raquo;</li>
- 
-      </ul>
-    </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Anova1way</a><ul>
-<li><a class="reference internal" href="#using-the-anova1way-object-directly">Using the Anova1way object directly</a></li>
-<li><a class="reference internal" href="#using-the-newman-keuls-test">Using the Newman-Keuls Test</a></li>
-<li><a class="reference internal" href="#running-single-factor-anova-with-dataframe">Running Single Factor ANOVA with <tt class="docutils literal"><span class="pre">DataFrame</span></tt></a></li>
-</ul>
-</li>
-</ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="Anova.html"
-                        title="previous chapter">Anova</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="ChiSquare1way.html"
-                        title="next chapter">ChiSquare1way</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/Anova1way.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+        <li class="nav-item nav-item-this"><a href="">Anova1way</a></li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
-  <div class="section" id="anova1way">
-<h1>Anova1way<a class="headerlink" href="#anova1way" title="Permalink to this headline">¶</a></h1>
+  <section id="anova1way">
+<h1>Anova1way<a class="headerlink" href="#anova1way" title="Permalink to this heading">¶</a></h1>
 <p><cite>Anova1way</cite> performs a single factor between analysis of variance.
-The analysis automatically calculates descriptive, performs the O&#8217;Brien test
+The analysis automatically calculates descriptive, performs the O’Brien test
 for heterosphericity (H0 is that the variances are equal), performs post-hoc
 power analyses, and post-hoc pairwise comparisons.</p>
 <p>This ANOVA method is robust to non-equivalent sample sizes. The observed power
@@ -149,140 +101,142 @@ estimates have been validated against <a class="reference external" href="http:/
 <p>Post-hoc comparisons can be made using the Tukey Test or the Newman-Keuls Test.
 If you are unfamiliar with these post-hoc multiple comparisons the idea is that the
 ANOVA will tell you if the data suggests that something is going on between the groups
-(not from the same population), but it doesn&#8217;t tell you which groups are different
+(not from the same population), but it doesn’t tell you which groups are different
 from one another. The post-hoc comparisons compare the groups to one another and try
 and identify which pairs are different.</p>
-<div class="section" id="using-the-anova1way-object-directly">
-<h2>Using the Anova1way object directly<a class="headerlink" href="#using-the-anova1way-object-directly" title="Permalink to this headline">¶</a></h2>
+<section id="using-the-anova1way-object-directly">
+<h2>Using the Anova1way object directly<a class="headerlink" href="#using-the-anova1way-object-directly" title="Permalink to this heading">¶</a></h2>
 <p>Example data from .. _Abdi, H. &amp; Williams, L. J. (2010):<a class="reference external" href="http://www.utdallas.edu/~herve/abdi-NewmanKeuls2010-pretty.pdf">http://www.utdallas.edu/~herve/abdi-NewmanKeuls2010-pretty.pdf</a>.
 By default Anova1way will use the Tukey test for pairwise comparisons.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">Anova1way</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">Anova1way</span>
 <span class="n">d</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">21.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">26.0</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="mf">13.0</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">,</span> <span class="mf">26.0</span><span class="p">],</span>
      <span class="p">[</span><span class="mf">23.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">,</span> <span class="mf">51.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">],</span>
      <span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">,</span> <span class="mf">29.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">21.0</span><span class="p">],</span>
      <span class="p">[</span><span class="mf">44.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">33.0</span><span class="p">,</span> <span class="mf">45.0</span><span class="p">,</span> <span class="mf">45.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">,</span> <span class="mf">49.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">],</span>
      <span class="p">[</span><span class="mf">39.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">,</span> <span class="mf">51.0</span><span class="p">,</span> <span class="mf">47.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">45.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">,</span> <span class="mf">51.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">,</span> <span class="mf">55.0</span><span class="p">]]</span>
-<span class="n">conditions_list</span> <span class="o">=</span> <span class="s">&#39;Contact Hit Bump Collide Smash&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="n">conditions_list</span> <span class="o">=</span> <span class="s1">&#39;Contact Hit Bump Collide Smash&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
 <span class="n">D</span><span class="o">=</span><span class="n">Anova1way</span><span class="p">()</span>
 <span class="n">D</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">conditions_list</span><span class="o">=</span><span class="n">conditions_list</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Anova: Single Factor on Measure
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Anova</span><span class="p">:</span> <span class="n">Single</span> <span class="n">Factor</span> <span class="n">on</span> <span class="n">Measure</span>
 
-SUMMARY
-Groups    Count   Sum   Average   Variance
-==========================================
-Contact      10   300        30    116.444
-Hit          10   350        35     86.444
-Bump         10   380        38    122.222
-Collide      10   410        41     41.556
-Smash        10   460        46     33.333
+<span class="n">SUMMARY</span>
+<span class="n">Groups</span>    <span class="n">Count</span>   <span class="n">Sum</span>   <span class="n">Average</span>   <span class="n">Variance</span>
+<span class="o">==========================================</span>
+<span class="n">Contact</span>      <span class="mi">10</span>   <span class="mi">300</span>        <span class="mi">30</span>    <span class="mf">116.444</span>
+<span class="n">Hit</span>          <span class="mi">10</span>   <span class="mi">350</span>        <span class="mi">35</span>     <span class="mf">86.444</span>
+<span class="n">Bump</span>         <span class="mi">10</span>   <span class="mi">380</span>        <span class="mi">38</span>    <span class="mf">122.222</span>
+<span class="n">Collide</span>      <span class="mi">10</span>   <span class="mi">410</span>        <span class="mi">41</span>     <span class="mf">41.556</span>
+<span class="n">Smash</span>        <span class="mi">10</span>   <span class="mi">460</span>        <span class="mi">46</span>     <span class="mf">33.333</span>
 
-O'BRIEN TEST FOR HOMOGENEITY OF VARIANCE
-Source of Variation       SS       df      MS         F     P-value   eta^2   Obs. power
-========================================================================================
-Treatments             68081.975    4   17020.494   1.859     0.134   0.142        0.498
-Error                 412050.224   45    9156.672
-========================================================================================
-Total                 480132.199   49
+<span class="n">O</span><span class="s1">&#39;BRIEN TEST FOR HOMOGENEITY OF VARIANCE</span>
+<span class="n">Source</span> <span class="n">of</span> <span class="n">Variation</span>       <span class="n">SS</span>       <span class="n">df</span>      <span class="n">MS</span>         <span class="n">F</span>     <span class="n">P</span><span class="o">-</span><span class="n">value</span>   <span class="n">eta</span><span class="o">^</span><span class="mi">2</span>   <span class="n">Obs</span><span class="o">.</span> <span class="n">power</span>
+<span class="o">========================================================================================</span>
+<span class="n">Treatments</span>             <span class="mf">68081.975</span>    <span class="mi">4</span>   <span class="mf">17020.494</span>   <span class="mf">1.859</span>     <span class="mf">0.134</span>   <span class="mf">0.142</span>        <span class="mf">0.498</span>
+<span class="n">Error</span>                 <span class="mf">412050.224</span>   <span class="mi">45</span>    <span class="mf">9156.672</span>
+<span class="o">========================================================================================</span>
+<span class="n">Total</span>                 <span class="mf">480132.199</span>   <span class="mi">49</span>
 
-ANOVA
-Source of Variation    SS    df   MS      F     P-value   eta^2   Obs. power
-============================================================================
-Treatments            1460    4   365   4.562     0.004   0.289        0.837
-Error                 3600   45    80
-============================================================================
-Total                 5060   49
+<span class="n">ANOVA</span>
+<span class="n">Source</span> <span class="n">of</span> <span class="n">Variation</span>    <span class="n">SS</span>    <span class="n">df</span>   <span class="n">MS</span>      <span class="n">F</span>     <span class="n">P</span><span class="o">-</span><span class="n">value</span>   <span class="n">eta</span><span class="o">^</span><span class="mi">2</span>   <span class="n">Obs</span><span class="o">.</span> <span class="n">power</span>
+<span class="o">============================================================================</span>
+<span class="n">Treatments</span>            <span class="mi">1460</span>    <span class="mi">4</span>   <span class="mi">365</span>   <span class="mf">4.562</span>     <span class="mf">0.004</span>   <span class="mf">0.289</span>        <span class="mf">0.837</span>
+<span class="n">Error</span>                 <span class="mi">3600</span>   <span class="mi">45</span>    <span class="mi">80</span>
+<span class="o">============================================================================</span>
+<span class="n">Total</span>                 <span class="mi">5060</span>   <span class="mi">49</span>
 
-POSTHOC MULTIPLE COMPARISONS
+<span class="n">POSTHOC</span> <span class="n">MULTIPLE</span> <span class="n">COMPARISONS</span>
 
-Tukey HSD: Table of q-statistics
-          Bump   Collide    Contact      Hit       Smash
-==========================================================
-Bump      0      1.061 ns   2.828 ns   1.061 ns   2.828 ns
-Collide          0          3.889 +    2.121 ns   1.768 ns
-Contact                     0          1.768 ns   5.657 **
-Hit                                    0          3.889 +
-Smash                                             0
-==========================================================
-  + p &lt; .10 (q-critical[5, 45] = 3.59038343675)
-  * p &lt; .05 (q-critical[5, 45] = 4.01861178004)
- ** p &lt; .01 (q-critical[5, 45] = 4.89280842987)</pre>
+<span class="n">Tukey</span> <span class="n">HSD</span><span class="p">:</span> <span class="n">Table</span> <span class="n">of</span> <span class="n">q</span><span class="o">-</span><span class="n">statistics</span>
+          <span class="n">Bump</span>   <span class="n">Collide</span>    <span class="n">Contact</span>      <span class="n">Hit</span>       <span class="n">Smash</span>
+<span class="o">==========================================================</span>
+<span class="n">Bump</span>      <span class="mi">0</span>      <span class="mf">1.061</span> <span class="n">ns</span>   <span class="mf">2.828</span> <span class="n">ns</span>   <span class="mf">1.061</span> <span class="n">ns</span>   <span class="mf">2.828</span> <span class="n">ns</span>
+<span class="n">Collide</span>          <span class="mi">0</span>          <span class="mf">3.889</span> <span class="o">+</span>    <span class="mf">2.121</span> <span class="n">ns</span>   <span class="mf">1.768</span> <span class="n">ns</span>
+<span class="n">Contact</span>                     <span class="mi">0</span>          <span class="mf">1.768</span> <span class="n">ns</span>   <span class="mf">5.657</span> <span class="o">**</span>
+<span class="n">Hit</span>                                    <span class="mi">0</span>          <span class="mf">3.889</span> <span class="o">+</span>
+<span class="n">Smash</span>                                             <span class="mi">0</span>
+<span class="o">==========================================================</span>
+  <span class="o">+</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">.10</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="n">critical</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">45</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.59038343675</span><span class="p">)</span>
+  <span class="o">*</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">.05</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="n">critical</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">45</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.01861178004</span><span class="p">)</span>
+ <span class="o">**</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">.01</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="n">critical</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">45</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.89280842987</span><span class="p">)</span>
+</pre></div>
 </div>
-</div>
-<div class="section" id="using-the-newman-keuls-test">
-<h2>Using the Newman-Keuls Test<a class="headerlink" href="#using-the-newman-keuls-test" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">Anova1way</span>
+</section>
+<section id="using-the-newman-keuls-test">
+<h2>Using the Newman-Keuls Test<a class="headerlink" href="#using-the-newman-keuls-test" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">Anova1way</span>
 <span class="n">d</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">21.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">26.0</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="mf">13.0</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">,</span> <span class="mf">26.0</span><span class="p">],</span>
      <span class="p">[</span><span class="mf">23.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">,</span> <span class="mf">51.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">],</span>
      <span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">,</span> <span class="mf">29.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">21.0</span><span class="p">],</span>
      <span class="p">[</span><span class="mf">44.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">33.0</span><span class="p">,</span> <span class="mf">45.0</span><span class="p">,</span> <span class="mf">45.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">,</span> <span class="mf">34.0</span><span class="p">,</span> <span class="mf">49.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">],</span>
      <span class="p">[</span><span class="mf">39.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">,</span> <span class="mf">51.0</span><span class="p">,</span> <span class="mf">47.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">45.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">,</span> <span class="mf">51.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">,</span> <span class="mf">55.0</span><span class="p">]]</span>
-<span class="n">conditions_list</span> <span class="o">=</span> <span class="s">&#39;Contact Hit Bump Collide Smash&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="n">conditions_list</span> <span class="o">=</span> <span class="s1">&#39;Contact Hit Bump Collide Smash&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
 <span class="n">D</span><span class="o">=</span><span class="n">Anova1way</span><span class="p">()</span>
-<span class="n">D</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">conditions_list</span><span class="o">=</span><span class="n">conditions_list</span><span class="p">,</span> <span class="n">posthoc</span><span class="o">=</span><span class="s">&#39;SNK&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+<span class="n">D</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">conditions_list</span><span class="o">=</span><span class="n">conditions_list</span><span class="p">,</span> <span class="n">posthoc</span><span class="o">=</span><span class="s1">&#39;SNK&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Anova: Single Factor on Measure
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Anova</span><span class="p">:</span> <span class="n">Single</span> <span class="n">Factor</span> <span class="n">on</span> <span class="n">Measure</span>
 
-SUMMARY
-Groups    Count   Sum   Average   Variance
-==========================================
-Contact      10   300        30    116.444
-Hit          10   350        35     86.444
-Bump         10   380        38    122.222
-Collide      10   410        41     41.556
-Smash        10   460        46     33.333
+<span class="n">SUMMARY</span>
+<span class="n">Groups</span>    <span class="n">Count</span>   <span class="n">Sum</span>   <span class="n">Average</span>   <span class="n">Variance</span>
+<span class="o">==========================================</span>
+<span class="n">Contact</span>      <span class="mi">10</span>   <span class="mi">300</span>        <span class="mi">30</span>    <span class="mf">116.444</span>
+<span class="n">Hit</span>          <span class="mi">10</span>   <span class="mi">350</span>        <span class="mi">35</span>     <span class="mf">86.444</span>
+<span class="n">Bump</span>         <span class="mi">10</span>   <span class="mi">380</span>        <span class="mi">38</span>    <span class="mf">122.222</span>
+<span class="n">Collide</span>      <span class="mi">10</span>   <span class="mi">410</span>        <span class="mi">41</span>     <span class="mf">41.556</span>
+<span class="n">Smash</span>        <span class="mi">10</span>   <span class="mi">460</span>        <span class="mi">46</span>     <span class="mf">33.333</span>
 
-O'BRIEN TEST FOR HOMOGENEITY OF VARIANCE
-Source of Variation       SS       df      MS         F     P-value   eta^2   Obs. power
-========================================================================================
-Treatments             68081.975    4   17020.494   1.859     0.134   0.142        0.498
-Error                 412050.224   45    9156.672
-========================================================================================
-Total                 480132.199   49
+<span class="n">O</span><span class="s1">&#39;BRIEN TEST FOR HOMOGENEITY OF VARIANCE</span>
+<span class="n">Source</span> <span class="n">of</span> <span class="n">Variation</span>       <span class="n">SS</span>       <span class="n">df</span>      <span class="n">MS</span>         <span class="n">F</span>     <span class="n">P</span><span class="o">-</span><span class="n">value</span>   <span class="n">eta</span><span class="o">^</span><span class="mi">2</span>   <span class="n">Obs</span><span class="o">.</span> <span class="n">power</span>
+<span class="o">========================================================================================</span>
+<span class="n">Treatments</span>             <span class="mf">68081.975</span>    <span class="mi">4</span>   <span class="mf">17020.494</span>   <span class="mf">1.859</span>     <span class="mf">0.134</span>   <span class="mf">0.142</span>        <span class="mf">0.498</span>
+<span class="n">Error</span>                 <span class="mf">412050.224</span>   <span class="mi">45</span>    <span class="mf">9156.672</span>
+<span class="o">========================================================================================</span>
+<span class="n">Total</span>                 <span class="mf">480132.199</span>   <span class="mi">49</span>
 
-ANOVA
-Source of Variation    SS    df   MS      F     P-value   eta^2   Obs. power
-============================================================================
-Treatments            1460    4   365   4.562     0.004   0.289        0.837
-Error                 3600   45    80
-============================================================================
-Total                 5060   49
+<span class="n">ANOVA</span>
+<span class="n">Source</span> <span class="n">of</span> <span class="n">Variation</span>    <span class="n">SS</span>    <span class="n">df</span>   <span class="n">MS</span>      <span class="n">F</span>     <span class="n">P</span><span class="o">-</span><span class="n">value</span>   <span class="n">eta</span><span class="o">^</span><span class="mi">2</span>   <span class="n">Obs</span><span class="o">.</span> <span class="n">power</span>
+<span class="o">============================================================================</span>
+<span class="n">Treatments</span>            <span class="mi">1460</span>    <span class="mi">4</span>   <span class="mi">365</span>   <span class="mf">4.562</span>     <span class="mf">0.004</span>   <span class="mf">0.289</span>        <span class="mf">0.837</span>
+<span class="n">Error</span>                 <span class="mi">3600</span>   <span class="mi">45</span>    <span class="mi">80</span>
+<span class="o">============================================================================</span>
+<span class="n">Total</span>                 <span class="mi">5060</span>   <span class="mi">49</span>
 
-POSTHOC MULTIPLE COMPARISONS
+<span class="n">POSTHOC</span> <span class="n">MULTIPLE</span> <span class="n">COMPARISONS</span>
 
-SNK: Step-down table of q-statistics
-       Pair           i    |diff|     q     range   df     p     Sig.
-=====================================================================
-Contact vs. Smash      1   16.000   5.657       5   45   0.002   **
-Collide vs. Contact    2   11.000   3.889       4   45   0.041   *
-Hit vs. Smash          3   11.000   3.889       4   45   0.041   *
-Bump vs. Smash         4    8.000   2.828       3   45   0.124   ns
-Bump vs. Contact       5    8.000   2.828       3   45   0.124   ns
-Collide vs. Hit        6    6.000   2.121       2   45   0.141   ns
-Collide vs. Smash      7    5.000       -       -    -       -   ns
-Contact vs. Hit        8    5.000       -       -    -       -   ns
-Bump vs. Collide       9    3.000       -       -    -       -   ns
-Bump vs. Hit          10    3.000       -       -    -       -   ns
-  + p &lt; .10,   * p &lt; .05,   ** p &lt; .01,   *** p &lt; .001</pre>
+<span class="n">SNK</span><span class="p">:</span> <span class="n">Step</span><span class="o">-</span><span class="n">down</span> <span class="n">table</span> <span class="n">of</span> <span class="n">q</span><span class="o">-</span><span class="n">statistics</span>
+       <span class="n">Pair</span>           <span class="n">i</span>    <span class="o">|</span><span class="n">diff</span><span class="o">|</span>     <span class="n">q</span>     <span class="nb">range</span>   <span class="n">df</span>     <span class="n">p</span>     <span class="n">Sig</span><span class="o">.</span>
+<span class="o">=====================================================================</span>
+<span class="n">Contact</span> <span class="n">vs</span><span class="o">.</span> <span class="n">Smash</span>      <span class="mi">1</span>   <span class="mf">16.000</span>   <span class="mf">5.657</span>       <span class="mi">5</span>   <span class="mi">45</span>   <span class="mf">0.002</span>   <span class="o">**</span>
+<span class="n">Collide</span> <span class="n">vs</span><span class="o">.</span> <span class="n">Contact</span>    <span class="mi">2</span>   <span class="mf">11.000</span>   <span class="mf">3.889</span>       <span class="mi">4</span>   <span class="mi">45</span>   <span class="mf">0.041</span>   <span class="o">*</span>
+<span class="n">Hit</span> <span class="n">vs</span><span class="o">.</span> <span class="n">Smash</span>          <span class="mi">3</span>   <span class="mf">11.000</span>   <span class="mf">3.889</span>       <span class="mi">4</span>   <span class="mi">45</span>   <span class="mf">0.041</span>   <span class="o">*</span>
+<span class="n">Bump</span> <span class="n">vs</span><span class="o">.</span> <span class="n">Smash</span>         <span class="mi">4</span>    <span class="mf">8.000</span>   <span class="mf">2.828</span>       <span class="mi">3</span>   <span class="mi">45</span>   <span class="mf">0.124</span>   <span class="n">ns</span>
+<span class="n">Bump</span> <span class="n">vs</span><span class="o">.</span> <span class="n">Contact</span>       <span class="mi">5</span>    <span class="mf">8.000</span>   <span class="mf">2.828</span>       <span class="mi">3</span>   <span class="mi">45</span>   <span class="mf">0.124</span>   <span class="n">ns</span>
+<span class="n">Collide</span> <span class="n">vs</span><span class="o">.</span> <span class="n">Hit</span>        <span class="mi">6</span>    <span class="mf">6.000</span>   <span class="mf">2.121</span>       <span class="mi">2</span>   <span class="mi">45</span>   <span class="mf">0.141</span>   <span class="n">ns</span>
+<span class="n">Collide</span> <span class="n">vs</span><span class="o">.</span> <span class="n">Smash</span>      <span class="mi">7</span>    <span class="mf">5.000</span>       <span class="o">-</span>       <span class="o">-</span>    <span class="o">-</span>       <span class="o">-</span>   <span class="n">ns</span>
+<span class="n">Contact</span> <span class="n">vs</span><span class="o">.</span> <span class="n">Hit</span>        <span class="mi">8</span>    <span class="mf">5.000</span>       <span class="o">-</span>       <span class="o">-</span>    <span class="o">-</span>       <span class="o">-</span>   <span class="n">ns</span>
+<span class="n">Bump</span> <span class="n">vs</span><span class="o">.</span> <span class="n">Collide</span>       <span class="mi">9</span>    <span class="mf">3.000</span>       <span class="o">-</span>       <span class="o">-</span>    <span class="o">-</span>       <span class="o">-</span>   <span class="n">ns</span>
+<span class="n">Bump</span> <span class="n">vs</span><span class="o">.</span> <span class="n">Hit</span>          <span class="mi">10</span>    <span class="mf">3.000</span>       <span class="o">-</span>       <span class="o">-</span>    <span class="o">-</span>       <span class="o">-</span>   <span class="n">ns</span>
+  <span class="o">+</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">.10</span><span class="p">,</span>   <span class="o">*</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">.05</span><span class="p">,</span>   <span class="o">**</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">.01</span><span class="p">,</span>   <span class="o">***</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">.001</span>
+</pre></div>
 </div>
-</div>
-<div class="section" id="running-single-factor-anova-with-dataframe">
-<h2>Running Single Factor ANOVA with <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt><a class="headerlink" href="#running-single-factor-anova-with-dataframe" title="Permalink to this headline">¶</a></h2>
-<p>The examples above pass a list of lists to <tt class="xref py py-class docutils literal"><span class="pre">Anova1Way</span></tt>. The <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> object
+</section>
+<section id="running-single-factor-anova-with-dataframe">
+<h2>Running Single Factor ANOVA with <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code><a class="headerlink" href="#running-single-factor-anova-with-dataframe" title="Permalink to this heading">¶</a></h2>
+<p>The examples above pass a list of lists to <code class="xref py py-class docutils literal notranslate"><span class="pre">Anova1Way</span></code>. The <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code> object
 also has a wrapper method for running a single factor ANOVA. It assumes data is in the
 stacked format with one observation per row.</p>
-<p>Let&#8217;s begin by making up some data.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<p>Let’s begin by making up some data.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">random</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sample</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">mult</span><span class="p">,</span> <span class="n">N</span> <span class="p">:</span> <span class="p">[</span><span class="n">random</span><span class="p">()</span><span class="o">*</span><span class="n">mult</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s">&#39;IV&#39;</span><span class="p">,</span><span class="s">&#39;DV&#39;</span><span class="p">],</span> <span class="p">[[</span><span class="s">&#39;A&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span> <span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s">&#39;IV&#39;</span><span class="p">,</span><span class="s">&#39;DV&#39;</span><span class="p">],</span> <span class="p">[[</span><span class="s">&#39;B&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span> <span class="n">sample</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)])))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s">&#39;IV&#39;</span><span class="p">,</span><span class="s">&#39;DV&#39;</span><span class="p">],</span> <span class="p">[[</span><span class="s">&#39;C&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span> <span class="n">sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">)])))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">mult</span><span class="p">,</span> <span class="n">N</span> <span class="p">:</span> <span class="p">[</span><span class="n">random</span><span class="p">()</span><span class="o">*</span><span class="n">mult</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;IV&#39;</span><span class="p">,</span><span class="s1">&#39;DV&#39;</span><span class="p">],</span> <span class="p">[[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span> <span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;IV&#39;</span><span class="p">,</span><span class="s1">&#39;DV&#39;</span><span class="p">],</span> <span class="p">[[</span><span class="s1">&#39;B&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span> <span class="n">sample</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)])))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;IV&#39;</span><span class="p">,</span><span class="s1">&#39;DV&#39;</span><span class="p">],</span> <span class="p">[[</span><span class="s1">&#39;C&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span> <span class="n">sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">)])))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="go">IV    DV</span>
 <span class="go">==========</span>
 <span class="go">A    0.779</span>
@@ -318,58 +272,103 @@ stacked format with one observation per row.</p>
 </pre></div>
 </div>
 <p>Now we can run the analysis</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aov</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">anova1way</span><span class="p">(</span><span class="s">&#39;DV&#39;</span><span class="p">,</span> <span class="s">&#39;IV&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">aov</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">aov</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">anova1way</span><span class="p">(</span><span class="s1">&#39;DV&#39;</span><span class="p">,</span> <span class="s1">&#39;IV&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">aov</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><pre>Anova: Single Factor on DV
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Anova</span><span class="p">:</span> <span class="n">Single</span> <span class="n">Factor</span> <span class="n">on</span> <span class="n">DV</span>
 
-SUMMARY
-Groups   Count    Sum     Average   Variance
-============================================
-A           10    4.785     0.478      0.114
-B           10   13.185     1.319      0.265
-C           10   17.681     1.768      0.685
+<span class="n">SUMMARY</span>
+<span class="n">Groups</span>   <span class="n">Count</span>    <span class="n">Sum</span>     <span class="n">Average</span>   <span class="n">Variance</span>
+<span class="o">============================================</span>
+<span class="n">A</span>           <span class="mi">10</span>    <span class="mf">4.785</span>     <span class="mf">0.478</span>      <span class="mf">0.114</span>
+<span class="n">B</span>           <span class="mi">10</span>   <span class="mf">13.185</span>     <span class="mf">1.319</span>      <span class="mf">0.265</span>
+<span class="n">C</span>           <span class="mi">10</span>   <span class="mf">17.681</span>     <span class="mf">1.768</span>      <span class="mf">0.685</span>
 
-O'BRIEN TEST FOR HOMOGENEITY OF VARIANCE
-Source of Variation    SS     df    MS       F     P-value   eta^2   Obs. power
-===============================================================================
-Treatments            1.749    2   0.875   3.697     0.038   0.215        0.566
-Error                 6.388   27   0.237
-===============================================================================
-Total                 8.137   29
+<span class="n">O</span><span class="s1">&#39;BRIEN TEST FOR HOMOGENEITY OF VARIANCE</span>
+<span class="n">Source</span> <span class="n">of</span> <span class="n">Variation</span>    <span class="n">SS</span>     <span class="n">df</span>    <span class="n">MS</span>       <span class="n">F</span>     <span class="n">P</span><span class="o">-</span><span class="n">value</span>   <span class="n">eta</span><span class="o">^</span><span class="mi">2</span>   <span class="n">Obs</span><span class="o">.</span> <span class="n">power</span>
+<span class="o">===============================================================================</span>
+<span class="n">Treatments</span>            <span class="mf">1.749</span>    <span class="mi">2</span>   <span class="mf">0.875</span>   <span class="mf">3.697</span>     <span class="mf">0.038</span>   <span class="mf">0.215</span>        <span class="mf">0.566</span>
+<span class="n">Error</span>                 <span class="mf">6.388</span>   <span class="mi">27</span>   <span class="mf">0.237</span>
+<span class="o">===============================================================================</span>
+<span class="n">Total</span>                 <span class="mf">8.137</span>   <span class="mi">29</span>
 
-ANOVA
-Source of Variation     SS     df    MS       F       P-value    eta^2   Obs. power
-===================================================================================
-Treatments             8.569    2   4.285   12.083   1.787e-04   0.472        0.900
-Error                  9.574   27   0.355
-===================================================================================
-Total                 18.143   29
+<span class="n">ANOVA</span>
+<span class="n">Source</span> <span class="n">of</span> <span class="n">Variation</span>     <span class="n">SS</span>     <span class="n">df</span>    <span class="n">MS</span>       <span class="n">F</span>       <span class="n">P</span><span class="o">-</span><span class="n">value</span>    <span class="n">eta</span><span class="o">^</span><span class="mi">2</span>   <span class="n">Obs</span><span class="o">.</span> <span class="n">power</span>
+<span class="o">===================================================================================</span>
+<span class="n">Treatments</span>             <span class="mf">8.569</span>    <span class="mi">2</span>   <span class="mf">4.285</span>   <span class="mf">12.083</span>   <span class="mf">1.787e-04</span>   <span class="mf">0.472</span>        <span class="mf">0.900</span>
+<span class="n">Error</span>                  <span class="mf">9.574</span>   <span class="mi">27</span>   <span class="mf">0.355</span>
+<span class="o">===================================================================================</span>
+<span class="n">Total</span>                 <span class="mf">18.143</span>   <span class="mi">29</span>
 
-POSTHOC MULTIPLE COMPARISONS
+<span class="n">POSTHOC</span> <span class="n">MULTIPLE</span> <span class="n">COMPARISONS</span>
 
-Tukey HSD: Table of q-statistics
-    A      B          C
-===========================
-A   0   2.443 ns   3.751 *
-B       0          1.308 ns
-C                  0
-===========================
-  + p &lt; .10 (q-critical[3, 27] = 3.0301664694)
-  * p &lt; .05 (q-critical[3, 27] = 3.50576984879)
- ** p &lt; .01 (q-critical[3, 27] = 4.49413305084)</pre>
+<span class="n">Tukey</span> <span class="n">HSD</span><span class="p">:</span> <span class="n">Table</span> <span class="n">of</span> <span class="n">q</span><span class="o">-</span><span class="n">statistics</span>
+    <span class="n">A</span>      <span class="n">B</span>          <span class="n">C</span>
+<span class="o">===========================</span>
+<span class="n">A</span>   <span class="mi">0</span>   <span class="mf">2.443</span> <span class="n">ns</span>   <span class="mf">3.751</span> <span class="o">*</span>
+<span class="n">B</span>       <span class="mi">0</span>          <span class="mf">1.308</span> <span class="n">ns</span>
+<span class="n">C</span>                  <span class="mi">0</span>
+<span class="o">===========================</span>
+  <span class="o">+</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">.10</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="n">critical</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">27</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.0301664694</span><span class="p">)</span>
+  <span class="o">*</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">.05</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="n">critical</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">27</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.50576984879</span><span class="p">)</span>
+ <span class="o">**</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">.01</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="n">critical</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">27</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.49413305084</span><span class="p">)</span>
+</pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Anova1way</a><ul>
+<li><a class="reference internal" href="#using-the-anova1way-object-directly">Using the Anova1way object directly</a></li>
+<li><a class="reference internal" href="#using-the-newman-keuls-test">Using the Newman-Keuls Test</a></li>
+<li><a class="reference internal" href="#running-single-factor-anova-with-dataframe">Running Single Factor ANOVA with <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="Anova.html"
+                          title="previous chapter">Anova</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="ChiSquare1way.html"
+                          title="next chapter">ChiSquare1way</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Anova1way.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -387,14 +386,15 @@ C                  0
         <li><a href="http://code.google.com/p/pyvttbl/">pyvttbl home</a>&nbsp;|&nbsp;</li>
         <li><a href="index.html">Documentation</a>
           &raquo;</li>
- 
+
+        <li class="nav-item nav-item-this"><a href="">Anova1way</a></li> 
       </ul>
     </div>
     <div class="specialfooter">
         <div class="specialfooterleft">This software is funded in part by NIH Grant P20 RR016454.</div>
         <div class="specialfooterright">
             &copy; Copyright 2012, Roger Lew.
-          Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+          Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.0.2.
         </div>
     </div>
   </body>

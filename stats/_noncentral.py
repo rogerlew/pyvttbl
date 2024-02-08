@@ -1,15 +1,6 @@
 from __future__ import print_function
 
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 
 import scipy
 
@@ -46,4 +37,3 @@ def ncx2cdf(x,df,nc):
     noncentrality parameters in {nc}. 
     """
     return scipy.stats.ncx2(df,nc).cdf(x)
-

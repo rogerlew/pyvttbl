@@ -1,31 +1,21 @@
 
+<!DOCTYPE html>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>DataFrame Overview &mdash; pyvttbl v 0.5.2.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     'v 0.5.2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pyvttbl v 0.5.2.0 documentation" href="index.html" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>DataFrame Overview &#8212; pyvttbl v 0.5.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PyvtTbl Overview" href="PyvtTbl.html" />
     <link rel="prev" title="Quick-Start Guide" href="quick-start.html" />
  
@@ -67,13 +57,12 @@ div.specialfooterright {
 }
 </style>
 
-  </head>
-  <body>
+  </head><body>
 <div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
 <img src="_static/pyvttbl_logo.png" alt="pyvttbl logo" />
 </div>
 
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -91,96 +80,56 @@ div.specialfooterright {
         <li><a href="http://code.google.com/p/pyvttbl/">pyvttbl home</a>&nbsp;|&nbsp;</li>
         <li><a href="index.html">Documentation</a>
           &raquo;</li>
- 
-      </ul>
-    </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">DataFrame Overview</a><ul>
-<li><a class="reference internal" href="#description">Description</a></li>
-<li><a class="reference internal" href="#public-methods">Public Methods</a></li>
-<li><a class="reference internal" href="#pyvttbl-plotting-wrappers"><tt class="docutils literal"><span class="pre">pyvttbl.plotting</span></tt> Wrappers</a></li>
-<li><a class="reference internal" href="#pyvttbl-stats-wrappers"><tt class="docutils literal"><span class="pre">pyvttbl.stats</span></tt> Wrappers</a></li>
-<li><a class="reference internal" href="#private-methods">Private Methods</a></li>
-</ul>
-</li>
-</ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="quick-start.html"
-                        title="previous chapter">Quick-Start Guide</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="PyvtTbl.html"
-                        title="next chapter">PyvtTbl Overview</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/DataFrame.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+        <li class="nav-item nav-item-this"><a href="">DataFrame Overview</a></li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
-  <div class="section" id="dataframe-overview">
-<h1>DataFrame Overview<a class="headerlink" href="#dataframe-overview" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="description">
-<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
-<p><tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> objects are containers for holding tabulated data. They
-inherent <tt class="xref py py-class docutils literal"><span class="pre">collections.OrderedDict</span></tt> and hold data in
-<tt class="xref py py-class docutils literal"><span class="pre">numpy.array</span></tt> objects.</p>
-</div>
-<div class="section" id="public-methods">
-<h2>Public Methods<a class="headerlink" href="#public-methods" title="Permalink to this headline">¶</a></h2>
-<p>Methods to get data into a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>, manipulate and manage data,
+  <section id="dataframe-overview">
+<h1>DataFrame Overview<a class="headerlink" href="#dataframe-overview" title="Permalink to this heading">¶</a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code> objects are containers for holding tabulated data. They
+inherent <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code> and hold data in
+<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code> objects.</p>
+</section>
+<section id="public-methods">
+<h2>Public Methods<a class="headerlink" href="#public-methods" title="Permalink to this heading">¶</a></h2>
+<p>Methods to get data into a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, manipulate and manage data,
 and write data. For the most part these remove the user from the fact they
 are using sqlite3 to manipulate data.</p>
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.__init__">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>initialize a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> object.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.__init__">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>initialize a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code> object.</p>
 <div class="line-block">
-<div class="line">Subclass of <tt class="xref py py-mod docutils literal"><span class="pre">collections</span></tt>. <tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt>.           </div>
-<div class="line">Understands the typical initialization <tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt> signatures.</div>
+<div class="line">Subclass of <code class="xref py py-mod docutils literal notranslate"><span class="pre">collections</span></code>. <code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code>.           </div>
+<div class="line">Understands the typical initialization <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> signatures.</div>
 <div class="line">Keys must be hashable.</div>
 <div class="line">Values become numpy.arrays or numpy.ma.MaskedArrays.</div>
 </div>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.__setitem__">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>item</em>, <em>mask=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.__setitem__">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.__setitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>assign a column in the table</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd><p class="first">key: hashable object to associate with item</p>
-<p class="last">item: an iterable that is put in an np.array or np.ma.array</p>
+<div><dl>
+<dt>args:</dt><dd><p>key: hashable object to associate with item</p>
+<p>item: an iterable that is put in an np.array or np.ma.array</p>
 </dd>
-<dt>kwds:</dt>
-<dd>mask: mask value passed to np.ma.MaskedArray.__init__()</dd>
-<dt>returns:</dt>
-<dd>None</dd>
+<dt>kwds:</dt><dd><p>mask: mask value passed to np.ma.MaskedArray.__init__()</p>
+</dd>
+<dt>returns:</dt><dd><p>None</p>
+</dd>
 </dl>
 </div></blockquote>
 <div class="line-block">
@@ -192,10 +141,9 @@ the insert method. To  another table to this one use
 the attach method.</div>
 </div>
 <blockquote>
-<div><dl class="docutils">
-<dt>example:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<div><dl>
+<dt>example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="go">first      last       age   gender </span>
 <span class="go">==================================</span>
 <span class="go">Roger   Lew            28   male   </span>
@@ -203,9 +151,9 @@ the attach method.</div>
 <span class="go">Megan   Whittington    26   female </span>
 <span class="go">John    Smith          51   male   </span>
 <span class="go">Jane    Doe            49   female </span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="p">[</span><span class="s">&#39;log10(age)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">&#39;age&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;log10(age)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="go">first      last       age   gender   log10(age) </span>
 <span class="go">===============================================</span>
 <span class="go">Roger   Lew            28   male          1.447 </span>
@@ -222,26 +170,25 @@ the attach method.</div>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.__delitem__">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">__delitem__</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.__delitem__">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">__delitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.__delitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>delete a column from the table</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd>key: associated with the item to delete</dd>
-<dt>returns:</dt>
-<dd>None</dd>
+<div><dl class="simple">
+<dt>args:</dt><dd><p>key: associated with the item to delete</p>
+</dd>
+<dt>returns:</dt><dd><p>None</p>
+</dd>
 </dl>
 </div></blockquote>
 <div class="line-block">
 <div class="line">df.__delitem__(key) &lt;==&gt; del df[key]</div>
 </div>
 <blockquote>
-<div><dl class="docutils">
-<dt>example:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<div><dl>
+<dt>example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="go">first      last       age   gender   log10(age) </span>
 <span class="go">===============================================</span>
 <span class="go">Roger   Lew            28   male          1.447 </span>
@@ -249,8 +196,8 @@ the attach method.</div>
 <span class="go">Megan   Whittington    26   female        1.415 </span>
 <span class="go">John    Smith          51   male          1.708 </span>
 <span class="go">Jane    Doe            49   female        1.690 </span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;log10(age)&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;log10(age)&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="go">first      last       age   gender </span>
 <span class="go">==================================</span>
 <span class="go">Roger   Lew            28   male   </span>
@@ -267,16 +214,16 @@ the attach method.</div>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.__str__">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.__str__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.__str__">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.__str__" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns human friendly string representation of object</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd>None</dd>
-<dt>returns:</dt>
-<dd>string with easy to read representation of table</dd>
+<div><dl class="simple">
+<dt>args:</dt><dd><p>None</p>
+</dd>
+<dt>returns:</dt><dd><p>string with easy to read representation of table</p>
+</dd>
 </dl>
 </div></blockquote>
 <div class="line-block">
@@ -285,22 +232,21 @@ the attach method.</div>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.read_tbl">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">read_tbl</tt><big>(</big><em>fname</em>, <em>skip=0</em>, <em>delimiter='</em>, <em>'</em>, <em>labels=True</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.read_tbl" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.read_tbl">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">read_tbl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.read_tbl" title="Permalink to this definition">¶</a></dt>
 <dd><p>loads tabulated data from a plain text file</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd>fname: path and name of datafile</dd>
-<dt>kwds:</dt>
-<dd><p class="first">skip: number of lines to skip before looking for column labels. (default = 0)</p>
-<p>delimiter: string to seperate values (default = &#8220;&#8217;&#8221;)</p>
-<p class="last">labels: bool specifiying whether first row (after skip) contains labels.
+<div><dl>
+<dt>args:</dt><dd><p>fname: path and name of datafile</p>
+</dd>
+<dt>kwds:</dt><dd><p>skip: number of lines to skip before looking for column labels. (default = 0)</p>
+<p>delimiter: string to seperate values (default = “’”)</p>
+<p>labels: bool specifiying whether first row (after skip) contains labels.
 (default = True)</p>
 </dd>
-<dt>returns:</dt>
-<dd>None</dd>
+<dt>returns:</dt><dd><p>None</p>
+</dd>
 </dl>
 </div></blockquote>
 <div class="line-block">
@@ -310,37 +256,39 @@ the attach method.</div>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.attach">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">attach</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.attach" title="Permalink to this definition">¶</a></dt>
-<dd><p>attaches a second <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> to self</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>other: a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> object whose key set matches self</dd>
-<dt>return:</dt>
-<dd>None</dd>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.attach">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">attach</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.attach" title="Permalink to this definition">¶</a></dt>
+<dd><p>attaches a second <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code> to self</p>
+<blockquote>
+<div><dl class="simple">
+<dt>args:</dt><dd><p>other: a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code> object whose key set matches self</p>
+</dd>
+<dt>return:</dt><dd><p>None</p>
+</dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.insert">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">insert</tt><big>(</big><em>row</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.insert" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.insert">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">insert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>insert a row into the table</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>row: should be mappable. e.g. a dict or a list with key/value pairs.</dd>
-<dt>returns:</dt>
-<dd>None</dd>
-<dt>example:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<blockquote>
+<div><dl>
+<dt>args:</dt><dd><p>row: should be mappable. e.g. a dict or a list with key/value pairs.</p>
+</dd>
+<dt>returns:</dt><dd><p>None</p>
+</dd>
+<dt>example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Person</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Person&#39;</span><span class="p">,[</span><span class="s">&#39;first&#39;</span><span class="p">,</span><span class="s">&#39;last&#39;</span><span class="p">,</span><span class="s">&#39;age&#39;</span><span class="p">,</span><span class="s">&#39;gender&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Person</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Person&#39;</span><span class="p">,[</span><span class="s1">&#39;first&#39;</span><span class="p">,</span><span class="s1">&#39;last&#39;</span><span class="p">,</span><span class="s1">&#39;age&#39;</span><span class="p">,</span><span class="s1">&#39;gender&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Roger&#39;</span><span class="p">,</span> <span class="s">&#39;Lew&#39;</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="s">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Bosco&#39;</span><span class="p">,</span> <span class="s">&#39;Robinson&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Megan&#39;</span><span class="p">,</span> <span class="s">&#39;Whittington&#39;</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="s">&#39;female&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s1">&#39;Roger&#39;</span><span class="p">,</span> <span class="s1">&#39;Lew&#39;</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="s1">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s1">&#39;Bosco&#39;</span><span class="p">,</span> <span class="s1">&#39;Robinson&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s1">&#39;Megan&#39;</span><span class="p">,</span> <span class="s1">&#39;Whittington&#39;</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="s1">&#39;female&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="go">first      last       age   gender </span>
 <span class="go">==================================</span>
 <span class="go">Roger   Lew            28   male   </span>
@@ -351,31 +299,32 @@ the attach method.</div>
 </div>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.sort">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">sort</tt><big>(</big><em>order=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.sort" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.sort">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">sort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>sort the table in-place</p>
-<dl class="docutils">
-<dt>kwds:</dt>
-<dd>order: is a list of factors to sort by
-to reverse order append &#8221; desc&#8221; to the factor</dd>
-<dt>returns:</dt>
-<dd>None</dd>
-<dt>example:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<blockquote>
+<div><dl>
+<dt>kwds:</dt><dd><p>order: is a list of factors to sort by
+to reverse order append ” desc” to the factor</p>
+</dd>
+<dt>returns:</dt><dd><p>None</p>
+</dd>
+<dt>example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyvttbl</span> <span class="kn">import</span> <span class="n">DataFrame</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Person</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Person&#39;</span><span class="p">,[</span><span class="s">&#39;first&#39;</span><span class="p">,</span><span class="s">&#39;last&#39;</span><span class="p">,</span><span class="s">&#39;age&#39;</span><span class="p">,</span><span class="s">&#39;gender&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Person</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Person&#39;</span><span class="p">,[</span><span class="s1">&#39;first&#39;</span><span class="p">,</span><span class="s1">&#39;last&#39;</span><span class="p">,</span><span class="s1">&#39;age&#39;</span><span class="p">,</span><span class="s1">&#39;gender&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Roger&#39;</span><span class="p">,</span> <span class="s">&#39;Lew&#39;</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="s">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Bosco&#39;</span><span class="p">,</span> <span class="s">&#39;Robinson&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Megan&#39;</span><span class="p">,</span> <span class="s">&#39;Whittington&#39;</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="s">&#39;female&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="s">&#39;Smith&#39;</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="s">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="s">&#39;female&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s">&#39;gender&#39;</span><span class="p">,</span> <span class="s">&#39;age&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s1">&#39;Roger&#39;</span><span class="p">,</span> <span class="s1">&#39;Lew&#39;</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="s1">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s1">&#39;Bosco&#39;</span><span class="p">,</span> <span class="s1">&#39;Robinson&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s1">&#39;Megan&#39;</span><span class="p">,</span> <span class="s1">&#39;Whittington&#39;</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="s1">&#39;female&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">,</span> <span class="s1">&#39;Smith&#39;</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="s1">&#39;male&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Person</span><span class="p">(</span><span class="s1">&#39;Jane&#39;</span><span class="p">,</span> <span class="s1">&#39;Doe&#39;</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="s1">&#39;female&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s1">&#39;gender&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="go">first      last       age   gender </span>
 <span class="go">==================================</span>
 <span class="go">Megan   Whittington    26   female </span>
@@ -388,25 +337,25 @@ to reverse order append &#8221; desc&#8221; to the factor</dd>
 </div>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.select_col">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">select_col</tt><big>(</big><em>key</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.select_col" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.select_col">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">select_col</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.select_col" title="Permalink to this definition">¶</a></dt>
 <dd><p>determines rows in table that satisfy the conditions given by where and returns
 the values of key in the remaining rows</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd>key: column label of data to return</dd>
-<dt>kwds:</dt>
-<dd>where: constraints to apply to table before returning data</dd>
-<dt>returns:</dt>
-<dd>a list</dd>
-<dt>example:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<div><dl>
+<dt>args:</dt><dd><p>key: column label of data to return</p>
+</dd>
+<dt>kwds:</dt><dd><p>where: constraints to apply to table before returning data</p>
+</dd>
+<dt>returns:</dt><dd><p>a list</p>
+</dd>
+<dt>example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="go">first      last       age   gender </span>
 <span class="go">==================================</span>
 <span class="go">Roger   Lew            28   male   </span>
@@ -414,7 +363,7 @@ the values of key in the remaining rows</p>
 <span class="go">Megan   Whittington    26   female </span>
 <span class="go">John    Smith          51   male   </span>
 <span class="go">Jane    Doe            49   female </span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">select_col</span><span class="p">(</span><span class="s">&#39;age&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s">&#39;gender == &quot;male&quot;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">select_col</span><span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s1">&#39;gender == &quot;male&quot;&#39;</span><span class="p">)</span>
 <span class="go">[28, 5, 51]</span>
 <span class="gp">&gt;&gt;&gt; </span>
 </pre></div>
@@ -425,18 +374,18 @@ the values of key in the remaining rows</p>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.row_iter">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">row_iter</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.row_iter" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.row_iter">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">row_iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.row_iter" title="Permalink to this definition">¶</a></dt>
 <dd><p>iterate over the rows in table</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>None</dd>
-<dt>returns:</dt>
-<dd>iterator that yields OrderedDict objects with (key,value) pairs
-cooresponding to the data in each row</dd>
-<dt>example:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<blockquote>
+<div><dl>
+<dt>args:</dt><dd><p>None</p>
+</dd>
+<dt>returns:</dt><dd><p>iterator that yields OrderedDict objects with (key,value) pairs
+cooresponding to the data in each row</p>
+</dd>
+<dt>example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="go">first      last       age   gender </span>
 <span class="go">==================================</span>
 <span class="go">Roger   Lew            28   male   </span>
@@ -456,59 +405,57 @@ cooresponding to the data in each row</dd>
 </div>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.pivot">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">pivot</tt><big>(</big><em>val</em>, <em>rows=None</em>, <em>cols=None</em>, <em>aggregate='avg'</em>, <em>where=None</em>, <em>attach_rlabels=False</em>, <em>method='valid'</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.pivot" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.pivot">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">pivot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'avg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attach_rlabels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'valid'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.pivot" title="Permalink to this definition">¶</a></dt>
 <dd><p>produces a contingency table according to the arguments and keywords
 provided.</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd>val: the colname to place as the data in the table</dd>
-<dt>kwds:</dt>
-<dd><dl class="first docutils">
-<dt>rows: list of colnames whos combinations will become rows</dt>
-<dd>in the table if left blank their will be one row</dd>
-<dt>cols: list of colnames whos combinations will become cols</dt>
-<dd>in the table if left blank their will be one col</dd>
-<dt>aggregate: function applied across data going into each cell</dt>
-<dd>of the table &lt;<a class="reference external" href="http://www.sqlite.org/lang_aggfunc.html">http://www.sqlite.org/lang_aggfunc.html</a>&gt;_</dd>
+<div><dl>
+<dt>args:</dt><dd><p>val: the colname to place as the data in the table</p>
+</dd>
+<dt>kwds:</dt><dd><dl class="simple">
+<dt>rows: list of colnames whos combinations will become rows</dt><dd><p>in the table if left blank their will be one row</p>
+</dd>
+<dt>cols: list of colnames whos combinations will become cols</dt><dd><p>in the table if left blank their will be one col</p>
+</dd>
+<dt>aggregate: function applied across data going into each cell</dt><dd><p>of the table &lt;<a class="reference external" href="http://www.sqlite.org/lang_aggfunc.html">http://www.sqlite.org/lang_aggfunc.html</a>&gt;_</p>
+</dd>
 </dl>
 <p>where: list of tuples or list of strings for filtering data</p>
-<dl class="last docutils">
-<dt>method:</dt>
-<dd><p class="first">&#8216;valid&#8217;: only returns rows or columns with valid entries.</p>
-<dl class="last docutils">
-<dt>&#8216;full&#8217;: return full factorial combinations of the</dt>
-<dd>conditions specified by rows and cols</dd>
-</dl>
+<dl>
+<dt>method:</dt><dd><p>‘valid’: only returns rows or columns with valid entries.</p>
+<dl class="simple">
+<dt>‘full’: return full factorial combinations of the</dt><dd><p>conditions specified by rows and cols</p>
 </dd>
 </dl>
 </dd>
-<dt>returns:</dt>
-<dd><tt class="xref py py-class docutils literal"><span class="pre">PyvtTbl</span></tt> object</dd>
+</dl>
+</dd>
+<dt>returns:</dt><dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">PyvtTbl</span></code> object</p>
+</dd>
 </dl>
 </div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.where">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">where</tt><big>(</big><em>where</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.where" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.where">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">where</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.where" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies the where filter to a copy of the DataFrame, and
 returns the new DataFrame. The associated DataFrame is not copied.</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd>where: criterion to apply to new table</dd>
-<dt>returns:</dt>
-<dd>a new <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt></dd>
-<dt>example:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<div><dl>
+<dt>args:</dt><dd><p>where: criterion to apply to new table</p>
+</dd>
+<dt>returns:</dt><dd><p>a new <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt>example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="go">first      last       age   gender </span>
 <span class="go">==================================</span>
 <span class="go">Roger   Lew            28   male   </span>
@@ -516,7 +463,7 @@ returns the new DataFrame. The associated DataFrame is not copied.</p>
 <span class="go">Megan   Whittington    26   female </span>
 <span class="go">John    Smith          51   male   </span>
 <span class="go">Jane    Doe            49   female</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="s">&#39;age &gt; 20 and age &lt; 45&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="s1">&#39;age &gt; 20 and age &lt; 45&#39;</span><span class="p">))</span>
 <span class="go">first      last       age   gender </span>
 <span class="go">==================================</span>
 <span class="go">Roger   Lew            28   male   </span>
@@ -530,62 +477,62 @@ returns the new DataFrame. The associated DataFrame is not copied.</p>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.where_update">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">where_update</tt><big>(</big><em>where</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.where_update" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.where_update">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">where_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.where_update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies the where filter in-place.</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>where: criterion to apply to table</dd>
-<dt>returns:</dt>
-<dd>None</dd>
+<blockquote>
+<div><dl class="simple">
+<dt>args:</dt><dd><p>where: criterion to apply to table</p>
+</dd>
+<dt>returns:</dt><dd><p>None</p>
+</dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.summary">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">summary</tt><big>(</big><em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.summary" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.summary">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>prints the descriptive information for each column in DataFrame</p>
-<dl class="docutils">
-<dt>kwds:</dt>
-<dd>where: criterion to apply to table before running analysis</dd>
-<dt>returns:</dt>
-<dd>None</dd>
+<blockquote>
+<div><dl class="simple">
+<dt>kwds:</dt><dd><p>where: criterion to apply to table before running analysis</p>
+</dd>
+<dt>returns:</dt><dd><p>None</p>
+</dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.validate">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">validate</tt><big>(</big><em>criteria</em>, <em>verbose=False</em>, <em>report=False</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.validate" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.validate">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">criteria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>validate the data in the table.</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>criteria: a dict whose keys should coorespond to columns in the table.
+<blockquote>
+<div><dl>
+<dt>args:</dt><dd><p>criteria: a dict whose keys should coorespond to columns in the table.
 The values should be functions which take a single parameter and return
-a boolean.</dd>
-<dt>kwds:</dt>
-<dd><dl class="first last docutils">
-<dt>verbose:</dt>
-<dd><p class="first">True: provide real-time feedback</p>
-<p class="last">False: don&#8217;t provide feedback (default)</p>
+a boolean.</p>
 </dd>
-<dt>report:</dt>
-<dd><p class="first">True: print a report upon completion</p>
-<p class="last">False: don&#8217;t print report (default)</p>
+<dt>kwds:</dt><dd><dl>
+<dt>verbose:</dt><dd><p>True: provide real-time feedback</p>
+<p>False: don’t provide feedback (default)</p>
+</dd>
+<dt>report:</dt><dd><p>True: print a report upon completion</p>
+<p>False: don’t print report (default)</p>
 </dd>
 </dl>
 </dd>
-<dt>returns:</dt>
-<dd><blockquote class="first">
+<dt>returns:</dt><dd><blockquote>
 <div><p>True: the criteria was satisfied</p>
 <p>False: the critera was not satisfied</p>
 </div></blockquote>
-<dl class="last docutils">
-<dt>example:</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<dl>
+<dt>example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="go">first      last       age   gender </span>
 <span class="go">==================================</span>
 <span class="go">Roger   Lew            28   male   </span>
@@ -596,7 +543,7 @@ a boolean.</dd>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">isint</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
 <span class="go">        try : return int(x)-float(x)==0</span>
 <span class="go">        except:  return False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">validate</span><span class="p">({</span><span class="s">&#39;age&#39;</span> <span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">isint</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">validate</span><span class="p">({</span><span class="s1">&#39;age&#39;</span> <span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">isint</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
 <span class="go">                 &#39;gender&#39; : lambda x: x in [&#39;male&#39;, &#39;female&#39;]},</span>
 <span class="go">                 verbose=True, report=True)                    </span>
 <span class="go">Validating gender:</span>
@@ -616,19 +563,19 @@ a boolean.</dd>
 </dl>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.types">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">types</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.types" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>returns a list of the sqlite3 datatypes of the columns </dt>
-<dd><dl class="first last docutils">
-<dt>args:</dt>
-<dd>None</dd>
-<dt>returns:</dt>
-<dd>an ordered list of sqlite3 types.</dd>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.types">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.types" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>returns a list of the sqlite3 datatypes of the columns </dt><dd><dl class="simple">
+<dt>args:</dt><dd><p>None</p>
+</dd>
+<dt>returns:</dt><dd><p>an ordered list of sqlite3 types.</p>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -638,569 +585,539 @@ a boolean.</dd>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.shape">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">shape</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.shape" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.shape">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the size of the data in the table as a tuple</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>None</dd>
-<dt>returns:</dt>
-<dd>tuple (number of columns, number of rows)</dd>
+<blockquote>
+<div><dl class="simple">
+<dt>args:</dt><dd><p>None</p>
+</dd>
+<dt>returns:</dt><dd><p>tuple (number of columns, number of rows)</p>
+</dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.bind_aggregate">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">bind_aggregate</tt><big>(</big><em>name</em>, <em>arity</em>, <em>func</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.bind_aggregate" title="Permalink to this definition">¶</a></dt>
-<dd><p>binds a sqlite3 aggregator to <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.bind_aggregate">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">bind_aggregate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.bind_aggregate" title="Permalink to this definition">¶</a></dt>
+<dd><p>binds a sqlite3 aggregator to <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd><p class="first">name: string to be associated with the aggregator</p>
+<div><dl>
+<dt>args:</dt><dd><p>name: string to be associated with the aggregator</p>
 <p>arity: the number of inputs required by the aggregator</p>
-<p class="last">func: the aggregator class</p>
+<p>func: the aggregator class</p>
 </dd>
-<dt>returns:</dt>
-<dd>None</dd>
+<dt>returns:</dt><dd><p>None</p>
+</dd>
 </dl>
 </div></blockquote>
 <div class="line-block">
-<div class="line"><tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>.aggregates is a list of the available aggregators.</div>
+<div class="line"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>.aggregates is a list of the available aggregators.</div>
 <div class="line">For information on rolling your own aggregators see:
 <a class="reference external" href="http://docs.python.org/library/sqlite3.html">http://docs.python.org/library/sqlite3.html</a></div>
 </div>
 </dd></dl>
 
-</div>
+</section>
 <hr class="docutils" />
-<div class="section" id="pyvttbl-plotting-wrappers">
-<h2><tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.plotting</span></tt> Wrappers<a class="headerlink" href="#pyvttbl-plotting-wrappers" title="Permalink to this headline">¶</a></h2>
+<section id="pyvttbl-plotting-wrappers">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyvttbl.plotting</span></code> Wrappers<a class="headerlink" href="#pyvttbl-plotting-wrappers" title="Permalink to this heading">¶</a></h2>
 <p>Methods to visualize data.</p>
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.histogram_plot">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">histogram_plot</tt><big>(</big><em>val</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.histogram_plot" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.histogram_plot">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">histogram_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.histogram_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes a histogram plot</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>key: column label of dependent variable</dd>
-<dt>kwds:</dt>
-<dd><p class="first">where: criterion to apply to table before running analysis</p>
+<blockquote>
+<div><dl>
+<dt>args:</dt><dd><p>key: column label of dependent variable</p>
+</dd>
+<dt>kwds:</dt><dd><p>where: criterion to apply to table before running analysis</p>
 <p>bins: number of bins (default = 10)</p>
-<p class="last">range: list of length 2 defining min and max bin edges</p>
+<p>range: list of length 2 defining min and max bin edges</p>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.scatter_plot">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">scatter_plot</tt><big>(</big><em>aname</em>, <em>bname</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.scatter_plot" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.scatter_plot">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">scatter_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bname</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.scatter_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a scatter plot with the specified parameters</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd><p class="first">aname: variable on x-axis</p>
-<p class="last">bname: variable on y-axis</p>
+<blockquote>
+<div><dl>
+<dt>args:</dt><dd><p>aname: variable on x-axis</p>
+<p>bname: variable on y-axis</p>
 </dd>
-<dt>kwds:</dt>
-<dd><dl class="first last docutils">
-<dt>alpha:</dt>
-<dd>amount of transparency applied</dd>
-<dt>trend :</dt>
-<dd><p class="first">None:          no model fitting</p>
-<p>&#8216;linear&#8217;:      f(x) = a + b*x</p>
-<p>&#8216;exponential&#8217;: f(x) = a * x**b</p>
-<p>&#8216;logarithmic&#8217;: f(x) = a * log(x) + b</p>
-<p>&#8216;polynomial&#8217;:  f(x) = a * x**2 + b*x + c</p>
-<p class="last">&#8216;power&#8217;:       f(x) = a * x**b</p>
+<dt>kwds:</dt><dd><dl>
+<dt>alpha:</dt><dd><p>amount of transparency applied</p>
+</dd>
+<dt>trend :</dt><dd><p>None:          no model fitting</p>
+<p>‘linear’:      f(x) = a + b*x</p>
+<p>‘exponential’: f(x) = a * x**b</p>
+<p>‘logarithmic’: f(x) = a * log(x) + b</p>
+<p>‘polynomial’:  f(x) = a * x**2 + b*x + c</p>
+<p>‘power’:       f(x) = a * x**b</p>
 </dd>
 </dl>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.box_plot">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">box_plot</tt><big>(</big><em>val</em>, <em>factors=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.box_plot" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.box_plot">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">box_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.box_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes a box plot</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd><dl class="first last docutils">
-<dt>df:</dt>
-<dd>a pyvttbl.DataFrame object</dd>
-<dt>val:</dt>
-<dd>the label of the dependent variable</dd>
+<dl class="simple">
+<dt>args:</dt><dd><dl class="simple">
+<dt>df:</dt><dd><p>a pyvttbl.DataFrame object</p>
+</dd>
+<dt>val:</dt><dd><p>the label of the dependent variable</p>
+</dd>
 </dl>
 </dd>
-<dt>kwds:</dt>
-<dd><dl class="first last docutils">
-<dt>factors:</dt>
-<dd>a list of factors to include in boxplot</dd>
-<dt>where:</dt>
-<dd>a string, list of strings, or list of tuples
-applied to the DataFrame before plotting</dd>
-<dt>fname:</dt>
-<dd>output file name</dd>
-<dt>quality:</dt>
-<dd>{&#8216;low&#8217; | &#8216;medium&#8217; | &#8216;high&#8217;} specifies image file dpi</dd>
+<dt>kwds:</dt><dd><dl class="simple">
+<dt>factors:</dt><dd><p>a list of factors to include in boxplot</p>
+</dd>
+<dt>where:</dt><dd><p>a string, list of strings, or list of tuples
+applied to the DataFrame before plotting</p>
+</dd>
+<dt>fname:</dt><dd><p>output file name</p>
+</dd>
+<dt>quality:</dt><dd><p>{‘low’ | ‘medium’ | ‘high’} specifies image file dpi</p>
+</dd>
 </dl>
 </dd>
 </dl>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.interaction_plot">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">interaction_plot</tt><big>(</big><em>val</em>, <em>xaxis</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.interaction_plot" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.interaction_plot">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">interaction_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xaxis</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.interaction_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>makes an interaction plot</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd><dl class="first last docutils">
-<dt>df:</dt>
-<dd>a pyvttbl.DataFrame object</dd>
-<dt>val:</dt>
-<dd>the label of the dependent variable</dd>
-<dt>xaxis:</dt>
-<dd>the label of the variable to place on the xaxis of each subplot</dd>
-</dl>
+<blockquote>
+<div><dl class="simple">
+<dt>args:</dt><dd><dl class="simple">
+<dt>df:</dt><dd><p>a pyvttbl.DataFrame object</p>
 </dd>
-<dt>kwds:</dt>
-<dd><dl class="first last docutils">
-<dt>seplines:</dt>
-<dd>label specifying seperate lines in each subplot</dd>
-<dt>sepxplots:</dt>
-<dd>label specifying seperate horizontal subplots</dd>
-<dt>sepyplots:</dt>
-<dd>label specifying separate vertical subplots</dd>
-<dt>xmin:</dt>
-<dd>(&#8216;AUTO&#8217; by default) minimum xaxis value across subplots</dd>
-<dt>xmax:</dt>
-<dd>(&#8216;AUTO&#8217; by default) maximum xaxis value across subplots</dd>
-<dt>ymin:</dt>
-<dd>(&#8216;AUTO&#8217; by default) minimum yaxis value across subplots</dd>
-<dt>ymax:</dt>
-<dd>(&#8216;AUTO&#8217; by default) maximum yaxis value across subplots</dd>
-<dt>where:</dt>
-<dd>a string, list of strings, or list of tuples
-applied to the DataFrame before plotting</dd>
-<dt>fname:</dt>
-<dd>output file name</dd>
-<dt>quality:</dt>
-<dd>{&#8216;low&#8217; | &#8216;medium&#8217; | &#8216;high&#8217;} specifies image file dpi</dd>
-<dt>yerr:</dt>
-<dd>{float, &#8216;ci&#8217;, &#8216;stdev&#8217;, &#8216;sem&#8217;} designates errorbars across
-datapoints in all subplots</dd>
-</dl>
+<dt>val:</dt><dd><p>the label of the dependent variable</p>
+</dd>
+<dt>xaxis:</dt><dd><p>the label of the variable to place on the xaxis of each subplot</p>
 </dd>
 </dl>
+</dd>
+<dt>kwds:</dt><dd><dl class="simple">
+<dt>seplines:</dt><dd><p>label specifying seperate lines in each subplot</p>
+</dd>
+<dt>sepxplots:</dt><dd><p>label specifying seperate horizontal subplots</p>
+</dd>
+<dt>sepyplots:</dt><dd><p>label specifying separate vertical subplots</p>
+</dd>
+<dt>xmin:</dt><dd><p>(‘AUTO’ by default) minimum xaxis value across subplots</p>
+</dd>
+<dt>xmax:</dt><dd><p>(‘AUTO’ by default) maximum xaxis value across subplots</p>
+</dd>
+<dt>ymin:</dt><dd><p>(‘AUTO’ by default) minimum yaxis value across subplots</p>
+</dd>
+<dt>ymax:</dt><dd><p>(‘AUTO’ by default) maximum yaxis value across subplots</p>
+</dd>
+<dt>where:</dt><dd><p>a string, list of strings, or list of tuples
+applied to the DataFrame before plotting</p>
+</dd>
+<dt>fname:</dt><dd><p>output file name</p>
+</dd>
+<dt>quality:</dt><dd><p>{‘low’ | ‘medium’ | ‘high’} specifies image file dpi</p>
+</dd>
+<dt>yerr:</dt><dd><p>{float, ‘ci’, ‘stdev’, ‘sem’} designates errorbars across
+datapoints in all subplots</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.scatter_matrix">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">scatter_matrix</tt><big>(</big><em>variables</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.scatter_matrix" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.scatter_matrix">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">scatter_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.scatter_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots a matrix of scatterplots</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd><dl class="first last docutils">
-<dt>variables:</dt>
-<dd>column labels to include in scatter matrix</dd>
+<blockquote>
+<div><dl>
+<dt>args:</dt><dd><dl class="simple">
+<dt>variables:</dt><dd><p>column labels to include in scatter matrix</p>
+</dd>
 </dl>
 </dd>
-<dt>kwds:</dt>
-<dd><dl class="first last docutils">
-<dt>alpha:</dt>
-<dd>amount of transparency applied</dd>
-<dt>grid:</dt>
-<dd>setting this to True will show the grid</dd>
-<dt>diagonal:</dt>
-<dd><p class="first">&#8216;kde&#8217;:  Kernel Density Estimation</p>
-<p>&#8216;hist&#8217;: 20 bin Histogram</p>
-<p class="last">None:  just labels</p>
+<dt>kwds:</dt><dd><dl>
+<dt>alpha:</dt><dd><p>amount of transparency applied</p>
 </dd>
-<dt>trend :</dt>
-<dd><p class="first">None:          no model fitting</p>
-<p>&#8216;linear&#8217;:      f(x) = a + b*x     (default)</p>
-<p>&#8216;exponential&#8217;: f(x) = a * x**b</p>
-<p>&#8216;logarithmic&#8217;: f(x) = a * log(x) + b</p>
-<p>&#8216;polynomial&#8217;:  f(x) = a * x**2 + b*x + c</p>
-<p class="last">&#8216;power&#8217;:       f(x) = a * x**b</p>
+<dt>grid:</dt><dd><p>setting this to True will show the grid</p>
 </dd>
-<dt>alternate_labels: Specifies whether the labels and ticks should</dt>
-<dd>alternate. Default is True. When False tick labels
+<dt>diagonal:</dt><dd><p>‘kde’:  Kernel Density Estimation</p>
+<p>‘hist’: 20 bin Histogram</p>
+<p>None:  just labels</p>
+</dd>
+<dt>trend :</dt><dd><p>None:          no model fitting</p>
+<p>‘linear’:      f(x) = a + b*x     (default)</p>
+<p>‘exponential’: f(x) = a * x**b</p>
+<p>‘logarithmic’: f(x) = a * log(x) + b</p>
+<p>‘polynomial’:  f(x) = a * x**2 + b*x + c</p>
+<p>‘power’:       f(x) = a * x**b</p>
+</dd>
+<dt>alternate_labels: Specifies whether the labels and ticks should</dt><dd><p>alternate. Default is True. When False tick labels
 will be on the left and botttom, and variable
-labels will be on the top and right.</dd>
+labels will be on the top and right.</p>
+</dd>
 </dl>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
-</div>
+</section>
 <hr class="docutils" />
-<div class="section" id="pyvttbl-stats-wrappers">
-<h2><tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt> Wrappers<a class="headerlink" href="#pyvttbl-stats-wrappers" title="Permalink to this headline">¶</a></h2>
+<section id="pyvttbl-stats-wrappers">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyvttbl.stats</span></code> Wrappers<a class="headerlink" href="#pyvttbl-stats-wrappers" title="Permalink to this heading">¶</a></h2>
 <p>Methods to conduct descriptive and inferential statistical analyses.</p>
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.descriptives">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">descriptives</tt><big>(</big><em>key</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.descriptives" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.descriptives">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">descriptives</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.descriptives" title="Permalink to this definition">¶</a></dt>
 <dd><p>Conducts a descriptive statistical analysis of the data in self[key].</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>key: column label</dd>
-<dt>kwds:</dt>
-<dd>where: criterion to apply to table before running analysis</dd>
-<dt>returns:</dt>
-<dd>a <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt>. <tt class="xref py py-class docutils literal"><span class="pre">Descriptives</span></tt> object</dd>
+<blockquote>
+<div><dl class="simple">
+<dt>args:</dt><dd><p>key: column label</p>
+</dd>
+<dt>kwds:</dt><dd><p>where: criterion to apply to table before running analysis</p>
+</dd>
+<dt>returns:</dt><dd><p>a <code class="xref py py-mod docutils literal notranslate"><span class="pre">pyvttbl.stats</span></code>. <code class="xref py py-class docutils literal notranslate"><span class="pre">Descriptives</span></code> object</p>
+</dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.histogram">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">histogram</tt><big>(</big><em>key</em>, <em>where=None</em>, <em>bins=10</em>, <em>range=None</em>, <em>density=False</em>, <em>cumulative=False</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.histogram" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.histogram">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cumulative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.histogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Conducts a histogram analysis of the data in self[key].</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>key: column label of dependent variable</dd>
-<dt>kwds:</dt>
-<dd><p class="first">where: criterion to apply to table before running analysis</p>
+<blockquote>
+<div><dl>
+<dt>args:</dt><dd><p>key: column label of dependent variable</p>
+</dd>
+<dt>kwds:</dt><dd><p>where: criterion to apply to table before running analysis</p>
 <p>bins: number of bins (default = 10)</p>
-<p class="last">range: list of length 2 defining min and max bin edges</p>
+<p>range: list of length 2 defining min and max bin edges</p>
 </dd>
-<dt>returns:</dt>
-<dd>a <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt>. <tt class="xref py py-class docutils literal"><span class="pre">Descriptives</span></tt> object</dd>
+<dt>returns:</dt><dd><p>a <code class="xref py py-mod docutils literal notranslate"><span class="pre">pyvttbl.stats</span></code>. <code class="xref py py-class docutils literal notranslate"><span class="pre">Descriptives</span></code> object</p>
+</dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.marginals">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">marginals</tt><big>(</big><em>key</em>, <em>factors</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.marginals" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates means, counts, standard errors, and confidence intervals
-for the marginal conditions of the factorial combinations specified in
-the factors list.</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>key: column label (of the dependent variable)</dd>
-<dt>kwds:</dt>
-<dd><p class="first">factors: list of column labels to segregate data</p>
-<p class="last">where: criterion to apply to table before running analysis</p>
-</dd>
-<dt>returns:</dt>
-<dd>a <tt class="xref py py-mod docutils literal"><span class="pre">pyvttbl.stats</span></tt>. <tt class="xref py py-class docutils literal"><span class="pre">Marginals</span></tt> object</dd>
-</dl>
-</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.marginals">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">marginals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.marginals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.anova1way">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">anova1way</tt><big>(</big><em>val</em>, <em>factor</em>, <em>posthoc='tukey'</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.anova1way" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.anova1way">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">anova1way</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posthoc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tukey'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.anova1way" title="Permalink to this definition">¶</a></dt>
 <dd><p>Conducts a one-way analysis of variance
 on val over the conditions in factor. The conditions do not necessarily
 need to have equal numbers of samples.</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd><blockquote class="first">
+<div><dl>
+<dt>args:</dt><dd><blockquote>
 <div><p>val: dependent variable</p>
 <p>factor: a dummy coded column label</p>
 </div></blockquote>
-<dl class="last docutils">
-<dt>kwds:</dt>
-<dd><dl class="first last docutils">
-<dt>posthoc:</dt>
-<dd><p class="first">&#8216;tukey&#8217;: conduct Tukey posthoc tests</p>
-<p class="last">&#8216;SNK&#8217;: conduct Newman-Keuls posthoc tests</p>
+<dl>
+<dt>kwds:</dt><dd><dl>
+<dt>posthoc:</dt><dd><p>‘tukey’: conduct Tukey posthoc tests</p>
+<p>‘SNK’: conduct Newman-Keuls posthoc tests</p>
 </dd>
 </dl>
 </dd>
-<dt>where:</dt>
-<dd>conditions to apply before running analysis</dd>
+<dt>where:</dt><dd><p>conditions to apply before running analysis</p>
+</dd>
 </dl>
 </dd>
-<dt>return:</dt>
-<dd>an <a class="reference internal" href="stats.html#pyvttbl.stats.Anova1way" title="pyvttbl.stats.Anova1way"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.Anova1way</span></tt></a> object</dd>
+<dt>return:</dt><dd><p>an <a class="reference internal" href="stats.html#pyvttbl.stats.Anova1way" title="pyvttbl.stats.Anova1way"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyvttbl.stats.Anova1way</span></code></a> object</p>
+</dd>
 </dl>
 </div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.anova">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">anova</tt><big>(</big><em>dv</em>, <em>sub='SUBJECT'</em>, <em>wfactors=None</em>, <em>bfactors=None</em>, <em>measure=''</em>, <em>transform=''</em>, <em>alpha=0.05</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.anova" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.anova">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">anova</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SUBJECT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wfactors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bfactors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.anova" title="Permalink to this definition">¶</a></dt>
 <dd><p>conducts a betweeen, within, or mixed, analysis of variance</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>dv: label containing dependent variable</dd>
-<dt>kwds:</dt>
-<dd><p class="first">wfactors: list of within variable factor labels</p>
+<blockquote>
+<div><dl>
+<dt>args:</dt><dd><p>dv: label containing dependent variable</p>
+</dd>
+<dt>kwds:</dt><dd><p>wfactors: list of within variable factor labels</p>
 <p>bfactors: list of between variable factor labels</p>
 <p>sub: label coding subjects (or the isomorphism)</p>
-<dl class="docutils">
-<dt>measure: string to describe dv (outputs &#8216;&lt;dv&gt; of</dt>
-<dd>&lt;measure&gt;&#8217;) intended when dv name is generic
-(e.g., MEAN, RMS, SD, ...)</dd>
+<dl class="simple">
+<dt>measure: string to describe dv (outputs ‘&lt;dv&gt; of</dt><dd><p>&lt;measure&gt;’) intended when dv name is generic
+(e.g., MEAN, RMS, SD, …)</p>
+</dd>
 </dl>
 <p>transform: string specifying a data transformation</p>
-<blockquote class="last">
-<div><table border="1" class="docutils">
-<colgroup>
-<col width="41%" />
-<col width="27%" />
-<col width="32%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">STRING OPTION</th>
-<th class="head">TRANSFORM</th>
-<th class="head">COMMENTS</th>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>STRING OPTION</p></th>
+<th class="head"><p>TRANSFORM</p></th>
+<th class="head"><p>COMMENTS</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>&#8216;&#8217;</td>
-<td>X</td>
-<td>default</td>
+<tbody>
+<tr class="row-even"><td><p>‘’</p></td>
+<td><p>X</p></td>
+<td><p>default</p></td>
 </tr>
-<tr class="row-odd"><td>&#8216;log&#8217;,&#8217;log10&#8217;</td>
-<td>numpy.log(X)</td>
-<td>base 10 transform</td>
+<tr class="row-odd"><td><p>‘log’,’log10’</p></td>
+<td><p>numpy.log(X)</p></td>
+<td><p>base 10 transform</p></td>
 </tr>
-<tr class="row-even"><td>&#8216;reciprocal&#8217;, &#8216;inverse&#8217;</td>
-<td>1/X</td>
-<td>&nbsp;</td>
+<tr class="row-even"><td><p>‘reciprocal’, ‘inverse’</p></td>
+<td><p>1/X</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>&#8216;square-root&#8217;, &#8216;sqrt&#8217;</td>
-<td>numpy.sqrt(X)</td>
-<td>&nbsp;</td>
+<tr class="row-odd"><td><p>‘square-root’, ‘sqrt’</p></td>
+<td><p>numpy.sqrt(X)</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>&#8216;arcsine&#8217;, &#8216;arcsin&#8217;</td>
-<td>numpy.arcsin(X)</td>
-<td>&nbsp;</td>
+<tr class="row-even"><td><p>‘arcsine’, ‘arcsin’</p></td>
+<td><p>numpy.arcsin(X)</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>&#8216;windsor 10&#8217;</td>
-<td>windsor(X, 10)</td>
-<td>10% windosr trim</td>
+<tr class="row-odd"><td><p>‘windsor 10’</p></td>
+<td><p>windsor(X, 10)</p></td>
+<td><p>10% windosr trim</p></td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.chisquare1way">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">chisquare1way</tt><big>(</big><em>observed</em>, <em>expected_dict=None</em>, <em>alpha=0.05</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.chisquare1way" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.chisquare1way">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">chisquare1way</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.chisquare1way" title="Permalink to this definition">¶</a></dt>
 <dd><p>conducts a one-way chi-square goodness-of-fit test on the data in observed</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>observed: column label containing categorical observations</dd>
-<dt>kwds:</dt>
-<dd><dl class="first docutils">
-<dt>expected_dict: a dictionary object with keys matching the categories</dt>
-<dd>in observed and values with the expected counts. The
+<blockquote>
+<div><dl>
+<dt>args:</dt><dd><p>observed: column label containing categorical observations</p>
+</dd>
+<dt>kwds:</dt><dd><dl class="simple">
+<dt>expected_dict: a dictionary object with keys matching the categories</dt><dd><p>in observed and values with the expected counts. The
 categories in the observed column must be a subset of
 the keys in the expected_dict. If expected_dict is None,
 the total N is assumed to be equally distributed across
-all groups.</dd>
+all groups.</p>
+</dd>
 </dl>
 <p>alpha: the type-I error probability</p>
-<dl class="last docutils">
-<dt>where:</dt>
-<dd>conditions to apply before running analysis</dd>
+<dl class="simple">
+<dt>where:</dt><dd><p>conditions to apply before running analysis</p>
+</dd>
 </dl>
 </dd>
-<dt>return:</dt>
-<dd>an <a class="reference internal" href="stats.html#pyvttbl.stats.ChiSquare1way" title="pyvttbl.stats.ChiSquare1way"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.ChiSquare1way</span></tt></a> object</dd>
+<dt>return:</dt><dd><p>an <a class="reference internal" href="stats.html#pyvttbl.stats.ChiSquare1way" title="pyvttbl.stats.ChiSquare1way"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyvttbl.stats.ChiSquare1way</span></code></a> object</p>
+</dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.chisquare2way">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">chisquare2way</tt><big>(</big><em>rfactor</em>, <em>cfactor</em>, <em>alpha=0.05</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.chisquare2way" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.chisquare2way">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">chisquare2way</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rfactor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfactor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.chisquare2way" title="Permalink to this definition">¶</a></dt>
 <dd><p>conducts a two-way chi-square goodness-of-fit test on the data in observed</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd><p class="first">rfactor: column key</p>
-<p class="last">cfactor: column key</p>
+<blockquote>
+<div><dl>
+<dt>args:</dt><dd><p>rfactor: column key</p>
+<p>cfactor: column key</p>
 </dd>
-<dt>kwds:</dt>
-<dd><p class="first">alpha: the type-I error probability</p>
-<dl class="last docutils">
-<dt>where:</dt>
-<dd>conditions to apply before running analysis</dd>
+<dt>kwds:</dt><dd><p>alpha: the type-I error probability</p>
+<dl class="simple">
+<dt>where:</dt><dd><p>conditions to apply before running analysis</p>
+</dd>
 </dl>
 </dd>
-<dt>return:</dt>
-<dd>an <a class="reference internal" href="stats.html#pyvttbl.stats.ChiSquare2way" title="pyvttbl.stats.ChiSquare2way"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.ChiSquare2way</span></tt></a> object</dd>
+<dt>return:</dt><dd><p>an <a class="reference internal" href="stats.html#pyvttbl.stats.ChiSquare2way" title="pyvttbl.stats.ChiSquare2way"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyvttbl.stats.ChiSquare2way</span></code></a> object</p>
+</dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.correlation">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">correlation</tt><big>(</big><em>variables</em>, <em>coefficient='pearson'</em>, <em>alpha=0.05</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.correlation" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.correlation">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefficient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pearson'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.correlation" title="Permalink to this definition">¶</a></dt>
 <dd><p>produces a correlation matrix and conducts step-down significance testing
 on the column labels in variables.</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd>variables: column keys to include in correlation matrix</dd>
-<dt>kwds:</dt>
-<dd><dl class="first docutils">
-<dt>coefficient:</dt>
-<dd>{ &#8216;pearson&#8217;, &#8216;spearman&#8217;, &#8216;kendalltau&#8217;, &#8216;pointbiserial&#8217; }</dd>
+<div><dl>
+<dt>args:</dt><dd><p>variables: column keys to include in correlation matrix</p>
+</dd>
+<dt>kwds:</dt><dd><dl class="simple">
+<dt>coefficient:</dt><dd><p>{ ‘pearson’, ‘spearman’, ‘kendalltau’, ‘pointbiserial’ }</p>
+</dd>
 </dl>
 <p>alpha: the type-I error probability</p>
-<dl class="last docutils">
-<dt>where:</dt>
-<dd>conditions to apply before running analysis</dd>
+<dl class="simple">
+<dt>where:</dt><dd><p>conditions to apply before running analysis</p>
+</dd>
 </dl>
 </dd>
-<dt>return:</dt>
-<dd>an <a class="reference internal" href="stats.html#pyvttbl.stats.Correlation" title="pyvttbl.stats.Correlation"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.Correlation</span></tt></a> object</dd>
+<dt>return:</dt><dd><p>an <a class="reference internal" href="stats.html#pyvttbl.stats.Correlation" title="pyvttbl.stats.Correlation"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyvttbl.stats.Correlation</span></code></a> object</p>
+</dd>
 </dl>
 </div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame.ttest">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">ttest</tt><big>(</big><em>aname</em>, <em>bname=None</em>, <em>pop_mean=0.0</em>, <em>paired=False</em>, <em>equal_variance=True</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame.ttest" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame.ttest">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">ttest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paired</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equal_variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame.ttest" title="Permalink to this definition">¶</a></dt>
 <dd><p>produces a correlation matrix and conducts step-down significance testing
 on the column labels in variables.</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd>aname: column key</dd>
-<dt>kwds:</dt>
-<dd><dl class="first last docutils">
-<dt>bname: is not specified a one-sample t-test is performed on</dt>
-<dd>comparing the values in column aname with a hypothesized
-population mean.</dd>
-<dt>pop_mean: specifies the null population mean for one-sample t-test.</dt>
-<dd>Ignored if bname is supplied</dd>
-<dt>paired:</dt>
-<dd><p class="first">True: a paired t-test is conducted</p>
-<p class="last">False: an independent samples t-test is conducted</p>
+<div><dl>
+<dt>args:</dt><dd><p>aname: column key</p>
 </dd>
-<dt>equal_variance:</dt>
-<dd><p class="first">True: assumes aname and bname have equal variance</p>
-<p class="last">False: assumes aname and bname have unequal variance</p>
+<dt>kwds:</dt><dd><dl>
+<dt>bname: is not specified a one-sample t-test is performed on</dt><dd><p>comparing the values in column aname with a hypothesized
+population mean.</p>
 </dd>
-<dt>where:</dt>
-<dd>conditions to apply before running analysis</dd>
+<dt>pop_mean: specifies the null population mean for one-sample t-test.</dt><dd><p>Ignored if bname is supplied</p>
+</dd>
+<dt>paired:</dt><dd><p>True: a paired t-test is conducted</p>
+<p>False: an independent samples t-test is conducted</p>
+</dd>
+<dt>equal_variance:</dt><dd><p>True: assumes aname and bname have equal variance</p>
+<p>False: assumes aname and bname have unequal variance</p>
+</dd>
+<dt>where:</dt><dd><p>conditions to apply before running analysis</p>
+</dd>
 </dl>
 </dd>
-<dt>return:</dt>
-<dd>an <a class="reference internal" href="stats.html#pyvttbl.stats.Ttest" title="pyvttbl.stats.Ttest"><tt class="xref py py-class docutils literal"><span class="pre">pyvttbl.stats.Ttest</span></tt></a> object</dd>
+<dt>return:</dt><dd><p>an <a class="reference internal" href="stats.html#pyvttbl.stats.Ttest" title="pyvttbl.stats.Ttest"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyvttbl.stats.Ttest</span></code></a> object</p>
+</dd>
 </dl>
 </div></blockquote>
 </dd></dl>
 
-</div>
+</section>
 <hr class="docutils" />
-<div class="section" id="private-methods">
-<h2>Private Methods<a class="headerlink" href="#private-methods" title="Permalink to this headline">¶</a></h2>
-<p>These methods are for working interfacing <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt>
+<section id="private-methods">
+<h2>Private Methods<a class="headerlink" href="#private-methods" title="Permalink to this heading">¶</a></h2>
+<p>These methods are for working interfacing <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>
 with sqlite3.</p>
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame._get_sqltype">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">_get_sqltype</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._get_sqltype" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame._get_sqltype">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">_get_sqltype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame._get_sqltype" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the sqlite3 type associated with the provided key</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>key: key in <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> (raises KeyError if key not in self)</dd>
-<dt>returns:</dt>
-<dd><dl class="first last docutils">
-<dt>a string specifiying the sqlite3 type associated with the data in self[key]:</dt>
-<dd>{ &#8216;null&#8217;, &#8216;integer&#8217;, &#8216;real&#8217;, &#8216;text&#8217;}</dd>
+<blockquote>
+<div><dl class="simple">
+<dt>args:</dt><dd><p>key: key in <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code> (raises KeyError if key not in self)</p>
+</dd>
+<dt>returns:</dt><dd><dl class="simple">
+<dt>a string specifiying the sqlite3 type associated with the data in self[key]:</dt><dd><p>{ ‘null’, ‘integer’, ‘real’, ‘text’}</p>
+</dd>
 </dl>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame._get_nptype">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">_get_nptype</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._get_nptype" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame._get_nptype">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">_get_nptype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame._get_nptype" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the numpy type object associated with the provided key</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>key: key in <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> (raises KeyError if key not in self)</dd>
-<dt>returns:</dt>
-<dd><p class="first">a numpy object specifiying the type associated with the data in self[key]:</p>
-<blockquote class="last">
-<div><table border="1" class="docutils">
-<colgroup>
-<col width="36%" />
-<col width="64%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">sql type</th>
-<th class="head">numpy type</th>
+<blockquote>
+<div><dl>
+<dt>args:</dt><dd><p>key: key in <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code> (raises KeyError if key not in self)</p>
+</dd>
+<dt>returns:</dt><dd><p>a numpy object specifiying the type associated with the data in self[key]:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>sql type</p></th>
+<th class="head"><p>numpy type</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>&#8216;null&#8217;</td>
-<td>np.dtype(object)</td>
+<tbody>
+<tr class="row-even"><td><p>‘null’</p></td>
+<td><p>np.dtype(object)</p></td>
 </tr>
-<tr class="row-odd"><td>&#8216;integer&#8217;</td>
-<td>np.dtype(int)</td>
+<tr class="row-odd"><td><p>‘integer’</p></td>
+<td><p>np.dtype(int)</p></td>
 </tr>
-<tr class="row-even"><td>&#8216;real&#8217;</td>
-<td>np.dtype(float)</td>
+<tr class="row-even"><td><p>‘real’</p></td>
+<td><p>np.dtype(float)</p></td>
 </tr>
-<tr class="row-odd"><td>&#8216;text&#8217;</td>
-<td>np.dtype(str)</td>
+<tr class="row-odd"><td><p>‘text’</p></td>
+<td><p>np.dtype(str)</p></td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame._get_mafillvalue">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">_get_mafillvalue</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._get_mafillvalue" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame._get_mafillvalue">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">_get_mafillvalue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame._get_mafillvalue" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the default fill value for invalid data associated with the provided key.</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd>key: key in <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> (raises KeyError if key not in self)</dd>
-<dt>returns:</dt>
-<dd><p class="first">string, float, or int associated with the data in self[key]</p>
-<blockquote class="last">
-<div><table border="1" class="docutils">
-<colgroup>
-<col width="43%" />
-<col width="57%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">sql type</th>
-<th class="head">default</th>
+<div><dl>
+<dt>args:</dt><dd><p>key: key in <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code> (raises KeyError if key not in self)</p>
+</dd>
+<dt>returns:</dt><dd><p>string, float, or int associated with the data in self[key]</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>sql type</p></th>
+<th class="head"><p>default</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>&#8216;null&#8217;</td>
-<td>&#8216;?&#8217;</td>
+<tbody>
+<tr class="row-even"><td><p>‘null’</p></td>
+<td><p>‘?’</p></td>
 </tr>
-<tr class="row-odd"><td>&#8216;integer&#8217;</td>
-<td>999999</td>
+<tr class="row-odd"><td><p>‘integer’</p></td>
+<td><p>999999</p></td>
 </tr>
-<tr class="row-even"><td>&#8216;real&#8217;</td>
-<td>1e20</td>
+<tr class="row-even"><td><p>‘real’</p></td>
+<td><p>1e20</p></td>
 </tr>
-<tr class="row-odd"><td>&#8216;text&#8217;</td>
-<td>&#8216;N/A&#8217;</td>
+<tr class="row-odd"><td><p>‘text’</p></td>
+<td><p>‘N/A’</p></td>
 </tr>
 </tbody>
 </table>
@@ -1214,41 +1131,44 @@ with sqlite3.</p>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame._are_col_lengths_equal">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">_are_col_lengths_equal</tt><big>(</big><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._are_col_lengths_equal" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame._are_col_lengths_equal">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">_are_col_lengths_equal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame._are_col_lengths_equal" title="Permalink to this definition">¶</a></dt>
 <dd><p>private method to check if the items in self have equal lengths</p>
-<dl class="docutils">
-<dt>args:</dt>
-<dd>None</dd>
-<dt>returns:</dt>
-<dd><p class="first">returns True if all the items are equal</p>
-<p class="last">returns False otherwise</p>
+<blockquote>
+<div><dl>
+<dt>args:</dt><dd><p>None</p>
+</dd>
+<dt>returns:</dt><dd><p>returns True if all the items are equal</p>
+<p>returns False otherwise</p>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame._determine_sqlite3_type">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">_determine_sqlite3_type</tt><big>(</big><em>iterable</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._determine_sqlite3_type" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame._determine_sqlite3_type">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">_determine_sqlite3_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame._determine_sqlite3_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>determine the sqlite3 datatype of iterable</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd>iterable: a 1-d iterable (list, tuple, np.array, etc.)</dd>
+<div><blockquote>
+<div><dl class="simple">
+<dt>args:</dt><dd><p>iterable: a 1-d iterable (list, tuple, np.array, etc.)</p>
+</dd>
 </dl>
 </div></blockquote>
-<dl class="docutils">
-<dt>returns:</dt>
-<dd>sqlite3 type as string: &#8216;null&#8217;, &#8216;integer&#8217;, &#8216;real&#8217;, or &#8216;text&#8217;</dd>
+<dl class="simple">
+<dt>returns:</dt><dd><p>sqlite3 type as string: ‘null’, ‘integer’, ‘real’, or ‘text’</p>
+</dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame._execute">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">_execute</tt><big>(</big><em>query</em>, <em>t=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._execute" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame._execute">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">_execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame._execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>private method to execute sqlite3 query</p>
 <div class="line-block">
 <div class="line">When the PRINTQUERIES bool is true it prints the queries
@@ -1257,9 +1177,9 @@ before executing them</div>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame._executemany">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">_executemany</tt><big>(</big><em>query</em>, <em>tlist</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._executemany" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame._executemany">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">_executemany</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame._executemany" title="Permalink to this definition">¶</a></dt>
 <dd><p>private method to execute sqlite3 queries</p>
 <div class="line-block">
 <div class="line">When the PRINTQUERIES bool is true it prints the queries
@@ -1269,35 +1189,34 @@ as fast for building tables as the execute method.</div>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame._get_indices_where">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">_get_indices_where</tt><big>(</big><em>where</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._get_indices_where" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame._get_indices_where">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">_get_indices_where</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame._get_indices_where" title="Permalink to this definition">¶</a></dt>
 <dd><p>determines the indices cooresponding to the conditions specified by the where
 argument.</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd>where: a string criterion without the &#8216;where&#8217;</dd>
-<dt>returns:</dt>
-<dd>a list of indices</dd>
+<div><dl class="simple">
+<dt>args:</dt><dd><p>where: a string criterion without the ‘where’</p>
+</dd>
+<dt>returns:</dt><dd><p>a list of indices</p>
+</dd>
 </dl>
 </div></blockquote>
 </dd></dl>
 
 <hr class="docutils" />
-<dl class="method">
-<dt id="pyvttbl.DataFrame._build_sqlite3_tbl">
-<tt class="descclassname">DataFrame.</tt><tt class="descname">_build_sqlite3_tbl</tt><big>(</big><em>nsubset</em>, <em>where=None</em><big>)</big><a class="headerlink" href="#pyvttbl.DataFrame._build_sqlite3_tbl" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvttbl.DataFrame._build_sqlite3_tbl">
+<span class="sig-prename descclassname"><span class="pre">DataFrame.</span></span><span class="sig-name descname"><span class="pre">_build_sqlite3_tbl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsubset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyvttbl.DataFrame._build_sqlite3_tbl" title="Permalink to this definition">¶</a></dt>
 <dd><p>build or rebuild sqlite table with columns in nsubset based on
 the where list.</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>args:</dt>
-<dd><p class="first">nsubset: a list of keys to include in the table</p>
-<p class="last">where: criterion the entries in the table must satisfy</p>
+<div><dl>
+<dt>args:</dt><dd><p>nsubset: a list of keys to include in the table</p>
+<p>where: criterion the entries in the table must satisfy</p>
 </dd>
-<dt>returns:</dt>
-<dd>None</dd>
+<dt>returns:</dt><dd><p>None</p>
+</dd>
 </dl>
 </div></blockquote>
 <div class="line-block">
@@ -1315,16 +1234,62 @@ should contain value for the operator.</div>
 </dd></dl>
 
 <hr class="docutils" />
-</div>
-</div>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">DataFrame Overview</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#public-methods">Public Methods</a></li>
+<li><a class="reference internal" href="#pyvttbl-plotting-wrappers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyvttbl.plotting</span></code> Wrappers</a></li>
+<li><a class="reference internal" href="#pyvttbl-stats-wrappers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyvttbl.stats</span></code> Wrappers</a></li>
+<li><a class="reference internal" href="#private-methods">Private Methods</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="quick-start.html"
+                          title="previous chapter">Quick-Start Guide</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="PyvtTbl.html"
+                          title="next chapter">PyvtTbl Overview</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/DataFrame.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -1342,14 +1307,15 @@ should contain value for the operator.</div>
         <li><a href="http://code.google.com/p/pyvttbl/">pyvttbl home</a>&nbsp;|&nbsp;</li>
         <li><a href="index.html">Documentation</a>
           &raquo;</li>
- 
+
+        <li class="nav-item nav-item-this"><a href="">DataFrame Overview</a></li> 
       </ul>
     </div>
     <div class="specialfooter">
         <div class="specialfooterleft">This software is funded in part by NIH Grant P20 RR016454.</div>
         <div class="specialfooterright">
             &copy; Copyright 2012, Roger Lew.
-          Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+          Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.0.2.
         </div>
     </div>
   </body>

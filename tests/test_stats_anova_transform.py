@@ -1,6 +1,4 @@
-from __future__ import print_function
-
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
 
 import unittest
@@ -19,6 +17,7 @@ from pyvttbl import DataFrame
 from pyvttbl.plotting import *
 from pyvttbl.stats import *
 from pyvttbl.misc.support import *
+
 
 class Test_anova_transform(unittest.TestCase):
     def test1(self):

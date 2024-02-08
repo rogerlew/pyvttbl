@@ -1,6 +1,4 @@
-from __future__ import print_function
-
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
 
 import atexit
@@ -49,6 +47,7 @@ def getmultcol(text):
     assigned.extend(copy(x))
     progress += 1
     return [header[i] for i in x]
+
 
 if __name__ == '__main__':
     top = """

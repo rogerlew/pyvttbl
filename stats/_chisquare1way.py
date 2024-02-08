@@ -1,29 +1,14 @@
-from __future__ import print_function
-
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
-
-# std lib
 import math
-from collections import Counter,OrderedDict
-from copy import copy
+from collections import OrderedDict
 
-# third party
 import scipy
 
-# included modules
 from pyvttbl.stats._noncentral import ncx2cdf
 from pyvttbl.misc.texttable import Texttable as TextTable
 from pyvttbl.misc.support import *
+
 
 def _flatten(x):
     """_flatten(sequence) -> list
@@ -41,11 +26,12 @@ def _flatten(x):
     result = []
     for el in x:
         #if isinstance(el, (list, tuple)):
-        if hasattr(el, "__iter__") and not isinstance(el, _strobj):
+        if hasattr(el, "__iter__") and not isinstance(el, str):
             result.extend(_flatten(el))
         else:
             result.append(el)
     return result
+
 
 def _str(x, dtype='a', n=3):
     """
@@ -72,6 +58,7 @@ def _str(x, dtype='a', n=3):
                 return '%.*e'%(n, f)
             else:
                 return '%.*f'%(n, f)
+
 
 class ChiSquare1way(OrderedDict):
     """1-way Chi-Square Test"""
@@ -110,7 +97,7 @@ class ChiSquare1way(OrderedDict):
             self.conditions_list = []
             abc = lambda i : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'\
                              [i%26]*(int(math.floor(i/26))+1)
-            for i in _xrange(len(observed)):
+            for i in range(len(observed)):
                 self.conditions_list.append(abc(i))
         else:
             self.conditions_list = conditions_list

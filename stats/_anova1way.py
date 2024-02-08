@@ -1,33 +1,18 @@
-from __future__ import print_function
-
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
 
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
-
-# std lib
 import math
 from collections import Counter,OrderedDict
-from copy import copy
 
-# third party
 import scipy
 import numpy as np
-
-# included modules
 
 from pyvttbl.stats._noncentral import ncfcdf
 from pyvttbl.stats.qsturng import qsturng, psturng
 from pyvttbl.misc.texttable import Texttable as TextTable
 from pyvttbl.misc.support import *
-	    
+
+
 class Anova1way(OrderedDict):
     def __init__(self, *args, **kwds):
         if len(args) > 1:
@@ -65,7 +50,7 @@ class Anova1way(OrderedDict):
         if conditions_list is None:
             abc = lambda i : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'\
                              [i%26]*(int(math.floor(i/26))+1)
-            for i in _xrange(len(list_of_lists)):
+            for i in range(len(list_of_lists)):
                 self.conditions_list.append(abc(i))
         else:
             self.conditions_list = conditions_list
@@ -126,9 +111,6 @@ class Anova1way(OrderedDict):
         # put means into a dict
         d = dict([(k,v) for k,v in zip(self.conditions_list, self['mus'])])
 
-##        # calculate the number of comparisons
-##        s = sum(range(len(d)))
-
         # calculate the number of observations per group
         s = min(self['ns'])
         
@@ -188,7 +170,6 @@ class Anova1way(OrderedDict):
         
         multtest = []
         for i,(pair,abs_diff) in enumerate(L):
-##            print (i,pair,abs_diff,k)
             
             if k>1:
                 q = abs_diff / math.sqrt(self['mswn']*(1./s))

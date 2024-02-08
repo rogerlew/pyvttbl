@@ -1,31 +1,14 @@
-from __future__ import print_function
-
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
 
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
-
-import collections
 import csv
-import itertools
-import inspect
 import math
 import sqlite3
 import warnings
 
-from pprint import pprint as pp
-from copy import copy, deepcopy
-from collections import OrderedDict, Counter, namedtuple
+from copy import copy
+from collections import OrderedDict, Counter
 
-import pylab
-import scipy
 import numpy as np
 
 from .misc import pystaggrelite3
@@ -447,7 +430,7 @@ class DataFrame(OrderedDict):
               OrderedDict([('first', 'Jane'), ('last', 'Doe'), ('age', 49), ('gender', 'female')])
               >>> 
 """
-        for i in _xrange(self.shape()[1]):
+        for i in range(self.shape()[1]):
             yield OrderedDict([(k, self[k][i]) for k in self])
         
     def types(self):
@@ -634,7 +617,7 @@ class DataFrame(OrderedDict):
         if where is None:
             where = []
 
-        if isinstance(where, _strobj):
+        if isinstance(where, str):
             where = [where]
             
         #  1. Perform some checking
@@ -648,7 +631,7 @@ class DataFrame(OrderedDict):
         ##############################################################           
         nsubset2 = set(nsubset)
         for item in where:
-            if isinstance(item, _strobj):
+            if isinstance(item, str):
                 tokens = item.split()
                 if tokens[0] not in self.keys():
                     raise KeyError(tokens[0])
@@ -708,7 +691,7 @@ class DataFrame(OrderedDict):
             query = []
             for item in where:
                 # process item as a string
-                if isinstance(item, _strobj):
+                if isinstance(item, str):
                     tokens = []
                     for word in item.split():
                         if word in self.keys():
@@ -977,15 +960,15 @@ class DataFrame(OrderedDict):
         # keep the columns with the row labels
         if attach_rlabels:
             cnames = [(r, '') for r in rows].extend(cnames)
-            cnames_mask = [1 for i in _xrange(len(rows))].extend(cnames_mask)
+            cnames_mask = [1 for i in range(len(rows))].extend(cnames_mask)
 
         if aggregate == 'tolist':
             if method=='full':
                 i=0
                 for row in self.cur:
                     while not rnames_mask[i]:
-                        data.append([[fill_val] for j in _xrange(len(cnames))])
-                        mask.append([[True] for j in _xrange(len(cnames))])
+                        data.append([[fill_val] for j in range(len(cnames))])
+                        mask.append([[True] for j in range(len(cnames))])
                         i+=1
                         
                     data.append([])
@@ -998,11 +981,11 @@ class DataFrame(OrderedDict):
                             if val_type == 'real' or val_type == 'integer':
                                 split =cell.split(',')
                                 data[-1].append([float(v) for v in  split])
-                                mask[-1].append([False for j in _xrange(len(split))])
+                                mask[-1].append([False for j in range(len(split))])
                             else:
                                 split =cell.split(',')
                                 data[-1].append(split)
-                                mask[-1].append([False for j in _xrange(len(split))])
+                                mask[-1].append([False for j in range(len(split))])
                     i+=1
             else:
                 for row in self.cur:
@@ -1016,11 +999,11 @@ class DataFrame(OrderedDict):
                             elif val_type == 'real' or val_type == 'integer':
                                 split =cell.split(',')
                                 data[-1].append([float(v) for v in  split])
-                                mask[-1].append([False for j in _xrange(len(split))])
+                                mask[-1].append([False for j in range(len(split))])
                             else:
                                 split =cell.split(',')
                                 data[-1].append(split)
-                                mask[-1].append([False for j in _xrange(len(split))])
+                                mask[-1].append([False for j in range(len(split))])
 
             # numpy arrays must have the same number of dimensions so we need to pad
             # cells to the maximum dimension of the data
@@ -1028,7 +1011,7 @@ class DataFrame(OrderedDict):
 
             for i,L in enumerate(data):
                 for j,c in enumerate(L):
-                    for k in _xrange(max_len - len(data[i][j])):
+                    for k in range(max_len - len(data[i][j])):
                         data[i][j].append(fill_val)
                         mask[i][j].append(True)
                         
@@ -1037,8 +1020,8 @@ class DataFrame(OrderedDict):
                 i=0
                 for row in self.cur:
                     while not rnames_mask[i]:
-                        data.append([fill_val for j in _xrange(len(cnames))])
-                        mask.append([True for j in _xrange(len(cnames))])
+                        data.append([fill_val for j in range(len(cnames))])
+                        mask.append([True for j in range(len(cnames))])
                         i+=1
 
                     row_data = list(row)[-len(cnames):]
@@ -1584,7 +1567,7 @@ class DataFrame(OrderedDict):
         
         # check or build fname
         if fname:
-            if not isinstance(fname, _strobj):
+            if not isinstance(fname, str):
                 raise TypeError('fname must be a string')
         else:
             lnames = [str(n).lower().replace('1','') for n in self.keys()]
@@ -2305,8 +2288,8 @@ class PyvtTbl(np.ma.MaskedArray, object):
            returns an iterator yielding pairs of array coordinates and values.
 
     """
-        for i in _xrange(self.shape[0]):
-            for j in _xrange(self.shape[1]):
+        for i in range(self.shape[0]):
+            for j in range(self.shape[1]):
                 yield (i,j), self[i,j]
 
 
@@ -2356,7 +2339,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
                 rdata = self[0,:].flatten().tolist()
             else:
                 rdata = [self[0,j].flatten().tolist()
-                         for j in _xrange(len(self.cnames))]
+                         for j in range(len(self.cnames))]
                 
             df.insert(list(zip(header, rdata)))
                 
@@ -2384,7 +2367,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
                     rdata =[c for (f, c) in L] + self[i,:].flatten().tolist()
                 else:
                     rdata = [self[i,j].flatten().tolist()
-                             for j in _xrange(len(self.cnames))]
+                             for j in range(len(self.cnames))]
                     
                 df.insert(list(zip(header, rdata)))
 
@@ -2507,7 +2490,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
                            ([],[self.grand_tot])[show_grand_tot])
             else:
                 rdata = [self[0,j].flatten().tolist()
-                         for j in _xrange(len(self.cnames))]
+                         for j in range(len(self.cnames))]
                 
                 tt.add_row(rdata + ([],[self.grand_tot])[show_grand_tot])
                         
@@ -2564,7 +2547,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
                                    self[i,:].flatten().tolist())
                     else:
                         rdata = [self[i,j].flatten().tolist()
-                                 for j in _xrange(len(self.cnames))]
+                                 for j in range(len(self.cnames))]
                         
                         tt.add_row([c for (f, c) in L] + rdata)
 
@@ -2615,7 +2598,7 @@ class PyvtTbl(np.ma.MaskedArray, object):
             kwds.append(', grand_tot=%s'%repr(self.grand_tot))            
             
         if self.where != []:
-            if isinstance(self.where, _strobj):
+            if isinstance(self.where, str):
                 kwds.append(", where='%s'"%self.where)
             else:
                 kwds.append(", where=%s"%self.where)

@@ -1,16 +1,5 @@
-from __future__ import print_function
+# Copyright (c) 2012-2024, Roger Lew [see LICENSE.txt]
 
-# Copyright (c) 2012, Roger Lew [see LICENSE.txt]
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
-    
 import os
 
 import pylab
@@ -18,6 +7,7 @@ import numpy as np
 from collections import Counter
 
 from pyvttbl.misc.support import _flatten
+
 
 def box_plot(df, val, factors=None, where=None,
         fname=None, output_dir='', quality='medium'):
@@ -79,10 +69,10 @@ def box_plot(df, val, factors=None, where=None,
         raise Exception('duplicate labels specified as plot parameters')
 
     # check fname
-    if not isinstance(fname, _strobj) and fname is not None:
+    if not isinstance(fname, str) and fname is not None:
         raise TypeError('fname must be None or string')
 
-    if isinstance(fname, _strobj):
+    if isinstance(fname, str):
         if not (fname.lower().endswith('.png') or \
                 fname.lower().endswith('.svg')):
             raise Exception('fname must end with .png or .svg')
@@ -129,7 +119,7 @@ def box_plot(df, val, factors=None, where=None,
     
     test['maintitle'] = maintitle
         
-    if fname == None:
+    if fname is None:
         fname = 'box(%s'%val
         if factors != []:
             fname += '~' + '_X_'.join([str(f) for f in factors])

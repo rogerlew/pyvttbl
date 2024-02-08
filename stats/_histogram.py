@@ -1,17 +1,7 @@
 from __future__ import print_function
 
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
-
 
 # std lib
 from collections import Counter,OrderedDict
@@ -49,7 +39,6 @@ class Histogram(OrderedDict):
         
         super(Histogram, self).__init__()
 
-        
         try:
             V = sorted(_flatten(list(V)))
         except:
@@ -105,19 +94,19 @@ class Histogram(OrderedDict):
         
         kwds = []            
         if self.cname is not None:
-            kwds.append(", cname='%s'"%self.cname)
+            kwds.append(f", cname='{self.cname}'")
 
         if self.bins != 10:
-            kwds.append(', bins=%s'%self.bins)
+            kwds.append(f', bins={self.bins}')
 
         if self.range is not None:
-            kwds.append(', range=%s'%repr(range))
+            kwds.append(f', range={self.range}')
 
         if self.density != False:
-            kwds.append(', density=%s'%density)
+            kwds.append(f', density={self.density}')
             
         if self.cumulative != False:
-            kwds.append(', cumulative=%s'%cumulative)
+            kwds.append(f', cumulative={self.cumulative}')
             
         kwds= ''.join(kwds)
 

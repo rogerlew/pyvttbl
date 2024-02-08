@@ -1,17 +1,4 @@
-from __future__ import print_function
-
-# Copyright (c) 2012, Roger Lew [see LICENSE.txt]
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
-
-import os
+# Copyright (c) 2012-2024, Roger Lew [see LICENSE.txt]
 
 import numpy as np
 import scipy
@@ -88,28 +75,6 @@ def _bivariate_trend_fit(x,y,trend):
 def _tick_formatter(ticks):
     return [_str(t) for t in ticks]
     
-##    # this could be tweaked more.
-##    # I didn't spend alot of time with it.
-##    s = [len(str(round(t,0)).replace('.0','').replace('.','')) for t in ticks]
-##
-##    # all integers less than 1,000,000
-##    if all([(int(t)-t) == 0 for t in ticks]) and all([c<8 for c in s]):
-##        return ['%i'%t for t in ticks]
-##
-##    # all less than 10
-##    if max(s) == 1:
-##        # all really small
-##        if any([t<.00001 for t in ticks]):            
-##            return ['%.1e'%t for t in ticks]
-##        return ['%.4f'%t for t in ticks]
-##
-##    # contains at least 1 "big" number
-##    if any([c>=8 for c in s]):
-##        return ['%.1e'%t for t in ticks]
-##
-##    # between 10 and 1,000,000
-##    else:
-##        return ['%i'%int(round(t)) for t in ticks]
 
 # copied from matplotlib/pyplot.py for compatibility with matplotlib < 1.0
 def _subplots(nrows=1, ncols=1, sharex=False, sharey=False, squeeze=True,
@@ -233,4 +198,3 @@ def _subplots(nrows=1, ncols=1, sharex=False, sharey=False, squeeze=True,
         axes = axarr.reshape(nrows, ncols)
 
     return fig, axes
-

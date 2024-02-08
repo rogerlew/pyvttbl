@@ -1,17 +1,9 @@
-from __future__ import print_function
-
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
 
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _xrange = range
-    
 import csv
 from pyvttbl import DataFrame
+
 
 def _xunique_combinations(items, n):
     """
@@ -21,9 +13,10 @@ def _xunique_combinations(items, n):
     if n == 0:
         yield []
     else:
-        for i in _xrange(len(items)):
+        for i in range(len(items)):
             for cc in _xunique_combinations(items[i+1:], n-1):
                 yield [items[i]]+cc
+
 
 def long2wide(in_fname, id, dvs, between=[], within=[],
          covariates=[], out_fname=None, nested=True):
@@ -47,7 +40,7 @@ def long2wide(in_fname, id, dvs, between=[], within=[],
     
     for i, dv in enumerate(dvs):
         print('\ncollaborating %s'%dv)
-        for j in _xrange(start, len(within)+1):
+        for j in range(start, len(within)+1):
             
             for factors in _xunique_combinations(within, j):
                 print('  pivoting', factors, '...')
@@ -69,14 +62,6 @@ def long2wide(in_fname, id, dvs, between=[], within=[],
         wtr.writerow([n.upper() for n in header])
         wtr.writerows(zip(*d)) # transpose and write
         
-##long2wide(in_fname='long_test_data.csv',
-##          id='participant',
-##          dvs=['dv1','dv2'],
-##          between=['bfactor1'],
-##          within=['wfactor1','wfactor2','wfactor3'],
-##          covariates=['cov1','cov2'],
-##          out_fname='formatted.csv',
-##          nested=False)
 
 if __name__ == "__main__":
     import time

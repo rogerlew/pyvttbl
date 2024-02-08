@@ -1,4 +1,4 @@
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
 
 """
@@ -31,7 +31,7 @@ from scipy.optimize import fminbound
 
 inf = np.inf
 
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 
 # changelog
 # 0.1   - initial release
@@ -43,6 +43,7 @@ __version__ = '0.2.3'
 #         select_vs
 #       - pysturng tester added.
 # 0.2.3 - uses np.inf and np.isinf
+# 0.2.4 - python 3 compatibility
 
 # Gleason's table was derived using least square estimation on the tabled
 # r values for combinations of p and v. In total there are 206

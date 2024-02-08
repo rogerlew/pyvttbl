@@ -1,24 +1,12 @@
-from __future__ import print_function
-
-# Copyright (c) 2012, Roger Lew [see LICENSE.txt]
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
+# Copyright (c) 2012-2024, Roger Lew [see LICENSE.txt]
 
 import os
 import math
 
 from collections import Counter
-from copy import copy, deepcopy
+from copy import copy
 
 import pylab
-import scipy
 import numpy as np
 
 from pyvttbl.misc.support import _isfloat,_str
@@ -141,10 +129,10 @@ def interaction_plot(df, val, xaxis,
         raise Exception('duplicate labels specified as plot parameters')
 
     # check fname
-    if not isinstance(fname, _strobj) and fname is not None:
+    if not isinstance(fname, str) and fname is not None:
         raise TypeError('fname must be None or string')
 
-    if isinstance(fname, _strobj):
+    if isinstance(fname, str):
         if not (fname.lower().endswith('.png') or \
                 fname.lower().endswith('.svg')):
             raise Exception('fname must end with .png or .svg')                
@@ -312,9 +300,9 @@ def interaction_plot(df, val, xaxis,
 
                     axs[-1].plot([xmin, xmax], [0., 0.], 'k:')
                     
-                else : # categorical x axis
-                    axs[-1].errorbar(_xrange(len(x)), y, yerr)
-                    pylab.xticks(_xrange(len(x)), x)
+                else: # categorical x axis
+                    axs[-1].errorbar(range(len(x)), y, yerr)
+                    pylab.xticks(range(len(x)), x)
                     xmin = - 0.5
                     xmax = len(x) - 0.5
                     
@@ -358,12 +346,12 @@ def interaction_plot(df, val, xaxis,
                             
                         axs[-1].plot([xmin, xmax], [0.,0.], 'k:')
                         
-                    else : # categorical x axis
+                    else: # categorical x axis
                         plots.append(
                             axs[-1].errorbar(
-                                _xrange(len(x)), y[i].flatten(), yerr)[0])
+                                range(len(x)), y[i].flatten(), yerr)[0])
                         
-                        pylab.xticks(_xrange(len(x)), x)
+                        pylab.xticks(range(len(x)), x)
                         xmin = - 0.5
                         xmax = len(x) - 0.5
                         

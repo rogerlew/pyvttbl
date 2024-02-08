@@ -2,9 +2,10 @@
 
 # Roger Lew
 # rogerlew@vandals.uidaho.edu
-# (c) 2008 BSD
+# (c) 2008-2024 BSD
 
 """SimpleHTML Writer Module"""
+
 import re
 from copy import copy
 from hashlib import md5
@@ -243,14 +244,3 @@ class NavFrame(SimpleHTML):
         fid.write('</frameset>\n')
         fid.write('</html>\n')
         fid.close()
-
-##html=SimpleHTML('Simple HTML Test')
-##html.add(p('This is a python class to write html'))
-##html.add(table([[[10,20,30],[40,50,60]],
-##               [[70,80,90],[10,11,12]]],
-##               thead=['A','B','C']))
-##html.add(img('that.png',width=1000))
-##
-##print ''.join(html.html)
-## 
-##html.write('simpleHTML.htm')

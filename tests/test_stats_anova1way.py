@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
 
 import unittest
@@ -316,7 +316,7 @@ D                               0
 
         D = Anova1way()
         D.run(d, conditions_list=conditions_list)     
-          
+
         diff = difflib.ndiff(str(D).splitlines(keepends=True),
                              R.splitlines(keepends=True))
         print(''.join(diff))

@@ -1,15 +1,4 @@
-from __future__ import print_function
-
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 
 import os
 
@@ -179,18 +168,6 @@ def scatter_matrix(df, variables, alpha=0.5, grid=False,
                 axes[i, j].set_xlabel('')
                 axes[i, j].set_ylabel('')
 
-##                is_datetype = ticks.inferred_type in ('datetime', 'date',
-##                                                  'datetime64')
-##
-##                if ticks.is_numeric() or is_datetype:
-##                    """
-##                    Matplotlib supports numeric values or datetime objects as
-##                    xaxis values. Taking LBYL approach here, by the time
-##                    matplotlib raises exception when using non numeric/datetime
-##                    values for xaxis, several actions are already taken by plt.
-##                    """
-##                    ticks = ticks._mpl_repr()
-                
             if alternate_labels:
                 # Handle xticks and xlabels
                 if i == 0: # top row
@@ -286,4 +263,3 @@ def scatter_matrix(df, variables, alpha=0.5, grid=False,
         fig.savefig(fname)
 
     pylab.close()
-

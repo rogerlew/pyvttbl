@@ -1,16 +1,7 @@
 from __future__ import print_function
 
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
 
 # std lib
 import math
@@ -24,6 +15,7 @@ import scipy
 from pyvttbl.misc.support import _flatten
 from pyvttbl.stats._noncentral import nctcdf
 from pyvttbl.misc.texttable import Texttable as TextTable
+
 
 class Ttest(OrderedDict):
     """Student's t-test"""
@@ -81,11 +73,6 @@ class Ttest(OrderedDict):
         from . import _stats
 
         A = _flatten(list(copy(A)))
-##        try:
-##            A = _flatten(list(copy(A)))
-##        except:
-##            raise TypeError('A must be a list-like object')
-            
         try:
             if B is not None:
                 B = _flatten(list(copy(B)))
@@ -129,7 +116,6 @@ class Ttest(OrderedDict):
             self['power1tail'] = 1. - nctcdf(self['tc2tail'], df, self['delta'])
             self['power2tail'] = 1. - nctcdf(self['tc1tail'], df, self['delta'])
             
-                
         elif paired == True:
             if len(A) - len(B) != 0:
                 raise Exception('A and B must have equal lengths '
@@ -178,7 +164,6 @@ class Ttest(OrderedDict):
             self['vpooled'] = svar
             self['tc2tail'] = scipy.stats.t.ppf((1.-alpha),df)
             self['tc1tail'] = scipy.stats.t.ppf((1.-alpha/2.),df)
-
 
             # post-hoc power analysis
             # http://www.psycho.uni-duesseldorf.de/abteilungen/aap/gpower3/download-and-register/Dokumente/GPower3-BRM-Paper.pdf
@@ -234,7 +219,6 @@ class Ttest(OrderedDict):
         if self == {}:
             return '(no data in object)'
 
-
         if self.B == None:
             tt = TextTable(max_width=100000000)
             tt.set_cols_dtype(['t', 'a'])
@@ -261,7 +245,6 @@ class Ttest(OrderedDict):
             tt.add_row(['Observed power two-tail', self['power2tail']])
 
             return '%s\n%s'%(first, tt.draw())
-
 
         tt = TextTable(max_width=100000000)
         tt.set_cols_dtype(['t', 'a', 'a'])

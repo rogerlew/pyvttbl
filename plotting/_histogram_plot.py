@@ -1,15 +1,4 @@
-from __future__ import print_function
-
-# Copyright (c) 2012, Roger Lew [see LICENSE.txt]
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
+# Copyright (c) 2012-2024, Roger Lew [see LICENSE.txt]
 
 import os
 
@@ -33,14 +22,14 @@ def histogram_plot(df, val, where=None, bins=10,
           range: list of length 2 defining min and max bin edges
     """
 
-    if where == None:
+    if where is None:
         where = []
 
     # check fname
-    if not isinstance(fname, _strobj) and fname is not None:
+    if not isinstance(fname, str) and fname is not None:
         raise TypeError('fname must be None or string')
 
-    if isinstance(fname, _strobj):
+    if isinstance(fname, str):
         if not (fname.lower().endswith('.png') or \
                 fname.lower().endswith('.svg')):
             raise Exception('fname must end with .png or .svg')                

@@ -102,9 +102,6 @@ listed here may not been have extensively tested.
 
 .. automethod:: pyvttbl.PyvtTbl.__div__
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. automethod:: pyvttbl.PyvtTbl.__rdiv__
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

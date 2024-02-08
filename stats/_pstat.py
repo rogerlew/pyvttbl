@@ -86,13 +86,14 @@ functions/methods.  Their inclusion here is for function name consistency.
 
 ## CHANGE LOG:
 ## ==========
-## 07-11-26 ... edited to work with numpy
-## 01-11-15 ... changed list2string() to accept a delimiter
-## 01-06-29 ... converted exec()'s to eval()'s to make compatible with Py2.1
-## 01-05-31 ... added duplicates() and aduplicates() functions
-## 00-12-28 ... license made GPL, docstring and import requirements
-## 99-11-01 ... changed version to 0.3
-## 99-08-30 ... removed get, getstrings, put, aget, aput (into io.py)
+## 02/08/24 ... make comptible with Python 3.x
+## 11/26/07 ... edited to work with numpy
+## 11/15/01 ... changed list2string() to accept a delimiter
+## 06/29/01 ... converted exec()'s to eval()'s to make compatible with Py2.1
+## 05/31/01 ... added duplicates() and aduplicates() functions
+## 12/28/00 ... license made GPL, docstring and import requirements
+## 11/01/99 ... changed version to 0.3
+## 08/30/99 ... removed get, getstrings, put, aget, aput (into io.py)
 ## 03/27/99 ... added areplace function, made replace fcn recursive
 ## 12/31/98 ... added writefc function for ouput to fixed column sizes
 ## 12/07/98 ... fixed import problem (failed on collapse() fcn)

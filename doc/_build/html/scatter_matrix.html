@@ -1,31 +1,21 @@
 
+<!DOCTYPE html>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>scatter_matrix &mdash; pyvttbl v 0.5.2.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     'v 0.5.2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pyvttbl v 0.5.2.0 documentation" href="index.html" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>scatter_matrix &#8212; pyvttbl v 0.5.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="pyvttbl.plotting API" href="plotting.html" />
     <link rel="prev" title="scatter_plot" href="scatter_plot.html" />
  
@@ -67,13 +57,12 @@ div.specialfooterright {
 }
 </style>
 
-  </head>
-  <body>
+  </head><body>
 <div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
 <img src="_static/pyvttbl_logo.png" alt="pyvttbl logo" />
 </div>
 
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -91,88 +80,51 @@ div.specialfooterright {
         <li><a href="http://code.google.com/p/pyvttbl/">pyvttbl home</a>&nbsp;|&nbsp;</li>
         <li><a href="index.html">Documentation</a>
           &raquo;</li>
- 
-      </ul>
-    </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">scatter_matrix</a><ul>
-<li><a class="reference internal" href="#example">Example</a></li>
-<li><a class="reference internal" href="#example-with-diagonal-hist">Example with diagonal=&#8217;hist&#8217;</a></li>
-<li><a class="reference internal" href="#example-with-diagonal-kde-and-alternate-labels-false">Example with diagonal=&#8217;kde&#8217; and alternate_labels=False</a></li>
-</ul>
-</li>
-</ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="scatter_plot.html"
-                        title="previous chapter">scatter_plot</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="plotting.html"
-                        title="next chapter"><tt class="docutils literal docutils literal"><span class="pre">pyvttbl.plotting</span></tt> API</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/scatter_matrix.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+        <li class="nav-item nav-item-this"><a href="">scatter_matrix</a></li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
-  <div class="section" id="scatter-matrix">
-<h1>scatter_matrix<a class="headerlink" href="#scatter-matrix" title="Permalink to this headline">¶</a></h1>
+  <section id="scatter-matrix">
+<h1>scatter_matrix<a class="headerlink" href="#scatter-matrix" title="Permalink to this heading">¶</a></h1>
 <p>Produces a scatter_matrix with optional trend fitting
 histograms, and Gaussian kernel density estimation.</p>
 <p>The x-limits and y-limits are set to be 120% of the range of the data.
 The subplots are also configured to be square. The plot resolution increases
 with the number of variables plotted.</p>
-<div class="section" id="example">
-<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>The simplest example is to load the data into a <tt class="xref py py-class docutils literal"><span class="pre">DataFrame</span></tt> and
-tell <tt class="xref py py-meth docutils literal"><span class="pre">scatter_matrix()</span></tt> what factors you would like in the matrix.</p>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>
+<p>The simplest example is to load the data into a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code> and
+tell <code class="xref py py-meth docutils literal notranslate"><span class="pre">scatter_matrix()</span></code> what factors you would like in the matrix.</p>
 <p>The defaults will give you factor labels down the diagonal and perform
 linear trend fitting for the subplots above the diagonal.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s">&#39;data/iqbrainsize.txt&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">([</span><span class="s">&#39;CCSA&#39;</span><span class="p">,</span><span class="s">&#39;FIQ&#39;</span><span class="p">,</span><span class="s">&#39;TOTSA&#39;</span><span class="p">,</span><span class="s">&#39;TOTVOL&#39;</span><span class="p">])</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">read_tbl</span><span class="p">(</span><span class="s1">&#39;data/iqbrainsize.txt&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">([</span><span class="s1">&#39;CCSA&#39;</span><span class="p">,</span><span class="s1">&#39;FIQ&#39;</span><span class="p">,</span><span class="s1">&#39;TOTSA&#39;</span><span class="p">,</span><span class="s1">&#39;TOTVOL&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>produces &#8216;scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL).png&#8217;</p>
-<img alt="scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL).png" class="align-center" src="_images/scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL).png" style="width: 700px; height: 700px;" />
-</div>
-<div class="section" id="example-with-diagonal-hist">
-<h2>Example with diagonal=&#8217;hist&#8217;<a class="headerlink" href="#example-with-diagonal-hist" title="Permalink to this headline">¶</a></h2>
-<p>Specifying diagonal=&#8217;hist&#8217; produces 20 bin histograms along the diagonal.
+<p>produces ‘scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL).png’</p>
+<a class="reference internal image-reference" href="_images/scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL).png"><img alt="scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL).png" class="align-center" src="_images/scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL).png" style="width: 700px; height: 700px;" /></a>
+</section>
+<section id="example-with-diagonal-hist">
+<h2>Example with diagonal=’hist’<a class="headerlink" href="#example-with-diagonal-hist" title="Permalink to this heading">¶</a></h2>
+<p>Specifying diagonal=’hist’ produces 20 bin histograms along the diagonal.
 The y-axis labels do not relate to the frequency counts.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">([</span><span class="s">&#39;CCSA&#39;</span><span class="p">,</span><span class="s">&#39;FIQ&#39;</span><span class="p">,</span><span class="s">&#39;TOTSA&#39;</span><span class="p">,</span><span class="s">&#39;TOTVOL&#39;</span><span class="p">],</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">([</span><span class="s1">&#39;CCSA&#39;</span><span class="p">,</span><span class="s1">&#39;FIQ&#39;</span><span class="p">,</span><span class="s1">&#39;TOTSA&#39;</span><span class="p">,</span><span class="s1">&#39;TOTVOL&#39;</span><span class="p">],</span>
 <span class="go">                      diagonal=&#39;histogram&#39;)</span>
 </pre></div>
 </div>
-<p>produces &#8216;scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=hist).png&#8217;</p>
-<img alt="scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=hist).png" class="align-center" src="_images/scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=hist).png" style="width: 700px; height: 700px;" />
-</div>
-<div class="section" id="example-with-diagonal-kde-and-alternate-labels-false">
-<h2>Example with diagonal=&#8217;kde&#8217; and alternate_labels=False<a class="headerlink" href="#example-with-diagonal-kde-and-alternate-labels-false" title="Permalink to this headline">¶</a></h2>
-<p>Specifying diagonal=&#8217;kde&#8217; produces kernel density estimation plots along
+<p>produces ‘scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=hist).png’</p>
+<a class="reference internal image-reference" href="_images/scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=hist).png"><img alt="scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=hist).png" class="align-center" src="_images/scatter_matrix(CCSA_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=hist).png" style="width: 700px; height: 700px;" /></a>
+</section>
+<section id="example-with-diagonal-kde-and-alternate-labels-false">
+<h2>Example with diagonal=’kde’ and alternate_labels=False<a class="headerlink" href="#example-with-diagonal-kde-and-alternate-labels-false" title="Permalink to this heading">¶</a></h2>
+<p>Specifying diagonal=’kde’ produces kernel density estimation plots along
 the diagonal. The y-axis labels do not relate to the density estimates.</p>
 <p>Special care was taken to make sure the appropriate labels and ticks are
 plotted regardless of the number of variables or number of plots specified.
@@ -180,22 +132,66 @@ With matrices with 5 or more variables become a bit hard to reconcile with
 the alternating ticks and labels. If you would like all the ticks on to the
 left and bottom and all the variable labels to the top and right specify
 just need to specify alternate_labels=False.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">([</span><span class="s">&#39;CCSA&#39;</span><span class="p">,</span><span class="s">&#39;HC&#39;</span><span class="p">,</span><span class="s">&#39;FIQ&#39;</span><span class="p">,</span><span class="s">&#39;TOTSA&#39;</span><span class="p">,</span><span class="s">&#39;TOTVOL&#39;</span><span class="p">],</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">([</span><span class="s1">&#39;CCSA&#39;</span><span class="p">,</span><span class="s1">&#39;HC&#39;</span><span class="p">,</span><span class="s1">&#39;FIQ&#39;</span><span class="p">,</span><span class="s1">&#39;TOTSA&#39;</span><span class="p">,</span><span class="s1">&#39;TOTVOL&#39;</span><span class="p">],</span>
 <span class="go">                      diagonal=&#39;histogram&#39;)</span>
 </pre></div>
 </div>
-<p>produces &#8216;scatter_matrix(CCSA_X_HC_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=kde,alternate_labels=False).png&#8217;</p>
-<img alt="scatter_matrix(CCSA_X_HC_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=kde,alternate_labels=False).png" class="align-center" src="_images/scatter_matrix(CCSA_X_HC_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=kde,alternate_labels=False).png" style="width: 700px; height: 700px;" />
-</div>
-</div>
+<p>produces ‘scatter_matrix(CCSA_X_HC_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=kde,alternate_labels=False).png’</p>
+<a class="reference internal image-reference" href="_images/scatter_matrix(CCSA_X_HC_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=kde,alternate_labels=False).png"><img alt="scatter_matrix(CCSA_X_HC_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=kde,alternate_labels=False).png" class="align-center" src="_images/scatter_matrix(CCSA_X_HC_X_FIQ_X_TOTSA_X_TOTVOL,diagonal=kde,alternate_labels=False).png" style="width: 700px; height: 700px;" /></a>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">scatter_matrix</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#example-with-diagonal-hist">Example with diagonal=’hist’</a></li>
+<li><a class="reference internal" href="#example-with-diagonal-kde-and-alternate-labels-false">Example with diagonal=’kde’ and alternate_labels=False</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="scatter_plot.html"
+                          title="previous chapter">scatter_plot</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="plotting.html"
+                          title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyvttbl.plotting</span></code> API</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/scatter_matrix.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -213,14 +209,15 @@ just need to specify alternate_labels=False.</p>
         <li><a href="http://code.google.com/p/pyvttbl/">pyvttbl home</a>&nbsp;|&nbsp;</li>
         <li><a href="index.html">Documentation</a>
           &raquo;</li>
- 
+
+        <li class="nav-item nav-item-this"><a href="">scatter_matrix</a></li> 
       </ul>
     </div>
     <div class="specialfooter">
         <div class="specialfooterleft">This software is funded in part by NIH Grant P20 RR016454.</div>
         <div class="specialfooterright">
             &copy; Copyright 2012, Roger Lew.
-          Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+          Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.0.2.
         </div>
     </div>
   </body>

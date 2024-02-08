@@ -1,8 +1,5 @@
-from __future__ import print_function
-
 from functools import reduce
 
-#!/usr/bin/env python
 #
 # texttable - module for creating simple ASCII tables
 # Copyright (C) 2003-2009 Gerome Fournier <jefke(at)free.fr>
@@ -28,6 +25,7 @@ from functools import reduce
 #      - a private method to format the cells (_str)
 #      - a private array to hold the formatting information (self._dtype)
 #      - some modifications to add_row()
+# Modified by Roger Lew 02/08/2024 for python 3
 
 """module for creating simple ASCII tables
 
@@ -141,6 +139,7 @@ def _str(x, dtype='a', n=3):
                 return '%.*e'%(n, f)
             else:
                 return '%.*f'%(n, f)
+            
             
 class ArraySizeError(Exception):
     """Exception raised when specified rows don't fit the required size

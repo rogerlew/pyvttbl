@@ -1,17 +1,6 @@
-from __future__ import print_function
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
-
-import os
+from os.path import join as _join
 
 import pylab
 import numpy as np
@@ -48,14 +37,14 @@ def scatter_plot(df, aname, bname, where=None, trend=None,
              'power':       f(x) = a * x**b
     """
     
-    if where == None:
+    if where is None:
         where = []
 
     # check fname
-    if not isinstance(fname, _strobj) and fname is not None:
+    if not isinstance(fname, str) and fname is not None:
         raise TypeError('fname must be None or string')
 
-    if isinstance(fname, _strobj):
+    if isinstance(fname, str):
         if not (fname.lower().endswith('.png') or \
                 fname.lower().endswith('.svg')):
             raise Exception('fname must end with .png or .svg')                
@@ -115,7 +104,7 @@ def scatter_plot(df, aname, bname, where=None, trend=None,
             fname += ',trend=' + trend
         fname += ').png'
 
-    fname = os.path.join(output_dir, fname)
+    fname = _join(output_dir, fname)
 
     # save figure
     if quality == 'low' or fname.endswith('.svg'):

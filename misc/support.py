@@ -1,19 +1,9 @@
-from __future__ import print_function
-
-# Copyright (c) 2011, Roger Lew [see LICENSE.txt]
+# Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
-
-# Python 2 to 3 workarounds
-import sys
-if sys.version_info[0] == 2:
-    _strobj = basestring
-    _xrange = xrange
-elif sys.version_info[0] == 3:
-    _strobj = str
-    _xrange = range
 
 import math
 import hashlib
+
 
 def _sha1(item):
     # Encode the string representation of 'item' to bytes before hashing
@@ -63,7 +53,7 @@ def _flatten(x):
     result = []
     for el in x:
         #if isinstance(el, (list, tuple)):
-        if hasattr(el, "__iter__") and not isinstance(el, _strobj):
+        if hasattr(el, "__iter__") and not isinstance(el, str):
             result.extend(_flatten(el))
         else:
             result.append(el)
@@ -77,7 +67,7 @@ def _xunique_combinations(items, n):
     if n == 0:
         yield []
     else:
-        for i in _xrange(len(items)):
+        for i in range(len(items)):
             for cc in _xunique_combinations(items[i+1:], n-1):
                 yield [items[i]]+cc
 
