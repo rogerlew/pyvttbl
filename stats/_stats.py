@@ -21,6 +21,7 @@
 # Comments and/or additions are welcome (send e-mail to:
 # strang@nmr.mgh.harvard.edu).
 #
+
 """
 stats.py module
 

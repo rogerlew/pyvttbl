@@ -33,32 +33,6 @@ def _flatten(x):
     return result
 
 
-def _str(x, dtype='a', n=3):
-    """
-    makes string formatting more human readable
-    """
-    try    : f=float(x)
-    except : return str(x)
-
-    if math.isnan(f) : return 'nan'
-    if math.isinf(f) : return 'inf'
-    
-    if   dtype == 'i' : return str(int(round(f)))
-    elif dtype == 'f' : return '%.*f'%(n, f)
-    elif dtype == 'e' : return '%.*e'%(n, f)
-    elif dtype == 't' : return str(x)
-    else:
-        if f-round(f) == 0:
-            if abs(f) > 1e8:
-                return '%.*e'%(n, f)
-            else:
-                return str(int(round(f)))
-        else:
-            if abs(f) > 1e8 or abs(f) < 1e-8:
-                return '%.*e'%(n, f)
-            else:
-                return '%.*f'%(n, f)
-
 
 class ChiSquare1way(OrderedDict):
     """1-way Chi-Square Test"""

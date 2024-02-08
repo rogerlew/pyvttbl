@@ -8,6 +8,7 @@ from pyvttbl.plotting import *
 from pyvttbl.stats import *
 from pyvttbl.misc.support import *
 
+
 class Test_anova_between(unittest.TestCase):
     def test2(self):
         ## Between-Subjects test

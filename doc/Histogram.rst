@@ -28,7 +28,7 @@ Example using :class:`DataFrame` wrapper
     23.000           
     
 Example using :class:`Histogram` directly
----------------------------------
+------------------------------------------
 
 ::
 

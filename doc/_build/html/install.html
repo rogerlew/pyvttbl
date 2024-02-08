@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Installation &#8212; pyvttbl v 0.5.2.0 documentation</title>
+    <title>Installation &#8212; pyvttbl v 0.5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -92,53 +92,26 @@ div.specialfooterright {
             
   <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h1>
-<p>The requirements for using pyvttbl are:</p>
+<p>The required packages for using pyvttbl are:</p>
 <ol class="arabic simple">
-<li><p><strong>Python 2.7.x</strong> (This package uses the <em>OrderedDict</em> and <em>Counter</em> objects
-introduced in the collections module of 2.7. )</p></li>
-<li><p><strong>SciPy</strong> : (tested with 0.9.0)</p></li>
-<li><p><strong>NumPy</strong> : (tested with 1.5.1)</p></li>
-<li><p><strong>Matplotlib</strong> : (tested with 1.0.1)</p></li>
+<li><p><strong>Python 3.x</strong> (test with 3.9.13)</p></li>
+<li><p><strong>SciPy</strong> : (tested with 1.9.1)</p></li>
+<li><p><strong>NumPy</strong> : (tested with 1.21.5)</p></li>
+<li><p><strong>Matplotlib</strong> : (tested with 3.5.2)</p></li>
 </ol>
 <p>Options to install pyvttbl</p>
-<ol class="arabic">
-<li><p>Acquire pyvttbl from PyPi</p>
 <ol class="arabic simple">
-<li><p>get <a class="reference external" href="http://pypi.python.org/pypi/setuptools/">setuptools</a></p></li>
-<li><p>run easy_install -U pyvttbl</p></li>
-</ol>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>the module should install unzipped</p>
-</div>
-</li>
-<li><p>Install from source</p>
+<li><p>Clone from github</p>
 <ol class="arabic simple">
-<li><p>You will also need to acquire
-<a class="reference external" href="http://code.google.com/p/dictset/">dictset</a> and
-<a class="reference external" href="http://code.google.com/p/py-st-a-ggre-lite3/">pystaggrelite3</a></p></li>
-</ol>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you use easy_install it should automatically acquire dictset
-and pystaggrelite3.</p>
-</div>
-<ol class="arabic simple" start="2">
-<li><dl class="simple">
-<dt><a class="reference external" href="http://pypi.python.org/pypi/pyvttbl/">Obtain source from PyPi</a></dt><dd><ol class="arabic simple" start="3">
-<li><p>Unzip</p></li>
-<li><p>Run “setup.py install”</p></li>
-</ol>
-</dd>
-</dl>
-</li>
+<li><p>open terminal in site-packages directory</p></li>
+<li><p>run “git clone <a class="reference external" href="https://github.com/rogerlew/pyvttbl/">https://github.com/rogerlew/pyvttbl/</a>”</p></li>
 </ol>
 </li>
 </ol>
 <p>To develop pyvttbl you should also have:</p>
 <ol class="arabic simple">
-<li><p><strong>nose</strong> (using 0.11.3)</p></li>
-<li><p><strong>Sphinx</strong> : (tested with 1.1.3)</p></li>
+<li><p><strong>pytest</strong> : (tested with 1.3.7)</p></li>
+<li><p><strong>Sphinx</strong> : (tested with 5.0.2)</p></li>
 </ol>
 </section>
 
@@ -205,7 +178,7 @@ and pystaggrelite3.</p>
     <div class="specialfooter">
         <div class="specialfooterleft">This software is funded in part by NIH Grant P20 RR016454.</div>
         <div class="specialfooterright">
-            &copy; Copyright 2012, Roger Lew.
+            &copy; Copyright 2024, Roger Lew.
           Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 5.0.2.
         </div>
     </div>

@@ -21,6 +21,9 @@
 # Comments and/or additions are welcome (send e-mail to:
 # strang@nmr.mgh.harvard.edu).
 #
+# Python 3 compatibility added by Roger Lew
+# 
+
 """
 pstat.py module
 

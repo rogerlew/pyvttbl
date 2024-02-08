@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 # Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 
 import scipy

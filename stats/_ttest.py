@@ -1,17 +1,12 @@
-from __future__ import print_function
-
 # Copyright (c) 2011-2024, Roger Lew [see LICENSE.txt]
 # This software is funded in part by NIH Grant P20 RR016454.
 
-# std lib
 import math
 from collections import OrderedDict
 from copy import copy
 
-# third party
 import scipy
 
-# included modules
 from pyvttbl.misc.support import _flatten
 from pyvttbl.stats._noncentral import nctcdf
 from pyvttbl.misc.texttable import Texttable as TextTable
