@@ -186,6 +186,16 @@ T2          C3       M3      1.333        0.333             0.680             1.
 ##        print(aov)
         self.assertEqual(str(aov),R)
 
+    def test1(self):
+            
+        df=DataFrame()
+        fname='data/error~subjectXtimeofdayXcourseXmodel.csv'
+        df.read_tbl(fname)
+        aov=df.anova('ERROR',wfactors=['TIMEOFDAY','COURSE','MODEL'])
+        aov.truncate(test='lb')
+
+        print(aov)
+
             
 def suite():
     return unittest.TestSuite((

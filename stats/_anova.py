@@ -1043,7 +1043,36 @@ class Anova(OrderedDict):
 
                     # record to dict
                     self[tuple(efs)]=r
-               
+                    
+
+    @property
+    def sphericity_test_filter(self):
+        return getattr(self, '_sphericity_test_filter', None)
+    
+    def truncate(self, test='gg', alpha=0.05):
+
+        for efs in list(self.keys()):
+            r = self[tuple(efs)]
+
+            if 'p' not in r:
+                continue 
+
+            keep = False
+            if test in ['gg', 'hf', 'lb']:
+                if 'p_%s'%test in r:
+                    if r['p_%s'%test] < alpha:
+                        keep = True
+                elif r['p'] < alpha:
+                    keep = True
+            elif r['p'] < alpha:
+                keep = True
+
+            if not keep:
+                print(efs)
+                del self[tuple(efs)]
+
+        self._sphericity_test_filter = test
+
     def _within(self):
         factors = self.wfactors
         pt_asarray = self.pt_asarray
@@ -1198,38 +1227,6 @@ class Anova(OrderedDict):
 
         return list(array(list(zeros((p-len(b))))+b)+1.)
                           
-##    def output2html(self, fname, script=''):
-##        if self.measure == '':
-##            title  = '%s ~'%self.dv
-##        else:
-##            title  = '%s of %s ~'%(measure, self.dv)
-##
-##        factors = self.wfactors + self.bfactors
-##        title += ''.join([' %s *'%f for f in factors])[:-2]
-##        html=SimpleHTML(title)
-##
-##        if len(self.wfactors)!=0 and len(self.bfactors)==0:
-##            self._within_html(html)
-##            
-##        if len(self.wfactors)==0 and len(self.bfactors)!=0:
-##            self._between_html(html)
-##            
-##        if len(self.wfactors)!=0 and len(self.bfactors)!=0:
-##            self._mixed_html(html)
-##            
-##        self._summary_html(html, factors)
-##        
-##        # Write Analysis Script
-##        if script != '':
-##            html.add(br(2))
-##            txt='Analysis Script'
-##            html.add(h(a(txt,name='1_'+md5sum(txt)),2,'center'))
-##            html.add(pre(script))
-##
-##        html.write( fname)
-##
-##    def output2html(self, fname):
-##        self.__html__()
         
     def _between_html(self, html):
         factors = self.bfactors
@@ -1252,6 +1249,9 @@ class Anova(OrderedDict):
 
         for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
+                if tuple(efs) not in self:
+                    continue
+                
                 r=self[tuple(efs)]
                 src=''.join(['%s * '%f for f in efs])[:-3]
                 tbodys[-1].append(f2s([src,r['ss'],r['df'],
@@ -1279,188 +1279,278 @@ class Anova(OrderedDict):
         D = self.D
         df = self.df
         conditions=self.df.conditions
+        sphericity_test_filter = self.sphericity_test_filter
 
         # Write Tests of Between-Subjects Effects
         html.add(br(2))
         txt='Tests of Between-Subjects Effects'
         html.add(h(a(txt,name='1_'+md5sum(txt)),2,'center'))
-        
-        if self.measure=='':
-            html.add(h('Measure: %s'%self.dv))
-        else:
-            html.add(h('Measure: %s of %s'%(self.dv,self.measure)))
-            
-        thead='Source,Type III Sum of Squares,df,MS,F,Sig.,'\
-               '&#951;<sup>2</sup><sub><sub>G</sub></sub>,Obs.,'\
-               'SE of x&#772;,&#177;95% CI,&lambda;,Obs. Power'.split(',')
-        tbodys=[]
 
-        tbodys.append([f2s(['Between Subjects',
-                            self[(self.sub,)]['ss'],
-                            self[(self.sub,)]['df'],
-                            '','','','','','','','',''])])
-
-        tbodys.append([])
-        
+        has_sig_effect = False
         for i in range(1,len(bfactors)+1):
             for efs in _xunique_combinations(bfactors, i):
-                r=self[tuple(efs)]
-                src='&nbsp;'*9+''.join(['%s * '%f for f in efs])[:-3]
-                tbodys[-1].append(f2s([src,r['ss'],r['df'],r['mss'],
-                                       r['F'],r['p'],r['eta'],r['obs'],
-                                       r['se'],r['ci'],r['lambda'],r['power']]))
+                if tuple(efs) not in self:
+                    continue
 
-        tbodys.append([f2s(['&nbsp;'*9+'Error',
-                            self[(self.sub,)]['sse'],
-                            self[(self.sub,)]['dfe'],
-                            self[(self.sub,)]['mse'],
-                            '','','','','','','',''])])
-        
-        html.add(table(tbodys, thead))
+                if 'p' in self[tuple(efs)]:
+                    has_sig_effect = True
+                    break
+
+        if not has_sig_effect:
+            html.add(h('Measure: %s - No Significant Effects or Interactions'%self.dv))
+        else:
+            if self.measure=='':
+                html.add(h('Measure: %s'%self.dv))
+            else:
+                html.add(h('Measure: %s of %s'%(self.dv,self.measure)))
+                
+            thead='Source,Type III Sum of Squares,df,MS,F,Sig.,'\
+                '&#951;<sup>2</sup><sub><sub>G</sub></sub>,Obs.,'\
+                'SE of x&#772;,&#177;95% CI,&lambda;,Obs. Power'.split(',')
+            tbodys=[]
+
+            tbodys.append([f2s(['Between Subjects',
+                                self[(self.sub,)]['ss'],
+                                self[(self.sub,)]['df'],
+                                '','','','','','','','',''])])
+
+            tbodys.append([])
+            
+            for i in range(1,len(bfactors)+1):
+                for efs in _xunique_combinations(bfactors, i):
+                    if tuple(efs) not in self:
+                        continue
+
+                    r=self[tuple(efs)]
+                    src='&nbsp;'*9+''.join(['%s * '%f for f in efs])[:-3]
+                    tbodys[-1].append(f2s([src,r['ss'],r['df'],r['mss'],
+                                        r['F'],r['p'],r['eta'],r['obs'],
+                                        r['se'],r['ci'],r['lambda'],r['power']]))
+
+            tbodys.append([f2s(['&nbsp;'*9+'Error',
+                                self[(self.sub,)]['sse'],
+                                self[(self.sub,)]['dfe'],
+                                self[(self.sub,)]['mse'],
+                                '','','','','','','',''])])
+            
+            html.add(table(tbodys, thead))
 
         # Write Tests of Within-Subjects Effects
         html.add(br(2))
         txt='Tests of Within-Subjects Effects'
         html.add(h(a(txt,name='1_'+md5sum(txt)),2,'center'))
 
-        if self.measure=='':
-            html.add(h('Measure: %s'%self.dv))
-        else:
-            html.add(h('Measure: %s of %s'%(self.dv,self.measure)))
-        thead='Source,,Type III Sum of Squares,&#949;,df,MS,F,Sig.,'\
-               '&#951;<sup>2</sup><sub><sub>G</sub></sub>,Obs.,'\
-               'SE of x&#772;,&#177;95% CI,&lambda;,Obs. Power'.split(',')
-        tbodys=[]
-
-        defs=[]
+        has_sig_effect = False
         for i in range(1,len(wfactors)+1):
             for efs in _xunique_combinations(wfactors, i):
-                defs.append(efs)
-                
-                tbodys.append([])
-                r=self[tuple(efs)]
-                src=''.join(['%s * '%f for f in efs])[:-3]
-                tbodys[-1].append(f2s([src,'Sphericity Assumed',
-                   r['ss'],' - ',r['df'],r['mss'],r['F'],
-                   r['p'],r['eta'],r['obs'],r['se'],
-                   r['ci'], r['lambda'],r['power']]))
-                tbodys[-1].append(f2s(['', 'Greenhouse-Geisser',
-                   r['ss'],r['eps_gg'],r['df_gg'],r['mss_gg'],r['F_gg'],
-                   r['p_gg'],r['eta'],r['obs_gg'],r['se_gg'],r['ci_gg'],
-                   r['lambda_gg'],r['power_gg']]))
-                tbodys[-1].append(f2s(['', 'Huynh-Feldt',
-                   r['ss'],r['eps_hf'],r['df_hf'],r['mss_hf'],r['F_hf'],
-                   r['p_hf'],r['eta'],r['obs_hf'],r['se_hf'],r['ci_hf'],
-                   r['lambda_hf'],r['power_hf']]))
-                tbodys[-1].append(f2s(['', 'Box',
-                   r['ss'],r['eps_lb'],r['df_lb'],r['mss_lb'],r['F_lb'],
-                   r['p_lb'],r['eta'],r['obs_lb'],r['se_lb'],r['ci_lb'],
-                   r['lambda_lb'],r['power_lb']]))
+                if tuple(efs) not in self:
+                    continue
 
-                for i in range(1,len(factors)+1):
-                    for efs2 in _xunique_combinations(factors, i):
-                        if efs2 not in self.befs and \
-                           efs2 not in defs and \
-                           efs2 not in self.wefs \
-                           and len(set(efs2).difference(set(efs+bfactors)))==0:
-                            defs.append(efs2)
-                            
-                            tbodys.append([])
-                            r=self[tuple(efs2)]
-                            src=''.join(['%s * '%f for f in efs2])[:-3]
+                if 'p' in self[tuple(efs)]:
+                    has_sig_effect = True
+                    break
+
+        if not has_sig_effect:
+            html.add(h('Measure: %s - No Significant Effects or Interactions'%self.dv))
+        else:
+            if self.measure=='':
+                html.add(h('Measure: %s'%self.dv))
+            else:
+                html.add(h('Measure: %s of %s'%(self.dv,self.measure)))
+            thead='Source,,Type III Sum of Squares,&#949;,df,MS,F,Sig.,'\
+                '&#951;<sup>2</sup><sub><sub>G</sub></sub>,Obs.,'\
+                'SE of x&#772;,&#177;95% CI,&lambda;,Obs. Power'.split(',')
+            tbodys=[]
+
+            defs=[]
+            for i in range(1,len(wfactors)+1):
+                for efs in _xunique_combinations(wfactors, i):
+                    if tuple(efs) in self:
+                        defs.append(efs)
+                        
+                        tbodys.append([])
+                        r=self[tuple(efs)]
+                        src=''.join(['%s * '%f for f in efs])[:-3]
+
+                        if sphericity_test_filter is None or sphericity_test_filter == '':
                             tbodys[-1].append(f2s([src,'Sphericity Assumed',
-                               r['ss'],' - ',r['df'],r['mss'],r['F'],r['p'],
-                               r['eta'],r['obs'],r['se'],
-                               r['ci'],r['lambda'],r['power']]))
-                            tbodys[-1].append(f2s(['', 'Greenhouse-Geisser',
-                               r['ss'],r['eps_gg'],r['df_gg'],r['mss_gg'],
-                               r['F_gg'],r['p_gg'],r['eta'],r['obs_gg'],
-                               r['se_gg'],r['ci_gg'],
-                               r['lambda_gg'],r['power_gg']]))
-                            tbodys[-1].append(f2s(['', 'Huynh-Feldt',
-                               r['ss'],r['eps_hf'],r['df_hf'],r['mss_hf'],
-                               r['F_hf'],r['p_hf'],r['eta'],r['obs_hf'],
-                               r['se_hf'],r['ci_hf'],
-                               r['lambda_hf'],r['power_hf']]))
-                            tbodys[-1].append(f2s(['', 'Box',
-                               r['ss'],r['eps_lb'],r['df_lb'],r['mss_lb'],
-                               r['F_lb'],r['p_lb'],r['eta'],r['obs_lb'],
-                               r['se_lb'],r['ci_lb'],
-                               r['lambda_lb'],r['power_lb']]))
-                            
-                tbodys.append([])
-                src='Error(%s)'%''.join(['%s * '%f for f in efs if
-                                         f not in bfactors])[:-3]
-                tbodys[-1].append(f2s([src,'Sphericity Assumed',
-                   r['sse'],' - ',r['dfe'],r['mse'],
-                   '','','','','','','','']))
-                tbodys[-1].append(f2s(['', 'Greenhouse-Geisser',
-                   r['sse'],r['eps_gg'],r['dfe_gg'],r['mse_gg'],
-                   '','','','','','','','']))
-                tbodys[-1].append(f2s(['', 'Huynh-Feldt',
-                   r['sse'],r['eps_hf'],r['dfe_hf'],r['mse_hf'],
-                   '','','','','','','','']))
-                tbodys[-1].append(f2s(['', 'Box',
-                   r['sse'],r['eps_lb'],r['dfe_lb'],r['mse_lb'],
-                   '','','','','','','','']))
+                            r['ss'],' - ',r['df'],r['mss'],r['F'],
+                            r['p'],r['eta'],r['obs'],r['se'],
+                            r['ci'], r['lambda'],r['power']]))
 
-        html.add(table(tbodys, thead))
+                        if sphericity_test_filter is None or sphericity_test_filter == 'gg':
+                            tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Greenhouse-Geisser',
+                            r['ss'],r['eps_gg'],r['df_gg'],r['mss_gg'],r['F_gg'],
+                            r['p_gg'],r['eta'],r['obs_gg'],r['se_gg'],r['ci_gg'],
+                            r['lambda_gg'],r['power_gg']]))
+                            
+                        if sphericity_test_filter is None or sphericity_test_filter == 'hf':
+                            tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Huynh-Feldt',
+                            r['ss'],r['eps_hf'],r['df_hf'],r['mss_hf'],r['F_hf'],
+                            r['p_hf'],r['eta'],r['obs_hf'],r['se_hf'],r['ci_hf'],
+                            r['lambda_hf'],r['power_hf']]))
+
+                        if sphericity_test_filter is None or sphericity_test_filter == 'lb':
+                            tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Box',
+                            r['ss'],r['eps_lb'],r['df_lb'],r['mss_lb'],r['F_lb'],
+                            r['p_lb'],r['eta'],r['obs_lb'],r['se_lb'],r['ci_lb'],
+                            r['lambda_lb'],r['power_lb']]))
+
+                    for i in range(1,len(factors)+1):
+                        for efs2 in _xunique_combinations(factors, i):
+                            if efs2 not in self.befs and \
+                            efs2 not in defs and \
+                            efs2 not in self.wefs \
+                            and len(set(efs2).difference(set(efs+bfactors))) == 0:
+                                if tuple(efs2) not in self:
+                                    continue
+                                
+                                defs.append(efs2)
+                                
+                                tbodys.append([])
+                                r=self[tuple(efs2)]
+                                src=''.join(['%s * '%f for f in efs2])[:-3]
+                                
+                                if sphericity_test_filter is None or sphericity_test_filter == '':
+                                    tbodys[-1].append(f2s([src,'Sphericity Assumed',
+                                    r['ss'],' - ',r['df'],r['mss'],r['F'],r['p'],
+                                    r['eta'],r['obs'],r['se'],
+                                    r['ci'],r['lambda'],r['power']]))
+                                    
+                                if sphericity_test_filter is None or sphericity_test_filter == 'gg':
+                                    tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Greenhouse-Geisser',
+                                    r['ss'],r['eps_gg'],r['df_gg'],r['mss_gg'],
+                                    r['F_gg'],r['p_gg'],r['eta'],r['obs_gg'],
+                                    r['se_gg'],r['ci_gg'],
+                                    r['lambda_gg'],r['power_gg']]))
+                                
+                                if sphericity_test_filter is None or sphericity_test_filter == 'hf':
+                                    tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Huynh-Feldt',
+                                    r['ss'],r['eps_hf'],r['df_hf'],r['mss_hf'],
+                                    r['F_hf'],r['p_hf'],r['eta'],r['obs_hf'],
+                                    r['se_hf'],r['ci_hf'],
+                                    r['lambda_hf'],r['power_hf']]))
+                                
+                                if sphericity_test_filter is None or sphericity_test_filter == 'lb':
+                                    tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Box',
+                                    r['ss'],r['eps_lb'],r['df_lb'],r['mss_lb'],
+                                    r['F_lb'],r['p_lb'],r['eta'],r['obs_lb'],
+                                    r['se_lb'],r['ci_lb'],
+                                    r['lambda_lb'],r['power_lb']]))
+                                    
+                    tbodys.append([])
+                    src='Error(%s)'%''.join(['%s * '%f for f in efs if
+                                            f not in bfactors])[:-3]
+                    
+                    if sphericity_test_filter is None or sphericity_test_filter == '':
+                        tbodys[-1].append(f2s([src,'Sphericity Assumed',
+                        r['sse'],' - ',r['dfe'],r['mse'],
+                        '','','','','','','','']))
+                        
+                    if sphericity_test_filter is None or sphericity_test_filter == 'gg':
+                        tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Greenhouse-Geisser',
+                        r['sse'],r['eps_gg'],r['dfe_gg'],r['mse_gg'],
+                        '','','','','','','','']))
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'hf':
+                        tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Huynh-Feldt',
+                        r['sse'],r['eps_hf'],r['dfe_hf'],r['mse_hf'],
+                        '','','','','','','','']))
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'lb':
+                        tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Box',
+                        r['sse'],r['eps_lb'],r['dfe_lb'],r['mse_lb'],
+                        '','','','','','','','']))
+
+            html.add(table(tbodys, thead))
 
     def _within_html(self, html):
         factors=self.wfactors
-        
+        sphericity_test_filter = self.sphericity_test_filter
+
         html.add(br(2))
         txt='Tests of Within-Subjects Effects'
         html.add(h(a(txt,name='1_'+md5sum(txt)),2,'center'))
         
-        # Write ANOVA 
-        if self.measure=='':
-            html.add(h('Measure: %s'%self.dv))
-        else:
-            html.add(h('Measure: %s of %s'%(self.dv,self.measure)))
-        thead='Source,,Type III Sum of Squares,&#949;,df,MS,F,Sig.,'\
-               '&#951;<sup>2</sup><sub><sub>G</sub></sub>,Obs.,'\
-               'SE of x&#772;,&#177;95% CI,&lambda;,Obs. Power'.split(',')
-        tbodys=[]
-
+        has_sig_effect = False
         for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
-                tbodys.append([])
-                r=self[tuple(efs)]
-                src=''.join(['%s * '%f for f in efs])[:-3]
-                tbodys[-1].append(f2s([src,'Sphericity Assumed',
-                   r['ss'],' - ',r['df'],r['mss'],r['F'],r['p'],
-                   r['eta'],r['obs'],r['se'],
-                   r['ci'],r['lambda'],r['power']]))
-                tbodys[-1].append(f2s(['', 'Greenhouse-Geisser',
-                   r['ss'],r['eps_gg'],r['df_gg'],r['mss_gg'],r['F_gg'],
-                   r['p_gg'],r['eta'],r['obs_gg'],r['se_gg'],
-                   r['ci_gg'],r['lambda_gg'],r['power_gg']]))
-                tbodys[-1].append(f2s(['', 'Huynh-Feldt',
-                   r['ss'],r['eps_hf'],r['df_hf'],r['mss_hf'],r['F_hf'],
-                   r['p_hf'],r['eta'],r['obs_hf'],r['se_hf'],
-                   r['ci_hf'],r['lambda_hf'],r['power_hf']]))
-                tbodys[-1].append(f2s(['', 'Box',
-                   r['ss'],r['eps_lb'],r['df_lb'],r['mss_lb'],r['F_lb'],
-                   r['p_lb'],r['eta'],r['obs_lb'],r['se_lb'],
-                   r['ci_lb'],r['lambda_lb'],r['power_lb']]))
+                if tuple(efs) not in self:
+                    continue
 
-                tbodys.append([])
-                src='Error(%s)'%src
-                tbodys[-1].append(f2s([src,'Sphericity Assumed',
-                   r['sse'],' - ',r['dfe'],r['mse'],
-                   '','','','','','','','']))
-                tbodys[-1].append(f2s(['', 'Greenhouse-Geisser',
-                   r['sse'],r['eps_gg'],r['dfe_gg'],r['mse_gg'],
-                   '','','','','','','','']))
-                tbodys[-1].append(f2s(['', 'Huynh-Feldt',
-                   r['sse'],r['eps_hf'],r['dfe_hf'],r['mse_hf'],
-                   '','','','','','','','']))
-                tbodys[-1].append(f2s(['', 'Box',
-                   r['sse'],r['eps_lb'],r['dfe_lb'],r['mse_lb'],
-                   '','','','','','','','']))
+                if 'p' in self[tuple(efs)]:
+                    has_sig_effect = True
+                    break
 
-        html.add(table(tbodys, thead))
+        if not has_sig_effect:
+            html.add(h('Measure: %s - No Significant Effects or Interactions'%self.dv))
+        else:
+            # Write ANOVA 
+            if self.measure=='':
+                html.add(h('Measure: %s'%self.dv))
+            else:
+                html.add(h('Measure: %s of %s'%(self.dv,self.measure)))
+            thead='Source,,Type III Sum of Squares,&#949;,df,MS,F,Sig.,'\
+                '&#951;<sup>2</sup><sub><sub>G</sub></sub>,Obs.,'\
+                'SE of x&#772;,&#177;95% CI,&lambda;,Obs. Power'.split(',')
+            tbodys=[]
+
+            for i in range(1,len(factors)+1):
+                for efs in _xunique_combinations(factors, i):
+                    if tuple(efs) not in self:
+                        continue
+                                
+                    tbodys.append([])
+                    r=self[tuple(efs)]
+                    src=''.join(['%s * '%f for f in efs])[:-3]
+                    if sphericity_test_filter is None or sphericity_test_filter == '':
+                        tbodys[-1].append(f2s([src,'Sphericity Assumed',
+                        r['ss'],' - ',r['df'],r['mss'],r['F'],r['p'],
+                        r['eta'],r['obs'],r['se'],
+                        r['ci'],r['lambda'],r['power']]))
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'gg':
+                        tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Greenhouse-Geisser',
+                        r['ss'],r['eps_gg'],r['df_gg'],r['mss_gg'],r['F_gg'],
+                        r['p_gg'],r['eta'],r['obs_gg'],r['se_gg'],
+                        r['ci_gg'],r['lambda_gg'],r['power_gg']]))
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'hf':
+                        tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Huynh-Feldt',
+                        r['ss'],r['eps_hf'],r['df_hf'],r['mss_hf'],r['F_hf'],
+                        r['p_hf'],r['eta'],r['obs_hf'],r['se_hf'],
+                        r['ci_hf'],r['lambda_hf'],r['power_hf']]))
+                        
+                    if sphericity_test_filter is None or sphericity_test_filter == 'lb':
+                        tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Box',
+                        r['ss'],r['eps_lb'],r['df_lb'],r['mss_lb'],r['F_lb'],
+                        r['p_lb'],r['eta'],r['obs_lb'],r['se_lb'],
+                        r['ci_lb'],r['lambda_lb'],r['power_lb']]))
+
+                    tbodys.append([])
+                    src='Error(%s)'%src
+                    
+                    if sphericity_test_filter is None or sphericity_test_filter == '':
+                        tbodys[-1].append(f2s([src,'Sphericity Assumed',
+                        r['sse'],' - ',r['dfe'],r['mse'],
+                        '','','','','','','','']))
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'gg':
+                        tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Greenhouse-Geisser',
+                        r['sse'],r['eps_gg'],r['dfe_gg'],r['mse_gg'],
+                        '','','','','','','','']))
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'hf':
+                        tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Huynh-Feldt',
+                        r['sse'],r['eps_hf'],r['dfe_hf'],r['mse_hf'],
+                        '','','','','','','','']))
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'lb':
+                        tbodys[-1].append(f2s([(src, '')[sphericity_test_filter is None], 'Box',
+                        r['sse'],r['eps_lb'],r['dfe_lb'],r['mse_lb'],
+                        '','','','','','','','']))
+
+            html.add(table(tbodys, thead))
 
     def _summary_html(self, html, factors):
         
@@ -1525,40 +1615,57 @@ class Anova(OrderedDict):
 
         s = ['\n\nTESTS OF BETWEEN-SUBJECTS EFFECTS\n\n']
         
-        # Write ANOVA results
-        if self.measure=='':
-            s.append('Measure: %s\n'%self.dv)
-        else:
-            s.append('Measure: %s of %s\n'%(self.dv,self.measure))
-
-        tt = TextTable(max_width=0)
-        tt.set_cols_dtype(['t'] + ['a']*11)
-        tt.set_cols_align(['l'] + ['r']*11)
-        tt.set_deco(TextTable.HEADER | TextTable.FOOTER)
-        tt.header('Source,Type III\nSS,df,MS,F,Sig.,et2_G,'
-                  'Obs.,SE,95% CI,lambda,Obs.\nPower'.split(','))
-        
+        has_sig_effect = False
         for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
-                r=self[tuple(efs)]
-                src=''.join(['%s * '%f for f in efs])[:-3]
-                tt.add_row([src,r['ss'],r['df'],
-                            r['mss'],r['F'],r['p'],
-                            r['eta'],r['obs'],r['se'],
-                            r['ci'],r['lambda'],r['power']])
+                if tuple(efs) not in self:
+                    continue
 
-        tt.add_row(['Error',self[(factors[0],)]['sse'],
-                   self[(factors[0],)]['dfe'],
-                   self[(factors[0],)]['mse'],
-                   '','','','','','','',''])
+                if 'p' in self[tuple(efs)]:
+                    has_sig_effect = True
+                    break
 
-        ss_total = nsum((self.df[self.dv]-mean(self.df[self.dv]))**2)
-        df_total = len(self.df[self.dv])-1-self.dftrim
-        
-        tt.footer(['Total',ss_total,df_total,
-                   '','','','','','','','',''])
-        
-        s.append(tt.draw())
+        if not has_sig_effect:
+            s.append('Measure: %s - No Significant Effects or Interactions'%self.dv)
+        else:
+                
+            # Write ANOVA results
+            if self.measure=='':
+                s.append('Measure: %s\n'%self.dv)
+            else:
+                s.append('Measure: %s of %s\n'%(self.dv,self.measure))
+
+            tt = TextTable(max_width=0)
+            tt.set_cols_dtype(['t'] + ['a']*11)
+            tt.set_cols_align(['l'] + ['r']*11)
+            tt.set_deco(TextTable.HEADER | TextTable.FOOTER)
+            tt.header('Source,Type III\nSS,df,MS,F,Sig.,et2_G,'
+                    'Obs.,SE,95% CI,lambda,Obs.\nPower'.split(','))
+            
+            for i in range(1,len(factors)+1):
+                for efs in _xunique_combinations(factors, i):
+                    if tuple(efs) not in self:
+                        continue
+
+                    r=self[tuple(efs)]
+                    src=''.join(['%s * '%f for f in efs])[:-3]
+                    tt.add_row([src,r['ss'],r['df'],
+                                r['mss'],r['F'],r['p'],
+                                r['eta'],r['obs'],r['se'],
+                                r['ci'],r['lambda'],r['power']])
+
+            tt.add_row(['Error',self[(factors[0],)]['sse'],
+                    self[(factors[0],)]['dfe'],
+                    self[(factors[0],)]['mse'],
+                    '','','','','','','',''])
+
+            ss_total = nsum((self.df[self.dv]-mean(self.df[self.dv]))**2)
+            df_total = len(self.df[self.dv])-1-self.dftrim
+            
+            tt.footer(['Total',ss_total,df_total,
+                    '','','','','','','','',''])
+            
+            s.append(tt.draw())
         return ''.join(s)
 
     def _mixed_str(self):
@@ -1568,225 +1675,341 @@ class Anova(OrderedDict):
         D = self.D
         df = self.df
         conditions=self.df.conditions
+        sphericity_test_filter = self.sphericity_test_filter
 
         # Write Tests of Between-Subjects Effects
 
         s = ['\n\nTESTS OF BETWEEN-SUBJECTS EFFECTS\n\n']
         
-        # Write ANOVA results
-        if self.measure=='':
-            s.append('Measure: %s\n'%self.dv)
-        else:
-            s.append('Measure: %s of %s\n'%(self.dv,self.measure))
-
-        tt = TextTable(max_width=0)
-        tt.set_cols_dtype(['t'] + ['a']*11)
-        tt.set_cols_align(['l'] + ['r']*11)
-        tt.set_deco(TextTable.HEADER | TextTable.FOOTER)
-        tt.header('Source,Type III\nSS,df,MS,F,Sig.,et2_G,'
-                  'Obs.,SE,95% CI,lambda,Obs.\nPower'.split(','))
-
-        tt.add_row(['Between Subjects',
-                    self[(self.sub,)]['ss'],
-                    self[(self.sub,)]['df'],
-                    '','','','','','','','',''])
-        
+        has_sig_effect = False
         for i in range(1,len(bfactors)+1):
             for efs in _xunique_combinations(bfactors, i):
-                r=self[tuple(efs)]
-                src=''.join(['%s * '%f for f in efs])[:-3]
-                tt.add_row([src,r['ss'],r['df'],
-                            r['mss'],r['F'],r['p'],
-                            r['eta'],r['obs'],r['se'],
-                            r['ci'],r['lambda'],r['power']])
+                if tuple(efs) not in self:
+                    continue
 
-        tt.footer(['Error',
-                   self[(self.sub,)]['sse'],
-                   self[(self.sub,)]['dfe'],
-                   self[(self.sub,)]['mse'],
-                   '','','','','','','',''])
-        s.append(tt.draw())
+                if 'p' in self[tuple(efs)]:
+                    has_sig_effect = True
+                    break
+
+        if not has_sig_effect:
+            s.append('Measure: %s - No Significant Effects or Interactions\n'%self.dv)
+        else:
+            # Write ANOVA results
+            if self.measure=='':
+                s.append('Measure: %s\n'%self.dv)
+            else:
+                s.append('Measure: %s of %s\n'%(self.dv,self.measure))
+
+            tt = TextTable(max_width=0)
+            tt.set_cols_dtype(['t'] + ['a']*11)
+            tt.set_cols_align(['l'] + ['r']*11)
+            tt.set_deco(TextTable.HEADER | TextTable.FOOTER)
+            tt.header('Source,Type III\nSS,df,MS,F,Sig.,et2_G,'
+                    'Obs.,SE,95% CI,lambda,Obs.\nPower'.split(','))
+
+            tt.add_row(['Between Subjects',
+                        self[(self.sub,)]['ss'],
+                        self[(self.sub,)]['df'],
+                        '','','','','','','','',''])
+            
+            for i in range(1,len(bfactors)+1):
+                for efs in _xunique_combinations(bfactors, i):
+                    if tuple(efs) not in self:
+                        continue
+                    
+                    r=self[tuple(efs)]
+                    src=''.join(['%s * '%f for f in efs])[:-3]
+                    tt.add_row([src,r['ss'],r['df'],
+                                r['mss'],r['F'],r['p'],
+                                r['eta'],r['obs'],r['se'],
+                                r['ci'],r['lambda'],r['power']])
+
+            tt.footer(['Error',
+                    self[(self.sub,)]['sse'],
+                    self[(self.sub,)]['dfe'],
+                    self[(self.sub,)]['mse'],
+                    '','','','','','','',''])
+            s.append(tt.draw())
         
     
         # Write Tests of Within-Subjects Effects
 
         s.append('\n\nTESTS OF WITHIN SUBJECTS EFFECTS\n\n')
         
-        # Write ANOVA 
-        if self.measure=='':
-            s.append('Measure: %s\n'%self.dv)
-        else:
-            s.append('Measure: %s of %s\n'%(self.dv,self.measure))
-
-        tt = TextTable(max_width=0)
-        tt.set_cols_dtype(['t']*2 + ['a']*12)
-        tt.set_cols_align(['l']*2 + ['r']*12)
-        tt.set_deco(TextTable.HEADER | TextTable.HLINES)
-        tt.header('Source,,Type III\nSS,eps,df,MS,F,Sig.,'
-                  'et2_G,Obs.,'
-                  'SE,95% CI,lambda,Obs.\nPower'.split(','))
-        
+        has_sig_effect = False
         defs=[]
         for i in range(1,len(wfactors)+1):
             for efs in _xunique_combinations(wfactors, i):
-                defs.append(efs)
-                treatment = []
-                r=self[tuple(efs)]
-                src=' *\n'.join(efs)
-                treatment.append([src,'Sphericity Assumed',
-                   r['ss'],' - ',r['df'],r['mss'],r['F'],r['p'],
-                   r['eta'],r['obs'],r['se'],
-                   r['ci'],r['lambda'],r['power']])
-                treatment.append(['', 'Greenhouse-Geisser',
-                   r['ss'],r['eps_gg'],r['df_gg'],r['mss_gg'],r['F_gg'],
-                   r['p_gg'],r['eta'],r['obs_gg'],r['se_gg'],
-                   r['ci_gg'],r['lambda_gg'],r['power_gg']])
-                treatment.append(['', 'Huynh-Feldt',
-                   r['ss'],r['eps_hf'],r['df_hf'],r['mss_hf'],r['F_hf'],
-                   r['p_hf'],r['eta'],r['obs_hf'],r['se_hf'],
-                   r['ci_hf'],r['lambda_hf'],r['power_hf']])
-                treatment.append(['', 'Box',
-                   r['ss'],r['eps_lb'],r['df_lb'],r['mss_lb'],r['F_lb'],
-                   r['p_lb'],r['eta'],r['obs_lb'],r['se_lb'],
-                   r['ci_lb'],r['lambda_lb'],r['power_lb']])
+                if tuple(efs) not in self:
+                    continue
 
-                row = []
-                for i in _range(14):
-                    row.append('\n'.join(_str(treatment[j][i])
-                                         for j in _range(4)))
-                tt.add_row(row)
-                
+                defs.append(efs)
+
+                if 'p' in self[tuple(efs)]:
+                    has_sig_effect = True
+
                 for i in range(1,len(factors)+1):
                     for efs2 in _xunique_combinations(factors, i):
                         if efs2 not in self.befs and \
-                           efs2 not in defs and \
-                           efs2 not in self.wefs \
-                           and len(set(efs2).difference(set(efs+bfactors)))==0:
-                            defs.append(efs2)
-                            treatment = []
-                            r=self[tuple(efs2)]
-                            src=''.join(['%s * '%f for f in efs2])[:-3]
+                        efs2 not in defs and \
+                        efs2 not in self.wefs \
+                        and len(set(efs2).difference(set(efs+bfactors)))==0:
+                            
+                            if tuple(efs2) not in self:
+                                continue
+
+                            if 'p' in self[tuple(efs2)]:
+                                has_sig_effect = True
+                                
+
+        if not has_sig_effect:
+            s.append('Measure: %s - No Significant Effects or Interactions'%self.dv)
+        else:
+
+            # Write ANOVA 
+            if self.measure=='':
+                s.append('Measure: %s\n'%self.dv)
+            else:
+                s.append('Measure: %s of %s\n'%(self.dv,self.measure))
+
+            tt = TextTable(max_width=0)
+            tt.set_cols_dtype(['t']*2 + ['a']*12)
+            tt.set_cols_align(['l']*2 + ['r']*12)
+            tt.set_deco(TextTable.HEADER | TextTable.HLINES)
+            tt.header('Source,,Type III\nSS,eps,df,MS,F,Sig.,'
+                    'et2_G,Obs.,'
+                    'SE,95% CI,lambda,Obs.\nPower'.split(','))
+            
+            defs=[]
+            for i in range(1,len(wfactors)+1):
+                for efs in _xunique_combinations(wfactors, i):
+                    if tuple(efs) in self:
+
+                        defs.append(efs)
+                        treatment = []
+                        r=self[tuple(efs)]
+                        src=' *\n'.join(efs)
+
+                        if sphericity_test_filter is None or sphericity_test_filter == '':
                             treatment.append([src,'Sphericity Assumed',
-                               r['ss'],' - ',r['df'],r['mss'],r['F'],r['p'],
-                               r['eta'],r['obs'],r['se'],
-                               r['ci'],r['lambda'],r['power']])
-                            treatment.append(['', 'Greenhouse-Geisser',
-                               r['ss'],r['eps_gg'],r['df_gg'],r['mss_gg'],
-                               r['F_gg'],r['p_gg'],r['eta'],r['obs_gg'],
-                               r['se_gg'],r['ci_gg'],
-                               r['lambda_gg'],r['power_gg']])
-                            treatment.append(['', 'Huynh-Feldt',
-                               r['ss'],r['eps_hf'],r['df_hf'],r['mss_hf'],
-                               r['F_hf'],r['p_hf'],r['eta'],r['obs_hf'],
-                               r['se_hf'],r['ci_hf'],
-                               r['lambda_hf'],r['power_hf']])
-                            treatment.append(['', 'Box',
-                               r['ss'],r['eps_lb'],r['df_lb'],r['mss_lb'],
-                               r['F_lb'],r['p_lb'],r['eta'],r['obs_lb'],
-                               r['se_lb'],r['ci_lb'],
-                               r['lambda_lb'],r['power_lb']])
+                            r['ss'],' - ',r['df'],r['mss'],r['F'],r['p'],
+                            r['eta'],r['obs'],r['se'],
+                            r['ci'],r['lambda'],r['power']])
                             
-                            row = []
-                            for i in _range(14):
-                                row.append('\n'.join(_str(treatment[j][i])
-                                                     for j in _range(4)))
-                            tt.add_row(row)
+                        if sphericity_test_filter is None or sphericity_test_filter == 'gg':
+                            treatment.append([(src, '')[sphericity_test_filter is None], 'Greenhouse-Geisser',
+                            r['ss'],r['eps_gg'],r['df_gg'],r['mss_gg'],r['F_gg'],
+                            r['p_gg'],r['eta'],r['obs_gg'],r['se_gg'],
+                            r['ci_gg'],r['lambda_gg'],r['power_gg']])
                             
-                error = []
-                
-                src='Error(%s)'%' *\n'.join([f for f in efs if
-                                             f not in bfactors])
-                error.append([src,'Sphericity Assumed',
-                   r['sse'],' - ',r['dfe'],r['mse'],
-                   '','','','','','','',''])
-                error.append(['', 'Greenhouse-Geisser',
-                   r['sse'],r['eps_gg'],r['dfe_gg'],r['mse_gg'],
-                   '','','','','','','',''])
-                error.append(['', 'Huynh-Feldt',
-                   r['sse'],r['eps_hf'],r['dfe_hf'],r['mse_hf'],
-                   '','','','','','','',''])
-                error.append(['', 'Box',
-                   r['sse'],r['eps_lb'],r['dfe_lb'],r['mse_lb'],
-                   '','','','','','','',''])
+                        if sphericity_test_filter is None or sphericity_test_filter == 'hf':
+                            treatment.append([(src, '')[sphericity_test_filter is None], 'Huynh-Feldt',
+                            r['ss'],r['eps_hf'],r['df_hf'],r['mss_hf'],r['F_hf'],
+                            r['p_hf'],r['eta'],r['obs_hf'],r['se_hf'],
+                            r['ci_hf'],r['lambda_hf'],r['power_hf']])
+                            
+                        if sphericity_test_filter is None or sphericity_test_filter == 'lb':
+                            treatment.append([(src, '')[sphericity_test_filter is None], 'Box',
+                            r['ss'],r['eps_lb'],r['df_lb'],r['mss_lb'],r['F_lb'],
+                            r['p_lb'],r['eta'],r['obs_lb'],r['se_lb'],
+                            r['ci_lb'],r['lambda_lb'],r['power_lb']])
 
-                row = []
-                for i in _range(14):
-                    row.append('\n'.join(_str(error[j][i])
-                                         for j in _range(4)))
-                tt.add_row(row)
+                        row = []
+                        nrows = len(treatment)
+                        for i in _range(14):
+                            row.append('\n'.join(_str(treatment[j][i])
+                                                for j in _range(nrows)))
+                        tt.add_row(row)
+                        
+                    for i in range(1,len(factors)+1):
+                        for efs2 in _xunique_combinations(factors, i):
+                            if efs2 not in self.befs and \
+                            efs2 not in defs and \
+                            efs2 not in self.wefs \
+                            and len(set(efs2).difference(set(efs+bfactors)))==0:
+                                
+                                if tuple(efs2) not in self:
+                                    continue
 
-        s.append(tt.draw())
+                                defs.append(efs2)
+                                treatment = []
+                                r=self[tuple(efs2)]
+                                src=''.join(['%s * '%f for f in efs2])[:-3]
+                                
+                                if sphericity_test_filter is None or sphericity_test_filter == '':
+                                    treatment.append([src,'Sphericity Assumed',
+                                    r['ss'],' - ',r['df'],r['mss'],r['F'],r['p'],
+                                    r['eta'],r['obs'],r['se'],
+                                    r['ci'],r['lambda'],r['power']])
+
+                                if sphericity_test_filter is None or sphericity_test_filter == 'gg':
+                                    treatment.append([(src, '')[sphericity_test_filter is None], 'Greenhouse-Geisser',
+                                    r['ss'],r['eps_gg'],r['df_gg'],r['mss_gg'],
+                                    r['F_gg'],r['p_gg'],r['eta'],r['obs_gg'],
+                                    r['se_gg'],r['ci_gg'],
+                                    r['lambda_gg'],r['power_gg']])
+
+                                if sphericity_test_filter is None or sphericity_test_filter == 'hf':
+                                    treatment.append([(src, '')[sphericity_test_filter is None], 'Huynh-Feldt',
+                                    r['ss'],r['eps_hf'],r['df_hf'],r['mss_hf'],
+                                    r['F_hf'],r['p_hf'],r['eta'],r['obs_hf'],
+                                    r['se_hf'],r['ci_hf'],
+                                    r['lambda_hf'],r['power_hf']])
+
+                                if sphericity_test_filter is None or sphericity_test_filter == 'lb':
+                                    treatment.append([(src, '')[sphericity_test_filter is None], 'Box',
+                                    r['ss'],r['eps_lb'],r['df_lb'],r['mss_lb'],
+                                    r['F_lb'],r['p_lb'],r['eta'],r['obs_lb'],
+                                    r['se_lb'],r['ci_lb'],
+                                    r['lambda_lb'],r['power_lb']])
+                                
+                                row = []
+                                nrows = len(treatment)
+                                for i in _range(14):
+                                    row.append('\n'.join(_str(treatment[j][i])
+                                                        for j in _range(nrows)))
+                                tt.add_row(row)
+                                
+                    error = []
+                    
+                    src='Error(%s)'%' *\n'.join([f for f in efs if
+                                                f not in bfactors])
+                    
+                    if sphericity_test_filter is None or sphericity_test_filter == '':
+                        error.append([src,'Sphericity Assumed',
+                        r['sse'],' - ',r['dfe'],r['mse'],
+                        '','','','','','','',''])
+                        
+                    if sphericity_test_filter is None or sphericity_test_filter == 'gg':
+                        error.append([(src, '')[sphericity_test_filter is None], 'Greenhouse-Geisser',
+                        r['sse'],r['eps_gg'],r['dfe_gg'],r['mse_gg'],
+                        '','','','','','','',''])
+                        
+                    if sphericity_test_filter is None or sphericity_test_filter == 'hf':
+                        error.append([(src, '')[sphericity_test_filter is None], 'Huynh-Feldt',
+                        r['sse'],r['eps_hf'],r['dfe_hf'],r['mse_hf'],
+                        '','','','','','','',''])
+                        
+                    if sphericity_test_filter is None or sphericity_test_filter == 'lb':
+                        error.append([(src, '')[sphericity_test_filter is None], 'Box',
+                        r['sse'],r['eps_lb'],r['dfe_lb'],r['mse_lb'],
+                        '','','','','','','',''])
+
+                    row = []
+                    nrows = len(error)
+                    for i in _range(14):
+                        row.append('\n'.join(_str(error[j][i])
+                                            for j in _range(nrows)))
+                    tt.add_row(row)
+
+            s.append(tt.draw())
+
         return ''.join(s)
     
     def _within_str(self):
         factors=self.wfactors
+        sphericity_test_filter = self.sphericity_test_filter
         
         s = ['\n\nTESTS OF WITHIN SUBJECTS EFFECTS\n\n']
         
-        # Write ANOVA 
-        if self.measure=='':
-            s.append('Measure: %s\n'%self.dv)
-        else:
-            s.append('Measure: %s of %s\n'%(self.dv,self.measure))
-
-        tt = TextTable(max_width=0)
-        tt.set_cols_dtype(['t']*2 + ['a']*12)
-        tt.set_cols_align(['l']*2 + ['r']*12)
-        tt.set_deco(TextTable.HEADER | TextTable.HLINES)
-        tt.header('Source,,Type III\nSS,eps,df,MS,F,Sig.,'
-                  'et2_G,Obs.,'
-                  'SE,95% CI,lambda,Obs.\nPower'.split(','))
-        
+        has_sig_effect = False
         for i in range(1,len(factors)+1):
             for efs in _xunique_combinations(factors, i):
-                treatment = []
-                r=self[tuple(efs)]
-                src=' *\n'.join(efs)
-                treatment.append([src,'Sphericity Assumed',
-                   r['ss'],' - ',r['df'],r['mss'],r['F'],r['p'],
-                   r['eta'],r['obs'],r['se'],
-                   r['ci'],r['lambda'],r['power']])
-                treatment.append(['', 'Greenhouse-Geisser',
-                   r['ss'],r['eps_gg'],r['df_gg'],r['mss_gg'],r['F_gg'],
-                   r['p_gg'],r['eta'],r['obs_gg'],r['se_gg'],
-                   r['ci_gg'],r['lambda_gg'],r['power_gg']])
-                treatment.append(['', 'Huynh-Feldt',
-                   r['ss'],r['eps_hf'],r['df_hf'],r['mss_hf'],r['F_hf'],
-                   r['p_hf'],r['eta'],r['obs_hf'],r['se_hf'],
-                   r['ci_hf'],r['lambda_hf'],r['power_hf']])
-                treatment.append(['', 'Box',
-                   r['ss'],r['eps_lb'],r['df_lb'],r['mss_lb'],r['F_lb'],
-                   r['p_lb'],r['eta'],r['obs_lb'],r['se_lb'],
-                   r['ci_lb'],r['lambda_lb'],r['power_lb']])
+                if tuple(efs) not in self:
+                    continue
 
-                row = []
-                for i in _range(14):
-                    row.append('\n'.join(_str(treatment[j][i])
-                                         for j in _range(4)))
-                tt.add_row(row)
+                if 'p' in self[tuple(efs)]:
+                    has_sig_effect = True
+                    break
 
-                error = []
-                src='Error(%s)'%src
-                error.append([src,'Sphericity Assumed',
-                   r['sse'],' - ',r['dfe'],r['mse'],
-                   '','','','','','','',''])
-                error.append(['', 'Greenhouse-Geisser',
-                   r['sse'],r['eps_gg'],r['dfe_gg'],r['mse_gg'],
-                   '','','','','','','',''])
-                error.append(['', 'Huynh-Feldt',
-                   r['sse'],r['eps_hf'],r['dfe_hf'],r['mse_hf'],
-                   '','','','','','','',''])
-                error.append(['', 'Box',
-                   r['sse'],r['eps_lb'],r['dfe_lb'],r['mse_lb'],
-                   '','','','','','','',''])
+        if not has_sig_effect:
+            s.append('Measure: %s - No Significant Effects or Interactions'%self.dv)
+        else:
+            # Write ANOVA 
+            if self.measure=='':
+                s.append('Measure: %s\n'%self.dv)
+            else:
+                s.append('Measure: %s of %s\n'%(self.dv,self.measure))
 
-                row = []
-                for i in _range(14):
-                    row.append('\n'.join(_str(error[j][i])
-                                         for j in _range(4)))
-                tt.add_row(row)
+            tt = TextTable(max_width=0)
+            tt.set_cols_dtype(['t']*2 + ['a']*12)
+            tt.set_cols_align(['l']*2 + ['r']*12)
+            tt.set_deco(TextTable.HEADER | TextTable.HLINES)
+            tt.header('Source,,Type III\nSS,eps,df,MS,F,Sig.,'
+                    'et2_G,Obs.,'
+                    'SE,95% CI,lambda,Obs.\nPower'.split(','))
+            
+            for i in range(1,len(factors)+1):
+                for efs in _xunique_combinations(factors, i):
+                    if tuple(efs) not in self:
+                        continue
+                    
+                    treatment = []
+                    r=self[tuple(efs)]
+                    src=' *\n'.join(efs)
 
-        s.append(tt.draw())
+                    if sphericity_test_filter is None or sphericity_test_filter == '':
+                        treatment.append([src,'Sphericity Assumed',
+                        r['ss'],' - ',r['df'],r['mss'],r['F'],r['p'],
+                        r['eta'],r['obs'],r['se'],
+                        r['ci'],r['lambda'],r['power']])
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'gg':
+                        treatment.append([(src, '')[sphericity_test_filter is None], 'Greenhouse-Geisser',
+                        r['ss'],r['eps_gg'],r['df_gg'],r['mss_gg'],r['F_gg'],
+                        r['p_gg'],r['eta'],r['obs_gg'],r['se_gg'],
+                        r['ci_gg'],r['lambda_gg'],r['power_gg']])
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'hf':
+                        treatment.append([(src, '')[sphericity_test_filter is None], 'Huynh-Feldt',
+                        r['ss'],r['eps_hf'],r['df_hf'],r['mss_hf'],r['F_hf'],
+                        r['p_hf'],r['eta'],r['obs_hf'],r['se_hf'],
+                        r['ci_hf'],r['lambda_hf'],r['power_hf']])
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'lb':
+                        treatment.append([(src, '')[sphericity_test_filter is None], 'Box',
+                        r['ss'],r['eps_lb'],r['df_lb'],r['mss_lb'],r['F_lb'],
+                        r['p_lb'],r['eta'],r['obs_lb'],r['se_lb'],
+                        r['ci_lb'],r['lambda_lb'],r['power_lb']])
+
+                    row = []
+                    nrows = len(treatment)
+                    for i in _range(14):
+                        row.append('\n'.join(_str(treatment[j][i])
+                                            for j in _range(nrows)))
+                    tt.add_row(row)
+
+                    error = []
+                    src='Error(%s)'%src
+
+                    if sphericity_test_filter is None or sphericity_test_filter == '':
+                        error.append([src,'Sphericity Assumed',
+                        r['sse'],' - ',r['dfe'],r['mse'],
+                        '','','','','','','',''])
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'gg':
+                        error.append([(src, '')[sphericity_test_filter is None], 'Greenhouse-Geisser',
+                        r['sse'],r['eps_gg'],r['dfe_gg'],r['mse_gg'],
+                        '','','','','','','',''])
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'hf':
+                        error.append([(src, '')[sphericity_test_filter is None], 'Huynh-Feldt',
+                        r['sse'],r['eps_hf'],r['dfe_hf'],r['mse_hf'],
+                        '','','','','','','',''])
+
+                    if sphericity_test_filter is None or sphericity_test_filter == 'lb':
+                        error.append([(src, '')[sphericity_test_filter is None], 'Box',
+                        r['sse'],r['eps_lb'],r['dfe_lb'],r['mse_lb'],
+                        '','','','','','','',''])
+
+                    row = []
+                    nrows = len(error)
+                    for i in _range(14):
+                        row.append('\n'.join(_str(error[j][i])
+                                            for j in _range(nrows)))
+                    tt.add_row(row)
+
+            s.append(tt.draw())
 
         return ''.join(s)
 
@@ -1892,10 +2115,6 @@ class Anova(OrderedDict):
                 height=1000.
                 width=height*(imw*1./imh*1.)
 
-##            # if this is the first plot write 'Summary Plots' header
-##            if self.plots==[]:
-##                html.add(h(a('Summary Plots',name='1_'+md5sum('Summary Plots')),2,'center'))
-##
             # Build title
             txt=['Summary Plot of %s ~ %s'%(val, xaxis)]
             if seplines!=''  : txt.append(' * %s'%seplines)
@@ -1903,18 +2122,6 @@ class Anova(OrderedDict):
             if sepyplots!='' : txt.append(' * %s'%sepyplots)
             txt=''.join(txt)
 
-##            html.add(br(1))
-##            html.add(h(a(txt,name='2_'+md5sum(txt))))
-##
-##            if yerr!=None:
-##            
-##                if errorbars=='ci':
-##                    html.add(p('Using Greenhouse-Geisser CI from %s of %f'%(efs,yerr)))
-##                elif errorbars=='se':
-##                    html.add(p('Using Greenhouse-Geisser SE from %s of %f'%(efs,yerr)))
-##
-##                
-##            html.add(a(img(fname,width=int(width),height=int(height)),href=fname))
             self.plots.append(txt)
 
     def __repr__(self):
@@ -1954,42 +2161,3 @@ class Anova(OrderedDict):
         kwds= ''.join(kwds)
         
         return 'Anova(%s%s)'%(args,kwds)
-
-#### Within-Subjects test
-##df=DataFrame()
-##fname='error~subjectXtimeofdayXcourseXmodel.csv'
-##df.read_tbl(fname)
-##aov=Anova()
-##aov.run(df,'ERROR',wfactors=['TIMEOFDAY','COURSE','MODEL'])#,transform='windsor05')
-##aov.output2html(fname[:-4]+'RESULTS.htm')
-##print(aov)
-##
-##
-#### Between-Subjects test w/ transform
-##df=DataFrame()
-##fname='words~ageXcondition.csv'
-##df.read_tbl(fname)
-##aov=Anova()
-##aov.run(df,'WORDS',bfactors=['AGE','CONDITION'],transform='windsor05')
-##aov.output2html('WINDSOR05_'+fname[:-4]+'RESULTS.htm')
-##
-##
-#### Between-Subjects test
-##df=DataFrame()
-##fname='words~ageXcondition.csv'
-##df.read_tbl(fname)
-##aov=Anova()
-##aov.run(df,'WORDS',bfactors=['AGE','CONDITION'])
-##aov.output2html(fname[:-4]+'RESULTS.htm')
-##
-##
-#### Mixed Between/Within test
-##df=DataFrame()
-##fname='suppression~subjectXgroupXcycleXphase.csv'
-##df.read_tbl(fname)
-##df['SUPPRESSION']=[.01*x for x in df['SUPPRESSION']]
-##aov=Anova()
-##aov.run(df,'SUPPRESSION',wfactors=['CYCLE','PHASE'],bfactors=['GROUP'])#,transform='windsor01')
-##aov.plot('SUPPRESSION','CYCLE',seplines='PHASE',quality='high')
-##aov.plot('SUPPRESSION','CYCLE',seplines='PHASE',sepyplots='GROUP',quality='high')
-##aov.output2html(fname[:-4]+'RESULTS.htm')                
