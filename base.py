@@ -22,6 +22,14 @@ from . import plotting
 # this file is a bit long but they can't be split without
 # running into circular import complications
 
+def float_try_parse(x):
+    try:
+        v = float(x)
+    except:
+        v = float('nan')
+    return v
+
+
 class DataFrame(OrderedDict):
     """holds the data in a dummy-coded group format"""
     def __init__(self, *args, **kwds):
@@ -998,7 +1006,7 @@ class DataFrame(OrderedDict):
                                 mask[-1].append([True])
                             elif val_type == 'real' or val_type == 'integer':
                                 split =cell.split(',')
-                                data[-1].append([float(v) for v in  split])
+                                data[-1].append([float_try_parse(v) for v in  split])
                                 mask[-1].append([False for j in range(len(split))])
                             else:
                                 split =cell.split(',')
